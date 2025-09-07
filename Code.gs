@@ -1,6 +1,6 @@
 // --- ค่าที่ต้องตั้ง ---
-const FOLDER_ID = 'ใส่ ID ของโฟลเดอร์ที่คุณคัดลอกไว้ที่นี่'; // <-- ตรวจสอบว่า ID ถูกต้อง
-const SHEET_NAME = 'Sheet1';
+const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec'; // <-- ตรวจสอบว่า ID ถูกต้อง
+const SHEET_NAME = 'data';
 // --------------------
 
 /**
@@ -52,8 +52,17 @@ function doGet(e) {
  */
 function getLatestMedia() {
   const allMedia = getMediaData();
+  
+  // กรองข้อมูลเฉพาะรายการที่มี 'วันที่อัปโหลด' ที่ถูกต้อง
+  const validMedia = allMedia.filter(item => {
+    const date = item['วันที่อัปโหลด'];
+    // ตรวจสอบว่าค่าวันที่ไม่ใช่ค่าว่างและสามารถแปลงเป็น Date object ที่ถูกต้องได้
+    return date && !isNaN(new Date(date).getTime());
+  });
+
   // เรียงลำดับข้อมูลตาม 'วันที่อัปโหลด' จากใหม่สุดไปเก่าสุด
-  const sortedMedia = allMedia.sort((a, b) => new Date(b['วันที่อัปโหลด']) - new Date(a['วันที่อัปโหลด']));
+  const sortedMedia = validMedia.sort((a, b) => new Date(b['วันที่อัปโหลด']) - new Date(a['วันที่อัปโหลด']));
+  
   // คืนค่ากลับไปแค่ 4 รายการแรก
   return sortedMedia.slice(0, 4);
 }
@@ -169,5 +178,4 @@ function getExistingFileIds_(sheet) {
   const values = range.getValues().flat().filter(String);
   return new Set(values);
 }
-
 
