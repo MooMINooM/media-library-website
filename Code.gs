@@ -4,23 +4,21 @@ const SHEET_NAME = 'data';
 // --------------------
 
 /**
- * สร้างเมนูบน Google Sheets
+ * สร้างเมนูบน Google Sheets (ถูกปิดการใช้งานชั่วคราว)
  */
+/*
 function onOpen() {
   SpreadsheetApp.getUi()
       .createMenu('เมนูคลังสื่อ')
       .addItem('ซิงค์ข้อมูลไฟล์จาก Drive', 'syncMediaFilesToSheet')
       .addToUi();
 }
+*/
 
 /**
  * Handles GET requests. Serves the HTML app or returns JSON data for API calls.
- * นี่คือฟังก์ชันที่แก้ไขใหม่ให้ทำงานเป็น API ได้
- * @param {Object} e - Event parameter.
- * @returns {HtmlOutput|ContentService.TextOutput} The HTML output or JSON data.
  */
 function doGet(e) {
-  // ตรวจสอบว่ามีการร้องขอข้อมูลแบบ API หรือไม่ (ผ่าน parameter ชื่อ 'action')
   if (e.parameter.action) {
     let output;
     let action = e.parameter.action;
@@ -29,18 +27,16 @@ function doGet(e) {
       output = getMediaData();
     } else if (action === 'getFilters') {
       output = getUniqueFilterValues();
-    } else if (action === 'getLatestMedia') { // --- เพิ่ม action ใหม่ ---
+    } else if (action === 'getLatestMedia') {
       output = getLatestMedia();
     } else {
       output = { error: 'Invalid action specified.' };
     }
     
-    // ส่งข้อมูลกลับไปในรูปแบบ JSON
     return ContentService.createTextOutput(JSON.stringify(output))
       .setMimeType(ContentService.MimeType.JSON);
   }
   
-  // ถ้าไม่มีการร้องขอแบบ API ก็ให้แสดงหน้าเว็บแอปตามปกติ (สำหรับทดสอบ)
   return HtmlService.createTemplateFromFile('WebApp').evaluate()
       .setTitle('คลังสื่อดิจิทัล')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
@@ -48,29 +44,25 @@ function doGet(e) {
 
 /**
  * ฟังก์ชันสำหรับดึงข้อมูลสื่อ 4 รายการล่าสุด
- * @returns {Array} ข้อมูลสื่อ 4 รายการล่าสุด
  */
 function getLatestMedia() {
   const allMedia = getMediaData();
   
-  // กรองข้อมูลเฉพาะรายการที่มี 'วันที่อัปโหลด' ที่ถูกต้อง
+  // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
   const validMedia = allMedia.filter(item => {
-    const date = item['วันที่อัปโหลด'];
-    // ตรวจสอบว่าค่าวันที่ไม่ใช่ค่าว่างและสามารถแปลงเป็น Date object ที่ถูกต้องได้
+    const date = item['UploadDate'];
     return date && !isNaN(new Date(date).getTime());
   });
 
-  // เรียงลำดับข้อมูลตาม 'วันที่อัปโหลด' จากใหม่สุดไปเก่าสุด
-  const sortedMedia = validMedia.sort((a, b) => new Date(b['วันที่อัปโหลด']) - new Date(a['วันที่อัปโหลด']));
+  // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
+  const sortedMedia = validMedia.sort((a, b) => new Date(b['UploadDate']) - new Date(a['UploadDate']));
   
-  // คืนค่ากลับไปแค่ 4 รายการแรก
   return sortedMedia.slice(0, 4);
 }
 
 
 /**
- * ฟังก์ชันสำหรับให้ฝั่ง Client (JavaScript) เรียกใช้เพื่อดึงข้อมูลสื่อทั้งหมดจาก Sheet
- * @returns {Array<Object>} ข้อมูลสื่อในรูปแบบ Array ของ Object
+ * ดึงข้อมูลสื่อทั้งหมดจาก Sheet
  */
 function getMediaData() {
   try {
@@ -78,17 +70,27 @@ function getMediaData() {
     const range = sheet.getDataRange();
     const values = range.getValues();
     
-    const headers = values.shift(); // เอาแถวแรก (หัวข้อ) ออกมาเก็บ
+    const headers = values.shift(); 
     
-    // แปลงข้อมูลจาก Array 2 มิติ เป็น Array ของ Object เพื่อให้ใช้ง่ายใน JavaScript
     const data = values.map(row => {
       const mediaObject = {};
       headers.forEach((header, index) => {
-        // แปลงวันที่เป็น ISO String เพื่อให้จัดการง่าย
-        if (header === 'วันที่อัปโหลด' && row[index] instanceof Date) {
+        // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
+        if (header === 'UploadDate' && row[index] instanceof Date) {
           mediaObject[header] = row[index].toISOString();
         } else {
-          mediaObject[header] = row[index];
+          // เปลี่ยนชื่อคอลัมน์ภาษาไทยในโค้ดเก่า ให้ตรงกับข้อมูลที่ส่งไปหน้าเว็บ
+          let key = header;
+          if (header === 'Title') key = 'ชื่อสื่อ';
+          if (header === 'Description') key = 'คำอธิบาย';
+          if (header === 'Category') key = 'ประเภทสื่อ (วิชา)';
+          if (header === 'Grade') key = 'ระดับชั้น';
+          if (header === 'Creator') key = 'ผู้สร้าง';
+          if (header === 'CoverImageURL') key = 'รูปปกสื่อ';
+          if (header === 'FileLink') key = 'ลิงก์ดูไฟล์';
+          if (header === 'UploadDate') key = 'วันที่อัปโหลด';
+          
+          mediaObject[key] = row[index];
         }
       });
       return mediaObject;
@@ -97,20 +99,20 @@ function getMediaData() {
     return data;
   } catch (error) {
     console.error("Error in getMediaData:", error);
-    return []; // คืนค่าเป็น Array ว่างถ้าเกิดข้อผิดพลาด
+    return [];
   }
 }
 
 /**
- * ดึงค่าที่ไม่ซ้ำกันสำหรับใช้สร้าง Filter (เช่น วิชา, ระดับชั้น)
- * @returns {Object} ออบเจ็กต์ที่มีรายการวิชาและระดับชั้นที่ไม่ซ้ำกัน
+ * ดึงค่าที่ไม่ซ้ำกันสำหรับใช้สร้าง Filter
  */
 function getUniqueFilterValues() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     
-    const subjectIndex = headers.indexOf('ประเภทสื่อ (วิชา)') + 1;
-    const gradeIndex = headers.indexOf('ระดับชั้น') + 1;
+    // FIX: ใช้ชื่อคอลัมน์ภาษาอังกฤษ
+    const subjectIndex = headers.indexOf('Category') + 1;
+    const gradeIndex = headers.indexOf('Grade') + 1;
 
     if (subjectIndex === 0 || gradeIndex === 0) {
         return { subjects: [], grades: [] };
@@ -129,8 +131,11 @@ function getUniqueFilterValues() {
 
 
 /**
- * ฟังก์ชันหลักสำหรับซิงค์ข้อมูลไฟล์จาก Google Drive ไปยัง Google Sheets
+ * ฟังก์ชันซิงค์ไฟล์ (ถูกปิดการใช้งานชั่วคราว)
+ * เนื่องจากโครงสร้างคอลัมน์ใน Sheet ไม่ตรงกับที่ฟังก์ชันนี้คาดหวัง
+ * การเปิดใช้งานอาจทำให้ข้อมูลเรียงผิดเพี้ยน
  */
+/*
 function syncMediaFilesToSheet() {
   try {
     const folder = DriveApp.getFolderById(FOLDER_ID);
@@ -167,10 +172,6 @@ function syncMediaFilesToSheet() {
   }
 }
 
-/**
- * ฟังก์ชันเสริม: ดึง ID ของไฟล์ทั้งหมดที่มีอยู่แล้วในชีต
- * @returns {Set<string>} ชุดข้อมูลของ File ID ที่ไม่ซ้ำกัน
- */
 function getExistingFileIds_(sheet) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return new Set();
@@ -178,4 +179,7 @@ function getExistingFileIds_(sheet) {
   const values = range.getValues().flat().filter(String);
   return new Set(values);
 }
+*/
+
+
 
