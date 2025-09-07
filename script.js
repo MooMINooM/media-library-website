@@ -73,7 +73,7 @@ function setupEventListeners() {
 
 // --- Data Fetching ---
 async function fetchData() {
-    if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec') {
+    if (!SCRIPT_URL || SCRIPT_URL === 'วาง URL ของเว็บแอปจาก Apps Script ที่นี่') {
          showError({ message: 'กรุณาตั้งค่า SCRIPT_URL ในไฟล์ script.js ก่อน' });
          return;
     }
