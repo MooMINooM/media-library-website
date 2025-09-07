@@ -49,6 +49,21 @@
         </a>
     </main>
 
+    <!-- Latest Media Section -->
+    <section id="latest-media" class="py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-8 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">สื่อแนะนำล่าสุด</h2>
+            <p class="text-gray-600 mb-12">สำรวจสื่อใหม่ๆ ที่เพิ่งเพิ่มเข้ามาในคลังของเรา</p>
+            <div id="latest-media-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Loading placeholders -->
+                <div class="animate-pulse bg-gray-200 rounded-xl h-80"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-80"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-80 hidden sm:block"></div>
+                <div class="animate-pulse bg-gray-200 rounded-xl h-80 hidden lg:block"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="bg-white py-6 border-t">
         <div class="container mx-auto text-center text-gray-500">
@@ -57,7 +72,7 @@
     </footer>
 
     <script>
-        // Script สำหรับควบคุม Dropdown Menu บนหน้า Welcome
+        // Script for Dropdown Menu
         const menuDropdownBtn = document.getElementById('menu-dropdown-btn');
         const menuDropdown = document.getElementById('menu-dropdown');
         const menuDropdownIcon = menuDropdownBtn.querySelector('i');
@@ -74,6 +89,58 @@
                 menuDropdownIcon.classList.remove('rotate-180');
             }
         });
+
+        // Script for Fetching Latest Media
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec';
+        const latestMediaContainer = document.getElementById('latest-media-container');
+
+        async function fetchLatestMedia() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getLatestMedia`);
+                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลล่าสุดได้');
+                
+                const latestMedia = await response.json();
+                latestMediaContainer.innerHTML = ''; // Clear placeholders
+
+                // --- FIX START ---
+                // Add a check to ensure latestMedia is an array before using forEach
+                if (Array.isArray(latestMedia)) {
+                    if (latestMedia.length === 0) {
+                        latestMediaContainer.innerHTML = '<p class="col-span-full text-gray-500">ยังไม่มีสื่อใหม่ในขณะนี้</p>';
+                        return;
+                    }
+
+                    latestMedia.forEach(media => {
+                        const card = document.createElement('a');
+                        card.href = `library.html`; // ลิงก์ไปหน้าคลังสื่อ
+                        card.className = 'media-card bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 block text-left';
+                        
+                        const coverImage = media['รูปปกสื่อ'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=ไม่มีรูปภาพ';
+
+                        card.innerHTML = `
+                            <img src="${coverImage}" alt="${media['ชื่อสื่อ']}" class="w-full h-48 object-cover">
+                            <div class="p-5">
+                                <div class="flex flex-wrap gap-2 mb-2">
+                                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200">${media['ประเภทสื่อ (วิชา)'] || 'ไม่ระบุ'}</span>
+                                </div>
+                                <h3 class="text-lg font-bold mb-2 truncate" title="${media['ชื่อสื่อ']}">${media['ชื่อสื่อ']}</h3>
+                            </div>
+                        `;
+                        latestMediaContainer.appendChild(card);
+                    });
+                } else {
+                    // If the data is not an array, throw an error.
+                    throw new Error('ข้อมูลที่ได้รับจากเซิร์ฟเวอร์ไม่อยู่ในรูปแบบที่ถูกต้อง');
+                }
+                // --- FIX END ---
+
+            } catch (error) {
+                latestMediaContainer.innerHTML = `<p class="col-span-full text-red-500">เกิดข้อผิดพลาด: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+        
+        window.addEventListener('load', fetchLatestMedia);
     </script>
 </body>
 </html>
