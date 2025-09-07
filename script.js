@@ -1,4 +1,8 @@
 let allMedia = [];
+const ITEMS_PER_PAGE = 12; // กำหนดให้แสดงผลครั้งละ 12 รายการ
+let currentFilteredItems = []; // รายการสื่อที่ผ่านการกรองแล้ว
+let itemsCurrentlyShown = 0; // จำนวนสื่อที่แสดงผลอยู่บนหน้าจอ
+
 // =================================================================
 //  สำคัญ! ตรวจสอบว่า URL นี้ถูกต้อง
 // =================================================================
@@ -11,35 +15,65 @@ const mediaCardsContainer = document.getElementById('media-cards');
 const modal = document.getElementById('media-modal');
 const modalContent = document.getElementById('modal-content');
 const closeModalBtn = document.getElementById('close-modal-btn');
+const backToTopBtn = document.getElementById('back-to-top');
+const copyLinkBtn = document.getElementById('copy-link-btn');
+const loadMoreContainer = document.getElementById('load-more-container');
+const loadMoreBtn = document.getElementById('load-more-btn');
+// -- Elements ใหม่สำหรับ Dropdown --
+const menuDropdownBtn = document.getElementById('menu-dropdown-btn');
+const menuDropdown = document.getElementById('menu-dropdown');
+const menuDropdownIcon = menuDropdownBtn.querySelector('i');
+
 
 // --- Event Listeners ---
-window.onload = () => {
+window.addEventListener('load', () => {
     fetchData();
+    setupEventListeners();
+});
+
+window.addEventListener('scroll', handleScroll);
+
+// -- Listener ใหม่สำหรับปิด Dropdown เมื่อคลิกที่อื่น --
+window.addEventListener('click', (event) => {
+    if (!menuDropdownBtn.contains(event.target)) {
+        menuDropdown.classList.add('hidden');
+        menuDropdownIcon.classList.remove('rotate-180');
+    }
+});
+
+
+function setupEventListeners() {
     document.getElementById('search').addEventListener('input', applyFilters);
     document.getElementById('subject-filter').addEventListener('change', applyFilters);
     document.getElementById('grade-filter').addEventListener('change', applyFilters);
 
-    // Modal Listeners
     closeModalBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Close if clicked on the background overlay
-            closeModal();
-        }
+        if (e.target === modal) closeModal();
     });
 
-    // Listen for clicks on cards using event delegation
     mediaCardsContainer.addEventListener('click', (e) => {
         const card = e.target.closest('.media-card');
         if (card) {
-            const fileId = card.dataset.fileId;
-            openModal(fileId);
+            openModal(card.dataset.fileId);
         }
     });
-};
+
+    backToTopBtn.addEventListener('click', scrollToTop);
+    copyLinkBtn.addEventListener('click', copyModalLink);
+    loadMoreBtn.addEventListener('click', displayMoreMedia);
+
+    // -- Listener ใหม่สำหรับปุ่ม Dropdown --
+    menuDropdownBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // ป้องกันไม่ให้ event click นี้ลอยไปถึง window
+        menuDropdown.classList.toggle('hidden');
+        menuDropdownIcon.classList.toggle('rotate-180');
+    });
+}
 
 // --- Data Fetching ---
 async function fetchData() {
-    if (!SCRIPT_URL || SCRIPT_URL === 'วาง URL ของเว็บแอปจาก Apps Script ที่นี่') {
+    if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec') {
          showError({ message: 'กรุณาตั้งค่า SCRIPT_URL ในไฟล์ script.js ก่อน' });
          return;
     }
@@ -56,7 +90,7 @@ async function fetchData() {
         
         allMedia = mediaData;
         populateFilters(filterData);
-        displayMedia(allMedia);
+        applyFilters(); // เรียกใช้ applyFilters เพื่อแสดงผลข้อมูลชุดแรก
     } catch (error) {
         showError(error);
     } finally {
@@ -73,13 +107,11 @@ function populateFilters(filters) {
 }
 
 // --- Display Logic ---
-function displayMedia(mediaList) {
+function displayMoreMedia() {
     const container = document.getElementById('media-cards');
-    const noResults = document.getElementById('no-results');
-    container.innerHTML = '';
-    noResults.classList.toggle('hidden', mediaList.length > 0);
+    const itemsToDisplay = currentFilteredItems.slice(itemsCurrentlyShown, itemsCurrentlyShown + ITEMS_PER_PAGE);
 
-    mediaList.forEach(media => {
+    itemsToDisplay.forEach(media => {
         const card = document.createElement('div');
         card.className = 'media-card bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 cursor-pointer';
         card.dataset.fileId = media['File ID'];
@@ -99,6 +131,15 @@ function displayMedia(mediaList) {
         `;
         container.appendChild(card);
     });
+
+    itemsCurrentlyShown += itemsToDisplay.length;
+
+    // ตรวจสอบเพื่อซ่อนหรือแสดงปุ่ม "โหลดเพิ่มเติม"
+    if (itemsCurrentlyShown >= currentFilteredItems.length) {
+        loadMoreContainer.classList.add('hidden');
+    } else {
+        loadMoreContainer.classList.remove('hidden');
+    }
 }
 
 // --- Filtering Logic ---
@@ -107,12 +148,19 @@ function applyFilters() {
     const selectedSubject = document.getElementById('subject-filter').value;
     const selectedGrade = document.getElementById('grade-filter').value;
 
-    const filteredMedia = allMedia.filter(media => 
+    currentFilteredItems = allMedia.filter(media => 
         (!searchTerm || media['ชื่อสื่อ'].toLowerCase().includes(searchTerm)) &&
         (!selectedSubject || media['ประเภทสื่อ (วิชา)'] === selectedSubject) &&
         (!selectedGrade || media['ระดับชั้น'] === selectedGrade)
     );
-    displayMedia(filteredMedia);
+    
+    // Reset การแสดงผลทั้งหมดก่อนเริ่มใหม่
+    mediaCardsContainer.innerHTML = '';
+    itemsCurrentlyShown = 0;
+    
+    document.getElementById('no-results').classList.toggle('hidden', currentFilteredItems.length > 0);
+
+    displayMoreMedia(); // แสดงข้อมูลชุดแรก
 }
 
 // --- Modal Logic ---
@@ -128,6 +176,8 @@ function openModal(fileId) {
     document.getElementById('modal-date').textContent = new Date(media['วันที่อัปโหลด']).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
     document.getElementById('modal-description').textContent = media['คำอธิบาย'] || 'ไม่มีคำอธิบาย';
     document.getElementById('modal-link').href = media['ลิงก์ดูไฟล์'];
+
+    copyLinkBtn.innerHTML = '<i class="fas fa-copy mr-2"></i> คัดลอกลิงก์';
 
     document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
@@ -146,9 +196,39 @@ function closeModal() {
     }, 300);
 }
 
+// --- Feature Logic ---
+function handleScroll() {
+    if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+}
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+function copyModalLink() {
+    const link = document.getElementById('modal-link').href;
+    navigator.clipboard.writeText(link).then(() => {
+        copyLinkBtn.innerHTML = '<i class="fas fa-check mr-2"></i> คัดลอกแล้ว!';
+        setTimeout(() => {
+            copyLinkBtn.innerHTML = '<i class="fas fa-copy mr-2"></i> คัดลอกลิงก์';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+
+// --- Utility Functions ---
 function showError(error) {
     console.error('Error:', error);
     const loader = document.getElementById('loader');
     loader.style.display = 'block';
     loader.innerHTML = `<p class="text-red-500 font-bold">เกิดข้อผิดพลาด: ${error.message}</p><p class="text-sm text-gray-600 mt-2">โปรดตรวจสอบว่าคุณได้ใส่ URL ของเว็บแอปถูกต้องแล้ว และได้ Deploy สคริปต์เวอร์ชันล่าสุดแล้ว</p>`;
 }
+
