@@ -1,6 +1,6 @@
 // --- ค่าที่ต้องตั้ง ---
-const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec'; // <-- ตรวจสอบว่า ID ถูกต้อง
-const SHEET_NAME = 'data';
+const FOLDER_ID = 'ใส่ ID ของโฟลเดอร์ที่คุณคัดลอกไว้ที่นี่'; // <-- ตรวจสอบว่า ID ถูกต้อง
+const SHEET_NAME = 'Sheet1';
 // --------------------
 
 /**
