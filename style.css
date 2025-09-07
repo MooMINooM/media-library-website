@@ -1,5 +1,6 @@
 body {
     font-family: 'Sarabun', sans-serif;
+    scroll-behavior: smooth; /* Makes scrolling smooth for back-to-top */
 }
 
 .card-container {
@@ -8,7 +9,6 @@ body {
     gap: 1.5rem;
 }
 
-/* Added for Modal transitions */
 .modal {
     transition: opacity 0.3s ease;
 }
@@ -16,3 +16,51 @@ body {
 .modal-content {
     transition: transform 0.3s ease;
 }
+
+/* New styles for Back to Top Button */
+#back-to-top {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+#back-to-top.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === เพิ่มโค้ดส่วนนี้เข้าไป === */
+/* Hero Section for Welcome Page */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 150px); /* Viewport height minus navbar and footer */
+    padding: 2rem;
+    background-color: #f9fafb; /* bg-gray-50 */
+}
+
+.hero-button {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 2.5rem; /* mt-10 */
+    padding: 0.875rem 2.5rem; /* py-3.5 px-10 */
+    font-size: 1.125rem; /* lg */
+    font-weight: 700; /* bold */
+    color: white;
+    background-color: #4f46e5; /* indigo-600 */
+    border-radius: 0.5rem; /* rounded-lg */
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.hero-button:hover {
+    background-color: #4338ca; /* indigo-700 */
+    transform: translateY(-2px);
+    box-shadow: 0 7px 10px rgba(0,0,0,0.1);
+}
+/* ======================== */
+
