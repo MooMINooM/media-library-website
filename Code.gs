@@ -2,6 +2,10 @@
 const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec'; // <-- ตรวจสอบว่า ID ถูกต้อง
 const SHEET_NAME = 'data';
 // --------------------
+// --- ค่าที่ต้องตั้ง ---
+const FOLDER_ID = 'ใส่ ID ของโฟลเดอร์ที่คุณคัดลอกไว้ที่นี่'; // <-- ตรวจสอบว่า ID ถูกต้อง
+const SHEET_NAME = 'Sheet1'; // <-- ตรวจสอบว่าชื่อชีตถูกต้อง
+// --------------------
 
 /**
  * สร้างเมนูบน Google Sheets (ถูกปิดการใช้งานชั่วคราว)
@@ -48,14 +52,14 @@ function doGet(e) {
 function getLatestMedia() {
   const allMedia = getMediaData();
   
-  // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
+  // FIX: แก้ไขให้ใช้ key 'วันที่อัปโหลด' (ภาษาไทย) ให้สอดคล้องกัน
   const validMedia = allMedia.filter(item => {
-    const date = item['UploadDate'];
+    const date = item['วันที่อัปโหลด'];
     return date && !isNaN(new Date(date).getTime());
   });
 
-  // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
-  const sortedMedia = validMedia.sort((a, b) => new Date(b['UploadDate']) - new Date(a['UploadDate']));
+  // FIX: แก้ไขให้ใช้ key 'วันที่อัปโหลด' (ภาษาไทย) ให้สอดคล้องกัน
+  const sortedMedia = validMedia.sort((a, b) => new Date(b['วันที่อัปโหลด']) - new Date(a['วันที่อัปโหลด']));
   
   return sortedMedia.slice(0, 4);
 }
@@ -75,23 +79,24 @@ function getMediaData() {
     const data = values.map(row => {
       const mediaObject = {};
       headers.forEach((header, index) => {
-        // FIX: ใช้ชื่อคอลัมน์ 'UploadDate' ที่เป็นภาษาอังกฤษ
-        if (header === 'UploadDate' && row[index] instanceof Date) {
-          mediaObject[header] = row[index].toISOString();
-        } else {
-          // เปลี่ยนชื่อคอลัมน์ภาษาไทยในโค้ดเก่า ให้ตรงกับข้อมูลที่ส่งไปหน้าเว็บ
-          let key = header;
-          if (header === 'Title') key = 'ชื่อสื่อ';
-          if (header === 'Description') key = 'คำอธิบาย';
-          if (header === 'Category') key = 'ประเภทสื่อ (วิชา)';
-          if (header === 'Grade') key = 'ระดับชั้น';
-          if (header === 'Creator') key = 'ผู้สร้าง';
-          if (header === 'CoverImageURL') key = 'รูปปกสื่อ';
-          if (header === 'FileLink') key = 'ลิงก์ดูไฟล์';
-          if (header === 'UploadDate') key = 'วันที่อัปโหลด';
-          
-          mediaObject[key] = row[index];
+        // FIX: ปรับปรุง Logic การแปลงชื่อ key ให้ถูกต้องและสอดคล้องกัน
+        let key = header;
+        if (header === 'Title') key = 'ชื่อสื่อ';
+        else if (header === 'Description') key = 'คำอธิบาย';
+        else if (header === 'Category') key = 'ประเภทสื่อ (วิชา)';
+        else if (header === 'Grade') key = 'ระดับชั้น';
+        else if (header === 'Creator') key = 'ผู้สร้าง';
+        else if (header === 'CoverImageURL') key = 'รูปปกสื่อ';
+        else if (header === 'FileLink') key = 'ลิงก์ดูไฟล์';
+        else if (header === 'UploadDate') key = 'วันที่อัปโหลด';
+
+        let value = row[index];
+        // แปลง Date object เป็น string มาตรฐาน
+        if (header === 'UploadDate' && value instanceof Date) {
+          value = value.toISOString();
         }
+        
+        mediaObject[key] = value;
       });
       return mediaObject;
     });
@@ -110,7 +115,7 @@ function getUniqueFilterValues() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     
-    // FIX: ใช้ชื่อคอลัมน์ภาษาอังกฤษ
+    // FIX: ใช้ชื่อคอลัมน์ภาษาอังกฤษตามไฟล์ Sheet
     const subjectIndex = headers.indexOf('Category') + 1;
     const gradeIndex = headers.indexOf('Grade') + 1;
 
@@ -180,6 +185,4 @@ function getExistingFileIds_(sheet) {
   return new Set(values);
 }
 */
-
-
 
