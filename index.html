@@ -21,14 +21,28 @@
     <nav class="bg-white shadow-md sticky top-0 z-20">
         <div class="container mx-auto px-4 md:px-8">
             <div class="flex justify-between items-center py-4">
+                <!-- Brand Logo/Name -->
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-book-open text-indigo-600 text-2xl"></i>
                     <a href="#" class="text-xl font-bold text-gray-800">คลังสื่อดิจิทัล</a>
                 </div>
-                <!-- สามารถเพิ่มลิงก์เมนูอื่นๆ ที่นี่ในอนาคต -->
-                <!-- <div class="hidden md:flex items-center space-x-4">
-                    <a href="#" class="text-gray-600 hover:text-indigo-600">เกี่ยวกับเรา</a>
-                </div> -->
+
+                <!-- Dropdown Menu -->
+                <div class="relative" id="menu-dropdown-container">
+                    <button id="menu-dropdown-btn" class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 focus:outline-none p-2 rounded-md">
+                        <span>เมนู</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30 ring-1 ring-black ring-opacity-5">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                            <i class="fas fa-photo-video w-4 mr-2"></i>หน้าคลังสื่อ
+                        </a>
+                        <!-- สามารถเพิ่มลิงก์เมนูอื่นๆ ที่นี่ในอนาคต -->
+                        <!-- <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
+                            <i class="fas fa-info-circle w-4 mr-2"></i>เกี่ยวกับเรา
+                        </a> -->
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -127,5 +141,4 @@
     <script src="script.js"></script>
 </body>
 </html>
-
 
