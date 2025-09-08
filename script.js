@@ -72,11 +72,6 @@ function formatDate(dateString) {
 
 // --- Data Fetching ---
 async function fetchData() {
-    if (!SCRIPT_URL || SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec') {
-        showError('เกิดข้อผิดพลาด: กรุณาตั้งค่า SCRIPT_URL ในไฟล์ script.js ก่อน\nโปรดตรวจสอบว่าคุณได้ใส่ URL ของเว็บแอปถูกต้องแล้ว และได้ Deploy สคริปต์เวอร์ชันล่าสุดแล้ว');
-        return;
-    }
-    
     try {
         if(loader) loader.style.display = 'block';
         if(errorMessage) errorMessage.style.display = 'none';
