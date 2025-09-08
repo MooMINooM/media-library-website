@@ -142,10 +142,10 @@ function displayMediaPage(page) {
             const card = document.createElement('div');
             card.className = 'bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer';
             card.innerHTML = `
-                <img src="${item['รูปปกสื่อ'] || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'}" alt="${item['ชื่อสื่อ']}" class="w-full h-40 object-cover">
+                <img src="${item['CoverImageURL'] || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'}" alt="${item['Title']}" class="w-full h-40 object-cover">
                 <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 truncate">${item['ชื่อสื่อ']}</h3>
-                    <p class="text-sm text-gray-600 mt-1">${item['ประเภทสื่อ (วิชา)'] || 'ไม่ระบุ'}</p>
+                    <h3 class="text-lg font-semibold text-gray-800 truncate">${item['Title']}</h3>
+                    <p class="text-sm text-gray-600 mt-1">${item['Category'] || 'ไม่ระบุ'}</p>
                 </div>
             `;
             card.addEventListener('click', () => openModal(item));
@@ -169,9 +169,9 @@ function applyFilters() {
     const selectedGrade = gradeFilter.value;
 
     filteredMedia = allMedia.filter(item => {
-        const titleMatch = item['ชื่อสื่อ']?.toLowerCase().includes(searchTerm) ?? true;
-        const subjectMatch = !selectedSubject || item['ประเภทสื่อ (วิชา)'] === selectedSubject;
-        const gradeMatch = !selectedGrade || item['ระดับชั้น'] === selectedGrade;
+        const titleMatch = item['Title']?.toLowerCase().includes(searchTerm) ?? true;
+        const subjectMatch = !selectedSubject || item['Category'] === selectedSubject;
+        const gradeMatch = !selectedGrade || item['Grade'] === selectedGrade;
         return titleMatch && subjectMatch && gradeMatch;
     });
 
@@ -181,17 +181,17 @@ function applyFilters() {
 // --- Modal Logic ---
 function openModal(item) {
     if (!modal) return;
-    modalTitle.textContent = item['ชื่อสื่อ'] || 'ไม่มีชื่อ';
-    modalCover.src = item['รูปปกสื่อ'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
-    modalDescription.textContent = item['คำอธิบาย'] || 'ไม่มีคำอธิบาย';
-    modalCreator.textContent = item['ผู้สร้าง'] || 'ไม่ระบุ';
-    modalSubject.textContent = item['ประเภทสื่อ (วิชา)'] || 'ไม่ระบุ';
-    modalGrade.textContent = item['ระดับชั้น'] || 'ไม่ระบุ';
-    modalUploadDate.textContent = formatDate(item['วันที่อัปโหลด']);
-    modalOpenFile.href = item['ลิงก์ดูไฟล์'] || '#';
+    modalTitle.textContent = item['Title'] || 'ไม่มีชื่อ';
+    modalCover.src = item['CoverImageURL'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
+    modalDescription.textContent = item['Description'] || 'ไม่มีคำอธิบาย';
+    modalCreator.textContent = item['Creator'] || 'ไม่ระบุ';
+    modalSubject.textContent = item['Category'] || 'ไม่ระบุ';
+    modalGrade.textContent = item['Grade'] || 'ไม่ระบุ';
+    modalUploadDate.textContent = formatDate(item['UploadDate']);
+    modalOpenFile.href = item['FileLink'] || '#';
     
     modalCopyLink.onclick = () => {
-        navigator.clipboard.writeText(item['ลิงก์ดูไฟล์'] || '').then(() => {
+        navigator.clipboard.writeText(item['FileLink'] || '').then(() => {
             modalCopyLink.textContent = 'คัดลอกแล้ว!';
             setTimeout(() => { modalCopyLink.textContent = 'คัดลอกลิงก์'; }, 2000);
         });
