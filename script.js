@@ -70,6 +70,29 @@ function formatDate(dateString) {
     });
 }
 
+/**
+ * แปลง URL ของ Google Drive ให้อยู่ในรูปแบบที่แสดงภาพได้โดยตรง
+ * @param {string} url - URL ดั้งเดิมจาก Google Sheets
+ * @returns {string} - URL ที่แปลงแล้ว หรือ URL เดิมถ้าไม่ใช่ลิงก์ Drive
+ */
+function transformGoogleDriveImageUrl(url) {
+    if (typeof url !== 'string' || !url) {
+        return '';
+    }
+    // Regex เพื่อดึง ID ของไฟล์จากลิงก์ Google Drive
+    const regex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+    const match = url.match(regex);
+
+    if (match && match[1]) {
+        const fileId = match[1];
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+
+    // ถ้าไม่ใช่ลิงก์ Google Drive ก็ให้คืนค่าเดิมกลับไป
+    return url;
+}
+
+
 // --- Data Fetching ---
 async function fetchData() {
     try {
@@ -141,8 +164,12 @@ function displayMediaPage(page) {
         mediaToDisplay.forEach(item => {
             const card = document.createElement('div');
             card.className = 'bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer';
+            
+            // แปลง URL ก่อนนำไปใช้
+            const imageUrl = transformGoogleDriveImageUrl(item['CoverImageURL']) || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+
             card.innerHTML = `
-                <img src="${item['CoverImageURL'] || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'}" 
+                <img src="${imageUrl}" 
                      onerror="this.onerror=null;this.src='https://placehold.co/400x300/e2e8f0/64748b?text=Invalid+Image';"
                      alt="${item['Title']}" class="w-full h-40 object-cover">
                 <div class="p-4">
@@ -185,8 +212,9 @@ function openModal(item) {
     if (!modal) return;
     modalTitle.textContent = item['Title'] || 'ไม่มีชื่อ';
     
-    // ตั้งค่ารูปภาพใน Modal พร้อมจัดการ Error
-    modalCover.src = item['CoverImageURL'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
+    // ตั้งค่ารูปภาพใน Modal พร้อมแปลง URL และจัดการ Error
+    const modalImageUrl = transformGoogleDriveImageUrl(item['CoverImageURL']) || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
+    modalCover.src = modalImageUrl;
     modalCover.onerror = () => {
         modalCover.onerror = null; // ป้องกันการวนลูปถ้า placeholder ก็เสีย
         modalCover.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Invalid+Image';
