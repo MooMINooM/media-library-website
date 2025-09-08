@@ -1,6 +1,6 @@
 // --- ค่าที่ต้องตั้ง ---
-const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec'; // <-- ตรวจสอบว่า ID ถูกต้อง
-const SHEET_NAME = 'data'; // <-- ตรวจสอบว่าชื่อชีตถูกต้อง
+// !!! สำคัญ: โปรดตรวจสอบว่าชื่อชีตของคุณตรงกับ 'Sheet1' หรือไม่ ถ้าไม่ตรงให้แก้ไขให้ถูกต้อง !!!
+const SHEET_NAME = 'data'; 
 // --------------------
 
 /**
@@ -87,7 +87,8 @@ function getUniqueFilterValues() {
     const uniqueGrades = [...new Set(grades)].sort();
     
     return { subjects: uniqueSubjects, grades: uniqueGrades };
-  } catch (error) {
+  } catch (error)
+ {
     console.error("Error in getUniqueFilterValues:", error);
     return { error: "Failed to get filter values", details: error.message };
   }
