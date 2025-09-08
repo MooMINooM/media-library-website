@@ -1,66 +1,40 @@
+/* General Body Styles */
 body {
-    font-family: 'Sarabun', sans-serif;
-    scroll-behavior: smooth; /* Makes scrolling smooth for back-to-top */
+    font-family: 'Sarabun', 'Inter', sans-serif;
+    scroll-behavior: smooth;
 }
 
-.card-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.modal {
-    transition: opacity 0.3s ease;
-}
-
-.modal-content {
-    transition: transform 0.3s ease;
-}
-
-/* New styles for Back to Top Button */
-#back-to-top {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-#back-to-top.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* === เพิ่มโค้ดส่วนนี้เข้าไป === */
-/* Hero Section for Welcome Page */
+/* Hero Section Styles */
 .hero-section {
+    background-color: #f0f4ff; /* A light, welcoming blue */
+    padding: 6rem 1rem;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    min-height: calc(100vh - 150px); /* Viewport height minus navbar and footer */
-    padding: 2rem;
-    background-color: #f9fafb; /* bg-gray-50 */
-}
-
-.hero-button {
-    display: inline-flex;
     align-items: center;
-    margin-top: 2.5rem; /* mt-10 */
-    padding: 0.875rem 2.5rem; /* py-3.5 px-10 */
-    font-size: 1.125rem; /* lg */
-    font-weight: 700; /* bold */
-    color: white;
-    background-color: #4f46e5; /* indigo-600 */
-    border-radius: 0.5rem; /* rounded-lg */
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-height: calc(100vh - 11rem); /* Full height minus navbar and footer */
 }
 
-.hero-button:hover {
-    background-color: #4338ca; /* indigo-700 */
-    transform: translateY(-2px);
-    box-shadow: 0 7px 10px rgba(0,0,0,0.1);
+/* Back to Top Button */
+#back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4f46e5;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-/* ======================== */
+
+#back-to-top:hover {
+    background-color: #4338ca;
+    transform: scale(1.1);
+}
 
