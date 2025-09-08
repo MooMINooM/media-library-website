@@ -142,7 +142,9 @@ function displayMediaPage(page) {
             const card = document.createElement('div');
             card.className = 'bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer';
             card.innerHTML = `
-                <img src="${item['CoverImageURL'] || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'}" alt="${item['Title']}" class="w-full h-40 object-cover">
+                <img src="${item['CoverImageURL'] || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'}" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/400x300/e2e8f0/64748b?text=Invalid+Image';"
+                     alt="${item['Title']}" class="w-full h-40 object-cover">
                 <div class="p-4">
                     <h3 class="text-lg font-semibold text-gray-800 truncate">${item['Title']}</h3>
                     <p class="text-sm text-gray-600 mt-1">${item['Category'] || 'ไม่ระบุ'}</p>
@@ -182,7 +184,14 @@ function applyFilters() {
 function openModal(item) {
     if (!modal) return;
     modalTitle.textContent = item['Title'] || 'ไม่มีชื่อ';
+    
+    // ตั้งค่ารูปภาพใน Modal พร้อมจัดการ Error
     modalCover.src = item['CoverImageURL'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
+    modalCover.onerror = () => {
+        modalCover.onerror = null; // ป้องกันการวนลูปถ้า placeholder ก็เสีย
+        modalCover.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Invalid+Image';
+    };
+
     modalDescription.textContent = item['Description'] || 'ไม่มีคำอธิบาย';
     modalCreator.textContent = item['Creator'] || 'ไม่ระบุ';
     modalSubject.textContent = item['Category'] || 'ไม่ระบุ';
