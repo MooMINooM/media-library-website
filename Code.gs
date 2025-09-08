@@ -3,6 +3,7 @@ const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS
 const SHEET_NAME = 'data';
 // --------------------
 
+
 /**
  * Handles GET requests. Serves the HTML app or returns JSON data for API calls.
  */
@@ -15,8 +16,6 @@ function doGet(e) {
       output = getMediaData();
     } else if (action === 'getFilters') {
       output = getUniqueFilterValues();
-    } else if (action === 'getLatestMedia') {
-      output = getLatestMedia();
     } else {
       output = { error: 'Invalid action specified.' };
     }
@@ -25,52 +24,28 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
   
+  // Note: This part is for the Apps Script Web App, not the Netlify site.
+  // It is kept for direct testing purposes.
   return HtmlService.createTemplateFromFile('WebApp').evaluate()
       .setTitle('คลังสื่อดิจิทัล')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
 
 /**
- * ฟังก์ชันสำหรับดึงข้อมูลสื่อ 4 รายการล่าสุด
- */
-function getLatestMedia() {
-  const allMedia = getMediaData();
-  const validMedia = allMedia.filter(item => {
-    const date = item['วันที่อัปโหลด'];
-    return date && !isNaN(new Date(date).getTime());
-  });
-  const sortedMedia = validMedia.sort((a, b) => new Date(b['วันที่อัปโหลด']) - new Date(a['วันที่อัปโหลด']));
-  return sortedMedia.slice(0, 4);
-}
-
-
-/**
- * ดึงข้อมูลสื่อทั้งหมดจาก Sheet (พร้อม Debugging Logs)
+ * ดึงข้อมูลสื่อทั้งหมดจาก Sheet
  */
 function getMediaData() {
   try {
-    Logger.log("--- เริ่มการทำงานของ getMediaData ---");
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-    
-    if (!sheet) {
-      Logger.log("!!! ข้อผิดพลาด: ไม่พบชีตชื่อ '" + SHEET_NAME + "'");
-      return [];
-    }
-    Logger.log("เจอชีตแล้ว: " + sheet.getName());
+    if (!sheet) return [];
 
     const range = sheet.getDataRange();
     const values = range.getValues();
-    Logger.log("จำนวนแถวทั้งหมดที่พบ (รวมหัวข้อ): " + values.length);
-    
-    if (values.length < 2) {
-      Logger.log("ไม่พบข้อมูล (มีแค่แถวหัวข้อหรือว่างเปล่า)");
-      return [];
-    }
+    if (values.length < 2) return [];
 
     const headers = values.shift(); 
-    Logger.log("หัวข้อคอลัมน์ที่พบ: " + headers.join(", "));
     
-    const data = values.map((row, rowIndex) => {
+    const data = values.map(row => {
       const mediaObject = {};
       headers.forEach((header, index) => {
         let key = header;
@@ -87,22 +62,14 @@ function getMediaData() {
         if (header === 'UploadDate' && value instanceof Date) {
           value = value.toISOString();
         }
+        
         mediaObject[key] = value;
       });
-
-      // จะแสดง Log แค่ข้อมูลแถวแรกเพื่อไม่ให้ยาวเกินไป
-      if (rowIndex === 0) {
-        Logger.log("ตัวอย่างข้อมูลแถวแรกที่ประมวลผลเสร็จ: " + JSON.stringify(mediaObject));
-      }
       return mediaObject;
     });
     
-    Logger.log("ประมวลผลข้อมูลสำเร็จ " + data.length + " รายการ");
-    Logger.log("--- จบการทำงานของ getMediaData ---");
     return data;
-
   } catch (error) {
-    Logger.log("!!! เกิดข้อผิดพลาดร้ายแรงใน getMediaData: " + error.toString());
     console.error("Error in getMediaData:", error);
     return [];
   }
@@ -114,6 +81,7 @@ function getMediaData() {
 function getUniqueFilterValues() {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    
     const subjectIndex = headers.indexOf('Category') + 1;
     const gradeIndex = headers.indexOf('Grade') + 1;
 
@@ -122,6 +90,7 @@ function getUniqueFilterValues() {
     }
     
     const lastRow = sheet.getLastRow();
+    
     const subjects = (lastRow > 1) ? sheet.getRange(2, subjectIndex, lastRow - 1).getValues().flat().filter(Boolean) : [];
     const grades = (lastRow > 1) ? sheet.getRange(2, gradeIndex, lastRow - 1).getValues().flat().filter(Boolean) : [];
     
@@ -130,3 +99,4 @@ function getUniqueFilterValues() {
     
     return { subjects: uniqueSubjects, grades: uniqueGrades };
 }
+
