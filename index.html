@@ -3,144 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ยินดีต้อนรับ - คลังสื่อดิจิทัล</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
-
-    <link rel="stylesheet" href="style.css">
-    
+    <title>คลังสื่อการเรียนรู้</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 font-sans">
 
     <!-- Navigation Bar -->
-    <nav class="bg-white shadow-md sticky top-0 z-20">
-        <div class="container mx-auto px-4 md:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-book-open text-indigo-600 text-2xl"></i>
-                    <a href="#" class="text-xl font-bold text-gray-800">คลังสื่อดิจิทัล</a>
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 text-2xl font-bold text-indigo-600 flex items-center">
+                        <span class="mr-2">📚</span>
+                        <span>คลังความรู้</span>
+                    </a>
                 </div>
-                <div class="relative" id="menu-dropdown-container">
-                    <button id="menu-dropdown-btn" class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 focus:outline-none p-2 rounded-md">
-                        <span>เมนู</span>
-                        <i class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
-                    </button>
-                    <div id="menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30 ring-1 ring-black ring-opacity-5">
-                        <a href="library.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-indigo-600">
-                            <i class="fas fa-photo-video w-4 mr-2"></i>ไปที่คลังสื่อ
-                        </a>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">หน้าแรก</a>
+                        <a href="library.html" class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">คลังสื่อ</a>
                     </div>
                 </div>
+                <div class="-mr-2 flex md:hidden">
+                    <!-- Mobile menu button -->
+                    <button type="button" id="mobile-menu-button" class="bg-gray-200 inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">หน้าแรก</a>
+                <a href="library.html" class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">คลังสื่อ</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <main class="hero-section">
-        <h1 class="text-5xl md:text-7xl font-extrabold text-gray-800 tracking-tight">ยินดีต้อนรับ</h1>
-        <p class="mt-6 text-lg md:text-xl max-w-2xl text-gray-600">
-            แหล่งรวบรวมสื่อการเรียนรู้ดิจิทัลที่ทันสมัยและครบวงจร ออกแบบมาเพื่อสนับสนุนการศึกษาในทุกระดับชั้น
-        </p>
-        <a href="library.html" class="hero-button">
-            เข้าสู่คลังสื่อ <i class="fas fa-arrow-right ml-2"></i>
-        </a>
-    </main>
-
-    <!-- Latest Media Section -->
-    <section id="latest-media" class="py-16 bg-white">
-        <div class="container mx-auto px-4 md:px-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">สื่อแนะนำล่าสุด</h2>
-            <p class="text-gray-600 mb-12">สำรวจสื่อใหม่ๆ ที่เพิ่งเพิ่มเข้ามาในคลังของเรา</p>
-            <div id="latest-media-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Loading placeholders -->
-                <div class="animate-pulse bg-gray-200 rounded-xl h-80"></div>
-                <div class="animate-pulse bg-gray-200 rounded-xl h-80"></div>
-                <div class="animate-pulse bg-gray-200 rounded-xl h-80 hidden sm:block"></div>
-                <div class="animate-pulse bg-gray-200 rounded-xl h-80 hidden lg:block"></div>
+    <main>
+        <div class="hero-section">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
+                    ยินดีต้อนรับสู่คลังสื่อการเรียนรู้
+                </h1>
+                <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
+                    แหล่งรวบรวมสื่อการสอนคุณภาพสำหรับครูและนักเรียน
+                </p>
+                <div class="mt-8">
+                    <a href="library.html" class="inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
+                        เข้าสู่คลังสื่อ
+                    </a>
+                </div>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-white py-6 border-t">
-        <div class="container mx-auto text-center text-gray-500">
-            <p>&copy; 2025 คลังสื่อดิจิทัล. พัฒนาเพื่อการศึกษา.</p>
+    <footer class="bg-white">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                &copy; 2025 คลังสื่อการเรียนรู้. สงวนลิขสิทธิ์.
+            </p>
         </div>
     </footer>
 
     <script>
-        // Script for Dropdown Menu
-        const menuDropdownBtn = document.getElementById('menu-dropdown-btn');
-        const menuDropdown = document.getElementById('menu-dropdown');
-        const menuDropdownIcon = menuDropdownBtn.querySelector('i');
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const openIcon = mobileMenuButton.querySelector('svg:first-child');
+        const closeIcon = mobileMenuButton.querySelector('svg:last-child');
 
-        menuDropdownBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            menuDropdown.classList.toggle('hidden');
-            menuDropdownIcon.classList.toggle('rotate-180');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            openIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
         });
-
-        window.addEventListener('click', (event) => {
-            if (!menuDropdownBtn.contains(event.target)) {
-                menuDropdown.classList.add('hidden');
-                menuDropdownIcon.classList.remove('rotate-180');
-            }
-        });
-
-        // Script for Fetching Latest Media
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec';
-        const latestMediaContainer = document.getElementById('latest-media-container');
-
-        async function fetchLatestMedia() {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=getLatestMedia`);
-                if (!response.ok) throw new Error('ไม่สามารถโหลดข้อมูลล่าสุดได้');
-                
-                const latestMedia = await response.json();
-                latestMediaContainer.innerHTML = ''; // Clear placeholders
-
-                // --- FIX START ---
-                // Add a check to ensure latestMedia is an array before using forEach
-                if (Array.isArray(latestMedia)) {
-                    if (latestMedia.length === 0) {
-                        latestMediaContainer.innerHTML = '<p class="col-span-full text-gray-500">ยังไม่มีสื่อใหม่ในขณะนี้</p>';
-                        return;
-                    }
-
-                    latestMedia.forEach(media => {
-                        const card = document.createElement('a');
-                        card.href = `library.html`; // ลิงก์ไปหน้าคลังสื่อ
-                        card.className = 'media-card bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 block text-left';
-                        
-                        const coverImage = media['รูปปกสื่อ'] || 'https://placehold.co/600x400/e2e8f0/64748b?text=ไม่มีรูปภาพ';
-
-                        card.innerHTML = `
-                            <img src="${coverImage}" alt="${media['ชื่อสื่อ']}" class="w-full h-48 object-cover">
-                            <div class="p-5">
-                                <div class="flex flex-wrap gap-2 mb-2">
-                                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200">${media['ประเภทสื่อ (วิชา)'] || 'ไม่ระบุ'}</span>
-                                </div>
-                                <h3 class="text-lg font-bold mb-2 truncate" title="${media['ชื่อสื่อ']}">${media['ชื่อสื่อ']}</h3>
-                            </div>
-                        `;
-                        latestMediaContainer.appendChild(card);
-                    });
-                } else {
-                    // If the data is not an array, throw an error.
-                    throw new Error('ข้อมูลที่ได้รับจากเซิร์ฟเวอร์ไม่อยู่ในรูปแบบที่ถูกต้อง');
-                }
-                // --- FIX END ---
-
-            } catch (error) {
-                latestMediaContainer.innerHTML = `<p class="col-span-full text-red-500">เกิดข้อผิดพลาด: ${error.message}</p>`;
-                console.error(error);
-            }
-        }
-        
-        window.addEventListener('load', fetchLatestMedia);
     </script>
 </body>
 </html>
