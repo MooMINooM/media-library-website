@@ -1,17 +1,15 @@
 // --- ค่าที่ต้องตั้ง ---
 const FOLDER_ID = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec'; // <-- ตรวจสอบว่า ID ถูกต้อง
-const SHEET_NAME = 'data';
+const SHEET_NAME = 'data'; // <-- ตรวจสอบว่าชื่อชีตถูกต้อง
 // --------------------
 
-
 /**
- * Handles GET requests. Serves the HTML app or returns JSON data for API calls.
+ * Handles GET requests. Returns JSON data for API calls.
  */
 function doGet(e) {
+  let output;
   if (e.parameter.action) {
-    let output;
-    let action = e.parameter.action;
-
+    const action = e.parameter.action;
     if (action === 'getMediaData') {
       output = getMediaData();
     } else if (action === 'getFilters') {
@@ -19,20 +17,16 @@ function doGet(e) {
     } else {
       output = { error: 'Invalid action specified.' };
     }
-    
-    return ContentService.createTextOutput(JSON.stringify(output))
-      .setMimeType(ContentService.MimeType.JSON);
+  } else {
+    output = { error: 'No action specified.' };
   }
   
-  // Note: This part is for the Apps Script Web App, not the Netlify site.
-  // It is kept for direct testing purposes.
-  return HtmlService.createTemplateFromFile('WebApp').evaluate()
-      .setTitle('คลังสื่อดิจิทัล')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+  return ContentService.createTextOutput(JSON.stringify(output))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
- * ดึงข้อมูลสื่อทั้งหมดจาก Sheet
+ * ดึงข้อมูลสื่อทั้งหมดจาก Sheet และส่งกลับเป็น JSON object โดยใช้ Header เดิมเป็น Key
  */
 function getMediaData() {
   try {
@@ -43,27 +37,19 @@ function getMediaData() {
     const values = range.getValues();
     if (values.length < 2) return [];
 
-    const headers = values.shift(); 
+    const headers = values.shift(); // ดึง Header ออกมาจากแถวแรก
     
+    // แปลงข้อมูลแต่ละแถวให้เป็น Object โดยใช้ Header เป็น Key
     const data = values.map(row => {
       const mediaObject = {};
       headers.forEach((header, index) => {
-        let key = header;
-        if (header === 'Title') key = 'ชื่อสื่อ';
-        else if (header === 'Description') key = 'คำอธิบาย';
-        else if (header === 'Category') key = 'ประเภทสื่อ (วิชา)';
-        else if (header === 'Grade') key = 'ระดับชั้น';
-        else if (header === 'Creator') key = 'ผู้สร้าง';
-        else if (header === 'CoverImageURL') key = 'รูปปกสื่อ';
-        else if (header === 'FileLink') key = 'ลิงก์ดูไฟล์';
-        else if (header === 'UploadDate') key = 'วันที่อัปโหลด';
-
         let value = row[index];
-        if (header === 'UploadDate' && value instanceof Date) {
-          value = value.toISOString();
+        if (value instanceof Date) {
+          // แปลงข้อมูลวันที่ให้เป็นรูปแบบมาตรฐาน ISO String
+          mediaObject[header] = value.toISOString();
+        } else {
+          mediaObject[header] = value;
         }
-        
-        mediaObject[key] = value;
       });
       return mediaObject;
     });
@@ -71,7 +57,7 @@ function getMediaData() {
     return data;
   } catch (error) {
     console.error("Error in getMediaData:", error);
-    return [];
+    return { error: "Failed to get media data", details: error.message };
   }
 }
 
@@ -79,7 +65,10 @@ function getMediaData() {
  * ดึงค่าที่ไม่ซ้ำกันสำหรับใช้สร้าง Filter
  */
 function getUniqueFilterValues() {
+  try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+    if (!sheet) return { subjects: [], grades: [] };
+
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     
     const subjectIndex = headers.indexOf('Category') + 1;
@@ -98,5 +87,9 @@ function getUniqueFilterValues() {
     const uniqueGrades = [...new Set(grades)].sort();
     
     return { subjects: uniqueSubjects, grades: uniqueGrades };
+  } catch (error) {
+    console.error("Error in getUniqueFilterValues:", error);
+    return { error: "Failed to get filter values", details: error.message };
+  }
 }
 
