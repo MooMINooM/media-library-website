@@ -24,22 +24,5 @@ body {
     transition: opacity 0.3s ease;
 }
 
-/* 🌟 NEW: Dropdown Styles 🌟 */
-.dropdown {
-    @apply relative;
-}
-
-.dropdown-toggle {
-    @apply inline-flex items-center;
-}
-
-.dropdown-menu {
-    @apply absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50;
-    /* transition for smooth appearance */
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-}
-
-.dropdown-item {
-    @apply block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800;
-}
+/* 🌟 REMOVED: Dropdown styles are now directly in index.html 🌟 */
 
