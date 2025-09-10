@@ -14,6 +14,32 @@ body {
     font-weight: bold;
 }
 
+/* --- สไตล์หน้ารายละเอียดข่าว --- */
+.news-detail-container img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+.news-detail-container h1 {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: bold;
+    color: #1E293B; /* text-slate-800 */
+    margin-bottom: 0.5rem;
+}
+.news-detail-container .news-date {
+    color: #64748B; /* text-slate-500 */
+    margin-bottom: 1.5rem;
+}
+.news-detail-container .news-full-content {
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.75; /* leading-loose */
+    color: #334155; /* text-slate-700 */
+}
+/* ----------------------------- */
+
+
 /* สไตล์สำหรับการ์ดบุคลากร */
 .personnel-card {
     background-color: white;
@@ -77,6 +103,7 @@ body {
     text-decoration: none;
     margin-top: 1rem;
     align-self: flex-start;
+    cursor: pointer; /* ทำให้ดูเหมือนกดได้ */
 }
 .news-card a:hover {
     text-decoration: underline;
