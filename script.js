@@ -4,9 +4,14 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unp
 // ---------------------------------------------------------
 
 
+// --- Global Variables ---
+let personnelDataCache = []; // Cache to store personnel data
+
+
 // --- MAIN SETUP ---
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
+    setupModal();
     showPage('home'); 
 });
 
@@ -40,47 +45,99 @@ function showPage(pageId) {
         }
     });
 
-    // --- Load data for the specific page ---
     if (pageId === 'personnel') {
         loadPersonnelData();
     }
 }
 
+// --- 🌟 NEW: MODAL (POP-UP) SYSTEM 🌟 ---
+function setupModal() {
+    const modal = document.getElementById('personnel-modal');
+    const closeBtn = document.getElementById('modal-close-btn');
+
+    // Close modal when close button is clicked
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Close modal when clicking on the background overlay
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+}
+
+function showPersonnelModal(person) {
+    const modal = document.getElementById('personnel-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+    const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+    
+    const educationList = person.education 
+        ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') 
+        : '<li>-</li>';
+
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <img 
+                src="${imageUrl}" 
+                alt="รูปภาพของ ${person.name}" 
+                class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3>
+            <p class="text-gray-600 text-lg">${person.role || '-'}</p>
+            <p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p>
+        </div>
+        <hr class="my-4">
+        <div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start">
+            <strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong>
+            <ul class="text-gray-500 list-disc list-inside">
+                ${educationList}
+            </ul>
+            
+            <strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong>
+            <span class="text-gray-500">${person.class || '-'}</span>
+
+            <strong class="text-gray-600 text-right">โทร:</strong>
+            <span class="text-gray-500">${person.tel || '-'}</span>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
 
 // --- UTILITY FUNCTION ---
-/**
- * แปลงลิงก์ Google Drive sharing URL ให้เป็น Direct Image URL (เวอร์ชันปรับปรุง)
- * @param {string} url - The original Google Drive URL
- * @returns {string} The direct image URL
- */
 function getDirectGoogleDriveUrl(url) {
-    if (!url || !url.includes('drive.google.com')) {
-        return url; 
-    }
+    if (!url || !url.includes('drive.google.com')) return url;
     try {
-        // รองรับลิงก์ทั้งแบบ /d/ และ /file/d/
         const parts = url.split('/');
         const idIndex = parts.findIndex(part => part === 'd') + 1;
         if (idIndex > 0 && idIndex < parts.length) {
             const fileId = parts[idIndex];
             return `https://drive.google.com/uc?export=view&id=${fileId}`;
         }
-        throw new Error("File ID not found in URL structure.");
+        return url;
     } catch (e) {
-        console.error("Could not parse Google Drive URL:", url, e);
-        return url; // ถ้าแปลงไม่ได้ ให้ใช้ลิงก์เดิมไปก่อน
+        return url;
     }
 }
 
-
 // --- PERSONNEL PAGE ---
 async function loadPersonnelData() {
-    const container = document.getElementById('personnel-container');
+    // Use cache if available to avoid re-fetching
+    if (personnelDataCache.length > 0) {
+        renderPersonnelList(personnelDataCache);
+        return;
+    }
+    
+    const listContainer = document.getElementById('personnel-list');
     const loadingEl = document.getElementById('personnel-loading');
 
     loadingEl.classList.remove('hidden');
-    container.innerHTML = ''; 
-    container.appendChild(loadingEl);
+    listContainer.innerHTML = '';
     
     try {
         if (!API_URL || API_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
@@ -90,11 +147,10 @@ async function loadPersonnelData() {
         const response = await fetch(`${API_URL}?sheet=personnel`);
         const result = await response.json();
 
-        if (result.error) {
-            throw new Error(result.error);
-        }
+        if (result.error) throw new Error(result.error);
         
-        renderPersonnel(result.data);
+        personnelDataCache = result.data; // Save to cache
+        renderPersonnelList(personnelDataCache);
 
     } catch (error) {
         console.error('Error loading personnel data:', error);
@@ -102,56 +158,39 @@ async function loadPersonnelData() {
     }
 }
 
-function renderPersonnel(personnelList) {
-    const container = document.getElementById('personnel-container');
+function renderPersonnelList(personnelList) {
+    const listContainer = document.getElementById('personnel-list');
     const loadingEl = document.getElementById('personnel-loading');
     
     loadingEl.classList.add('hidden');
-    container.innerHTML = '';
+    listContainer.innerHTML = '';
 
     if (!personnelList || personnelList.length === 0) {
-        container.innerHTML = '<p class="col-span-full text-center text-gray-500">ไม่พบข้อมูลบุคลากร</p>';
+        listContainer.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลบุคลากร</p>';
         return;
     }
 
-    personnelList.forEach(person => {
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md p-4 text-center transform hover:scale-105 transition-transform duration-300 flex flex-col';
+    personnelList.forEach((person, index) => {
+        const listItem = document.createElement('a');
+        listItem.href = '#';
+        listItem.className = 'block bg-gray-50 p-3 rounded-lg hover:bg-blue-100 transition-colors duration-200';
+        listItem.dataset.index = index; // Use index as identifier
         
-        const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
-        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-        
-        const educationList = person.education 
-            ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') 
-            : '<li>-</li>';
-
-        card.innerHTML = `
-            <div class="flex-grow">
-                <img 
-                    src="${finalImageUrl}" 
-                    alt="รูปภาพของ ${person.name}" 
-                    class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100"
-                    onerror="this.onerror=null; this.src='${errorImageUrl}';"
-                >
-                <h3 class="text-lg font-bold text-blue-800">${person.name || 'N/A'}</h3>
-                <p class="text-gray-600">${person.role || '-'}</p>
-                <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
-            </div>
-            <hr class="my-3">
-            <div class="text-xs text-left grid grid-cols-[auto_1fr] gap-x-2 items-start">
-                <strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong>
-                <ul class="text-gray-500 list-disc list-inside">
-                    ${educationList}
-                </ul>
-                
-                <strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong>
-                <span class="text-gray-500">${person.class || '-'}</span>
-
-                <strong class="text-gray-600 text-right">โทร:</strong>
-                <span class="text-gray-500">${person.tel || '-'}</span>
-            </div>
+        listItem.innerHTML = `
+            <h4 class="font-bold text-blue-800">${person.name || 'N/A'}</h4>
+            <p class="text-sm text-gray-600">${person.role || '-'}</p>
         `;
-        container.appendChild(card);
+
+        listItem.addEventListener('click', (e) => {
+            e.preventDefault();
+            const clickedIndex = e.currentTarget.dataset.index;
+            const selectedPerson = personnelDataCache[clickedIndex];
+            if(selectedPerson) {
+                showPersonnelModal(selectedPerson);
+            }
+        });
+
+        listContainer.appendChild(listItem);
     });
 }
 
