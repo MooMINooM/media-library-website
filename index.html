@@ -8,10 +8,8 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- เปลี่ยนฟอนต์เป็น Sarabun -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<!-- เปลี่ยนคลาส font ที่ body -->
 <body class="font-sarabun bg-gray-100">
 
     <!-- ส่วนหัวของเว็บ (Header) - ใช้ร่วมกันทุกหน้า -->
@@ -47,47 +45,19 @@
         <!-- =================== หน้าบุคลากร =================== -->
         <section id="page-personnel" class="page-content hidden">
             <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">คณะผู้บริหารและบุคลากร</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- ตัวอย่างการ์ดบุคลากร -->
-                <div class="bg-white text-center rounded-lg shadow-md p-6">
-                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-xl text-gray-800">นายสมชาย ใจดี</h3>
-                    <p class="text-gray-500">ผู้อำนวยการโรงเรียน</p>
-                </div>
-                <div class="bg-white text-center rounded-lg shadow-md p-6">
-                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-xl text-gray-800">นางสาวสมศรี มีสุข</h3>
-                    <p class="text-gray-500">รองผู้อำนวยการฝ่ายวิชาการ</p>
-                </div>
-                <div class="bg-white text-center rounded-lg shadow-md p-6">
-                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-xl text-gray-800">นายชาตรี รักเรียน</h3>
-                    <p class="text-gray-500">หัวหน้ากลุ่มสาระฯ วิทยาศาสตร์</p>
-                </div>
-                 <div class="bg-white text-center rounded-lg shadow-md p-6">
-                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
-                    <h3 class="font-bold text-xl text-gray-800">นางสาวมณีวรรณ สอนดี</h3>
-                    <p class="text-gray-500">หัวหน้ากลุ่มสาระฯ ภาษาไทย</p>
-                </div>
-                <!-- เพิ่มการ์ดบุคลากรคนอื่นๆ ที่นี่ -->
+            <!-- เนื้อหาบุคลากรจะถูกเติมโดย JavaScript -->
+            <div id="personnel-list-container" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <p class="text-center text-gray-500 col-span-4">กำลังโหลดข้อมูลบุคลากร...</p>
             </div>
         </section>
 
         <!-- =================== หน้าข่าวประชาสัมพันธ์ =================== -->
         <section id="page-news" class="page-content hidden">
              <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">ข่าวประชาสัมพันธ์ทั้งหมด</h2>
-             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- ข่าวที่ 1 (เหมือนหน้าแรก) -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="https://placehold.co/600x400/E2E8F0/334155?text=รูปภาพข่าว" alt="รูปภาพข่าว" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="font-bold text-xl mb-2">กิจกรรมวันไหว้ครู ประจำปีการศึกษา 2568</h3>
-                        <p class="text-gray-700 text-base">ขอเชิญชวนนักเรียนและผู้ปกครองเข้าร่วมกิจกรรมวันไหว้ครู เพื่อแสดงความกตัญญูกตเวที...</p>
-                        <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">อ่านต่อ...</a>
-                    </div>
-                </div>
-                 <!-- เพิ่มข่าวอื่นๆ ที่นี่ -->
-            </div>
+             <!-- เนื้อหาข่าวจะถูกเติมโดย JavaScript -->
+             <div id="news-list-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <p class="text-center text-gray-500 col-span-3">กำลังโหลดข่าวสาร...</p>
+             </div>
         </section>
 
         <!-- =================== หน้าคลังนวัตกรรม =================== -->
@@ -104,12 +74,11 @@
     <!-- ส่วนท้ายของเว็บ (Footer) - ใช้ร่วมกันทุกหน้า -->
     <footer class="bg-gray-800 text-white mt-16 py-8">
         <div class="container mx-auto px-6 text-center">
-             <!-- เปลี่ยนชื่อโรงเรียน -->
-            <p>&copy; 2568 โรงเรียนบ้านภูพระโนนผักหวาน สงวนลิขสิทธิ์</p>
+             <p>&copy; 2568 โรงเรียนบ้านภูพระโนนผักหวาน สงวนลิขสิทธิ์</p>
         </div>
     </footer>
 
-    <!-- Firebase SDK (จำเป็นสำหรับหน้าคลังนวัตกรรม) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     
