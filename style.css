@@ -1,6 +1,5 @@
 /* เราใช้ Tailwind CSS เป็นหลัก แต่สามารถเพิ่มสไตล์ที่ซับซ้อนที่นี่ได้ */
 body {
-    /* เปลี่ยนฟอนต์เป็น Sarabun */
     font-family: 'Sarabun', sans-serif;
 }
 
@@ -15,7 +14,76 @@ body {
     font-weight: bold;
 }
 
-/* สไตล์สำหรับการ์ดนวัตกรรม (ยกมาจากโปรเจกต์เก่า) */
+/* สไตล์สำหรับการ์ดบุคลากร */
+.personnel-card {
+    background-color: white;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+}
+.personnel-card img {
+    width: 8rem; /* 128px */
+    height: 8rem; /* 128px */
+    border-radius: 9999px; /* rounded-full */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+    object-fit: cover;
+}
+.personnel-card h3 {
+    font-weight: bold;
+    font-size: 1.25rem; /* text-xl */
+    color: #1E293B; /* text-slate-800 */
+}
+.personnel-card p {
+    color: #64748B; /* text-slate-500 */
+}
+
+
+/* สไตล์สำหรับการ์ดข่าว */
+.news-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.news-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.news-card-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.news-card h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1E293B; /* text-slate-800 */
+    margin-bottom: 0.5rem;
+}
+.news-card p {
+    color: #475569; /* text-slate-600 */
+    flex-grow: 1;
+}
+.news-card a {
+    color: #3B82F6; /* text-blue-500 */
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 1rem;
+    align-self: flex-start;
+}
+.news-card a:hover {
+    text-decoration: underline;
+}
+
+
+/* สไตล์สำหรับการ์ดนวัตกรรม */
 .innovation-card {
     background-color: white;
     border-radius: 0.5rem;
