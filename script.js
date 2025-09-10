@@ -98,6 +98,11 @@ function renderPersonnel(personnelList) {
         // Fallback image if imageUrl is empty
         const imageUrl = person.imageUrl || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
 
+        // --- 🧠 NEW: Process multiple education entries ---
+        const educationList = person.education 
+            ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') 
+            : '<li>-</li>';
+
         card.innerHTML = `
             <div class="flex-grow">
                 <img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100">
@@ -108,7 +113,9 @@ function renderPersonnel(personnelList) {
             <hr class="my-3">
             <div class="text-xs text-left grid grid-cols-[auto_1fr] gap-x-2 items-start">
                 <strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong>
-                <span class="text-gray-500">${person.education || '-'}</span>
+                <ul class="text-gray-500 list-disc list-inside">
+                    ${educationList}
+                </ul>
                 
                 <strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong>
                 <span class="text-gray-500">${person.class || '-'}</span>
