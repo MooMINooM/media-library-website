@@ -6,90 +6,114 @@
     <title>โรงเรียนบ้านภูพระโนนผักหวาน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- เปลี่ยนฟอนต์เป็น Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans">
+<!-- เปลี่ยนคลาส font ที่ body -->
+<body class="font-sarabun bg-gray-100">
 
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="index.html" class="flex-shrink-0 text-2xl font-bold text-indigo-600 flex items-center">
-                        <span class="mr-2">📚</span>
-                        <span>โรงเรียนบ้านภูพระโนนผักหวาน</span>
-                    </a>
+    <!-- ส่วนหัวของเว็บ (Header) - ใช้ร่วมกันทุกหน้า -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl md:text-2xl font-bold text-blue-800">โรงเรียนบ้านภูพระโนนผักหวาน</div>
+            <nav id="main-nav">
+                <a href="#" data-page="home" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2">หน้าแรก</a>
+                <a href="#" data-page="personnel" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2">บุคลากร</a>
+                <a href="#" data-page="news" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2">ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="innovations" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2">คลังนวัตกรรม</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ส่วนเนื้อหาหลัก (Main Content) - เนื้อหาจะเปลี่ยนไปตามหน้า -->
+    <main class="container mx-auto px-6 py-8">
+
+        <!-- =================== หน้าแรก =================== -->
+        <section id="page-home" class="page-content">
+            <div class="text-center bg-blue-700 text-white py-20 rounded-lg">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">ยินดีต้อนรับสู่โรงเรียนบ้านภูพระโนนผักหวาน</h1>
+                <p class="text-xl">สถานที่แห่งการเรียนรู้และเติบโตอย่างมีคุณภาพ</p>
+            </div>
+            <div class="mt-16 bg-white p-8 rounded-lg shadow-md">
+                 <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">เกี่ยวกับโรงเรียน</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    โรงเรียนบ้านภูพระโนนผักหวานก่อตั้งขึ้นเมื่อปี พ.ศ. 25XX ด้วยความมุ่งมั่นที่จะมอบการศึกษาที่ดีที่สุดให้กับนักเรียนทุกคน เรามีคณะครูผู้ทรงคุณวุฒิและบุคลากรที่พร้อมให้การสนับสนุนนักเรียนในทุกๆ ด้าน เพื่อให้นักเรียนได้ค้นพบศักยภาพของตนเองและเติบโตเป็นผู้ใหญ่ที่มีคุณภาพต่อไปในอนาคต
+                </p>
+            </div>
+        </section>
+
+        <!-- =================== หน้าบุคลากร =================== -->
+        <section id="page-personnel" class="page-content hidden">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">คณะผู้บริหารและบุคลากร</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- ตัวอย่างการ์ดบุคลากร -->
+                <div class="bg-white text-center rounded-lg shadow-md p-6">
+                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+                    <h3 class="font-bold text-xl text-gray-800">นายสมชาย ใจดี</h3>
+                    <p class="text-gray-500">ผู้อำนวยการโรงเรียน</p>
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="index.html" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">หน้าแรก</a>
-                        <a href="library.html" class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">คลังสื่อ</a>
+                <div class="bg-white text-center rounded-lg shadow-md p-6">
+                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+                    <h3 class="font-bold text-xl text-gray-800">นางสาวสมศรี มีสุข</h3>
+                    <p class="text-gray-500">รองผู้อำนวยการฝ่ายวิชาการ</p>
+                </div>
+                <div class="bg-white text-center rounded-lg shadow-md p-6">
+                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+                    <h3 class="font-bold text-xl text-gray-800">นายชาตรี รักเรียน</h3>
+                    <p class="text-gray-500">หัวหน้ากลุ่มสาระฯ วิทยาศาสตร์</p>
+                </div>
+                 <div class="bg-white text-center rounded-lg shadow-md p-6">
+                    <img src="https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover">
+                    <h3 class="font-bold text-xl text-gray-800">นางสาวมณีวรรณ สอนดี</h3>
+                    <p class="text-gray-500">หัวหน้ากลุ่มสาระฯ ภาษาไทย</p>
+                </div>
+                <!-- เพิ่มการ์ดบุคลากรคนอื่นๆ ที่นี่ -->
+            </div>
+        </section>
+
+        <!-- =================== หน้าข่าวประชาสัมพันธ์ =================== -->
+        <section id="page-news" class="page-content hidden">
+             <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">ข่าวประชาสัมพันธ์ทั้งหมด</h2>
+             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- ข่าวที่ 1 (เหมือนหน้าแรก) -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="https://placehold.co/600x400/E2E8F0/334155?text=รูปภาพข่าว" alt="รูปภาพข่าว" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">กิจกรรมวันไหว้ครู ประจำปีการศึกษา 2568</h3>
+                        <p class="text-gray-700 text-base">ขอเชิญชวนนักเรียนและผู้ปกครองเข้าร่วมกิจกรรมวันไหว้ครู เพื่อแสดงความกตัญญูกตเวที...</p>
+                        <a href="#" class="text-blue-600 hover:underline mt-4 inline-block">อ่านต่อ...</a>
                     </div>
                 </div>
-                <div class="-mr-2 flex md:hidden">
-                    <!-- Mobile menu button -->
-                    <button type="button" id="mobile-menu-button" class="bg-gray-200 inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
-                        <span class="sr-only">Open main menu</span>
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+                 <!-- เพิ่มข่าวอื่นๆ ที่นี่ -->
             </div>
-        </div>
-        <!-- Mobile menu, show/hide based on menu state. -->
-        <div class="md:hidden hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="index.html" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">หน้าแรก</a>
-                <a href="library.html" class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 block px-3 py-2 rounded-md text-base font-medium">คลังสื่อ</a>
-            </div>
-        </div>
-    </nav>
+        </section>
 
-    <!-- Hero Section -->
-    <main>
-        <div class="hero-section">
-            <div class="text-center">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
-                    ยินดีต้อนรับสู่โรงเรียนบ้านภูพระโนนผักหวาน
-                </h1>
-                <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
-                    แหล่งรวบรวมสื่อการสอนคุณภาพสำหรับครูและนักเรียน
-                </p>
-                <div class="mt-8">
-                    <a href="library.html" class="inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
-                        เข้าสู่คลังสื่อ
-                    </a>
-                </div>
+        <!-- =================== หน้าคลังนวัตกรรม =================== -->
+        <section id="page-innovations" class="page-content hidden">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">คลังนวัตกรรมดิจิทัล</h2>
+            <!-- เนื้อหาของคลังนวัตกรรมจะถูกเติมโดย JavaScript -->
+            <div id="innovations-list-container" class="space-y-6">
+                <p class="text-center text-gray-500">กำลังเชื่อมต่อฐานข้อมูล...</p>
             </div>
-        </div>
+        </section>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm text-gray-500">
-                &copy; 2025 คลังสื่อการเรียนรู้. สงวนลิขสิทธิ์.
-            </p>
+    <!-- ส่วนท้ายของเว็บ (Footer) - ใช้ร่วมกันทุกหน้า -->
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-6 text-center">
+             <!-- เปลี่ยนชื่อโรงเรียน -->
+            <p>&copy; 2568 โรงเรียนบ้านภูพระโนนผักหวาน สงวนลิขสิทธิ์</p>
         </div>
     </footer>
 
-    <script>
-        // Mobile Menu Toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const openIcon = mobileMenuButton.querySelector('svg:first-child');
-        const closeIcon = mobileMenuButton.querySelector('svg:last-child');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            openIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        });
-    </script>
+    <!-- Firebase SDK (จำเป็นสำหรับหน้าคลังนวัตกรรม) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
 
