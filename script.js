@@ -1,74 +1,19 @@
-// --- 🎯 SETUP: กรุณาวาง Firebase Config ของคุณที่นี่ ---
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-
-// --- Global Variables & Firebase Initialization ---
-let db, auth, currentUser;
-try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    auth = firebase.auth();
-    console.log("✅ Firebase Initialized Successfully");
-} catch (e) {
-    console.error("🔥 Firebase Initialization Failed:", e);
-}
+// ------------------- 🎯 CONFIGURATION -------------------
+// ❗️ กรุณานำ "Web app URL" ที่ได้จากการ Deploy ใน Apps Script มาวางที่นี่
+const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+// ---------------------------------------------------------
 
 
+// --- MAIN SETUP ---
 document.addEventListener('DOMContentLoaded', () => {
-    initializeAuth();
-    setupInitialPage();
+    setupNavigation();
+    showPage('home'); 
 });
 
 
-// --- ระบบยืนยันตัวตน (Authentication) ---
-function initializeAuth() {
-    auth.onAuthStateChanged(user => {
-        currentUser = user;
-        setupAdminUI(user);
-    });
-}
-
-function setupAdminUI(user) {
+// --- NAVIGATION SYSTEM ---
+function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
-    const oldAdminContainer = document.getElementById('admin-nav-container');
-    if (oldAdminContainer) oldAdminContainer.remove();
-
-    const adminContainer = document.createElement('div');
-    adminContainer.id = 'admin-nav-container';
-    adminContainer.className = 'flex items-center whitespace-nowrap'; 
-
-    if (user) {
-        adminContainer.innerHTML = `
-            <a href="#" data-page="admin" class="nav-link bg-green-600 hover:bg-green-700 text-white !border-b-2 !border-transparent rounded-md">แผงควบคุม</a>
-            <a href="#" id="logout-btn" class="nav-link bg-red-600 hover:bg-red-700 text-white !border-b-2 !border-transparent ml-2 rounded-md">ออกจากระบบ</a>
-        `;
-        mainNav.appendChild(adminContainer);
-        
-        document.getElementById('logout-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            auth.signOut();
-            showPage('home');
-        });
-
-    } else {
-        adminContainer.innerHTML = `
-            <a href="#" data-page="login" class="nav-link whitespace-nowrap">สำหรับผู้ดูแล</a>
-        `;
-        mainNav.appendChild(adminContainer);
-    }
-}
-
-
-// --- การแสดงผลหน้าเริ่มต้นและระบบนำทางหลัก ---
-function setupInitialPage() {
-    const mainNav = document.getElementById('main-nav');
-    
     mainNav.addEventListener('click', (e) => {
         if (e.target.matches('a[data-page]')) {
             e.preventDefault();
@@ -76,8 +21,6 @@ function setupInitialPage() {
             showPage(pageId);
         }
     });
-
-    showPage('home');
 }
 
 function showPage(pageId) {
@@ -97,42 +40,75 @@ function showPage(pageId) {
         }
     });
 
-    // โหลดข้อมูลสำหรับหน้านั้นๆ
-    switch (pageId) {
-        case 'home':
-            break;
-        case 'personnel':
-            listenForPersonnel();
-            break;
-        case 'students':
-            listenForStudents();
-            break;
-        case 'school-board':
-            listenForSchoolBoard();
-            break;
-        case 'student-council':
-            listenForStudentCouncil();
-            break;
-        case 'news':
-            listenForNews();
-            break;
-        case 'documents': // เพิ่ม case ใหม่สำหรับหน้าเอกสาร
-            listenForDocuments();
-            break;
-
-        case 'innovations':
-            listenForInnovations();
-            break;
+    // --- Load data for the specific page ---
+    if (pageId === 'personnel') {
+        loadPersonnelData();
     }
 }
 
 
-// --- ฟังก์ชันดึงข้อมูลต่างๆ (Placeholder) ---
-function listenForPersonnel() { console.log("Fetching Personnel data..."); }
-function listenForStudents() { console.log("Fetching Students data..."); }
-function listenForSchoolBoard() { console.log("Fetching School Board data..."); }
-function listenForStudentCouncil() { console.log("Fetching Student Council data..."); }
-function listenForNews() { console.log("Fetching News data..."); }
-function listenForDocuments() { console.log("Fetching Documents data..."); } // เพิ่มฟังก์ชันใหม่
-function listenForInnovations() { console.log("Fetching Innovations data..."); }
+// --- PERSONNEL PAGE ---
+async function loadPersonnelData() {
+    const container = document.getElementById('personnel-container');
+    const loadingEl = document.getElementById('personnel-loading');
+
+    // Show loading message
+    loadingEl.classList.remove('hidden');
+    container.innerHTML = ''; // Clear old content
+    container.appendChild(loadingEl);
+    
+    try {
+        if (!API_URL || API_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+            throw new Error("กรุณาตั้งค่า API_URL ในไฟล์ script.js ก่อน");
+        }
+        
+        // Fetch data from our Google Sheet API
+        const response = await fetch(`${API_URL}?sheet=personnel`);
+        const result = await response.json();
+
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        
+        renderPersonnel(result.data);
+
+    } catch (error) {
+        console.error('Error loading personnel data:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+
+function renderPersonnel(personnelList) {
+    const container = document.getElementById('personnel-container');
+    const loadingEl = document.getElementById('personnel-loading');
+    
+    // Hide loading and clear container
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!personnelList || personnelList.length === 0) {
+        container.innerHTML = '<p class="col-span-full text-center text-gray-500">ไม่พบข้อมูลบุคลากร</p>';
+        return;
+    }
+
+    personnelList.forEach(person => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-4 text-center transform hover:scale-105 transition-transform duration-300';
+        
+        // Fallback image if imageUrl is empty
+        const imageUrl = person.imageUrl || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+
+        card.innerHTML = `
+            <img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100">
+            <h3 class="text-lg font-bold text-blue-800">${person.name || 'N/A'}</h3>
+            <p class="text-gray-600">${person.role || '-'}</p>
+            <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
+            <hr class="my-3">
+            <p class="text-xs text-gray-500"><strong>วุฒิการศึกษา:</strong> ${person.education || '-'}</p>
+            <p class="text-xs text-gray-500 mt-1"><strong>ห้องประจำชั้น:</strong> ${person.class || '-'}</p>
+            <p class="text-xs text-gray-500 mt-1"><strong>โทร:</strong> ${person.tel || '-'}</p>
+        `;
+        container.appendChild(card);
+    });
+}
 
