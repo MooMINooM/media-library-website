@@ -1,19 +1,15 @@
-/* เราจะใช้ Tailwind CSS เป็นหลัก 
-  ไฟล์นี้มีไว้สำหรับสไตล์ที่ซับซ้อน หรือเพื่อกำหนดคลาสใช้ซ้ำ (Reusable classes)
-*/
-
+/* ... (โค้ดเดิม) ... */
 body {
     font-family: 'Sarabun', sans-serif;
-    background-color: #f0f2f5; /* bg-gray-100 */
+    background-color: #f0f2f5;
 }
 
 .section-title {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
-/* 🌟 NEW: Styles for vertical sidebar navigation 🌟 */
 .nav-link {
-    @apply block w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md;
+    @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out cursor-pointer;
 }
 
 .nav-link:hover {
@@ -26,5 +22,24 @@ body {
 
 #personnel-modal {
     transition: opacity 0.3s ease;
+}
+
+/* 🌟 NEW: Dropdown Styles 🌟 */
+.dropdown {
+    @apply relative;
+}
+
+.dropdown-toggle {
+    @apply inline-flex items-center;
+}
+
+.dropdown-menu {
+    @apply absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50;
+    /* transition for smooth appearance */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.dropdown-item {
+    @apply block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800;
 }
 
