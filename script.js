@@ -106,7 +106,7 @@ function renderPersonnel(personnelList) {
                 <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
             </div>
             <hr class="my-3">
-            <div class="text-xs text-left grid grid-cols-[auto_1fr] gap-x-2 items-center">
+            <div class="text-xs text-left grid grid-cols-[auto_1fr] gap-x-2 items-start">
                 <strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong>
                 <span class="text-gray-500">${person.education || '-'}</span>
                 
