@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Flags ป้องกันการเรียก listener ซ้ำซ้อน
     let innovationsListenerAttached = false;
     let newsListenerAttached = false;
+    let personnelListenerAttached = false; // เพิ่ม Flag สำหรับหน้าบุคลากร
 
     function showPage(pageId) {
         pageContents.forEach(page => page.classList.add('hidden'));
@@ -43,6 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
             listenForNews();
             newsListenerAttached = true;
         }
+        if (pageId === 'page-personnel' && !personnelListenerAttached) {
+            listenForPersonnel(); // เรียกฟังก์ชันใหม่
+            personnelListenerAttached = true;
+        }
     }
 
     navLinks.forEach(link => {
@@ -57,12 +62,46 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// --- ระบบข่าวประชาสัมพันธ์ (ดึงข้อมูลจาก Firestore) ---
+// --- ระบบบุคลากร (ฟังก์ชันใหม่) ---
+function listenForPersonnel() {
+    const db = firebase.firestore();
+    const personnelContainer = document.getElementById('personnel-list-container');
+
+    // เรียงลำดับบุคลากรตาม field 'order' จากน้อยไปมาก
+    db.collection('personnel').orderBy('order', 'asc').onSnapshot(
+        (querySnapshot) => {
+            if (querySnapshot.empty) {
+                personnelContainer.innerHTML = '<p class="text-center text-gray-500 col-span-4">ยังไม่มีข้อมูลบุคลากรในระบบ</p>';
+                return;
+            }
+
+            personnelContainer.innerHTML = ''; // ล้างข้อมูลเก่า
+            querySnapshot.forEach((doc) => {
+                const person = doc.data();
+
+                const cardHTML = `
+                    <div class="personnel-card">
+                        <img src="${person.imageUrl || 'https://placehold.co/400x400/E2E8F0/334155?text=รูปบุคลากร'}" alt="${person.name}">
+                        <h3>${person.name || 'ไม่ระบุชื่อ'}</h3>
+                        <p>${person.position || 'ไม่ระบุตำแหน่ง'}</p>
+                    </div>
+                `;
+                personnelContainer.innerHTML += cardHTML;
+            });
+        }, 
+        (error) => {
+            console.error("Error fetching personnel: ", error);
+            personnelContainer.innerHTML = '<p class="text-center text-red-500 col-span-4">เกิดข้อผิดพลาดในการดึงข้อมูลบุคลากร</p>';
+        }
+    );
+}
+
+
+// --- ระบบข่าวประชาสัมพันธ์ ---
 function listenForNews() {
     const db = firebase.firestore();
     const newsContainer = document.getElementById('news-list-container');
     
-    // เรียงลำดับข่าวตาม 'publishDate' จากใหม่ไปเก่า
     db.collection('news').orderBy('publishDate', 'desc').onSnapshot(
         (querySnapshot) => {
             if (querySnapshot.empty) {
@@ -70,17 +109,15 @@ function listenForNews() {
                 return;
             }
 
-            newsContainer.innerHTML = ''; // ล้างข้อมูลเก่า
+            newsContainer.innerHTML = '';
             querySnapshot.forEach((doc) => {
                 const newsItem = doc.data();
-
                 const cardHTML = `
                     <div class="news-card">
                         <img src="${newsItem.imageUrl || 'https://placehold.co/600x400/E2E8F0/334155?text=รูปภาพข่าว'}" alt="${newsItem.title}">
                         <div class="news-card-content">
                             <h3>${newsItem.title || 'ไม่มีหัวข้อข่าว'}</h3>
                             <p>${newsItem.summary || 'ไม่มีเนื้อหาโดยย่อ'}</p>
-                            <!-- ในอนาคต เราสามารถสร้างลิงก์ไปยังหน้ารายละเอียดข่าวได้ -->
                             <a href="#">อ่านต่อ...</a>
                         </div>
                     </div>
@@ -96,7 +133,7 @@ function listenForNews() {
 }
 
 
-// --- ระบบคลังนวัตกรรม (ดึงข้อมูลจาก Firestore) ---
+// --- ระบบคลังนวัตกรรม ---
 function listenForInnovations() {
     const db = firebase.firestore();
     const innovationsContainer = document.getElementById('innovations-list-container');
@@ -108,10 +145,9 @@ function listenForInnovations() {
                 return;
             }
 
-            innovationsContainer.innerHTML = ''; // ล้างข้อมูลเก่า
+            innovationsContainer.innerHTML = '';
             querySnapshot.forEach((doc) => {
                 const innovation = doc.data();
-
                 const cardHTML = `
                     <div class="innovation-card">
                         <img src="${innovation.coverImageURL || 'https://placehold.co/300x300/E2E8F0/334155?text=รูปภาพ'}" alt="${innovation.title}">
