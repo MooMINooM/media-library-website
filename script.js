@@ -49,7 +49,7 @@ function showPage(pageId) {
 
 // --- UTILITY FUNCTION ---
 /**
- * แปลงลิงก์ Google Drive sharing URL ให้เป็น Direct Image URL
+ * แปลงลิงก์ Google Drive sharing URL ให้เป็น Direct Image URL (เวอร์ชันปรับปรุง)
  * @param {string} url - The original Google Drive URL
  * @returns {string} The direct image URL
  */
@@ -58,11 +58,17 @@ function getDirectGoogleDriveUrl(url) {
         return url; 
     }
     try {
-        const fileId = url.split('/d/')[1].split('/')[0];
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        // รองรับลิงก์ทั้งแบบ /d/ และ /file/d/
+        const parts = url.split('/');
+        const idIndex = parts.findIndex(part => part === 'd') + 1;
+        if (idIndex > 0 && idIndex < parts.length) {
+            const fileId = parts[idIndex];
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+        throw new Error("File ID not found in URL structure.");
     } catch (e) {
-        console.error("Could not parse Google Drive URL:", url);
-        return url; 
+        console.error("Could not parse Google Drive URL:", url, e);
+        return url; // ถ้าแปลงไม่ได้ ให้ใช้ลิงก์เดิมไปก่อน
     }
 }
 
