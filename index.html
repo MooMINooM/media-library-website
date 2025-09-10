@@ -12,7 +12,7 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- 🌟 NEW: Header is now a full-width banner 🌟 -->
+    <!-- Header จะยังคงอยู่ด้านบนสุดและเต็มความกว้าง -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto p-6 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-blue-800">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
@@ -20,11 +20,13 @@
         </div>
     </header>
 
-    <!-- 🌟 NEW: Navigation is now a full-width sticky banner 🌟 -->
-    <nav id="main-nav-container" class="bg-white shadow-md sticky top-0 z-40">
-        <div class="container mx-auto">
-             <!-- 🌟 UPDATED: เพิ่มค่า gap-x ให้มากขึ้น 🌟 -->
-             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 md:gap-x-12 overflow-x-auto whitespace-nowrap p-2">
+    <!-- 🌟 NEW: Main container for sidebar and content 🌟 -->
+    <div class="container mx-auto p-4 flex gap-6">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-1/4 lg:w-1/5 bg-white rounded-lg shadow-md p-4 sticky top-4 self-start">
+            <h3 class="text-lg font-bold text-blue-800 border-b pb-2 mb-4">เมนูหลัก</h3>
+            <nav id="main-nav" class="flex flex-col gap-2">
                 <a href="#" data-page="home" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">หน้าหลัก</a>
                 <a href="#" data-page="personnel" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลบุคลากร</a>
                 <a href="#" data-page="students" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลนักเรียน</a>
@@ -33,15 +35,14 @@
                 <a href="#" data-page="news" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข่าวประชาสัมพันธ์</a>
                 <a href="#" data-page="documents" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">เอกสาร</a>
                 <a href="#" data-page="innovations" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คลังนวัตกรรม</a>
+                <hr class="my-2">
                 <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="nav-link text-blue-600 hover:text-blue-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Facebook</a>
                 <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="nav-link text-red-600 hover:text-red-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Youtube</a>
-            </div>
-        </div>
-    </nav>
+            </nav>
+        </aside>
 
-    <!-- 🌟 NEW: Main content area is now in its own container 🌟 -->
-    <div class="container mx-auto p-4">
-        <main id="main-content">
+        <!-- Main Content Area -->
+        <main id="main-content" class="w-3/4 lg:w-4/5">
             <!-- หน้าแรก -->
             <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6">
                 <h2 class="section-title">ยินดีต้อนรับ</h2>
@@ -52,7 +53,7 @@
             <section id="page-personnel" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">ผู้บริหาร คณะครู และบุคลากรทางการศึกษา</h2>
-                    <div id="personnel-list" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <div id="personnel-list" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         <!-- การ์ดบุคลากรจะถูกสร้างโดย JavaScript ที่นี่ -->
                     </div>
                     <p id="personnel-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
