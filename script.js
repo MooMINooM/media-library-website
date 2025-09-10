@@ -107,13 +107,13 @@ function renderPersonnel(personnelList) {
             </div>
             <hr class="my-3">
             <div class="text-xs text-left grid grid-cols-2 gap-x-2">
-                <strong class="text-gray-600 justify-self-end">วุฒิการศึกษา:</strong>
+                <strong class="text-gray-600">วุฒิการศึกษา:</strong>
                 <span class="text-gray-500">${person.education || '-'}</span>
                 
-                <strong class="text-gray-600 justify-self-end">ห้องประจำชั้น:</strong>
+                <strong class="text-gray-600">ห้องประจำชั้น:</strong>
                 <span class="text-gray-500">${person.class || '-'}</span>
 
-                <strong class="text-gray-600 justify-self-end">โทร:</strong>
+                <strong class="text-gray-600">โทร:</strong>
                 <span class="text-gray-500">${person.tel || '-'}</span>
             </div>
         `;
