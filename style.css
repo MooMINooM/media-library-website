@@ -6,45 +6,30 @@ body {
     font-family: 'Sarabun', sans-serif;
     background-color: #f0f2f5; /* bg-gray-100 */
 }
-/* เราจะใช้ Tailwind CSS เป็นหลัก 
-  ไฟล์นี้มีไว้สำหรับสไตล์ที่ซับซ้อน หรือเพื่อกำหนดคลาสใช้ซ้ำ (Reusable classes)
-*/
-
-body {
-    font-family: 'Sarabun', sans-serif;
-    background-color: #f0f2f5; /* bg-gray-100 */
-}
 
 .section-title {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
 .nav-link {
-    @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-800 transition-colors duration-200;
+    /* 🌟 UPDATED: เพิ่ม transition property และ transform 🌟 */
+    @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out;
 }
+
+.nav-link:hover {
+    @apply bg-blue-50 text-blue-800 transform scale-105;
+}
+
+.nav-link:active {
+    /* 🌟 NEW: เพิ่มเอฟเฟกต์ตอนกดปุ่ม 🌟 */
+    @apply transform scale-95;
+}
+
 
 .nav-link.active {
     @apply bg-blue-100 text-blue-800 border-b-2 border-blue-500;
 }
 
-#personnel-modal {
-    transition: opacity 0.3s ease;
-}
-
-
-.section-title {
-    @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
-}
-
-.nav-link {
-    @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-blue-50 hover:text-blue-800 transition-colors duration-200;
-}
-
-.nav-link.active {
-    @apply bg-blue-100 text-blue-800 border-b-2 border-blue-500;
-}
-
-/* 🌟 NEW: Transition for modal 🌟 */
 #personnel-modal {
     transition: opacity 0.3s ease;
 }
