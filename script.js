@@ -1,32 +1,61 @@
 // ------------------- 🎯 CONFIGURATION -------------------
-// ❗️ กรุณานำ "Web app URL" ที่ได้จากการ Deploy ใน Apps Script มาวางที่นี่
 const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 // ---------------------------------------------------------
 
+let personnelDataCache = [];
 
-// --- Global Variables ---
-let personnelDataCache = []; // Cache to store personnel data
-
-
-// --- MAIN SETUP ---
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
+    setupDropdowns(); // 🌟 NEW
     setupModal();
-    showPage('home'); 
+    showPage('home');
 });
+
+// --- 🌟 NEW: DROPDOWN SYSTEM 🌟 ---
+function setupDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const menu = dropdown.querySelector('.dropdown-menu');
+
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling up to the window
+            // Close other open dropdowns
+            closeAllDropdowns(menu);
+            menu.classList.toggle('hidden');
+        });
+    });
+
+    // Close dropdown when clicking anywhere else on the page
+    window.addEventListener('click', () => {
+        closeAllDropdowns();
+    });
+}
+
+function closeAllDropdowns(exceptMenu = null) {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu !== exceptMenu) {
+            menu.classList.add('hidden');
+        }
+    });
+}
 
 
 // --- NAVIGATION SYSTEM ---
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
     mainNav.addEventListener('click', (e) => {
+        // Handle both regular links and dropdown items
         if (e.target.matches('a[data-page]')) {
             e.preventDefault();
             const pageId = e.target.dataset.page;
             showPage(pageId);
+            closeAllDropdowns(); // Close dropdown after selection
         }
     });
 }
+
 
 function showPage(pageId) {
     document.querySelectorAll('.page-content').forEach(page => {
@@ -38,17 +67,42 @@ function showPage(pageId) {
         activePage.classList.remove('hidden');
     }
 
+    // Highlight active link (simple version)
     document.querySelectorAll('#main-nav a[data-page]').forEach(link => {
         link.classList.remove('active');
         if (link.dataset.page === pageId) {
             link.classList.add('active');
+            // Also highlight the parent dropdown toggle if it exists
+            const parentDropdown = link.closest('.dropdown');
+            if (parentDropdown) {
+                parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
+            }
         }
     });
+    
+    // Clear active state from dropdown toggles if a non-dropdown link is active
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+         if (!toggle.classList.contains('active')) {
+             const parentDropdown = toggle.closest('.dropdown');
+             let isActive = false;
+             parentDropdown.querySelectorAll('a[data-page]').forEach(link => {
+                 if (link.classList.contains('active')) {
+                     isActive = true;
+                 }
+             });
+             if (!isActive) {
+                 toggle.classList.remove('active');
+             }
+         }
+    });
 
-    if (pageId === 'personnel') {
+
+    if (pageId === 'personnel-list') {
         loadPersonnelData();
     }
 }
+
+// ... (The rest of the script.js remains the same) ...
 
 // --- MODAL (POP-UP) SYSTEM ---
 function setupModal() {
@@ -130,7 +184,7 @@ async function loadPersonnelData() {
         return;
     }
     
-    const listContainer = document.getElementById('personnel-list');
+    const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
 
     loadingEl.classList.remove('hidden');
@@ -155,9 +209,8 @@ async function loadPersonnelData() {
     }
 }
 
-// 🌟 NEW: Renders personnel as cards instead of a list 🌟
 function renderPersonnelList(personnelList) {
-    const listContainer = document.getElementById('personnel-list');
+    const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
     
     loadingEl.classList.add('hidden');
@@ -170,7 +223,6 @@ function renderPersonnelList(personnelList) {
 
     personnelList.forEach((person, index) => {
         const cardItem = document.createElement('div');
-        // Make the card clickable
         cardItem.className = 'bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4';
         cardItem.dataset.index = index;
         
