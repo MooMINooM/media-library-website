@@ -1,6 +1,6 @@
 // ------------------- 🎯 CONFIGURATION -------------------
 // ❗️ กรุณานำ "Web app URL" ที่ได้จากการ Deploy ใน Apps Script มาวางที่นี่
-const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 // ---------------------------------------------------------
 
 
