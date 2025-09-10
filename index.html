@@ -12,7 +12,6 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Header จะยังคงอยู่ด้านบนสุดและเต็มความกว้าง -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto p-6 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-blue-800">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
@@ -20,53 +19,81 @@
         </div>
     </header>
 
-    <!-- 🌟 NEW: Main container for sidebar and content 🌟 -->
-    <div class="container mx-auto p-4 flex gap-6">
+    <nav id="main-nav-container" class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto">
+             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-4 md:gap-x-6 p-2">
+                <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
+                
+                <!-- 🌟 NEW: Dropdown Menu Structure 🌟 -->
+                <div class="dropdown">
+                    <button class="nav-link dropdown-toggle">โรงเรียน ▼</button>
+                    <div class="dropdown-menu hidden">
+                        <a href="#" data-page="history" class="dropdown-item">ประวัติความเป็นมา</a>
+                        <a href="#" data-page="info" class="dropdown-item">ข้อมูลทั่วไป</a>
+                        <a href="#" data-page="vision" class="dropdown-item">วิสัยทัศน์/ปรัชญา/พันธกิจ</a>
+                        <a href="#" data-page="structure" class="dropdown-item">โครงสร้างการบริหาร</a>
+                    </div>
+                </div>
 
-        <!-- Sidebar Navigation -->
-        <aside class="w-1/4 lg:w-1/5 bg-white rounded-lg shadow-md p-4 sticky top-4 self-start">
-            <h3 class="text-lg font-bold text-blue-800 border-b pb-2 mb-4">เมนูหลัก</h3>
-            <nav id="main-nav" class="flex flex-col gap-2">
-                <a href="#" data-page="home" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">หน้าหลัก</a>
-                <a href="#" data-page="personnel" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลบุคลากร</a>
-                <a href="#" data-page="students" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลนักเรียน</a>
-                <a href="#" data-page="school-board" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คณะกรรมการสถานศึกษา</a>
-                <a href="#" data-page="student-council" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คณะกรรมการสภานักเรียน</a>
-                <a href="#" data-page="news" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข่าวประชาสัมพันธ์</a>
-                <a href="#" data-page="documents" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">เอกสาร</a>
-                <a href="#" data-page="innovations" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คลังนวัตกรรม</a>
-                <hr class="my-2">
-                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="nav-link text-blue-600 hover:text-blue-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Facebook</a>
-                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="nav-link text-red-600 hover:text-red-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Youtube</a>
-            </nav>
-        </aside>
+                <div class="dropdown">
+                    <button class="nav-link dropdown-toggle">ข้อมูลบุคลากร ▼</button>
+                    <div class="dropdown-menu hidden">
+                        <a href="#" data-page="personnel-list" class="dropdown-item">รายชื่อบุคลากร</a>
+                        <a href="#" data-page="personnel-achievements" class="dropdown-item">ผลงานบุคลากร</a>
+                    </div>
+                </div>
 
-        <!-- Main Content Area -->
-        <main id="main-content" class="w-3/4 lg:w-4/5">
-            <!-- หน้าแรก -->
+                <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
+                
+                <div class="dropdown">
+                    <button class="nav-link dropdown-toggle">คณะกรรมการ ▼</button>
+                    <div class="dropdown-menu hidden">
+                        <a href="#" data-page="school-board" class="dropdown-item">คณะกรรมการสถานศึกษา</a>
+                        <a href="#" data-page="student-council" class="dropdown-item">คณะกรรมการสภานักเรียน</a>
+                    </div>
+                </div>
+
+                <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
+                <a href="#" data-page="innovations" class="nav-link">คลังสื่อและนวัตกรรม</a>
+
+                <div class="dropdown">
+                    <button class="nav-link dropdown-toggle">โซเชียลมีเดีย ▼</button>
+                    <div class="dropdown-menu hidden">
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">Facebook</a>
+                        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">Youtube</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4">
+        <main id="main-content">
+            <!-- หน้าหลัก -->
             <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6">
                 <h2 class="section-title">ยินดีต้อนรับ</h2>
-                <p>ยินดีต้อนรับสู่เว็บไซต์โรงเรียนบ้านภูพระโนนผักหวาน แหล่งรวมข้อมูลข่าวสารและกิจกรรมต่างๆ ของโรงเรียน</p>
             </section>
 
-            <!-- หน้าข้อมูลบุคลากร -->
-            <section id="page-personnel" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ผู้บริหาร คณะครู และบุคลากรทางการศึกษา</h2>
-                    <div id="personnel-list" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        <!-- การ์ดบุคลากรจะถูกสร้างโดย JavaScript ที่นี่ -->
-                    </div>
+            <!-- (หน้าย่อยต่างๆ ที่ซ่อนไว้) -->
+            <section id="page-history" class="page-content hidden"><h2 class="section-title">ประวัติความเป็นมา</h2></section>
+            <section id="page-info" class="page-content hidden"><h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2></section>
+            <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
+            <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
+            <section id="page-personnel-list" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">รายชื่อบุคลากร</h2>
+                    <div id="personnel-list-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
                     <p id="personnel-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
-            
-            <!-- (หน้าอื่นๆ ที่ซ่อนไว้) -->
+            <section id="page-personnel-achievements" class="page-content hidden"><h2 class="section-title">ผลงานบุคลากร</h2></section>
             <section id="page-students" class="page-content hidden"><h2 class="section-title">ข้อมูลนักเรียน</h2></section>
             <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
             <section id="page-student-council" class="page-content hidden"><h2 class="section-title">คณะกรรมการสภานักเรียน</h2></section>
             <section id="page-news" class="page-content hidden"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2></section>
             <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
-            <section id="page-innovations" class="page-content hidden"><h2 class="section-title">คลังนวัตกรรม</h2></section>
+            <section id="page-innovations" class="page-content hidden"><h2 class="section-title">คลังสื่อและนวัตกรรม</h2></section>
         </main>
     </div>
 
@@ -74,9 +101,7 @@
     <div id="personnel-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
             <button id="modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-            <div id="modal-content" class="p-6">
-                <!-- เนื้อหา Pop-up จะถูกสร้างโดย JavaScript ที่นี่ -->
-            </div>
+            <div id="modal-content" class="p-6"></div>
         </div>
     </div>
 
