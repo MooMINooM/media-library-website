@@ -45,25 +45,31 @@
         <!-- =================== หน้าบุคลากร =================== -->
         <section id="page-personnel" class="page-content hidden">
             <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">คณะผู้บริหารและบุคลากร</h2>
-            <!-- เนื้อหาบุคลากรจะถูกเติมโดย JavaScript -->
             <div id="personnel-list-container" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <p class="text-center text-gray-500 col-span-4">กำลังโหลดข้อมูลบุคลากร...</p>
             </div>
         </section>
 
-        <!-- =================== หน้าข่าวประชาสัมพันธ์ =================== -->
+        <!-- =================== หน้าข่าวประชาสัมพันธ์ (List View) =================== -->
         <section id="page-news" class="page-content hidden">
              <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">ข่าวประชาสัมพันธ์ทั้งหมด</h2>
-             <!-- เนื้อหาข่าวจะถูกเติมโดย JavaScript -->
              <div id="news-list-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <p class="text-center text-gray-500 col-span-3">กำลังโหลดข่าวสาร...</p>
              </div>
         </section>
 
+        <!-- =================== หน้ารายละเอียดข่าว (Detail View) =================== -->
+        <section id="page-news-detail" class="page-content hidden bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
+            <button id="back-to-news-btn" class="mb-6 text-blue-600 hover:underline">&larr; กลับไปหน้ารวมข่าว</button>
+            <div id="news-detail-content">
+                <!-- เนื้อหารายละเอียดข่าวจะถูกเติมโดย JavaScript -->
+            </div>
+        </section>
+
+
         <!-- =================== หน้าคลังนวัตกรรม =================== -->
         <section id="page-innovations" class="page-content hidden">
             <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">คลังนวัตกรรมดิจิทัล</h2>
-            <!-- เนื้อหาของคลังนวัตกรรมจะถูกเติมโดย JavaScript -->
             <div id="innovations-list-container" class="space-y-6">
                 <p class="text-center text-gray-500">กำลังเชื่อมต่อฐานข้อมูล...</p>
             </div>
