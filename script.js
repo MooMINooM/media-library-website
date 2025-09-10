@@ -1,273 +1,139 @@
-// --- Mobile Menu Toggle ---
+// --- 🎯 SETUP: กรุณาวาง Firebase Config ของคุณที่นี่ ---
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "edunova-5d966", // <-- สำคัญ: ใส่ Project ID ของคุณ
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// --- ระบบจัดการหน้า (Page Navigation) ---
 document.addEventListener('DOMContentLoaded', () => {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    // ตรวจสอบว่า element เหล่านี้มีอยู่จริงในหน้านั้นๆ ก่อนจะเพิ่ม event listener
-    if (mobileMenuButton && mobileMenu) {
-        const openIcon = mobileMenuButton.querySelector('svg:first-child');
-        const closeIcon = mobileMenuButton.querySelector('svg:last-child');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            openIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        });
-    }
-});
-
-// --- Media Library Logic ---
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgxfZ5SB9Um4HftajMJS6RJMG9kwd6hVjKz_DYTxDgQOB9qk1Xxl0mS1dr5YuoIFi-/exec';
-let allMedia = [];
-let filteredMedia = [];
-let currentPage = 1;
-const ITEMS_PER_PAGE = 12;
-
-// DOM Elements
-const mediaGrid = document.getElementById('media-grid');
-const loader = document.getElementById('loader');
-const errorMessage = document.getElementById('error-message');
-const searchBox = document.getElementById('search-box');
-const subjectFilter = document.getElementById('subject-filter');
-const gradeFilter = document.getElementById('grade-filter');
-const loadMoreButton = document.getElementById('load-more-button');
-const loadMoreContainer = document.getElementById('load-more-container');
-
-// Modal Elements
-const modal = document.getElementById('details-modal');
-const modalClose = document.getElementById('modal-close');
-const modalTitle = document.getElementById('modal-title');
-const modalCover = document.getElementById('modal-cover');
-const modalDescription = document.getElementById('modal-description');
-const modalCreator = document.getElementById('modal-creator');
-const modalSubject = document.getElementById('modal-subject');
-const modalGrade = document.getElementById('modal-grade');
-const modalUploadDate = document.getElementById('modal-uploaddate');
-const modalCopyLink = document.getElementById('modal-copy-link');
-const modalOpenFile = document.getElementById('modal-open-file');
-
-// Back to Top Button
-const backToTopButton = document.getElementById("back-to-top");
-
-
-// --- Utility Functions ---
-function showError(message) {
-    if (loader) loader.style.display = 'none';
-    if (errorMessage) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-    }
-    if (mediaGrid) mediaGrid.innerHTML = '';
-}
-
-function formatDate(dateString) {
-    if (!dateString) return 'ไม่ระบุ';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-/**
- * แปลง URL ของ Google Drive ให้อยู่ในรูปแบบที่แสดงภาพได้โดยตรง
- * @param {string} url - URL ดั้งเดิมจาก Google Sheets
- * @returns {string} - URL ที่แปลงแล้ว หรือ URL เดิมถ้าไม่ใช่ลิงก์ Drive
- */
-function transformGoogleDriveImageUrl(url) {
-    if (typeof url !== 'string' || !url) {
-        return '';
-    }
-    // Regex เพื่อดึง ID ของไฟล์จากลิงก์ Google Drive
-    const regex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
-    const match = url.match(regex);
-
-    if (match && match[1]) {
-        const fileId = match[1];
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
-    }
-
-    // ถ้าไม่ใช่ลิงก์ Google Drive ก็ให้คืนค่าเดิมกลับไป
-    return url;
-}
-
-
-// --- Data Fetching ---
-async function fetchData() {
     try {
-        if(loader) loader.style.display = 'block';
-        if(errorMessage) errorMessage.style.display = 'none';
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase Connected!");
+    } catch (e) {
+        console.error("Firebase initialization failed:", e);
+    }
 
-        const [mediaRes, filtersRes] = await Promise.all([
-            fetch(`${SCRIPT_URL}?action=getMediaData`),
-            fetch(`${SCRIPT_URL}?action=getFilters`)
-        ]);
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pageContents = document.querySelectorAll('.page-content');
+    
+    // Flags ป้องกันการเรียก listener ซ้ำซ้อน
+    let innovationsListenerAttached = false;
+    let newsListenerAttached = false;
 
-        if (!mediaRes.ok || !filtersRes.ok) {
-            throw new Error('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
-        }
-
-        const mediaData = await mediaRes.json();
-        const filterData = await filtersRes.json();
+    function showPage(pageId) {
+        pageContents.forEach(page => page.classList.add('hidden'));
         
-        if (!Array.isArray(mediaData)) {
-            throw new Error('ข้อมูลที่ได้รับจากเซิร์ฟเวอร์ไม่ถูกต้อง');
+        const activePage = document.getElementById(pageId);
+        if (activePage) activePage.classList.remove('hidden');
+
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.dataset.page === pageId.replace('page-', ''));
+        });
+
+        // --- Logic การโหลดข้อมูลตามหน้า ---
+        if (pageId === 'page-innovations' && !innovationsListenerAttached) {
+            listenForInnovations();
+            innovationsListenerAttached = true;
         }
-
-        allMedia = mediaData;
-        filteredMedia = allMedia;
-        populateFilters(filterData);
-        displayMediaPage(1); 
-
-    } catch (error) {
-        showError(error.message);
-        console.error("Fetch error:", error);
-    } finally {
-        if(loader) loader.style.display = 'none';
-    }
-}
-
-// --- Display Logic ---
-function populateFilters(filterData) {
-    if (subjectFilter && filterData.subjects) {
-        filterData.subjects.forEach(subject => {
-            const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject;
-            subjectFilter.appendChild(option);
-        });
-    }
-    if (gradeFilter && filterData.grades) {
-        filterData.grades.forEach(grade => {
-            const option = document.createElement('option');
-            option.value = grade;
-            option.textContent = grade;
-            gradeFilter.appendChild(option);
-        });
-    }
-}
-
-function displayMediaPage(page) {
-    currentPage = page;
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const mediaToDisplay = filteredMedia.slice(start, end);
-
-    if (page === 1 && mediaGrid) {
-        mediaGrid.innerHTML = '';
-    }
-
-    if (mediaToDisplay.length === 0 && page === 1) {
-        mediaGrid.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบสื่อที่ตรงกับเงื่อนไข</p>';
-    } else {
-        mediaToDisplay.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer';
-            
-            // แปลง URL ก่อนนำไปใช้
-            const imageUrl = transformGoogleDriveImageUrl(item['CoverImageURL']) || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
-
-            card.innerHTML = `
-                <img src="${imageUrl}" 
-                     onerror="this.onerror=null;this.src='https://placehold.co/400x300/e2e8f0/64748b?text=Invalid+Image';"
-                     alt="${item['Title']}" class="w-full h-40 object-cover">
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 truncate">${item['Title']}</h3>
-                    <p class="text-sm text-gray-600 mt-1">${item['Category'] || 'ไม่ระบุ'}</p>
-                </div>
-            `;
-            card.addEventListener('click', () => openModal(item));
-            if(mediaGrid) mediaGrid.appendChild(card);
-        });
-    }
-
-    // Handle "Load More" button visibility
-    if (loadMoreContainer) {
-        if (end < filteredMedia.length) {
-            loadMoreContainer.style.display = 'block';
-        } else {
-            loadMoreContainer.style.display = 'none';
+        if (pageId === 'page-news' && !newsListenerAttached) {
+            listenForNews();
+            newsListenerAttached = true;
         }
     }
-}
 
-function applyFilters() {
-    const searchTerm = searchBox.value.toLowerCase();
-    const selectedSubject = subjectFilter.value;
-    const selectedGrade = gradeFilter.value;
-
-    filteredMedia = allMedia.filter(item => {
-        const titleMatch = item['Title']?.toLowerCase().includes(searchTerm) ?? true;
-        const subjectMatch = !selectedSubject || item['Category'] === selectedSubject;
-        const gradeMatch = !selectedGrade || item['Grade'] === selectedGrade;
-        return titleMatch && subjectMatch && gradeMatch;
+    navLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const pageId = 'page-' + link.dataset.page;
+            showPage(pageId);
+        });
     });
 
-    displayMediaPage(1);
-}
-
-// --- Modal Logic ---
-function openModal(item) {
-    if (!modal) return;
-    modalTitle.textContent = item['Title'] || 'ไม่มีชื่อ';
-    
-    // ตั้งค่ารูปภาพใน Modal พร้อมแปลง URL และจัดการ Error
-    const modalImageUrl = transformGoogleDriveImageUrl(item['CoverImageURL']) || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
-    modalCover.src = modalImageUrl;
-    modalCover.onerror = () => {
-        modalCover.onerror = null; // ป้องกันการวนลูปถ้า placeholder ก็เสีย
-        modalCover.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Invalid+Image';
-    };
-
-    modalDescription.textContent = item['Description'] || 'ไม่มีคำอธิบาย';
-    modalCreator.textContent = item['Creator'] || 'ไม่ระบุ';
-    modalSubject.textContent = item['Category'] || 'ไม่ระบุ';
-    modalGrade.textContent = item['Grade'] || 'ไม่ระบุ';
-    modalUploadDate.textContent = formatDate(item['UploadDate']);
-    modalOpenFile.href = item['FileLink'] || '#';
-    
-    modalCopyLink.onclick = () => {
-        navigator.clipboard.writeText(item['FileLink'] || '').then(() => {
-            modalCopyLink.textContent = 'คัดลอกแล้ว!';
-            setTimeout(() => { modalCopyLink.textContent = 'คัดลอกลิงก์'; }, 2000);
-        });
-    };
-    
-    modal.style.display = 'block';
-}
-
-function closeModal() {
-    if(modal) modal.style.display = 'none';
-}
-
-
-// --- Event Listeners ---
-if (searchBox) searchBox.addEventListener('input', applyFilters);
-if (subjectFilter) subjectFilter.addEventListener('change', applyFilters);
-if (gradeFilter) gradeFilter.addEventListener('change', applyFilters);
-if (loadMoreButton) loadMoreButton.addEventListener('click', () => displayMediaPage(currentPage + 1));
-if (modalClose) modalClose.addEventListener('click', closeModal);
-if (modal) modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
+    showPage('page-home');
 });
-if (backToTopButton) {
-    window.onscroll = () => {
-        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-            backToTopButton.style.display = "flex";
-        } else {
-            backToTopButton.style.display = "none";
+
+
+// --- ระบบข่าวประชาสัมพันธ์ (ดึงข้อมูลจาก Firestore) ---
+function listenForNews() {
+    const db = firebase.firestore();
+    const newsContainer = document.getElementById('news-list-container');
+    
+    // เรียงลำดับข่าวตาม 'publishDate' จากใหม่ไปเก่า
+    db.collection('news').orderBy('publishDate', 'desc').onSnapshot(
+        (querySnapshot) => {
+            if (querySnapshot.empty) {
+                newsContainer.innerHTML = '<p class="text-center text-gray-500 col-span-3">ยังไม่มีข่าวประชาสัมพันธ์ในระบบ</p>';
+                return;
+            }
+
+            newsContainer.innerHTML = ''; // ล้างข้อมูลเก่า
+            querySnapshot.forEach((doc) => {
+                const newsItem = doc.data();
+
+                const cardHTML = `
+                    <div class="news-card">
+                        <img src="${newsItem.imageUrl || 'https://placehold.co/600x400/E2E8F0/334155?text=รูปภาพข่าว'}" alt="${newsItem.title}">
+                        <div class="news-card-content">
+                            <h3>${newsItem.title || 'ไม่มีหัวข้อข่าว'}</h3>
+                            <p>${newsItem.summary || 'ไม่มีเนื้อหาโดยย่อ'}</p>
+                            <!-- ในอนาคต เราสามารถสร้างลิงก์ไปยังหน้ารายละเอียดข่าวได้ -->
+                            <a href="#">อ่านต่อ...</a>
+                        </div>
+                    </div>
+                `;
+                newsContainer.innerHTML += cardHTML;
+            });
+        }, 
+        (error) => {
+            console.error("Error fetching news: ", error);
+            newsContainer.innerHTML = '<p class="text-center text-red-500 col-span-3">เกิดข้อผิดพลาดในการดึงข้อมูลข่าวสาร</p>';
         }
-    };
-    backToTopButton.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    );
 }
 
-// Initial data fetch for the library page
-if (document.getElementById('media-grid')) {
-    fetchData();
+
+// --- ระบบคลังนวัตกรรม (ดึงข้อมูลจาก Firestore) ---
+function listenForInnovations() {
+    const db = firebase.firestore();
+    const innovationsContainer = document.getElementById('innovations-list-container');
+    
+    db.collection('innovations').onSnapshot(
+        (querySnapshot) => {
+            if (querySnapshot.empty) {
+                innovationsContainer.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีข้อมูลนวัตกรรมในระบบ</p>';
+                return;
+            }
+
+            innovationsContainer.innerHTML = ''; // ล้างข้อมูลเก่า
+            querySnapshot.forEach((doc) => {
+                const innovation = doc.data();
+
+                const cardHTML = `
+                    <div class="innovation-card">
+                        <img src="${innovation.coverImageURL || 'https://placehold.co/300x300/E2E8F0/334155?text=รูปภาพ'}" alt="${innovation.title}">
+                        <div class="innovation-card-content">
+                            <h3>${innovation.title || 'ไม่มีชื่อเรื่อง'}</h3>
+                            <p class="text-sm text-gray-500 mt-1">โดย: ${innovation.creator || 'ไม่ระบุ'}</p>
+                            <p class="text-gray-700 mt-2">${innovation.description || 'ไม่มีคำอธิบาย'}</p>
+                            <div class="tags-container mt-2">
+                                <span class="tag">ประเภท: ${innovation.fileType || 'ไม่ระบุ'}</span>
+                                <span class="tag">ระดับชั้น: ${innovation.grade || 'ไม่ระบุ'}</span>
+                            </div>
+                            <a href="${innovation.fileLink}" target="_blank" class="action-button">เปิดดูนวัตกรรม</a>
+                        </div>
+                    </div>
+                `;
+                innovationsContainer.innerHTML += cardHTML;
+            });
+        }, 
+        (error) => {
+            console.error("Error fetching innovations: ", error);
+            innovationsContainer.innerHTML = '<p class="text-center text-red-500">เกิดข้อผิดพลาดในการดึงข้อมูลนวัตกรรม</p>';
+        }
+    );
 }
 
