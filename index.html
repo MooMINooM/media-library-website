@@ -21,18 +21,18 @@
 
         <!-- Navigation Bar -->
         <nav id="main-nav-container" class="bg-white rounded-lg shadow-md p-2 mb-4 sticky top-4 z-40">
+             <!-- 🌟 UPDATED: เพิ่มคลาส transition และ transform ที่นี่โดยตรง 🌟 -->
             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 md:gap-x-6 overflow-x-auto whitespace-nowrap p-2">
-                <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
-                <a href="#" data-page="personnel" class="nav-link">ข้อมูลบุคลากร</a>
-                <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
-                <a href="#" data-page="school-board" class="nav-link">คณะกรรมการสถานศึกษา</a>
-                <a href="#" data-page="student-council" class="nav-link">คณะกรรมการสภานักเรียน</a>
-                <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
-                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
-                <a href="#" data-page="innovations" class="nav-link">คลังนวัตกรรม</a>
-                <!-- 🌟 NEW: Social Media Links 🌟 -->
-                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="nav-link text-blue-600 hover:text-blue-800">Facebook</a>
-                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="nav-link text-red-600 hover:text-red-800">Youtube</a>
+                <a href="#" data-page="home" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">หน้าหลัก</a>
+                <a href="#" data-page="personnel" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลบุคลากร</a>
+                <a href="#" data-page="students" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข้อมูลนักเรียน</a>
+                <a href="#" data-page="school-board" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คณะกรรมการสถานศึกษา</a>
+                <a href="#" data-page="student-council" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คณะกรรมการสภานักเรียน</a>
+                <a href="#" data-page="news" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="documents" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">เอกสาร</a>
+                <a href="#" data-page="innovations" class="nav-link transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">คลังนวัตกรรม</a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="nav-link text-blue-600 hover:text-blue-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Facebook</a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="nav-link text-red-600 hover:text-red-800 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95">Youtube</a>
             </div>
         </nav>
 
@@ -48,7 +48,6 @@
             <section id="page-personnel" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คณะผู้บริหารและคณาจารย์</h2>
-                    <!-- 🌟 NEW: Grid layout for personnel cards 🌟 -->
                     <div id="personnel-list" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                         <!-- การ์ดบุคลากรจะถูกสร้างโดย JavaScript ที่นี่ -->
                     </div>
