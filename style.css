@@ -11,15 +11,17 @@ body {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
-/* 🌟 DELETED: ลบโค้ดส่วนนี้ออก เพราะเราย้ายไปไว้ใน HTML แล้ว 🌟 */
-/* .nav-link { ... } */
-/* .nav-link:hover { ... } */
-/* .nav-link:active { ... } */
+/* 🌟 NEW: Styles for vertical sidebar navigation 🌟 */
+.nav-link {
+    @apply block w-full text-left px-4 py-2 text-sm font-medium text-gray-700 rounded-md;
+}
 
+.nav-link:hover {
+    @apply bg-blue-50 text-blue-800;
+}
 
 .nav-link.active {
-    /* เรายังคงเก็บ .active ไว้ที่นี่ เพราะ JavaScript เป็นตัวควบคุม */
-    @apply bg-blue-100 text-blue-800 border-b-2 border-blue-500;
+    @apply bg-blue-100 text-blue-800 font-bold;
 }
 
 #personnel-modal {
