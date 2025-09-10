@@ -93,20 +93,29 @@ function renderPersonnel(personnelList) {
 
     personnelList.forEach(person => {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md p-4 text-center transform hover:scale-105 transition-transform duration-300';
+        card.className = 'bg-white rounded-lg shadow-md p-4 text-center transform hover:scale-105 transition-transform duration-300 flex flex-col';
         
         // Fallback image if imageUrl is empty
         const imageUrl = person.imageUrl || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
 
         card.innerHTML = `
-            <img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100">
-            <h3 class="text-lg font-bold text-blue-800">${person.name || 'N/A'}</h3>
-            <p class="text-gray-600">${person.role || '-'}</p>
-            <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
+            <div class="flex-grow">
+                <img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100">
+                <h3 class="text-lg font-bold text-blue-800">${person.name || 'N/A'}</h3>
+                <p class="text-gray-600">${person.role || '-'}</p>
+                <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
+            </div>
             <hr class="my-3">
-            <p class="text-xs text-gray-500"><strong>วุฒิการศึกษา:</strong> ${person.education || '-'}</p>
-            <p class="text-xs text-gray-500 mt-1"><strong>ห้องประจำชั้น:</strong> ${person.class || '-'}</p>
-            <p class="text-xs text-gray-500 mt-1"><strong>โทร:</strong> ${person.tel || '-'}</p>
+            <div class="text-xs text-left grid grid-cols-2 gap-x-2">
+                <strong class="text-gray-600 justify-self-end">วุฒิการศึกษา:</strong>
+                <span class="text-gray-500">${person.education || '-'}</span>
+                
+                <strong class="text-gray-600 justify-self-end">ห้องประจำชั้น:</strong>
+                <span class="text-gray-500">${person.class || '-'}</span>
+
+                <strong class="text-gray-600 justify-self-end">โทร:</strong>
+                <span class="text-gray-500">${person.tel || '-'}</span>
+            </div>
         `;
         container.appendChild(card);
     });
