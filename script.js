@@ -55,14 +55,14 @@ function showPage(pageId) {
  */
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) {
-        return url; // ถ้าไม่ใช่ลิงก์ GDrive หรือไม่มีค่า ให้ return ค่าเดิม
+        return url; 
     }
     try {
         const fileId = url.split('/d/')[1].split('/')[0];
         return `https://drive.google.com/uc?export=view&id=${fileId}`;
     } catch (e) {
         console.error("Could not parse Google Drive URL:", url);
-        return url; // ถ้าแปลงไม่ได้ ให้ใช้ลิงก์เดิมไปก่อน
+        return url; 
     }
 }
 
@@ -72,9 +72,8 @@ async function loadPersonnelData() {
     const container = document.getElementById('personnel-container');
     const loadingEl = document.getElementById('personnel-loading');
 
-    // Show loading message
     loadingEl.classList.remove('hidden');
-    container.innerHTML = ''; // Clear old content
+    container.innerHTML = ''; 
     container.appendChild(loadingEl);
     
     try {
@@ -113,8 +112,8 @@ function renderPersonnel(personnelList) {
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg shadow-md p-4 text-center transform hover:scale-105 transition-transform duration-300 flex flex-col';
         
-        // --- 🧠 NEW: Convert GDrive URL and set fallback ---
         const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
         
         const educationList = person.education 
             ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') 
@@ -122,7 +121,12 @@ function renderPersonnel(personnelList) {
 
         card.innerHTML = `
             <div class="flex-grow">
-                <img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100">
+                <img 
+                    src="${finalImageUrl}" 
+                    alt="รูปภาพของ ${person.name}" 
+                    class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-blue-100"
+                    onerror="this.onerror=null; this.src='${errorImageUrl}';"
+                >
                 <h3 class="text-lg font-bold text-blue-800">${person.name || 'N/A'}</h3>
                 <p class="text-gray-600">${person.role || '-'}</p>
                 <p class="text-sm text-gray-500 mt-2">${person.academicStanding || ''}</p>
