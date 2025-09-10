@@ -24,32 +24,32 @@
              <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-4 md:gap-x-6 p-2">
                 <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
                 
-                <!-- 🌟 NEW: Dropdown Menu Structure 🌟 -->
-                <div class="dropdown">
-                    <button class="nav-link dropdown-toggle">โรงเรียน ▼</button>
-                    <div class="dropdown-menu hidden">
-                        <a href="#" data-page="history" class="dropdown-item">ประวัติความเป็นมา</a>
-                        <a href="#" data-page="info" class="dropdown-item">ข้อมูลทั่วไป</a>
-                        <a href="#" data-page="vision" class="dropdown-item">วิสัยทัศน์/ปรัชญา/พันธกิจ</a>
-                        <a href="#" data-page="structure" class="dropdown-item">โครงสร้างการบริหาร</a>
+                <!-- 🌟 UPDATED: Dropdown with inline Tailwind classes 🌟 -->
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โรงเรียน ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="history" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
+                        <a href="#" data-page="info" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
+                        <a href="#" data-page="vision" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">วิสัยทัศน์/ปรัชญา/พันธกิจ</a>
+                        <a href="#" data-page="structure" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
                     </div>
                 </div>
 
-                <div class="dropdown">
-                    <button class="nav-link dropdown-toggle">ข้อมูลบุคลากร ▼</button>
-                    <div class="dropdown-menu hidden">
-                        <a href="#" data-page="personnel-list" class="dropdown-item">รายชื่อบุคลากร</a>
-                        <a href="#" data-page="personnel-achievements" class="dropdown-item">ผลงานบุคลากร</a>
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">ข้อมูลบุคลากร ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="personnel-list" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">รายชื่อบุคลากร</a>
+                        <a href="#" data-page="personnel-achievements" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานบุคลากร</a>
                     </div>
                 </div>
 
                 <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
                 
-                <div class="dropdown">
-                    <button class="nav-link dropdown-toggle">คณะกรรมการ ▼</button>
-                    <div class="dropdown-menu hidden">
-                        <a href="#" data-page="school-board" class="dropdown-item">คณะกรรมการสถานศึกษา</a>
-                        <a href="#" data-page="student-council" class="dropdown-item">คณะกรรมการสภานักเรียน</a>
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">คณะกรรมการ ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="school-board" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
+                        <a href="#" data-page="student-council" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
                     </div>
                 </div>
 
@@ -57,11 +57,11 @@
                 <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
                 <a href="#" data-page="innovations" class="nav-link">คลังสื่อและนวัตกรรม</a>
 
-                <div class="dropdown">
-                    <button class="nav-link dropdown-toggle">โซเชียลมีเดีย ▼</button>
-                    <div class="dropdown-menu hidden">
-                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">Facebook</a>
-                        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">Youtube</a>
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โซเชียลมีเดีย ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Facebook</a>
+                        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
                     </div>
                 </div>
             </div>
