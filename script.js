@@ -50,17 +50,15 @@ function showPage(pageId) {
     }
 }
 
-// --- 🌟 NEW: MODAL (POP-UP) SYSTEM 🌟 ---
+// --- MODAL (POP-UP) SYSTEM ---
 function setupModal() {
     const modal = document.getElementById('personnel-modal');
     const closeBtn = document.getElementById('modal-close-btn');
 
-    // Close modal when close button is clicked
     closeBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
     });
 
-    // Close modal when clicking on the background overlay
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.add('hidden');
@@ -127,7 +125,6 @@ function getDirectGoogleDriveUrl(url) {
 
 // --- PERSONNEL PAGE ---
 async function loadPersonnelData() {
-    // Use cache if available to avoid re-fetching
     if (personnelDataCache.length > 0) {
         renderPersonnelList(personnelDataCache);
         return;
@@ -149,7 +146,7 @@ async function loadPersonnelData() {
 
         if (result.error) throw new Error(result.error);
         
-        personnelDataCache = result.data; // Save to cache
+        personnelDataCache = result.data;
         renderPersonnelList(personnelDataCache);
 
     } catch (error) {
@@ -158,6 +155,7 @@ async function loadPersonnelData() {
     }
 }
 
+// 🌟 NEW: Renders personnel as cards instead of a list 🌟
 function renderPersonnelList(personnelList) {
     const listContainer = document.getElementById('personnel-list');
     const loadingEl = document.getElementById('personnel-loading');
@@ -166,23 +164,34 @@ function renderPersonnelList(personnelList) {
     listContainer.innerHTML = '';
 
     if (!personnelList || personnelList.length === 0) {
-        listContainer.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลบุคลากร</p>';
+        listContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลบุคลากร</p>';
         return;
     }
 
     personnelList.forEach((person, index) => {
-        const listItem = document.createElement('a');
-        listItem.href = '#';
-        listItem.className = 'block bg-gray-50 p-3 rounded-lg hover:bg-blue-100 transition-colors duration-200';
-        listItem.dataset.index = index; // Use index as identifier
+        const cardItem = document.createElement('div');
+        // Make the card clickable
+        cardItem.className = 'bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4';
+        cardItem.dataset.index = index;
         
-        listItem.innerHTML = `
-            <h4 class="font-bold text-blue-800">${person.name || 'N/A'}</h4>
-            <p class="text-sm text-gray-600">${person.role || '-'}</p>
+        const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+
+        cardItem.innerHTML = `
+            <img 
+                src="${finalImageUrl}" 
+                alt="รูปภาพของ ${person.name}" 
+                class="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="text-center mt-2">
+                <h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4>
+                <p class="text-sm text-gray-600">${person.role || '-'}</p>
+                <p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p>
+            </div>
         `;
 
-        listItem.addEventListener('click', (e) => {
-            e.preventDefault();
+        cardItem.addEventListener('click', (e) => {
             const clickedIndex = e.currentTarget.dataset.index;
             const selectedPerson = personnelDataCache[clickedIndex];
             if(selectedPerson) {
@@ -190,7 +199,7 @@ function renderPersonnelList(personnelList) {
             }
         });
 
-        listContainer.appendChild(listItem);
+        listContainer.appendChild(cardItem);
     });
 }
 
