@@ -21,29 +21,116 @@
     </header>
 
     <nav id="main-nav-container" class="bg-white shadow-md sticky top-0 z-40">
-        <!-- ... existing nav code ... -->
+        <div class="container mx-auto">
+             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-12 p-2">
+                
+                <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
+
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โรงเรียน ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
+                        <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
+                        <a href="#" data-page="vision" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">วิสัยทัศน์/ปรัชญา/พันธกิจ</a>
+                        <a href="#" data-page="structure" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
+                        <a href="#" data-page="school-board" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
+                        <a href="#" data-page="student-council" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
+                    </div>
+                </div>
+
+                <a href="#" data-page="personnel-list" class="nav-link">ข้อมูลบุคลากร</a>
+                <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
+
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">ผลงาน ▼</button>
+                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="teacher-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานครู</a>
+                        <a href="#" data-page="student-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานนักเรียน</a>
+                        <a href="#" data-page="school-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานสถานศึกษา</a>
+                    </div>
+                </div>
+
+                <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
+                <a href="#" data-page="innovations" class="nav-link">คลังสื่อและนวัตกรรม</a>
+                
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โซเชียลมีเดีย ▼</button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Facebook</a>
+                        <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </nav>
 
     <div class="container mx-auto p-4">
         <main id="main-content">
-            <!-- ... existing page sections ... -->
+            <!-- Page Content Sections -->
+            <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6"><h2 class="section-title">ยินดีต้อนรับ</h2></section>
             
-            <!-- 🌟 UPDATED: Teacher Achievements page container is now a grid 🌟 -->
-            <section id="page-teacher-achievements" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ผลงานครู</h2>
-                    <div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Teacher Achievements cards will be inserted here -->
-                    </div>
-                    <p id="teacher-achievements-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+            <!-- School Pages -->
+            <section id="page-history" class="page-content hidden"><h2 class="section-title">ประวัติความเป็นมา</h2></section>
+            <section id="page-info" class="page-content hidden"><h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2></section>
+            <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
+            <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
+            <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
+            <section id="page-student-council" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
+                    <div id="student-council-container" class="mt-6"></div>
+                    <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            
+            <!-- Personnel Page -->
+            <section id="page-personnel-list" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข้อมูลบุคลากร</h2>
+                    <div id="personnel-list-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+                    <p id="personnel-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
 
-            <!-- ... other existing page sections ... -->
+            <!-- Student Page -->
+            <section id="page-students" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข้อมูลนักเรียน (ภาพรวม)</h2>
+                    <div id="student-summary-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center my-6"></div>
+                    <div id="students-chart-container" class="mt-6 relative" style="height: 450px;">
+                        <canvas id="studentChart"></canvas>
+                    </div>
+                    <p id="students-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            
+            <!-- Achievement Pages -->
+            <section id="page-teacher-achievements" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ผลงานครู</h2>
+                    <div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    <p id="teacher-achievements-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
+            <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
+
+            <!-- Other Main Pages -->
+            <section id="page-news" class="page-content hidden"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2></section>
+            <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
+            <section id="page-innovations" class="page-content hidden"><h2 class="section-title">คลังสื่อและนวัตกรรม</h2></section>
         </main>
     </div>
 
-    <!-- ... existing modal code ... -->
+    <!-- Modal (Pop-up) Structure -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <div id="detail-modal-content" class="p-6"></div>
+        </div>
+    </div>
     
     <script src="script.js"></script>
 </body>
