@@ -1,28 +1,51 @@
-/* ... (โค้ดเดิม) ... */
+/* We use Tailwind CSS for most styles directly in the HTML.
+   This file is for more complex styles or reusable classes.
+*/
+
 body {
     font-family: 'Sarabun', sans-serif;
-    background-color: #f0f2f5;
+}
+
+/* Base style for nav links */
+.nav-link, .dropdown-toggle {
+     @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 relative overflow-hidden;
+}
+
+/* 🌟 NEW: Create the blue animated bar using a pseudo-element 🌟 */
+.nav-link::after, .dropdown-toggle::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px; /* ความหนาของแถบสี */
+    background-color: #2563EB; /* Tailwind's blue-600 */
+    transform: translateX(-101%); /* ซ่อนแถบไว้ทางซ้าย */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Style for the active nav link */
+.nav-link.active, .dropdown-toggle.active {
+    @apply text-blue-800; /* เปลี่ยนแค่สีตัวอักษร */
+}
+
+/* 🌟 NEW: Animate the bar into view when the link is active 🌟 */
+.nav-link.active::after, .dropdown-toggle.active::after {
+    transform: translateX(0); /* เลื่อนแถบสีเข้ามา */
+}
+
+
+/* Effect when clicking a nav link */
+.nav-link:active {
+    @apply scale-95;
 }
 
 .section-title {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
-.nav-link {
-    @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out cursor-pointer;
+/* A helper class for dropdown menu items */
+.dropdown-item {
+    @apply block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800;
 }
-
-.nav-link:hover {
-    @apply bg-blue-50 text-blue-800;
-}
-
-.nav-link.active {
-    @apply bg-blue-100 text-blue-800 font-bold;
-}
-
-#personnel-modal {
-    transition: opacity 0.3s ease;
-}
-
-/* 🌟 REMOVED: Dropdown styles are now directly in index.html 🌟 */
 
