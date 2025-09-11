@@ -2,9 +2,11 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 // ---------------------------------------------------------
 
-// --- Global Caches for data ---
+// --- Global Caches & State ---
 let personnelDataCache = [];
 let studentDataCache = [];
+let studentChartInstance = null; // To hold the chart object
+let studentDataInterval = null; // To hold the interval timer
 
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showPage('home');
 });
 
-// --- DROPDOWN SYSTEM ---
+// --- DROPDOWN & NAVIGATION SYSTEMS (No Changes) ---
 function setupDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(dropdown => {
@@ -34,7 +36,6 @@ function closeAllDropdowns(exceptMenu = null) {
     });
 }
 
-// --- NAVIGATION SYSTEM ---
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
     mainNav.addEventListener('click', (e) => {
@@ -48,19 +49,23 @@ function setupNavigation() {
 }
 
 function showPage(pageId) {
+    // Clear any existing interval when changing pages
+    if (studentDataInterval) {
+        clearInterval(studentDataInterval);
+        studentDataInterval = null;
+    }
+
     document.querySelectorAll('.page-content').forEach(page => {
         page.classList.add('hidden');
     });
 
     const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) {
-        activePage.classList.remove('hidden');
-    }
+    if (activePage) activePage.classList.remove('hidden');
 
+    // Highlighting logic
     document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
         link.classList.remove('active');
     });
-
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
@@ -70,22 +75,21 @@ function showPage(pageId) {
         }
     }
 
-    // --- Load data for the specific page ---
+    // --- 🌟 UPDATED: Load data for the specific page ---
     switch (pageId) {
         case 'personnel-list':
-            loadPersonnelData(); // Restored this function call
+            loadPersonnelData();
             break;
         case 'students':
-            loadStudentData();
-            break;
-        case 'teacher-achievements':
-            console.log("Loading Teacher Achievements...");
+            loadStudentData(); // Load data immediately
+            // Refresh data every 5 minutes (300,000 milliseconds)
+            studentDataInterval = setInterval(() => loadStudentData(true), 300000);
             break;
         // ... other cases
     }
 }
 
-// --- MODAL & UTILITY FUNCTIONS ---
+// --- MODAL & UTILITY & PERSONNEL FUNCTIONS (No Changes) ---
 function setupModal() {
     const modal = document.getElementById('personnel-modal');
     const closeBtn = document.getElementById('modal-close-btn');
@@ -94,7 +98,6 @@ function setupModal() {
         if (e.target === modal) modal.classList.add('hidden');
     });
 }
-
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) return url;
     try {
@@ -107,9 +110,6 @@ function getDirectGoogleDriveUrl(url) {
         return url;
     } catch (e) { return url; }
 }
-
-
-// --- PERSONNEL PAGE ---
 async function loadPersonnelData() {
     if (personnelDataCache.length > 0) {
         renderPersonnelList(personnelDataCache);
@@ -120,7 +120,7 @@ async function loadPersonnelData() {
     loadingEl.classList.remove('hidden');
     listContainer.innerHTML = '';
     try {
-        const response = await fetch(`${API_URL}?sheet=personnel`); // Fetches from 'personnel' sheet
+        const response = await fetch(`${API_URL}?sheet=personnel`);
         const result = await response.json();
         if (result.error) throw new Error(result.error);
         personnelDataCache = result.data;
@@ -130,7 +130,6 @@ async function loadPersonnelData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
 function renderPersonnelList(personnelList) {
     const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -146,13 +145,7 @@ function renderPersonnelList(personnelList) {
         cardItem.dataset.index = index;
         const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
         const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-        cardItem.innerHTML = `
-            <img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';">
-            <div class="text-center mt-2">
-                <h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4>
-                <p class="text-sm text-gray-600">${person.role || '-'}</p>
-                <p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p>
-            </div>`;
+        cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="text-center mt-2"><h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4><p class="text-sm text-gray-600">${person.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p></div>`;
         cardItem.addEventListener('click', (e) => {
             const clickedIndex = e.currentTarget.dataset.index;
             const selectedPerson = personnelDataCache[clickedIndex];
@@ -161,90 +154,138 @@ function renderPersonnelList(personnelList) {
         listContainer.appendChild(cardItem);
     });
 }
-
 function showPersonnelModal(person) {
     const modal = document.getElementById('personnel-modal');
     const modalContent = document.getElementById('modal-content');
     const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
     const educationList = person.education ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') : '<li>-</li>';
-    modalContent.innerHTML = `
-        <div class="text-center">
-            <img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';">
-            <h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3>
-            <p class="text-gray-600 text-lg">${person.role || '-'}</p>
-            <p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p>
-        </div>
-        <hr class="my-4">
-        <div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start">
-            <strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong>
-            <ul class="text-gray-500 list-disc list-inside">${educationList}</ul>
-            <strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong>
-            <span class="text-gray-500">${person.class || '-'}</span>
-            <strong class="text-gray-600 text-right">โทร:</strong>
-            <span class="text-gray-500">${person.tel || '-'}</span>
-        </div>`;
+    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><ul class="text-gray-500 list-disc list-inside">${educationList}</ul><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
     modal.classList.remove('hidden');
 }
 
-// --- STUDENT PAGE ---
-async function loadStudentData() {
-    if (studentDataCache.length > 0) {
-        renderStudentData(studentDataCache);
-        return;
-    }
-    const tableContainer = document.getElementById('students-table-container');
+
+// --- 🌟 NEW & UPDATED: STUDENT PAGE WITH CHART 🌟 ---
+async function loadStudentData(isRefresh = false) {
     const loadingEl = document.getElementById('students-loading');
-    loadingEl.classList.remove('hidden');
-    tableContainer.innerHTML = '';
+    
+    // Only show loading message on initial load
+    if (!isRefresh) {
+        loadingEl.textContent = 'กำลังโหลดข้อมูล...';
+        loadingEl.classList.remove('hidden');
+    }
+    
     try {
-        const response = await fetch(`${API_URL}?sheet=students`); // Fetches from 'students' sheet
+        // Add a cache-busting parameter to the URL for refreshing
+        const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
+        const response = await fetch(url);
         const result = await response.json();
+
         if (result.error) throw new Error(result.error);
+        
         studentDataCache = result.data;
-        renderStudentData(studentDataCache);
+        renderStudentChart(studentDataCache);
+
     } catch (error) {
         console.error('Error loading student data:', error);
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
 
-function renderStudentData(studentList) {
-    const tableContainer = document.getElementById('students-table-container');
+function renderStudentChart(studentList) {
     const loadingEl = document.getElementById('students-loading');
+    const summaryContainer = document.getElementById('student-summary-container');
+    const ctx = document.getElementById('studentChart').getContext('2d');
+    
     loadingEl.classList.add('hidden');
-    tableContainer.innerHTML = '';
+    summaryContainer.innerHTML = '';
+
     if (!studentList || studentList.length === 0) {
-        tableContainer.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลนักเรียน</p>';
+        summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
         return;
     }
-    const table = document.createElement('table');
-    table.className = 'min-w-full divide-y divide-gray-200';
-    table.innerHTML = `
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ระดับชั้น</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ห้อง</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">นักเรียนชาย</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">นักเรียนหญิง</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รวม</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ครูประจำชั้น</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200"></tbody>`;
-    const tableBody = table.querySelector('tbody');
-    studentList.forEach(studentClass => {
-        const teachers = studentClass.teacher ? studentClass.teacher.split('\n').join('<br>') : '-';
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${studentClass.grade || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${studentClass.class || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${studentClass.boys || '0'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${studentClass.girls || '0'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${studentClass.total || '0'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${teachers}</td>`;
-        tableBody.appendChild(row);
+
+    // 1. Process data for the chart
+    const labels = studentList.map(s => `${s.grade || ''}${s.class ? ' ห้อง ' + s.class : ''}`.trim());
+    const boysData = studentList.map(s => parseInt(s.boys) || 0);
+    const girlsData = studentList.map(s => parseInt(s.girls) || 0);
+
+    // 2. Calculate summary statistics
+    const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
+    const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
+    const grandTotal = totalBoys + totalGirls;
+
+    // 3. Render summary cards
+    summaryContainer.innerHTML = `
+        <div class="bg-blue-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-blue-800">${totalBoys.toLocaleString()}</h3>
+            <p class="text-sm text-blue-600">นักเรียนชาย</p>
+        </div>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-pink-800">${totalGirls.toLocaleString()}</h3>
+            <p class="text-sm text-pink-600">นักเรียนหญิง</p>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-gray-800">${grandTotal.toLocaleString()}</h3>
+            <p class="text-sm text-gray-600">นักเรียนทั้งหมด</p>
+        </div>
+    `;
+
+    // 4. Destroy the old chart if it exists
+    if (studentChartInstance) {
+        studentChartInstance.destroy();
+    }
+
+    // 5. Create the new chart
+    studentChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'นักเรียนชาย',
+                    data: boysData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'นักเรียนหญิง',
+                    data: girlsData,
+                    backgroundColor: 'rgba(236, 72, 153, 0.7)', // pink-500
+                    borderColor: 'rgba(236, 72, 153, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'จำนวนนักเรียน (คน)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'ระดับชั้น'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'จำนวนนักเรียนแยกตามเพศและระดับชั้น'
+                }
+            }
+        }
     });
-    tableContainer.appendChild(table);
 }
 
