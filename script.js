@@ -204,15 +204,16 @@ function renderStudentChart(studentList) {
     }
 
     // 1. Process data for the chart
-    // 🌟 CHANGED: Labels are now just the grade level
     const labels = studentList.map(s => s.grade || '');
     const boysData = studentList.map(s => parseInt(s.boys) || 0);
     const girlsData = studentList.map(s => parseInt(s.girls) || 0);
+    // 🌟 NEW: Process total data from the sheet
+    const totalData = studentList.map(s => parseInt(s.total) || 0);
 
     // 2. Calculate summary statistics
     const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
     const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
-    const grandTotal = totalBoys + totalGirls;
+    const grandTotal = totalBoys + totalGirls; // Can also be derived from totalData.reduce(...)
 
     // 3. Render summary cards
     summaryContainer.innerHTML = `
@@ -253,6 +254,14 @@ function renderStudentChart(studentList) {
                     data: girlsData,
                     backgroundColor: 'rgba(236, 72, 153, 0.7)', // pink-500
                     borderColor: 'rgba(236, 72, 153, 1)',
+                    borderWidth: 1
+                },
+                // 🌟 NEW: Added the 'Total' dataset
+                {
+                    label: 'รวม',
+                    data: totalData,
+                    backgroundColor: 'rgba(107, 114, 128, 0.7)', // gray-500
+                    borderColor: 'rgba(107, 114, 128, 1)',
                     borderWidth: 1
                 }
             ]
