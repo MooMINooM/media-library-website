@@ -298,7 +298,8 @@ async function loadStudentCouncilData() {
     loadingEl.classList.remove('hidden');
     container.innerHTML = '';
     try {
-        const response = await fetch(`${API_URL}?sheet=school_board`);
+        // 🌟 FIXED: Changed 'school_board' to 'student_board' to match your sheet name
+        const response = await fetch(`${API_URL}?sheet=student_board`);
         const result = await response.json();
         if (result.error) throw new Error(result.error);
         studentCouncilDataCache = result.data;
