@@ -1,27 +1,5 @@
-// ------------------- 🎯 CONFIGURATION -------------------
-const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
-// ---------------------------------------------------------
+// ... existing code before showPage ...
 
-// --- Global Caches & State ---
-let personnelDataCache = [];
-let studentDataCache = [];
-let studentCouncilDataCache = [];
-let teacherAchievementsCache = [];
-let studentChartInstance = null;
-let studentDataInterval = null;
-
-document.addEventListener('DOMContentLoaded', () => {
-    setupNavigation();
-    setupDropdowns();
-    setupModal();
-    setupEventListeners();
-    showPage('home');
-});
-
-// --- DROPDOWN, NAVIGATION, EVENT LISTENERS, MODAL (No Changes) ---
-function setupDropdowns() { /* ... */ }
-function closeAllDropdowns(exceptMenu = null) { /* ... */ }
-function setupNavigation() { /* ... */ }
 function showPage(pageId) {
     if (studentDataInterval) {
         clearInterval(studentDataInterval);
@@ -55,23 +33,8 @@ function showPage(pageId) {
             break;
     }
 }
-function setupEventListeners() { /* ... */ }
-function setupModal() { /* ... */ }
-function getDirectGoogleDriveUrl(url) { /* ... */ }
 
-// --- PERSONNEL PAGE & MODAL (No Changes) ---
-async function loadPersonnelData() { /* ... */ }
-function renderPersonnelList(personnelList) { /* ... */ }
-function showPersonnelModal(person) { /* ... */ }
-
-// --- STUDENT PAGE WITH CHART (No Changes) ---
-async function loadStudentData(isRefresh = false) { /* ... */ }
-function renderStudentChart(studentList) { /* ... */ }
-
-// --- STUDENT COUNCIL PAGE & MODAL (No Changes) ---
-async function loadStudentCouncilData() { /* ... */ }
-function renderStudentCouncilList(boardList) { /* ... */ }
-function showStudentCouncilModal(member) { /* ... */ }
+// ... existing code before loadTeacherAchievementsData ...
 
 // --- 🌟 UPDATED: TEACHER ACHIEVEMENTS PAGE with new card layout 🌟 ---
 async function loadTeacherAchievementsData() {
@@ -119,13 +82,18 @@ function renderTeacherAchievements(achievementsList) {
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
 
+        // Truncate long project names with ellipsis
+        const truncatedProject = (item.project && item.project.length > 50) 
+            ? item.project.substring(0, 50) + '...' 
+            : item.project;
+
         card.innerHTML = `
             <div>
                 <h4 class="font-bold text-blue-800 text-lg">${item.name || '-'}</h4>
                 <a href="${item.url_pro || '#'}" target="_blank" rel="noopener noreferrer" 
-                   class="block mt-2 text-sm text-gray-600 hover:text-blue-800 hover:underline truncate" 
+                   class="block mt-1 text-sm text-gray-600 hover:text-blue-800 hover:underline" 
                    title="${item.project || ''}">
-                    ${item.project || '-'}
+                    ${truncatedProject || '-'}
                 </a>
             </div>
             <div class="mt-4 text-right">
@@ -138,4 +106,6 @@ function renderTeacherAchievements(achievementsList) {
         container.appendChild(card);
     });
 }
+
+// ... rest of the existing code ...
 
