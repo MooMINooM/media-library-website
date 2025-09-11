@@ -75,7 +75,7 @@ function showPage(pageId) {
         }
     }
 
-    // --- 🌟 UPDATED: Load data for the specific page ---
+    // --- UPDATED: Load data for the specific page ---
     switch (pageId) {
         case 'personnel-list':
             loadPersonnelData();
@@ -165,18 +165,16 @@ function showPersonnelModal(person) {
 }
 
 
-// --- 🌟 NEW & UPDATED: STUDENT PAGE WITH CHART 🌟 ---
+// --- 🌟 UPDATED: STUDENT PAGE WITH CHART 🌟 ---
 async function loadStudentData(isRefresh = false) {
     const loadingEl = document.getElementById('students-loading');
     
-    // Only show loading message on initial load
     if (!isRefresh) {
         loadingEl.textContent = 'กำลังโหลดข้อมูล...';
         loadingEl.classList.remove('hidden');
     }
     
     try {
-        // Add a cache-busting parameter to the URL for refreshing
         const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
         const response = await fetch(url);
         const result = await response.json();
@@ -206,7 +204,8 @@ function renderStudentChart(studentList) {
     }
 
     // 1. Process data for the chart
-    const labels = studentList.map(s => `${s.grade || ''}${s.class ? ' ห้อง ' + s.class : ''}`.trim());
+    // 🌟 CHANGED: Labels are now just the grade level
+    const labels = studentList.map(s => s.grade || '');
     const boysData = studentList.map(s => parseInt(s.boys) || 0);
     const girlsData = studentList.map(s => parseInt(s.girls) || 0);
 
