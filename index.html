@@ -28,7 +28,6 @@
 
                 <div class="relative dropdown">
                     <button class="nav-link dropdown-toggle inline-flex items-center">โรงเรียน ▼</button>
-                    <!-- 🌟 FIXED: Added correct styling classes directly to the links 🌟 -->
                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
                         <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
@@ -78,14 +77,10 @@
             <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
             <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
             <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
-
-            <!-- 🌟 UPDATED: Student Council page now has a container 🌟 -->
             <section id="page-student-council" class="page-content hidden">
                  <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
-                    <div id="student-council-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                        <!-- Student Council cards will be inserted here -->
-                    </div>
+                    <div id="student-council-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
                     <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
@@ -123,11 +118,11 @@
         </main>
     </div>
 
-    <!-- Modal (Pop-up) Structure for Personnel -->
-    <div id="personnel-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+    <!-- 🌟 UPDATED: Renamed Modal ID to be more generic 🌟 -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
-            <button id="modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-            <div id="modal-content" class="p-6"></div>
+            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <div id="detail-modal-content" class="p-6"></div>
         </div>
     </div>
     
