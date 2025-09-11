@@ -8,30 +8,19 @@ body {
 
 /* Base style for nav links */
 .nav-link, .dropdown-toggle {
-     @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 relative overflow-hidden;
+     /* Note: The @apply directive may not work correctly when using the Tailwind CDN script. 
+       It's recommended to place these classes directly in your HTML for best results.
+     */
+     @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105;
 }
 
-/* 🌟 NEW: Create the blue animated bar using a pseudo-element 🌟 */
-.nav-link::after, .dropdown-toggle::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px; /* ความหนาของแถบสี */
-    background-color: #2563EB; /* Tailwind's blue-600 */
-    transform: translateX(-101%); /* ซ่อนแถบไว้ทางซ้าย */
-    transition: transform 0.3s ease-in-out;
-}
 
-/* Style for the active nav link */
+/* 🌟 UPDATED: A simpler and cleaner style for the active nav link 🌟 */
 .nav-link.active, .dropdown-toggle.active {
-    @apply text-blue-800; /* เปลี่ยนแค่สีตัวอักษร */
-}
-
-/* 🌟 NEW: Animate the bar into view when the link is active 🌟 */
-.nav-link.active::after, .dropdown-toggle.active::after {
-    transform: translateX(0); /* เลื่อนแถบสีเข้ามา */
+    /* When a link is active, it gets a light blue background and bold blue text */
+    background-color: #EFF6FF; /* Tailwind's blue-50 */
+    color: #1D4ED8; /* Tailwind's blue-700 */
+    font-weight: 700; /* font-bold */
 }
 
 
