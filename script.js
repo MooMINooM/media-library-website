@@ -14,13 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupDropdowns();
     setupModal();
-    setupEventListeners(); // 🌟 NEW: Centralized event listeners are set up here
+    setupEventListeners(); // This is the crucial function for pop-ups
     // Show the homepage by default
     showPage('home');
 });
 
 // --- DROPDOWN SYSTEM ---
-// This function makes the dropdown menus work
 function setupDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(dropdown => {
@@ -28,13 +27,11 @@ function setupDropdowns() {
         const menu = dropdown.querySelector('.dropdown-menu');
         
         toggle.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents the window click event from firing immediately
-            closeAllDropdowns(menu); // Close other dropdowns
+            e.stopPropagation();
+            closeAllDropdowns(menu);
             menu.classList.toggle('hidden');
         });
     });
-
-    // Add a listener to the whole window to close dropdowns when clicking anywhere else
     window.addEventListener('click', () => {
         closeAllDropdowns();
     });
@@ -49,43 +46,33 @@ function closeAllDropdowns(exceptMenu = null) {
 }
 
 // --- NAVIGATION SYSTEM ---
-// This function handles changing pages when a nav link is clicked
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
     mainNav.addEventListener('click', (e) => {
-        // We only care about clicks on links that have a 'data-page' attribute
         if (e.target.matches('a[data-page]')) {
             e.preventDefault();
             const pageId = e.target.dataset.page;
             showPage(pageId);
-            closeAllDropdowns(); // Always close dropdowns after navigating
+            closeAllDropdowns();
         }
     });
 }
 
 function showPage(pageId) {
-    // Clear any automatic data refreshing when we change pages
     if (studentDataInterval) {
         clearInterval(studentDataInterval);
         studentDataInterval = null;
     }
-
-    // Hide all pages first
     document.querySelectorAll('.page-content').forEach(page => {
         page.classList.add('hidden');
     });
-
-    // Show the requested page
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) {
         activePage.classList.remove('hidden');
     }
-
-    // Update the active link styles in the navigation bar
     document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
         link.classList.remove('active');
     });
-
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
@@ -94,8 +81,6 @@ function showPage(pageId) {
             parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
         }
     }
-
-    // Load the specific data needed for the new page
     switch (pageId) {
         case 'personnel-list':
             loadPersonnelData();
@@ -110,17 +95,14 @@ function showPage(pageId) {
     }
 }
 
-// --- 🌟 NEW & FIXED: CENTRALIZED EVENT LISTENER SETUP 🌟 ---
-// This single function handles clicks for all dynamically created cards.
+// --- 🌟 FIXED: CENTRALIZED EVENT LISTENER SETUP 🌟 ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     
     mainContent.addEventListener('click', (e) => {
-        // Find the closest parent card with a specific class
         const personnelCard = e.target.closest('.personnel-card');
         const councilCard = e.target.closest('.student-council-card');
 
-        // If a personnel card was clicked...
         if (personnelCard) {
             const index = personnelCard.dataset.index;
             const selectedPerson = personnelDataCache[index];
@@ -129,7 +111,6 @@ function setupEventListeners() {
             }
         }
 
-        // If a student council card was clicked...
         if (councilCard) {
             const index = councilCard.dataset.index;
             const selectedMember = studentCouncilDataCache[index];
@@ -139,7 +120,6 @@ function setupEventListeners() {
         }
     });
 }
-
 
 // --- MODAL & UTILITY FUNCTIONS ---
 function setupModal() {
@@ -184,8 +164,6 @@ async function loadPersonnelData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
-// 🌟 FIXED: This function now just creates the card with the correct class.
 function renderPersonnelList(personnelList) {
     const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -197,13 +175,10 @@ function renderPersonnelList(personnelList) {
     }
     personnelList.forEach((person, index) => {
         const cardItem = document.createElement('div');
-        // This 'personnel-card' class is crucial for the event listener
         cardItem.className = 'personnel-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4';
         cardItem.dataset.index = index;
-        
         const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
         const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-
         cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="text-center mt-2"><h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4><p class="text-sm text-gray-600">${person.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p></div>`;
         listContainer.appendChild(cardItem);
     });
@@ -219,8 +194,105 @@ function showPersonnelModal(person) {
 }
 
 // --- STUDENT PAGE WITH CHART ---
-async function loadStudentData(isRefresh = false) { /* ... Same as before ... */ }
-function renderStudentChart(studentList) { /* ... Same as before ... */ }
+async function loadStudentData(isRefresh = false) {
+    const loadingEl = document.getElementById('students-loading');
+    if (!isRefresh) {
+        loadingEl.textContent = 'กำลังโหลดข้อมูล...';
+        loadingEl.classList.remove('hidden');
+    }
+    try {
+        const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        studentDataCache = result.data;
+        renderStudentChart(studentDataCache);
+    } catch (error) {
+        console.error('Error loading student data:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+function renderStudentChart(studentList) {
+    const loadingEl = document.getElementById('students-loading');
+    const summaryContainer = document.getElementById('student-summary-container');
+    const ctx = document.getElementById('studentChart').getContext('2d');
+    loadingEl.classList.add('hidden');
+    summaryContainer.innerHTML = '';
+    if (!studentList || studentList.length === 0) {
+        summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
+        return;
+    }
+    const labels = studentList.map(s => s.grade || '');
+    const boysData = studentList.map(s => parseInt(s.boys) || 0);
+    const girlsData = studentList.map(s => parseInt(s.girls) || 0);
+    const totalData = studentList.map(s => parseInt(s.total) || 0);
+    const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
+    const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
+    const grandTotal = totalBoys + totalGirls;
+    summaryContainer.innerHTML = `
+        <div class="bg-blue-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-blue-800">${totalBoys.toLocaleString()}</h3>
+            <p class="text-sm text-blue-600">นักเรียนชาย</p>
+        </div>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-pink-800">${totalGirls.toLocaleString()}</h3>
+            <p class="text-sm text-pink-600">นักเรียนหญิง</p>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-gray-800">${grandTotal.toLocaleString()}</h3>
+            <p class="text-sm text-gray-600">นักเรียนทั้งหมด</p>
+        </div>
+    `;
+    if (studentChartInstance) {
+        studentChartInstance.destroy();
+    }
+    studentChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'นักเรียนชาย',
+                    data: boysData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'นักเรียนหญิง',
+                    data: girlsData,
+                    backgroundColor: 'rgba(236, 72, 153, 0.7)',
+                    borderColor: 'rgba(236, 72, 153, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'รวม',
+                    data: totalData,
+                    backgroundColor: 'rgba(107, 114, 128, 0.7)',
+                    borderColor: 'rgba(107, 114, 128, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'จำนวนนักเรียน (คน)' }
+                },
+                x: {
+                    title: { display: true, text: 'ระดับชั้น' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'จำนวนนักเรียนแยกตามเพศและระดับชั้น' }
+            }
+        }
+    });
+}
 
 // --- STUDENT COUNCIL PAGE ---
 async function loadStudentCouncilData() {
@@ -243,8 +315,6 @@ async function loadStudentCouncilData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
-// 🌟 FIXED: This function now just creates the card with the correct class.
 function renderStudentCouncilList(boardList) {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
@@ -258,7 +328,6 @@ function renderStudentCouncilList(boardList) {
 
     const createCard = (member, index) => {
         const cardItem = document.createElement('div');
-        // This 'student-council-card' class is crucial for the event listener
         cardItem.className = 'student-council-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center';
         cardItem.dataset.index = index;
         
