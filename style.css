@@ -30,6 +30,6 @@ body {
    overflow: hidden;
    display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2; /* สามารถเปลี่ยนเลข 2 เป็นจำนวนบรรทัดที่ต้องการได้ */
+   -webkit-line-clamp: 2; /* This will limit the text to 2 lines */
 }
 
