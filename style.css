@@ -25,3 +25,11 @@ body {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
+/* 🌟 NEW: A helper class for multi-line text truncation 🌟 */
+.line-clamp-2 {
+   overflow: hidden;
+   display: -webkit-box;
+   -webkit-box-orient: vertical;
+   -webkit-line-clamp: 2; /* สามารถเปลี่ยนเลข 2 เป็นจำนวนบรรทัดที่ต้องการได้ */
+}
+
