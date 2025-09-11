@@ -8,21 +8,13 @@ body {
 
 /* Base style for nav links */
 .nav-link, .dropdown-toggle {
-     /* Note: The @apply directive may not work correctly when using the Tailwind CDN script. 
-       It's recommended to place these classes directly in your HTML for best results.
-     */
      @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105;
 }
 
-
-/* 🌟 UPDATED: A simpler and cleaner style for the active nav link 🌟 */
+/* Style for the active nav link */
 .nav-link.active, .dropdown-toggle.active {
-    /* When a link is active, it gets a light blue background and bold blue text */
-    background-color: #EFF6FF; /* Tailwind's blue-50 */
-    color: #1D4ED8; /* Tailwind's blue-700 */
-    font-weight: 700; /* font-bold */
+    @apply bg-blue-100 text-blue-800;
 }
-
 
 /* Effect when clicking a nav link */
 .nav-link:active {
@@ -31,10 +23,5 @@ body {
 
 .section-title {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
-}
-
-/* A helper class for dropdown menu items */
-.dropdown-item {
-    @apply block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800;
 }
 
