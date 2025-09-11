@@ -5,8 +5,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unp
 // --- Global Caches & State ---
 let personnelDataCache = [];
 let studentDataCache = [];
-let studentChartInstance = null; // To hold the chart object
-let studentDataInterval = null; // To hold the interval timer
+let studentChartInstance = null;
+let studentDataInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showPage('home');
 });
 
-// --- DROPDOWN & NAVIGATION SYSTEMS (No Changes) ---
+// --- DROPDOWN SYSTEM ---
 function setupDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(dropdown => {
@@ -36,6 +36,7 @@ function closeAllDropdowns(exceptMenu = null) {
     });
 }
 
+// --- NAVIGATION SYSTEM ---
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
     mainNav.addEventListener('click', (e) => {
@@ -49,7 +50,6 @@ function setupNavigation() {
 }
 
 function showPage(pageId) {
-    // Clear any existing interval when changing pages
     if (studentDataInterval) {
         clearInterval(studentDataInterval);
         studentDataInterval = null;
@@ -62,10 +62,10 @@ function showPage(pageId) {
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) activePage.classList.remove('hidden');
 
-    // Highlighting logic
     document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
         link.classList.remove('active');
     });
+
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
@@ -75,17 +75,16 @@ function showPage(pageId) {
         }
     }
 
-    // --- UPDATED: Load data for the specific page ---
+    // --- 🌟 UPDATED: Load data for all relevant pages ---
     switch (pageId) {
         case 'personnel-list':
             loadPersonnelData();
             break;
         case 'students':
-            loadStudentData(); // Load data immediately
-            // Refresh data every 5 minutes (300,000 milliseconds)
+            loadStudentData();
             studentDataInterval = setInterval(() => loadStudentData(true), 300000);
             break;
-        // ... other cases
+        // Add other cases here as we build them
     }
 }
 
@@ -164,58 +163,42 @@ function showPersonnelModal(person) {
     modal.classList.remove('hidden');
 }
 
-
-// --- 🌟 UPDATED: STUDENT PAGE WITH CHART 🌟 ---
+// --- STUDENT PAGE WITH CHART (No Changes) ---
 async function loadStudentData(isRefresh = false) {
     const loadingEl = document.getElementById('students-loading');
-    
     if (!isRefresh) {
         loadingEl.textContent = 'กำลังโหลดข้อมูล...';
         loadingEl.classList.remove('hidden');
     }
-    
     try {
         const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
         const response = await fetch(url);
         const result = await response.json();
-
         if (result.error) throw new Error(result.error);
-        
         studentDataCache = result.data;
         renderStudentChart(studentDataCache);
-
     } catch (error) {
         console.error('Error loading student data:', error);
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
 function renderStudentChart(studentList) {
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
     const ctx = document.getElementById('studentChart').getContext('2d');
-    
     loadingEl.classList.add('hidden');
     summaryContainer.innerHTML = '';
-
     if (!studentList || studentList.length === 0) {
         summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
         return;
     }
-
-    // 1. Process data for the chart
     const labels = studentList.map(s => s.grade || '');
     const boysData = studentList.map(s => parseInt(s.boys) || 0);
     const girlsData = studentList.map(s => parseInt(s.girls) || 0);
-    // 🌟 NEW: Process total data from the sheet
     const totalData = studentList.map(s => parseInt(s.total) || 0);
-
-    // 2. Calculate summary statistics
     const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
     const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
-    const grandTotal = totalBoys + totalGirls; // Can also be derived from totalData.reduce(...)
-
-    // 3. Render summary cards
+    const grandTotal = totalBoys + totalGirls;
     summaryContainer.innerHTML = `
         <div class="bg-blue-50 p-4 rounded-lg shadow">
             <h3 class="text-xl font-bold text-blue-800">${totalBoys.toLocaleString()}</h3>
@@ -230,13 +213,9 @@ function renderStudentChart(studentList) {
             <p class="text-sm text-gray-600">นักเรียนทั้งหมด</p>
         </div>
     `;
-
-    // 4. Destroy the old chart if it exists
     if (studentChartInstance) {
         studentChartInstance.destroy();
     }
-
-    // 5. Create the new chart
     studentChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -245,22 +224,21 @@ function renderStudentChart(studentList) {
                 {
                     label: 'นักเรียนชาย',
                     data: boysData,
-                    backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue-500
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
                     borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1
                 },
                 {
                     label: 'นักเรียนหญิง',
                     data: girlsData,
-                    backgroundColor: 'rgba(236, 72, 153, 0.7)', // pink-500
+                    backgroundColor: 'rgba(236, 72, 153, 0.7)',
                     borderColor: 'rgba(236, 72, 153, 1)',
                     borderWidth: 1
                 },
-                // 🌟 NEW: Added the 'Total' dataset
                 {
                     label: 'รวม',
                     data: totalData,
-                    backgroundColor: 'rgba(107, 114, 128, 0.7)', // gray-500
+                    backgroundColor: 'rgba(107, 114, 128, 0.7)',
                     borderColor: 'rgba(107, 114, 128, 1)',
                     borderWidth: 1
                 }
@@ -272,26 +250,15 @@ function renderStudentChart(studentList) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'จำนวนนักเรียน (คน)'
-                    }
+                    title: { display: true, text: 'จำนวนนักเรียน (คน)' }
                 },
                 x: {
-                    title: {
-                        display: true,
-                        text: 'ระดับชั้น'
-                    }
+                    title: { display: true, text: 'ระดับชั้น' }
                 }
             },
             plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'จำนวนนักเรียนแยกตามเพศและระดับชั้น'
-                }
+                legend: { position: 'top' },
+                title: { display: true, text: 'จำนวนนักเรียนแยกตามเพศและระดับชั้น' }
             }
         }
     });
