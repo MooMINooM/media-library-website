@@ -77,10 +77,14 @@
             <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
             <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
             <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
+            
+            <!-- 🌟 UPDATED: Student Council page - container no longer has grid classes 🌟 -->
             <section id="page-student-council" class="page-content hidden">
                  <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
-                    <div id="student-council-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+                    <div id="student-council-container" class="mt-6">
+                        <!-- Student Council cards will be inserted here by JavaScript -->
+                    </div>
                     <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
@@ -118,7 +122,7 @@
         </main>
     </div>
 
-    <!-- 🌟 UPDATED: Renamed Modal ID to be more generic 🌟 -->
+    <!-- Modal (Pop-up) Structure -->
     <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
             <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
