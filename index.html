@@ -78,7 +78,17 @@
             <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
             <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
             <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
-            <section id="page-student-council" class="page-content hidden"><h2 class="section-title">คณะกรรมการสภานักเรียน</h2></section>
+
+            <!-- 🌟 UPDATED: Student Council page now has a container 🌟 -->
+            <section id="page-student-council" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
+                    <div id="student-council-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        <!-- Student Council cards will be inserted here -->
+                    </div>
+                    <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
             
             <!-- Personnel Page -->
             <section id="page-personnel-list" class="page-content hidden">
