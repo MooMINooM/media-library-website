@@ -82,6 +82,7 @@ function showPage(pageId) {
             parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
         }
     }
+    // 🌟 REMOVED: No need to call a loading function for the static 'history' page
     switch (pageId) {
         case 'personnel-list':
             loadPersonnelData();
