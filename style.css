@@ -6,26 +6,10 @@ body {
     font-family: 'Sarabun', sans-serif;
 }
 
-/* Base style for nav links */
-.nav-link, .dropdown-toggle {
-     @apply px-3 py-2 text-sm font-medium text-gray-700 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105;
-}
-
-/* Style for the active nav link */
-.nav-link.active, .dropdown-toggle.active {
-    @apply bg-blue-100 text-blue-800;
-}
-
-/* Effect when clicking a nav link */
-.nav-link:active {
-    @apply scale-95;
-}
-
 .section-title {
     @apply text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-4;
 }
 
-/* 🌟 NEW: A helper class for multi-line text truncation 🌟 */
 .line-clamp-2 {
    overflow: hidden;
    display: -webkit-box;
