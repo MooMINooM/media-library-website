@@ -31,7 +31,7 @@
                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
                         <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
-                        <a href="#" data-page="vision" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">วิสัยทัศน์/ปรัชญา/พันธกิจ</a>
+                        <!-- 🌟 REMOVED: Vision/Philosophy/Mission link removed from dropdown 🌟 -->
                         <a href="#" data-page="structure" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
                         <a href="#" data-page="school-board" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
                         <a href="#" data-page="student-council" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
@@ -58,7 +58,7 @@
                     <button class="nav-link dropdown-toggle inline-flex items-center">โซเชียลมีเดีย ▼</button>
                     <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="https://www.facebook.com/phuphra" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Facebook</a>
-                        <a href="https://www.youtube.com/@%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9A%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%A0%E0%B8%B%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B9%82%E0%B8%99%E0%B8%99%E0%B8%9C%E0%B8%B1%E0%B8%81%E0%B8%AB%E0%B8%A7%E0%B8%B2%E0%B8%99" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
+                        <a href="https://www.youtube.com/@%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9A%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%A0%E0%B8%B9%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B9%82%E0%B8%99%E0%B8%99%E0%B8%9C%E0%B8%B1%E0%B8%81%E0%B8%AB%E0%B8%A7%E0%B8%B2%E0%B8%99" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
                     </div>
                 </div>
 
@@ -74,9 +74,7 @@
                  <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">ประวัติความเป็นมา</h2>
                     <div class="mt-6 prose max-w-none">
-                        <p>
-                            โรงเรียนบ้านภูพระโนนผักหวาน ก่อตั้งเมื่อวันที่ 1 พฤษภาคม พ.ศ. 2500...
-                        </p>
+                        <p>โรงเรียนบ้านภูพระโนนผักหวาน ก่อตั้งเมื่อวันที่ 1 พฤษภาคม พ.ศ. 2500...</p>
                     </div>
                     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+1" alt="ประวัติโรงเรียน 1" class="shadow-md w-full h-52 object-cover">
@@ -86,21 +84,17 @@
                 </div>
             </section>
 
-            <!-- 🌟 UPDATED: General Info page with new 3-panel layout 🌟 -->
+            <!-- 🌟 UPDATED: General Info page with Vision, Philosophy, Mission added 🌟 -->
             <section id="page-info" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2>
                     <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                         
-                        <!-- Left Panel: Logo -->
                         <div class="md:col-span-2 bg-gray-50 p-6 rounded-lg flex items-center justify-center transform hover:scale-105 hover:shadow-xl transition-all duration-300">
-                            <!-- 🖼️ ใส่ URL โลโก้โรงเรียนของคุณที่นี่ -->
                             <img src="https://placehold.co/400x400/FFFFFF/3182CE?text=ตราสัญลักษณ์โรงเรียน" alt="ตราสัญลักษณ์โรงเรียน" class="max-h-64 object-contain">
                         </div>
 
-                        <!-- Right Panels Container -->
                         <div class="md:col-span-1 flex flex-col gap-6">
-                            <!-- Top-Right Panel: School Colors -->
                             <div class="bg-gray-50 p-6 rounded-lg transform hover:scale-105 hover:shadow-xl transition-all duration-300">
                                 <h3 class="font-bold text-lg text-gray-700 mb-3">สีประจำโรงเรียน</h3>
                                 <div class="flex items-center gap-4">
@@ -112,21 +106,35 @@
                                     <span class="font-semibold text-gray-600">เหลือง</span>
                                 </div>
                             </div>
-
-                            <!-- Bottom-Right Panel: School Motto -->
-                            <div class="bg-gray-50 p-6 rounded-lg flex-grow flex flex-col justify-center items-center text-center transform hover:scale-105 hover:shadow-xl transition-all duration-300">
-                                <h3 class="font-bold text-lg text-gray-700 mb-2">ปรัชญาของโรงเรียน</h3>
-                                <!-- ✍️ ใส่ปรัชญาหรือคำขวัญของคุณที่นี่ -->
-                                <p class="text-gray-600 italic">"ปญฺญา โลกสฺมิ ปชฺโชโต"</p>
-                                <p class="text-sm text-gray-500 mt-1">(ปัญญาเป็นแสงสว่างในโลก)</p>
-                            </div>
                         </div>
-
                     </div>
+
+                    <!-- New Sections for Vision, Philosophy, Mission -->
+                    <div class="mt-8 space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">วิสัยทัศน์ (Vision)</h3>
+                            <p class="text-gray-600">"โรงเรียนคุณภาพ ชุมชนมีส่วนร่วม สร้างคนดี มีคุณธรรม นำความรู้ สู่มาตรฐานสากล"</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">ปรัชญา (Philosophy)</h3>
+                            <p class="text-gray-600 italic">"ปญฺญา โลกสฺมิ ปชฺโชโต" (ปัญญาเป็นแสงสว่างในโลก)</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">พันธกิจ (Mission)</h3>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>จัดการศึกษาให้ผู้เรียนมีคุณภาพตามมาตรฐานการศึกษา</li>
+                                <li>ส่งเสริมผู้เรียนให้มีคุณธรรม จริยธรรม และค่านิยมที่พึงประสงค์</li>
+                                <li>พัฒนาครูและบุคลากรทางการศึกษาให้เป็นครูมืออาชีพ</li>
+                                <li>บริหารจัดการศึกษาโดยใช้โรงเรียนเป็นฐาน (SBM)</li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
-            <section id="page-vision" class="page-content hidden"><h2 class="section-title">วิสัยทัศน์/ปรัชญา/พันธกิจ</h2></section>
+            <!-- 🌟 REMOVED: Old Vision page section is no longer needed 🌟 -->
+
             <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
             <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
             <section id="page-student-council" class="page-content hidden">
