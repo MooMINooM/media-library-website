@@ -1,153 +1,168 @@
-// ------------------- 🎯 CONFIGURATION -------------------
-const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
-// ---------------------------------------------------------
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โรงเรียนบ้านภูพระโนนผักหวาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
 
-// --- Global Caches & State ---
-let personnelDataCache = [];
-let studentDataCache = [];
-let studentCouncilDataCache = [];
-let teacherAchievementsCache = [];
-let studentChartInstance = null;
-let studentDataInterval = null;
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto p-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-800">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
+            <p class="text-gray-600 mt-1">สำนักงานเขตพื้นที่การศึกษาประถมศึกษาหนองบัวลำภู เขต 2</p>
+        </div>
+    </header>
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupNavigation();
-    setupDropdowns();
-    setupModal();
-    setupEventListeners();
-    showPage('home');
-});
+    <nav id="main-nav-container" class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto">
+             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-12 p-2">
+                
+                <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
 
-// --- DROPDOWN & NAVIGATION SYSTEMS ---
-function setupDropdowns() {
-    const dropdowns = document.querySelectorAll('.dropdown');
-    dropdowns.forEach(dropdown => {
-        const toggle = dropdown.querySelector('.dropdown-toggle');
-        const menu = dropdown.querySelector('.dropdown-menu');
-        toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeAllDropdowns(menu);
-            menu.classList.toggle('hidden');
-        });
-    });
-    window.addEventListener('click', () => closeAllDropdowns());
-}
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โรงเรียน ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
+                        <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
+                        <a href="#" data-page="structure" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
+                        <a href="#" data-page="school-board" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
+                        <a href="#" data-page="student-council" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
+                    </div>
+                </div>
 
-function closeAllDropdowns(exceptMenu = null) {
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (menu !== exceptMenu) menu.classList.add('hidden');
-    });
-}
+                <a href="#" data-page="personnel-list" class="nav-link">ข้อมูลบุคลากร</a>
+                <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
 
-function setupNavigation() {
-    const mainNav = document.getElementById('main-nav');
-    mainNav.addEventListener('click', (e) => {
-        if (e.target.matches('a[data-page]')) {
-            e.preventDefault();
-            const pageId = e.target.dataset.page;
-            showPage(pageId);
-            closeAllDropdowns();
-        }
-    });
-}
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">ผลงาน ▼</button>
+                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="teacher-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานครู</a>
+                        <a href="#" data-page="student-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานนักเรียน</a>
+                        <a href="#" data-page="school-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานสถานศึกษา</a>
+                    </div>
+                </div>
 
-function showPage(pageId) {
-    if (studentDataInterval) {
-        clearInterval(studentDataInterval);
-        studentDataInterval = null;
-    }
-    document.querySelectorAll('.page-content').forEach(page => {
-        page.classList.add('hidden');
-    });
+                <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
+                <a href="#" data-page="innovations" class="nav-link">คลังสื่อและนวัตกรรม</a>
+                
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">โซเชียลมีเดีย ▼</button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="https://www.facebook.com/phuphra" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Facebook</a>
+                        <a href="https://www.youtube.com/@%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9A%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%A0%E0%B8%B9%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B9%82%E0%B8%99%E0%B8%99%E0%B8%9C%E0%B8%B1%E0%B8%81%E0%B8%AB%E0%B8%A7%E0%B8%B2%E0%B8%99" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
+                    </div>
+                </div>
 
-    const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) activePage.classList.remove('hidden');
+            </div>
+        </div>
+    </nav>
 
-    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
-        link.classList.remove('active');
-    });
+    <div class="container mx-auto p-4">
+        <main id="main-content">
+            <!-- Page Content Sections -->
+            <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6"><h2 class="section-title">ยินดีต้อนรับ</h2></section>
+            
+            <section id="page-history" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ประวัติความเป็นมา</h2>
+                    <div class="mt-6 prose max-w-none">
+                        <p>โรงเรียนบ้านภูพระโนนผักหวาน ก่อตั้งเมื่อวันที่ 1 พฤษภาคม พ.ศ. 2500...</p>
+                    </div>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+1" alt="ประวัติโรงเรียน 1" class="shadow-md w-full h-52 object-cover">
+                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+2" alt="ประวัติโรงเรียน 2" class="shadow-md w-full h-52 object-cover">
+                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+3" alt="ประวัติโรงเรียน 3" class="shadow-md w-full h-52 object-cover">
+                    </div>
+                </div>
+            </section>
 
-    const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-        const parentDropdown = activeLink.closest('.dropdown');
-        if (parentDropdown) {
-            parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
-        }
-    }
+            <section id="page-info" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2>
+                    <div class="mt-8 space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">วิสัยทัศน์ (Vision)</h3>
+                            <p class="text-gray-600">"โรงเรียนคุณภาพ ชุมชนมีส่วนร่วม สร้างคนดี มีคุณธรรม นำความรู้ สู่มาตรฐานสากล"</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">ปรัชญา (Philosophy)</h3>
+                            <p class="text-gray-600 italic">"ปญฺญา โลกสฺมิ ปชฺโชโต" (ปัญญาเป็นแสงสว่างในโลก)</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="font-bold text-xl text-blue-800 mb-2">พันธกิจ (Mission)</h3>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>จัดการศึกษาให้ผู้เรียนมีคุณภาพตามมาตรฐานการศึกษา</li>
+                                <li>ส่งเสริมผู้เรียนให้มีคุณธรรม จริยธรรม และค่านิยมที่พึงประสงค์</li>
+                                <li>พัฒนาครูและบุคลากรทางการศึกษาให้เป็นครูมืออาชีพ</li>
+                                <li>บริหารจัดการศึกษาโดยใช้โรงเรียนเป็นฐาน (SBM)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
+            <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
+            <section id="page-student-council" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
+                    <div id="student-council-container" class="mt-6"></div>
+                    <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            
+            <section id="page-personnel-list" class="page-content hidden">
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข้อมูลบุคลากร</h2>
+                    <div id="personnel-list-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+                    <p id="personnel-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
 
-    // No changes needed in switch statement as 'vision' was never a dynamic page
-    switch (pageId) {
-        case 'personnel-list':
-            loadPersonnelData();
-            break;
-        case 'students':
-            loadStudentData();
-            studentDataInterval = setInterval(() => loadStudentData(true), 300000);
-            break;
-        case 'student-council':
-            loadStudentCouncilData();
-            break;
-        case 'teacher-achievements':
-            loadTeacherAchievementsData();
-            break;
-    }
-}
+            <section id="page-students" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข้อมูลนักเรียน (ภาพรวม)</h2>
+                    <div id="student-summary-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center my-6"></div>
+                    <div id="students-chart-container" class="mt-6 relative" style="height: 450px;">
+                        <canvas id="studentChart"></canvas>
+                    </div>
+                    <p id="students-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            
+            <section id="page-teacher-achievements" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ผลงานครู</h2>
+                    <div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    <p id="teacher-achievements-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+            <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
+            <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
 
-// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
-function setupEventListeners() {
-    const mainContent = document.getElementById('main-content');
-    mainContent.addEventListener('click', (e) => {
-        const personnelCard = e.target.closest('.personnel-card');
-        const councilCard = e.target.closest('.student-council-card');
-        if (personnelCard) {
-            const index = personnelCard.dataset.index;
-            const selectedPerson = personnelDataCache[index];
-            if (selectedPerson) showPersonnelModal(selectedPerson);
-        }
-        if (councilCard) {
-            const index = councilCard.dataset.index;
-            const selectedMember = studentCouncilDataCache[index];
-            if (selectedMember) showStudentCouncilModal(selectedMember);
-        }
-    });
-}
-function setupModal() {
-    const modal = document.getElementById('detail-modal');
-    const closeBtn = document.getElementById('detail-modal-close-btn');
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.add('hidden');
-    });
-}
-function getDirectGoogleDriveUrl(url) {
-    if (!url || !url.includes('drive.google.com')) return url;
-    try {
-        const parts = url.split('/');
-        const idIndex = parts.findIndex(part => part === 'd') + 1;
-        if (idIndex > 0 && idIndex < parts.length) {
-            const fileId = parts[idIndex];
-            return `https://drive.google.com/uc?export=view&id=${fileId}`;
-        }
-        return url;
-    } catch (e) { return url; }
-}
+            <section id="page-news" class="page-content hidden"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2></section>
+            <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
+            <section id="page-innovations" class="page-content hidden"><h2 class="section-title">คลังสื่อและนวัตกรรม</h2></section>
+        </main>
+    </div>
 
-// --- PERSONNEL PAGE ---
-async function loadPersonnelData() { /* ... No changes ... */ }
-function renderPersonnelList(personnelList) { /* ... No changes ... */ }
-function showPersonnelModal(person) { /* ... No changes ... */ }
-
-// --- STUDENT PAGE WITH CHART ---
-async function loadStudentData(isRefresh = false) { /* ... No changes ... */ }
-function renderStudentChart(studentList) { /* ... No changes ... */ }
-
-// --- STUDENT COUNCIL PAGE ---
-async function loadStudentCouncilData() { /* ... No changes ... */ }
-function renderStudentCouncilList(boardList) { /* ... No changes ... */ }
-function showStudentCouncilModal(member) { /* ... No changes ... */ }
-
-// --- TEACHER ACHIEVEMENTS PAGE ---
-async function loadTeacherAchievementsData() { /* ... No changes ... */ }
-function renderTeacherAchievements(achievementsList) { /* ... No changes ... */ }
+    <!-- Modal (Pop-up) Structure -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <div id="detail-modal-content" class="p-6"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
 
