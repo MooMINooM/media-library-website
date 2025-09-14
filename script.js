@@ -1,168 +1,406 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โรงเรียนบ้านภูพระโนนผักหวาน</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
+// ------------------- 🎯 CONFIGURATION -------------------
+const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
+// ---------------------------------------------------------
 
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto p-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-800">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
-            <p class="text-gray-600 mt-1">สำนักงานเขตพื้นที่การศึกษาประถมศึกษาหนองบัวลำภู เขต 2</p>
+// --- Global Caches & State ---
+let personnelDataCache = [];
+let studentDataCache = [];
+let studentCouncilDataCache = [];
+let teacherAchievementsCache = [];
+let studentChartInstance = null;
+let studentDataInterval = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // These functions set up all the interactive parts of the website
+    setupNavigation();
+    setupDropdowns();
+    setupModal();
+    setupEventListeners();
+    // Show the homepage by default
+    showPage('home');
+});
+
+// --- DROPDOWN SYSTEM ---
+function setupDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns(menu);
+            menu.classList.toggle('hidden');
+        });
+    });
+    window.addEventListener('click', () => {
+        closeAllDropdowns();
+    });
+}
+
+function closeAllDropdowns(exceptMenu = null) {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        if (menu !== exceptMenu) {
+            menu.classList.add('hidden');
+        }
+    });
+}
+
+// --- NAVIGATION SYSTEM ---
+function setupNavigation() {
+    const mainNav = document.getElementById('main-nav');
+    mainNav.addEventListener('click', (e) => {
+        if (e.target.matches('a[data-page]')) {
+            e.preventDefault();
+            const pageId = e.target.dataset.page;
+            showPage(pageId);
+            closeAllDropdowns();
+        }
+    });
+}
+
+function showPage(pageId) {
+    if (studentDataInterval) {
+        clearInterval(studentDataInterval);
+        studentDataInterval = null;
+    }
+    document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.add('hidden');
+    });
+    const activePage = document.getElementById(`page-${pageId}`);
+    if (activePage) {
+        activePage.classList.remove('hidden');
+    }
+    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
+        link.classList.remove('active');
+    });
+    const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+        const parentDropdown = activeLink.closest('.dropdown');
+        if (parentDropdown) {
+            parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
+        }
+    }
+    switch (pageId) {
+        case 'personnel-list':
+            loadPersonnelData();
+            break;
+        case 'students':
+            loadStudentData();
+            studentDataInterval = setInterval(() => loadStudentData(true), 300000);
+            break;
+        case 'student-council':
+            loadStudentCouncilData();
+            break;
+        case 'teacher-achievements':
+            loadTeacherAchievementsData();
+            break;
+    }
+}
+
+// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
+function setupEventListeners() {
+    const mainContent = document.getElementById('main-content');
+    mainContent.addEventListener('click', (e) => {
+        const personnelCard = e.target.closest('.personnel-card');
+        const councilCard = e.target.closest('.student-council-card');
+        if (personnelCard) {
+            const index = personnelCard.dataset.index;
+            const selectedPerson = personnelDataCache[index];
+            if (selectedPerson) showPersonnelModal(selectedPerson);
+        }
+        if (councilCard) {
+            const index = councilCard.dataset.index;
+            const selectedMember = studentCouncilDataCache[index];
+            if (selectedMember) showStudentCouncilModal(selectedMember);
+        }
+    });
+}
+function setupModal() {
+    const modal = document.getElementById('detail-modal');
+    const closeBtn = document.getElementById('detail-modal-close-btn');
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+}
+function getDirectGoogleDriveUrl(url) {
+    if (!url || !url.includes('drive.google.com')) return url;
+    try {
+        const parts = url.split('/');
+        const idIndex = parts.findIndex(part => part === 'd') + 1;
+        if (idIndex > 0 && idIndex < parts.length) {
+            const fileId = parts[idIndex];
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+        return url;
+    } catch (e) { return url; }
+}
+
+// --- PERSONNEL PAGE ---
+async function loadPersonnelData() {
+    if (personnelDataCache.length > 0) {
+        renderPersonnelList(personnelDataCache);
+        return;
+    }
+    const listContainer = document.getElementById('personnel-list-container');
+    const loadingEl = document.getElementById('personnel-loading');
+    loadingEl.classList.remove('hidden');
+    listContainer.innerHTML = '';
+    try {
+        const response = await fetch(`${API_URL}?sheet=personnel`);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        personnelDataCache = result.data;
+        renderPersonnelList(personnelDataCache);
+    } catch (error) {
+        console.error('Error loading personnel data:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+function renderPersonnelList(personnelList) {
+    const listContainer = document.getElementById('personnel-list-container');
+    const loadingEl = document.getElementById('personnel-loading');
+    loadingEl.classList.add('hidden');
+    listContainer.innerHTML = '';
+    if (!personnelList || personnelList.length === 0) {
+        listContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลบุคลากร</p>';
+        return;
+    }
+    personnelList.forEach((person, index) => {
+        const cardItem = document.createElement('div');
+        cardItem.className = 'personnel-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4';
+        cardItem.dataset.index = index;
+        const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+        cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="text-center mt-2"><h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4><p class="text-sm text-gray-600">${person.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p></div>`;
+        listContainer.appendChild(cardItem);
+    });
+}
+function showPersonnelModal(person) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+    const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+    const educationList = person.education ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') : '<li>-</li>';
+    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><ul class="text-gray-500 list-disc list-inside">${educationList}</ul><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
+    modal.classList.remove('hidden');
+}
+
+// --- STUDENT PAGE WITH CHART ---
+async function loadStudentData(isRefresh = false) {
+    const loadingEl = document.getElementById('students-loading');
+    if (!isRefresh) {
+        loadingEl.textContent = 'กำลังโหลดข้อมูล...';
+        loadingEl.classList.remove('hidden');
+    }
+    try {
+        const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        studentDataCache = result.data;
+        renderStudentChart(studentDataCache);
+    } catch (error) {
+        console.error('Error loading student data:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+function renderStudentChart(studentList) {
+    const loadingEl = document.getElementById('students-loading');
+    const summaryContainer = document.getElementById('student-summary-container');
+    const ctx = document.getElementById('studentChart').getContext('2d');
+    loadingEl.classList.add('hidden');
+    summaryContainer.innerHTML = '';
+    if (!studentList || studentList.length === 0) {
+        summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
+        return;
+    }
+    const labels = studentList.map(s => s.grade || '');
+    const boysData = studentList.map(s => parseInt(s.boys) || 0);
+    const girlsData = studentList.map(s => parseInt(s.girls) || 0);
+    const totalData = studentList.map(s => parseInt(s.total) || 0);
+    const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
+    const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
+    const grandTotal = totalBoys + totalGirls;
+    summaryContainer.innerHTML = `
+        <div class="bg-blue-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-blue-800">${totalBoys.toLocaleString()}</h3>
+            <p class="text-sm text-blue-600">นักเรียนชาย</p>
         </div>
-    </header>
+        <div class="bg-pink-50 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-pink-800">${totalGirls.toLocaleString()}</h3>
+            <p class="text-sm text-pink-600">นักเรียนหญิง</p>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-gray-800">${grandTotal.toLocaleString()}</h3>
+            <p class="text-sm text-gray-600">นักเรียนทั้งหมด</p>
+        </div>
+    `;
+    if (studentChartInstance) {
+        studentChartInstance.destroy();
+    }
+    studentChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'นักเรียนชาย',
+                    data: boysData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'นักเรียนหญิง',
+                    data: girlsData,
+                    backgroundColor: 'rgba(236, 72, 153, 0.7)',
+                    borderColor: 'rgba(236, 72, 153, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'รวม',
+                    data: totalData,
+                    backgroundColor: 'rgba(107, 114, 128, 0.7)',
+                    borderColor: 'rgba(107, 114, 128, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'จำนวนนักเรียน (คน)' }
+                },
+                x: {
+                    title: { display: true, text: 'ระดับชั้น' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'จำนวนนักเรียนแยกตามเพศและระดับชั้น' }
+            }
+        }
+    });
+}
 
-    <nav id="main-nav-container" class="bg-white shadow-md sticky top-0 z-40">
-        <div class="container mx-auto">
-             <div id="main-nav" class="flex flex-wrap items-center justify-center gap-x-8 md:gap-x-12 p-2">
-                
-                <a href="#" data-page="home" class="nav-link">หน้าหลัก</a>
+// --- STUDENT COUNCIL PAGE ---
+async function loadStudentCouncilData() {
+    if (studentCouncilDataCache.length > 0) {
+        renderStudentCouncilList(studentCouncilDataCache);
+        return;
+    }
+    const container = document.getElementById('student-council-container');
+    const loadingEl = document.getElementById('student-council-loading');
+    loadingEl.classList.remove('hidden');
+    container.innerHTML = '';
+    try {
+        const response = await fetch(`${API_URL}?sheet=student_board`);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        studentCouncilDataCache = result.data;
+        renderStudentCouncilList(studentCouncilDataCache);
+    } catch (error) {
+        console.error('Error loading student council data:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+function renderStudentCouncilList(boardList) {
+    const container = document.getElementById('student-council-container');
+    const loadingEl = document.getElementById('student-council-loading');
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+    if (!boardList || boardList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลคณะกรรมการสภานักเรียน</p>';
+        return;
+    }
+    const createCard = (member, index) => {
+        const cardItem = document.createElement('div');
+        cardItem.className = 'student-council-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center';
+        cardItem.dataset.index = index;
+        const finalImageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+        cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${member.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="mt-2"><h4 class="font-bold text-blue-800 text-md">${member.name || 'N/A'}</h4><p class="text-sm text-gray-600">${member.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${member.class || ''}</p></div>`;
+        return cardItem;
+    };
+    const president = boardList[0];
+    if (president) {
+        const presidentContainer = document.createElement('div');
+        presidentContainer.className = 'flex justify-center mb-8';
+        presidentContainer.appendChild(createCard(president, 0));
+        container.appendChild(presidentContainer);
+    }
+    const otherMembers = boardList.slice(1);
+    if (otherMembers.length > 0) {
+        const othersContainer = document.createElement('div');
+        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6';
+        otherMembers.forEach((member, index) => {
+            othersContainer.appendChild(createCard(member, index + 1));
+        });
+        container.appendChild(othersContainer);
+    }
+}
+function showStudentCouncilModal(member) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    const imageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+    const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p><p class="text-md text-gray-500 mt-1">${member.class || ''}</p></div>`;
+    modal.classList.remove('hidden');
+}
 
-                <div class="relative dropdown">
-                    <button class="nav-link dropdown-toggle inline-flex items-center">โรงเรียน ▼</button>
-                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
-                        <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
-                        <a href="#" data-page="structure" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
-                        <a href="#" data-page="school-board" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
-                        <a href="#" data-page="student-council" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
-                    </div>
-                </div>
-
-                <a href="#" data-page="personnel-list" class="nav-link">ข้อมูลบุคลากร</a>
-                <a href="#" data-page="students" class="nav-link">ข้อมูลนักเรียน</a>
-
-                <div class="relative dropdown">
-                    <button class="nav-link dropdown-toggle inline-flex items-center">ผลงาน ▼</button>
-                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="#" data-page="teacher-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานครู</a>
-                        <a href="#" data-page="student-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานนักเรียน</a>
-                        <a href="#" data-page="school-achievements" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ผลงานสถานศึกษา</a>
-                    </div>
-                </div>
-
-                <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
-                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
-                <a href="#" data-page="innovations" class="nav-link">คลังสื่อและนวัตกรรม</a>
-                
-                <div class="relative dropdown">
-                    <button class="nav-link dropdown-toggle inline-flex items-center">โซเชียลมีเดีย ▼</button>
-                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="https://www.facebook.com/phuphra" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Facebook</a>
-                        <a href="https://www.youtube.com/@%E0%B9%82%E0%B8%A3%E0%B8%87%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9A%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%A0%E0%B8%B9%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B9%82%E0%B8%99%E0%B8%99%E0%B8%9C%E0%B8%B1%E0%B8%81%E0%B8%AB%E0%B8%A7%E0%B8%B2%E0%B8%99" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">Youtube</a>
-                    </div>
-                </div>
-
+// --- TEACHER ACHIEVEMENTS PAGE ---
+async function loadTeacherAchievementsData() {
+    if (teacherAchievementsCache.length > 0) {
+        renderTeacherAchievements(teacherAchievementsCache);
+        return;
+    }
+    const container = document.getElementById('teacher-achievements-container');
+    const loadingEl = document.getElementById('teacher-achievements-loading');
+    loadingEl.classList.remove('hidden');
+    container.innerHTML = '';
+    try {
+        const response = await fetch(`${API_URL}?sheet=performance`);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        teacherAchievementsCache = result.data;
+        renderTeacherAchievements(teacherAchievementsCache);
+    } catch (error) {
+        console.error('Error loading teacher achievements:', error);
+        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+    }
+}
+function renderTeacherAchievements(achievementsList) {
+    const container = document.getElementById('teacher-achievements-container');
+    const loadingEl = document.getElementById('teacher-achievements-loading');
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+    if (!achievementsList || achievementsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลผลงานครู</p>';
+        return;
+    }
+    achievementsList.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
+        card.innerHTML = `
+            <div>
+                <h4 class="font-bold text-blue-800 text-lg">${item.name || '-'}</h4>
+                <a href="${item.url_pro || '#'}" target="_blank" rel="noopener noreferrer" class="block mt-1 text-sm text-gray-600 hover:text-blue-800 hover:underline line-clamp-2 h-10" title="${item.project || ''}">
+                    ${item.project || '-'}
+                </a>
             </div>
-        </div>
-    </nav>
-
-    <div class="container mx-auto p-4">
-        <main id="main-content">
-            <!-- Page Content Sections -->
-            <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6"><h2 class="section-title">ยินดีต้อนรับ</h2></section>
-            
-            <section id="page-history" class="page-content hidden">
-                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ประวัติความเป็นมา</h2>
-                    <div class="mt-6 prose max-w-none">
-                        <p>โรงเรียนบ้านภูพระโนนผักหวาน ก่อตั้งเมื่อวันที่ 1 พฤษภาคม พ.ศ. 2500...</p>
-                    </div>
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+1" alt="ประวัติโรงเรียน 1" class="shadow-md w-full h-52 object-cover">
-                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+2" alt="ประวัติโรงเรียน 2" class="shadow-md w-full h-52 object-cover">
-                        <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+3" alt="ประวัติโรงเรียน 3" class="shadow-md w-full h-52 object-cover">
-                    </div>
-                </div>
-            </section>
-
-            <section id="page-info" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2>
-                    <div class="mt-8 space-y-6">
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="font-bold text-xl text-blue-800 mb-2">วิสัยทัศน์ (Vision)</h3>
-                            <p class="text-gray-600">"โรงเรียนคุณภาพ ชุมชนมีส่วนร่วม สร้างคนดี มีคุณธรรม นำความรู้ สู่มาตรฐานสากล"</p>
-                        </div>
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="font-bold text-xl text-blue-800 mb-2">ปรัชญา (Philosophy)</h3>
-                            <p class="text-gray-600 italic">"ปญฺญา โลกสฺมิ ปชฺโชโต" (ปัญญาเป็นแสงสว่างในโลก)</p>
-                        </div>
-                        <div class="bg-gray-50 p-6 rounded-lg">
-                            <h3 class="font-bold text-xl text-blue-800 mb-2">พันธกิจ (Mission)</h3>
-                            <ul class="list-disc list-inside text-gray-600 space-y-1">
-                                <li>จัดการศึกษาให้ผู้เรียนมีคุณภาพตามมาตรฐานการศึกษา</li>
-                                <li>ส่งเสริมผู้เรียนให้มีคุณธรรม จริยธรรม และค่านิยมที่พึงประสงค์</li>
-                                <li>พัฒนาครูและบุคลากรทางการศึกษาให้เป็นครูมืออาชีพ</li>
-                                <li>บริหารจัดการศึกษาโดยใช้โรงเรียนเป็นฐาน (SBM)</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
-            <section id="page-school-board" class="page-content hidden"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2></section>
-            <section id="page-student-council" class="page-content hidden">
-                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">คณะกรรมการสภานักเรียน</h2>
-                    <div id="student-council-container" class="mt-6"></div>
-                    <p id="student-council-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
-                </div>
-            </section>
-            
-            <section id="page-personnel-list" class="page-content hidden">
-                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ข้อมูลบุคลากร</h2>
-                    <div id="personnel-list-container" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
-                    <p id="personnel-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
-                </div>
-            </section>
-
-            <section id="page-students" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ข้อมูลนักเรียน (ภาพรวม)</h2>
-                    <div id="student-summary-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center my-6"></div>
-                    <div id="students-chart-container" class="mt-6 relative" style="height: 450px;">
-                        <canvas id="studentChart"></canvas>
-                    </div>
-                    <p id="students-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
-                </div>
-            </section>
-            
-            <section id="page-teacher-achievements" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">ผลงานครู</h2>
-                    <div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-                    <p id="teacher-achievements-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
-                </div>
-            </section>
-            <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
-            <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
-
-            <section id="page-news" class="page-content hidden"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2></section>
-            <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
-            <section id="page-innovations" class="page-content hidden"><h2 class="section-title">คลังสื่อและนวัตกรรม</h2></section>
-        </main>
-    </div>
-
-    <!-- Modal (Pop-up) Structure -->
-    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
-            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-            <div id="detail-modal-content" class="p-6"></div>
-        </div>
-    </div>
-    
-    <script src="script.js"></script>
-</body>
-</html>
+            <div class="mt-4 text-right">
+                <a href="${item.url_all || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                    ดูผลงานทั้งหมด
+                </a>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
 
