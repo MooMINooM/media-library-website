@@ -113,6 +113,9 @@ function showPage(pageId) {
         case 'teacher-achievements':
             loadTeacherAchievementsData();
             break;
+        case 'school-board':
+            renderSchoolBoardList();
+            break;
     }
 }
 
@@ -122,6 +125,8 @@ function setupEventListeners() {
     mainContent.addEventListener('click', (e) => {
         const personnelCard = e.target.closest('.personnel-card');
         const councilCard = e.target.closest('.student-council-card');
+        const boardCard = e.target.closest('.school-board-card');
+
         if (personnelCard) {
             const index = personnelCard.dataset.index;
             const selectedPerson = STATIC_PERSONNEL_DATA[index];
@@ -131,6 +136,11 @@ function setupEventListeners() {
             const index = councilCard.dataset.index;
             const selectedMember = STATIC_STUDENT_COUNCIL_DATA[index];
             if (selectedMember) showStudentCouncilModal(selectedMember);
+        }
+        if (boardCard) {
+            const index = boardCard.dataset.index;
+            const selectedMember = STATIC_SCHOOL_BOARD_DATA[index];
+            if (selectedMember) showSchoolBoardModal(selectedMember);
         }
     });
 }
@@ -327,10 +337,6 @@ function renderStudentChart(studentList) {
 }
 
 // --- STUDENT COUNCIL PAGE ---
-function loadStudentCouncilData() {
-    renderStudentCouncilList();
-}
-
 function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
@@ -361,6 +367,7 @@ function renderStudentCouncilList() {
             </div>`;
         return cardItem;
     };
+    
     const president = boardData[0];
     if (president) {
         const presidentContainer = document.createElement('div');
@@ -390,6 +397,79 @@ function showStudentCouncilModal(member) {
             <h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3>
             <p class="text-gray-600 text-lg">${member.role || '-'}</p>
             <p class="text-md text-gray-500 mt-1">${member.class || ''}</p>
+        </div>`;
+    modal.classList.remove('hidden');
+}
+
+// --- SCHOOL BOARD PAGE ---
+function renderSchoolBoardList() {
+    const container = document.getElementById('school-board-container');
+    const loadingEl = document.getElementById('school-board-loading');
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    const boardData = STATIC_SCHOOL_BOARD_DATA;
+
+    if (!boardData || boardData.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลคณะกรรมการสถานศึกษา</p>';
+        return;
+    }
+    
+    const createCard = (member, index, isPresident = false) => {
+        const cardItem = document.createElement('div');
+        const cardWidth = isPresident ? 'max-w-xs' : '';
+        cardItem.className = `school-board-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center ${cardWidth}`;
+        cardItem.dataset.index = index;
+        const finalImageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+        const imageSize = isPresident ? 'w-32 h-32' : 'w-24 h-24';
+        const nameSize = isPresident ? 'text-lg' : 'text-md';
+        cardItem.innerHTML = `
+            <img src="${finalImageUrl}" alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';">
+            <div class="mt-2">
+                <h4 class="font-bold text-blue-800 ${nameSize}">${member.name || 'N/A'}</h4>
+                <p class="text-sm text-gray-600">${member.role || '-'}</p>
+            </div>`;
+        return cardItem;
+    };
+
+    const president = boardData[0];
+    if (president) {
+        const presidentSection = document.createElement('div');
+        presidentSection.className = 'mb-8';
+        presidentSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ประธานกรรมการ</h3>`;
+        const presidentContainer = document.createElement('div');
+        presidentContainer.className = 'flex justify-center';
+        presidentContainer.appendChild(createCard(president, 0, true));
+        presidentSection.appendChild(presidentContainer);
+        container.appendChild(presidentSection);
+    }
+
+    const otherMembers = boardData.slice(1);
+    if (otherMembers.length > 0) {
+        const othersSection = document.createElement('div');
+        othersSection.className = 'mt-8 border-t pt-6';
+        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะกรรมการ</h3>`;
+        const othersContainer = document.createElement('div');
+        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6';
+        otherMembers.forEach((member, index) => {
+            othersContainer.appendChild(createCard(member, index + 1));
+        });
+        othersSection.appendChild(othersContainer);
+        container.appendChild(othersSection);
+    }
+}
+
+function showSchoolBoardModal(member) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    const imageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+    const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';">
+            <h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3>
+            <p class="text-gray-600 text-lg">${member.role || '-'}</p>
         </div>`;
     modal.classList.remove('hidden');
 }
