@@ -195,29 +195,22 @@ function renderPersonnelList() {
 
     const director = personnelList[0];
     if (director) {
-        const directorSection = document.createElement('div');
-        directorSection.className = 'col-span-full mb-8';
         const directorContainer = document.createElement('div');
-        directorContainer.className = 'flex justify-center';
+        directorContainer.className = 'flex justify-center mb-8';
         directorContainer.appendChild(createCard(director, 0, true));
-        directorSection.appendChild(directorContainer);
-        container.appendChild(directorSection);
+        container.appendChild(directorContainer);
     }
 
     const otherPersonnel = personnelList.slice(1);
     if (otherPersonnel.length > 0) {
-        const othersSection = document.createElement('div');
-        othersSection.className = 'col-span-full mt-8 border-t pt-6';
-        
         const othersContainer = document.createElement('div');
-        othersContainer.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6';
+        othersContainer.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-8 border-t pt-6';
         
         otherPersonnel.forEach((person, index) => {
             othersContainer.appendChild(createCard(person, index + 1));
         });
         
-        othersSection.appendChild(othersContainer);
-        container.appendChild(othersSection);
+        container.appendChild(othersContainer);
     }
 }
 
@@ -369,7 +362,6 @@ function renderStudentCouncilList() {
         return cardItem;
     };
     
-    // 🌟 UPDATED: Removed the header sections
     const president = boardData[0];
     if (president) {
         const presidentContainer = document.createElement('div');
@@ -387,7 +379,6 @@ function renderStudentCouncilList() {
         container.appendChild(othersContainer);
     }
 }
-
 function showStudentCouncilModal(member) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
