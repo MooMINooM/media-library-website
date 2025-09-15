@@ -197,7 +197,6 @@ function renderPersonnelList() {
     if (director) {
         const directorSection = document.createElement('div');
         directorSection.className = 'col-span-full mb-8';
-        directorSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ผู้อำนวยการสถานศึกษา</h3>`;
         const directorContainer = document.createElement('div');
         directorContainer.className = 'flex justify-center';
         directorContainer.appendChild(createCard(director, 0, true));
@@ -209,7 +208,6 @@ function renderPersonnelList() {
     if (otherPersonnel.length > 0) {
         const othersSection = document.createElement('div');
         othersSection.className = 'col-span-full mt-8 border-t pt-6';
-        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะครูและบุคลากร</h3>`;
         
         const othersContainer = document.createElement('div');
         othersContainer.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6';
@@ -370,10 +368,23 @@ function renderStudentCouncilList() {
             </div>`;
         return cardItem;
     };
-    const president = boardData[0];
     
-        othersSection.appendChild(othersContainer);
-        container.appendChild(othersSection);
+    // 🌟 UPDATED: Removed the header sections
+    const president = boardData[0];
+    if (president) {
+        const presidentContainer = document.createElement('div');
+        presidentContainer.className = 'flex justify-center mb-8';
+        presidentContainer.appendChild(createCard(president, 0, true));
+        container.appendChild(presidentContainer);
+    }
+    const otherMembers = boardData.slice(1);
+    if (otherMembers.length > 0) {
+        const othersContainer = document.createElement('div');
+        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 border-t pt-6';
+        otherMembers.forEach((member, index) => {
+            othersContainer.appendChild(createCard(member, index + 1));
+        });
+        container.appendChild(othersContainer);
     }
 }
 
@@ -413,7 +424,6 @@ async function loadTeacherAchievementsData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
 function renderTeacherAchievements(achievementsList) {
     const container = document.getElementById('teacher-achievements-container');
     const loadingEl = document.getElementById('teacher-achievements-loading');
