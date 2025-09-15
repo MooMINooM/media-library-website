@@ -2,7 +2,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 // ---------------------------------------------------------
 
-// --- 🌟 UPDATED: Static data for Student Council Structure 🌟 ---
+// --- Static data for Student Council Structure ---
 const STATIC_STUDENT_COUNCIL_DATA = [
     { id: 'president', name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน' },
     { id: 'vp_academic', name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ' },
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showPage('home');
 });
 
-// --- DROPDOWN & NAVIGATION SYSTEMS ---
+// --- DROPDOWN SYSTEM ---
 function setupDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     dropdowns.forEach(dropdown => {
@@ -52,6 +52,7 @@ function closeAllDropdowns(exceptMenu = null) {
     });
 }
 
+// --- NAVIGATION SYSTEM ---
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
     mainNav.addEventListener('click', (e) => {
@@ -98,7 +99,7 @@ function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
+// --- EVENT LISTENERS, MODAL, UTILITY ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
@@ -116,6 +117,7 @@ function setupEventListeners() {
         }
     });
 }
+
 function setupModal() {
     const modal = document.getElementById('detail-modal');
     const closeBtn = document.getElementById('detail-modal-close-btn');
@@ -124,6 +126,7 @@ function setupModal() {
         if (e.target === modal) modal.classList.add('hidden');
     });
 }
+
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) return url;
     try {
@@ -158,6 +161,7 @@ async function loadPersonnelData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
+
 function renderPersonnelList(personnelList) {
     const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -177,6 +181,7 @@ function renderPersonnelList(personnelList) {
         listContainer.appendChild(cardItem);
     });
 }
+
 function showPersonnelModal(person) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
@@ -206,6 +211,7 @@ async function loadStudentData(isRefresh = false) {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
+
 function renderStudentChart(studentList) {
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
@@ -309,42 +315,62 @@ async function loadStudentCouncilData() {
         console.error('Error loading student council images:', error);
     }
 }
+
 function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
-    const createCard = (member, index) => {
+
+    const boardData = STATIC_STUDENT_COUNCIL_DATA;
+
+    if (!boardData || boardData.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลคณะกรรมการสภานักเรียน</p>';
+        return;
+    }
+    const createCard = (member, index, isPresident = false) => {
         const cardItem = document.createElement('div');
-        cardItem.className = `student-council-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center`;
+        const cardWidth = isPresident ? 'max-w-xs' : '';
+        cardItem.className = `student-council-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center ${cardWidth}`;
         cardItem.dataset.index = index;
         cardItem.dataset.id = member.id;
+        const imageSize = isPresident ? 'w-32 h-32' : 'w-24 h-24';
+        const nameSize = isPresident ? 'text-lg' : 'text-md';
         cardItem.innerHTML = `
-            <img src="https://placehold.co/200x200/EBF8FF/3182CE?text=..." alt="รูปภาพของ ${member.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">
+            <img src="https://placehold.co/200x200/EBF8FF/3182CE?text=..." alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200">
             <div class="mt-2">
-                <h4 class="font-bold text-blue-800 text-md">${member.name || 'N/A'}</h4>
+                <h4 class="font-bold text-blue-800 ${nameSize}">${member.name || 'N/A'}</h4>
                 <p class="text-sm text-gray-600">${member.role || '-'}</p>
                 <p class="text-xs text-gray-500 mt-1">${member.class || ''}</p>
             </div>`;
         return cardItem;
     };
-    const president = STATIC_STUDENT_COUNCIL_DATA[0];
+    const president = boardData[0];
     if (president) {
+        const presidentSection = document.createElement('div');
+        presidentSection.className = 'mb-8';
+        presidentSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ประธานนักเรียน</h3>`;
         const presidentContainer = document.createElement('div');
-        presidentContainer.className = 'flex justify-center mb-8';
-        presidentContainer.appendChild(createCard(president, 0));
-        container.appendChild(presidentContainer);
+        presidentContainer.className = 'flex justify-center';
+        presidentContainer.appendChild(createCard(president, 0, true));
+        presidentSection.appendChild(presidentContainer);
+        container.appendChild(presidentSection);
     }
-    const otherMembers = STATIC_STUDENT_COUNCIL_DATA.slice(1);
+    const otherMembers = boardData.slice(1);
     if (otherMembers.length > 0) {
+        const othersSection = document.createElement('div');
+        othersSection.className = 'mt-8 border-t pt-6';
+        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะกรรมการ</h3>`;
         const othersContainer = document.createElement('div');
         othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6';
         otherMembers.forEach((member, index) => {
             othersContainer.appendChild(createCard(member, index + 1));
         });
-        container.appendChild(othersContainer);
+        othersSection.appendChild(othersContainer);
+        container.appendChild(othersSection);
     }
 }
+
 function renderStudentCouncilImages(imageMap) {
     const cards = document.querySelectorAll('.student-council-card');
     cards.forEach(card => {
