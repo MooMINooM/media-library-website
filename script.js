@@ -371,26 +371,7 @@ function renderStudentCouncilList() {
         return cardItem;
     };
     const president = boardData[0];
-    if (president) {
-        const presidentSection = document.createElement('div');
-        presidentSection.className = 'mb-8';
-        presidentSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ประธานนักเรียน</h3>`;
-        const presidentContainer = document.createElement('div');
-        presidentContainer.className = 'flex justify-center';
-        presidentContainer.appendChild(createCard(president, 0, true));
-        presidentSection.appendChild(presidentContainer);
-        container.appendChild(presidentSection);
-    }
-    const otherMembers = boardData.slice(1);
-    if (otherMembers.length > 0) {
-        const othersSection = document.createElement('div');
-        othersSection.className = 'mt-8 border-t pt-6';
-        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะกรรมการ</h3>`;
-        const othersContainer = document.createElement('div');
-        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6';
-        otherMembers.forEach((member, index) => {
-            othersContainer.appendChild(createCard(member, index + 1));
-        });
+    
         othersSection.appendChild(othersContainer);
         container.appendChild(othersSection);
     }
