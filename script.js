@@ -18,16 +18,18 @@ const STATIC_STUDENT_COUNCIL_DATA = [
 // --- Global Caches & State ---
 let personnelDataCache = [];
 let studentDataCache = [];
-let studentCouncilImagesCache = null;
+let studentCouncilDataCache = [];
 let teacherAchievementsCache = [];
 let studentChartInstance = null;
 let studentDataInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // These functions set up all the interactive parts of the website
     setupNavigation();
     setupDropdowns();
     setupModal();
     setupEventListeners();
+    // Show the homepage by default
     showPage('home');
 });
 
@@ -37,18 +39,23 @@ function setupDropdowns() {
     dropdowns.forEach(dropdown => {
         const toggle = dropdown.querySelector('.dropdown-toggle');
         const menu = dropdown.querySelector('.dropdown-menu');
+        
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
             closeAllDropdowns(menu);
             menu.classList.toggle('hidden');
         });
     });
-    window.addEventListener('click', () => closeAllDropdowns());
+    window.addEventListener('click', () => {
+        closeAllDropdowns();
+    });
 }
 
 function closeAllDropdowns(exceptMenu = null) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (menu !== exceptMenu) menu.classList.add('hidden');
+        if (menu !== exceptMenu) {
+            menu.classList.add('hidden');
+        }
     });
 }
 
@@ -70,18 +77,24 @@ function showPage(pageId) {
         clearInterval(studentDataInterval);
         studentDataInterval = null;
     }
-    document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
+    document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.add('hidden');
+    });
     const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) activePage.classList.remove('hidden');
-
-    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
+    if (activePage) {
+        activePage.classList.remove('hidden');
+    }
+    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
+        link.classList.remove('active');
+    });
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
         const parentDropdown = activeLink.closest('.dropdown');
-        if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
+        if (parentDropdown) {
+            parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
+        }
     }
-
     switch (pageId) {
         case 'personnel-list':
             loadPersonnelData();
@@ -99,7 +112,7 @@ function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS, MODAL, UTILITY ---
+// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
@@ -117,7 +130,6 @@ function setupEventListeners() {
         }
     });
 }
-
 function setupModal() {
     const modal = document.getElementById('detail-modal');
     const closeBtn = document.getElementById('detail-modal-close-btn');
@@ -126,7 +138,6 @@ function setupModal() {
         if (e.target === modal) modal.classList.add('hidden');
     });
 }
-
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) return url;
     try {
