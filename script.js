@@ -361,7 +361,6 @@ function renderStudentCouncilList() {
             </div>`;
         return cardItem;
     };
-    
     const president = boardData[0];
     if (president) {
         const presidentContainer = document.createElement('div');
@@ -379,6 +378,7 @@ function renderStudentCouncilList() {
         container.appendChild(othersContainer);
     }
 }
+
 function showStudentCouncilModal(member) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
