@@ -4,15 +4,15 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unp
 
 // --- Static data for Student Council Structure ---
 const STATIC_STUDENT_COUNCIL_DATA = [
-    { id: 'president', name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน' },
-    { id: 'vp_academic', name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ' },
-    { id: 'vp_activities', name: 'รองประธานฝ่ายกิจกรรม', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายกิจกรรม' },
-    { id: 'vp_facilities', name: 'รองประธานฝ่ายอาคารและสถานที่', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายอาคารและสถานที่' },
-    { id: 'vp_discipline', name: 'รองประธานฝ่ายสารวัตรนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายสารวัตรนักเรียน' },
-    { id: 'committee_1', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ' },
-    { id: 'committee_2', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ' },
-    { id: 'committee_3', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ' },
-    { id: 'committee_4', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ' },
+    { id: 'president', name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'vp_academic', name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'vp_activities', name: 'รองประธานฝ่ายกิจกรรม', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายกิจกรรม', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'vp_facilities', name: 'รองประธานฝ่ายอาคารและสถานที่', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายอาคารและสถานที่', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'vp_discipline', name: 'รองประธานฝ่ายสารวัตรนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายสารวัตรนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'committee_1', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'committee_2', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'committee_3', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { id: 'committee_4', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
 // --- Global Caches & State ---
@@ -161,7 +161,6 @@ async function loadPersonnelData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
 function renderPersonnelList(personnelList) {
     const listContainer = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -181,7 +180,6 @@ function renderPersonnelList(personnelList) {
         listContainer.appendChild(cardItem);
     });
 }
-
 function showPersonnelModal(person) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
@@ -211,7 +209,6 @@ async function loadStudentData(isRefresh = false) {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
-
 function renderStudentChart(studentList) {
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
@@ -297,25 +294,7 @@ function renderStudentChart(studentList) {
 // --- STUDENT COUNCIL PAGE ---
 async function loadStudentCouncilData() {
     renderStudentCouncilList();
-    if (studentCouncilImagesCache) {
-        renderStudentCouncilImages(studentCouncilImagesCache);
-        return;
-    }
-    try {
-        const response = await fetch(`${API_URL}?sheet=student_council_images`);
-        const result = await response.json();
-        if (result.error) throw new Error(result.error);
-        const imageMap = result.data.reduce((acc, item) => {
-            if (item.id) acc[item.id] = item.imageUrl;
-            return acc;
-        }, {});
-        studentCouncilImagesCache = imageMap;
-        renderStudentCouncilImages(studentCouncilImagesCache);
-    } catch (error) {
-        console.error('Error loading student council images:', error);
-    }
 }
-
 function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
@@ -333,11 +312,12 @@ function renderStudentCouncilList() {
         const cardWidth = isPresident ? 'max-w-xs' : '';
         cardItem.className = `student-council-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center ${cardWidth}`;
         cardItem.dataset.index = index;
-        cardItem.dataset.id = member.id;
+        const finalImageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
         const imageSize = isPresident ? 'w-32 h-32' : 'w-24 h-24';
         const nameSize = isPresident ? 'text-lg' : 'text-md';
         cardItem.innerHTML = `
-            <img src="https://placehold.co/200x200/EBF8FF/3182CE?text=..." alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200">
+            <img src="${finalImageUrl}" alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';">
             <div class="mt-2">
                 <h4 class="font-bold text-blue-800 ${nameSize}">${member.name || 'N/A'}</h4>
                 <p class="text-sm text-gray-600">${member.role || '-'}</p>
@@ -370,26 +350,10 @@ function renderStudentCouncilList() {
         container.appendChild(othersSection);
     }
 }
-
-function renderStudentCouncilImages(imageMap) {
-    const cards = document.querySelectorAll('.student-council-card');
-    cards.forEach(card => {
-        const id = card.dataset.id;
-        const imgEl = card.querySelector('img');
-        const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-        if (imageMap[id] && imgEl) {
-            const finalImageUrl = getDirectGoogleDriveUrl(imageMap[id]);
-            imgEl.src = finalImageUrl;
-            imgEl.onerror = () => { imgEl.src = errorImageUrl; };
-        } else if (imgEl) {
-            imgEl.src = 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
-        }
-    });
-}
 function showStudentCouncilModal(member) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
-    const imageUrl = studentCouncilImagesCache ? getDirectGoogleDriveUrl(studentCouncilImagesCache[member.id]) : 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
+    const imageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
     modalContent.innerHTML = `
         <div class="text-center">
