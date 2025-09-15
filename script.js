@@ -2,6 +2,28 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 // ---------------------------------------------------------
 
+// --- Static data for Personnel Structure ---
+const STATIC_PERSONNEL_DATA = [
+    { 
+        name: 'นายสมชาย ใจดี', 
+        role: 'ผู้อำนวยการสถานศึกษา',
+        academicStanding: 'ชำนาญการพิเศษ',
+        education: 'ค.ม. การบริหารการศึกษา',
+        class: '-',
+        tel: '081-234-5678',
+        imageUrl: 'YOUR_IMAGE_URL_HERE' 
+    },
+    { 
+        name: 'นางสาวสมศรี มีสุข', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการ',
+        education: 'ศษ.บ. ภาษาไทย\nค.ม. นวัตกรรมการศึกษา',
+        class: 'ประถมศึกษาปีที่ 1',
+        tel: '082-345-6789',
+        imageUrl: 'YOUR_IMAGE_URL_HERE'
+    },
+];
+
 // --- Static data for Student Council Structure ---
 const STATIC_STUDENT_COUNCIL_DATA = [
     { id: 'president', name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
@@ -10,26 +32,19 @@ const STATIC_STUDENT_COUNCIL_DATA = [
     { id: 'vp_facilities', name: 'รองประธานฝ่ายอาคารและสถานที่', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายอาคารและสถานที่', imageUrl: 'YOUR_IMAGE_URL_HERE' },
     { id: 'vp_discipline', name: 'รองประธานฝ่ายสารวัตรนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายสารวัตรนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
     { id: 'committee_1', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'committee_2', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'committee_3', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'committee_4', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
 // --- Global Caches & State ---
-let personnelDataCache = [];
 let studentDataCache = [];
-let studentCouncilDataCache = [];
 let teacherAchievementsCache = [];
 let studentChartInstance = null;
 let studentDataInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // These functions set up all the interactive parts of the website
     setupNavigation();
     setupDropdowns();
     setupModal();
     setupEventListeners();
-    // Show the homepage by default
     showPage('home');
 });
 
@@ -39,23 +54,18 @@ function setupDropdowns() {
     dropdowns.forEach(dropdown => {
         const toggle = dropdown.querySelector('.dropdown-toggle');
         const menu = dropdown.querySelector('.dropdown-menu');
-        
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
             closeAllDropdowns(menu);
             menu.classList.toggle('hidden');
         });
     });
-    window.addEventListener('click', () => {
-        closeAllDropdowns();
-    });
+    window.addEventListener('click', () => closeAllDropdowns());
 }
 
 function closeAllDropdowns(exceptMenu = null) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (menu !== exceptMenu) {
-            menu.classList.add('hidden');
-        }
+        if (menu !== exceptMenu) menu.classList.add('hidden');
     });
 }
 
@@ -77,34 +87,28 @@ function showPage(pageId) {
         clearInterval(studentDataInterval);
         studentDataInterval = null;
     }
-    document.querySelectorAll('.page-content').forEach(page => {
-        page.classList.add('hidden');
-    });
+    document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
     const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) {
-        activePage.classList.remove('hidden');
-    }
-    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
-        link.classList.remove('active');
-    });
+    if (activePage) activePage.classList.remove('hidden');
+
+    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
         const parentDropdown = activeLink.closest('.dropdown');
-        if (parentDropdown) {
-            parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
-        }
+        if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
+
     switch (pageId) {
         case 'personnel-list':
-            loadPersonnelData();
+            renderPersonnelList();
             break;
         case 'students':
             loadStudentData();
             studentDataInterval = setInterval(() => loadStudentData(true), 300000);
             break;
         case 'student-council':
-            loadStudentCouncilData();
+            renderStudentCouncilList();
             break;
         case 'teacher-achievements':
             loadTeacherAchievementsData();
@@ -112,7 +116,7 @@ function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
+// --- EVENT LISTENERS, MODAL, UTILITY ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
@@ -120,7 +124,7 @@ function setupEventListeners() {
         const councilCard = e.target.closest('.student-council-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
-            const selectedPerson = personnelDataCache[index];
+            const selectedPerson = STATIC_PERSONNEL_DATA[index];
             if (selectedPerson) showPersonnelModal(selectedPerson);
         }
         if (councilCard) {
@@ -130,6 +134,7 @@ function setupEventListeners() {
         }
     });
 }
+
 function setupModal() {
     const modal = document.getElementById('detail-modal');
     const closeBtn = document.getElementById('detail-modal-close-btn');
@@ -138,6 +143,7 @@ function setupModal() {
         if (e.target === modal) modal.classList.add('hidden');
     });
 }
+
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) return url;
     try {
@@ -152,45 +158,71 @@ function getDirectGoogleDriveUrl(url) {
 }
 
 // --- PERSONNEL PAGE ---
-async function loadPersonnelData() {
-    if (personnelDataCache.length > 0) {
-        renderPersonnelList(personnelDataCache);
-        return;
-    }
-    const listContainer = document.getElementById('personnel-list-container');
-    const loadingEl = document.getElementById('personnel-loading');
-    loadingEl.classList.remove('hidden');
-    listContainer.innerHTML = '';
-    try {
-        const response = await fetch(`${API_URL}?sheet=personnel`);
-        const result = await response.json();
-        if (result.error) throw new Error(result.error);
-        personnelDataCache = result.data;
-        renderPersonnelList(personnelDataCache);
-    } catch (error) {
-        console.error('Error loading personnel data:', error);
-        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
-    }
-}
-function renderPersonnelList(personnelList) {
-    const listContainer = document.getElementById('personnel-list-container');
+function renderPersonnelList() {
+    const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
     loadingEl.classList.add('hidden');
-    listContainer.innerHTML = '';
+    container.innerHTML = '';
+
+    const personnelList = STATIC_PERSONNEL_DATA;
+
     if (!personnelList || personnelList.length === 0) {
-        listContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลบุคลากร</p>';
+        container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลบุคลากร</p>';
         return;
     }
-    personnelList.forEach((person, index) => {
+
+    const createCard = (person, index, isDirector = false) => {
         const cardItem = document.createElement('div');
-        cardItem.className = 'personnel-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4';
+        const cardWidth = isDirector ? 'max-w-xs' : '';
+        cardItem.className = `personnel-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col items-center p-4 text-center ${cardWidth}`;
         cardItem.dataset.index = index;
+        
         const finalImageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
         const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-        cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="text-center mt-2"><h4 class="font-bold text-blue-800 text-md">${person.name || 'N/A'}</h4><p class="text-sm text-gray-600">${person.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p></div>`;
-        listContainer.appendChild(cardItem);
-    });
+        
+        const imageSize = isDirector ? 'w-32 h-32' : 'w-24 h-24';
+        const nameSize = isDirector ? 'text-lg' : 'text-md';
+
+        cardItem.innerHTML = `
+            <img src="${finalImageUrl}" alt="รูปภาพของ ${person.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';">
+            <div class="mt-2">
+                <h4 class="font-bold text-blue-800 ${nameSize}">${person.name || 'N/A'}</h4>
+                <p class="text-sm text-gray-600">${person.role || '-'}</p>
+                <p class="text-xs text-gray-500 mt-1">${person.academicStanding || ''}</p>
+            </div>`;
+        return cardItem;
+    };
+
+    const director = personnelList[0];
+    if (director) {
+        const directorSection = document.createElement('div');
+        directorSection.className = 'col-span-full mb-8';
+        directorSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ผู้อำนวยการสถานศึกษา</h3>`;
+        const directorContainer = document.createElement('div');
+        directorContainer.className = 'flex justify-center';
+        directorContainer.appendChild(createCard(director, 0, true));
+        directorSection.appendChild(directorContainer);
+        container.appendChild(directorSection);
+    }
+
+    const otherPersonnel = personnelList.slice(1);
+    if (otherPersonnel.length > 0) {
+        const othersSection = document.createElement('div');
+        othersSection.className = 'col-span-full mt-8 border-t pt-6';
+        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะครูและบุคลากร</h3>`;
+        
+        const othersContainer = document.createElement('div');
+        othersContainer.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6';
+        
+        otherPersonnel.forEach((person, index) => {
+            othersContainer.appendChild(createCard(person, index + 1));
+        });
+        
+        othersSection.appendChild(othersContainer);
+        container.appendChild(othersSection);
+    }
 }
+
 function showPersonnelModal(person) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
@@ -220,6 +252,7 @@ async function loadStudentData(isRefresh = false) {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
+
 function renderStudentChart(studentList) {
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
@@ -303,9 +336,10 @@ function renderStudentChart(studentList) {
 }
 
 // --- STUDENT COUNCIL PAGE ---
-async function loadStudentCouncilData() {
+function loadStudentCouncilData() {
     renderStudentCouncilList();
 }
+
 function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
@@ -361,6 +395,7 @@ function renderStudentCouncilList() {
         container.appendChild(othersSection);
     }
 }
+
 function showStudentCouncilModal(member) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
@@ -397,6 +432,7 @@ async function loadTeacherAchievementsData() {
         loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
     }
 }
+
 function renderTeacherAchievements(achievementsList) {
     const container = document.getElementById('teacher-achievements-container');
     const loadingEl = document.getElementById('teacher-achievements-loading');
