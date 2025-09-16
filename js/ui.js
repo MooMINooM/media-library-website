@@ -265,7 +265,7 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-// --- 🌟 UPDATED: Innovations Renderer 🌟 ---
+// --- 🌟 UPDATED: Innovations Renderer and Modal 🌟 ---
 export function renderInnovations(innovationsList) {
     const container = document.getElementById('innovations-container');
     const loadingEl = document.getElementById('innovations-loading');
@@ -277,30 +277,25 @@ export function renderInnovations(innovationsList) {
         return;
     }
 
-    innovationsList.forEach(item => {
-        const card = document.createElement('a');
-        card.href = item.fileUrl || '#';
-        card.target = '_blank';
-        card.rel = 'noopener noreferrer';
-        card.className = 'block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden';
+    innovationsList.forEach((item, index) => {
+        const card = document.createElement('div'); // Changed to DIV
+        card.className = 'innovation-card block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer'; // Added class and cursor
+        card.dataset.index = index; // Added index
 
         const coverImageUrl = getDirectGoogleDriveUrl(item.coverImageUrl) || `https://placehold.co/600x400/EBF8FF/3182CE?text=${encodeURIComponent(item.category || 'นวัตกรรม')}`;
         const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
         
-        // Format the date for better readability
         let formattedDate = '-';
         if (item.uploadDate) {
             try {
                 formattedDate = new Date(item.uploadDate).toLocaleDateString('th-TH', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
+                    year: 'numeric', month: 'short', day: 'numeric',
                 });
             } catch(e) { /* Keep default date */ }
         }
 
         card.innerHTML = `
-            <div class="relative">
+            <div class="relative pointer-events-none">
                 <img 
                     src="${coverImageUrl}" 
                     alt="ปกของ ${item.title}" 
@@ -309,10 +304,9 @@ export function renderInnovations(innovationsList) {
                 >
                 <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">${item.category || 'ทั่วไป'}</div>
             </div>
-            <div class="p-4 flex flex-col h-full">
+            <div class="p-4 flex flex-col h-full pointer-events-none">
                 <h4 class="font-bold text-lg text-gray-800 mt-1 truncate" title="${item.title}">${item.title || 'ไม่มีชื่อเรื่อง'}</h4>
                 <p class="text-sm text-gray-600 mt-1 line-clamp-2 h-10">${item.description || ''}</p>
-                
                 <div class="mt-3 text-xs text-gray-500 space-y-1">
                     <div class="flex items-center">
                         <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-5.243-7.243l10.486 4.494M4.757 12h14.486"></path></svg>
@@ -323,7 +317,6 @@ export function renderInnovations(innovationsList) {
                         <span>ระดับชั้น: ${item.grade || '-'}</span>
                     </div>
                 </div>
-
                 <div class="border-t mt-3 pt-2 text-xs text-gray-500 flex justify-between items-center">
                     <span>โดย: ${item.creator || '-'}</span>
                     <span>${formattedDate}</span>
@@ -332,5 +325,55 @@ export function renderInnovations(innovationsList) {
         `;
         container.appendChild(card);
     });
+}
+
+export function showInnovationModal(item) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    const coverImageUrl = getDirectGoogleDriveUrl(item.coverImageUrl) || `https://placehold.co/600x400/EBF8FF/3182CE?text=${encodeURIComponent(item.category || 'นวัตกรรม')}`;
+    const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+        
+    let formattedDate = '-';
+    if (item.uploadDate) {
+        try {
+            formattedDate = new Date(item.uploadDate).toLocaleDateString('th-TH', {
+                year: 'numeric', month: 'long', day: 'numeric',
+            });
+        } catch(e) { /* Keep default date */ }
+    }
+
+    modalContent.innerHTML = `
+        <div>
+            <img 
+                src="${coverImageUrl}" 
+                alt="ปกของ ${item.title}" 
+                class="w-full h-48 object-cover rounded-t-lg"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="p-6">
+                <p class="text-sm font-semibold text-blue-600 uppercase">${item.category || 'ไม่มีหมวดหมู่'}</p>
+                <h3 class="text-2xl font-bold text-gray-800 mt-1">${item.title || 'ไม่มีชื่อเรื่อง'}</h3>
+                <p class="text-sm text-gray-500 mt-2">โดย: ${item.creator || '-'}</p>
+                <p class="text-gray-600 mt-4">${item.description || 'ไม่มีคำอธิบาย'}</p>
+                
+                <div class="mt-4 border-t pt-4 text-sm text-gray-700 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
+                    <strong class="text-right">วิชา:</strong>
+                    <span>${item.subject || '-'}</span>
+                    <strong class="text-right">ระดับชั้น:</strong>
+                    <span>${item.grade || '-'}</span>
+                    <strong class="text-right">วันที่ลง:</strong>
+                    <span>${formattedDate}</span>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="${item.fileUrl || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        เปิดไฟล์นวัตกรรม
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    modal.classList.remove('hidden');
 }
 
