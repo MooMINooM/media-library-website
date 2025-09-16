@@ -26,13 +26,19 @@ const STATIC_PERSONNEL_DATA = [
 
 // --- Static data for Student Council Structure ---
 const STATIC_STUDENT_COUNCIL_DATA = [
-    { id: 'president', name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'vp_academic', name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'vp_activities', name: 'รองประธานฝ่ายกิจกรรม', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายกิจกรรม', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'vp_facilities', name: 'รองประธานฝ่ายอาคารและสถานที่', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายอาคารและสถานที่', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'vp_discipline', name: 'รองประธานฝ่ายสารวัตรนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'รองประธานนักเรียนฝ่ายสารวัตรนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { id: 'committee_1', name: 'กรรมการ', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
+
+// --- 🌟 NEW: Static data for School Board Structure 🌟 ---
+const STATIC_SCHOOL_BOARD_DATA = [
+    { name: 'ประธานกรรมการ', role: 'ประธานกรรมการสถานศึกษา', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'กรรมการผู้แทนผู้ปกครอง', role: 'กรรมการผู้แทนผู้ปกครอง', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'กรรมการผู้แทนครู', role: 'กรรมการผู้แทนครู', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'กรรมการและเลขานุการ', role: 'กรรมการและเลขานุการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+];
+
 
 // --- Global Caches & State ---
 let studentDataCache = [];
@@ -41,12 +47,10 @@ let studentChartInstance = null;
 let studentDataInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // These functions set up all the interactive parts of the website
     setupNavigation();
     setupDropdowns();
     setupModal();
     setupEventListeners();
-    // Show the homepage by default
     showPage('home');
 });
 
@@ -126,6 +130,9 @@ function showPage(pageId) {
         case 'teacher-achievements':
             loadTeacherAchievementsData();
             break;
+        case 'school-board':
+            renderSchoolBoardList();
+            break;
     }
 }
 
@@ -135,6 +142,8 @@ function setupEventListeners() {
     mainContent.addEventListener('click', (e) => {
         const personnelCard = e.target.closest('.personnel-card');
         const councilCard = e.target.closest('.student-council-card');
+        const boardCard = e.target.closest('.school-board-card');
+
         if (personnelCard) {
             const index = personnelCard.dataset.index;
             const selectedPerson = STATIC_PERSONNEL_DATA[index];
@@ -144,6 +153,11 @@ function setupEventListeners() {
             const index = councilCard.dataset.index;
             const selectedMember = STATIC_STUDENT_COUNCIL_DATA[index];
             if (selectedMember) showStudentCouncilModal(selectedMember);
+        }
+        if (boardCard) {
+            const index = boardCard.dataset.index;
+            const selectedMember = STATIC_SCHOOL_BOARD_DATA[index];
+            if (selectedMember) showSchoolBoardModal(selectedMember);
         }
     });
 }
