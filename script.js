@@ -50,6 +50,15 @@ const STATIC_PERSONNEL_DATA = [
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOiOOQOJolSM3KBrQfY3-n7cvLQ746I3_YQtsTy5G00moXHhh8Cji4WV4GvCEMcJUuevM9r-Jje4ET62SUkN6widCgmojbgx_oJwpLcLaWYNQBnNfXiLTF-1pb6HSVIgvmdJQPo2f_E5EMojv7ruDtE=w693-h923-s-no-gm?authuser=0'
     },
     { 
+        name: 'นายวิรุฬห์ บงแก้ว', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการพิเศษ',
+        education: '- ค.บ.วิทยาศาสตร์ มหาวิทยาลัยราชภัฏอุดรธานี',
+        class: 'มัธยมศึกษาปีที่ 3',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPNb6WJYiWbSEVCkhL3cGUFvkXCEgVEwt46pJKAt1gtaGOX6OsGWWVNP1cl-moxubzYdel9uyFhMU0isvWDfH16NA9JwsyGjC9fiONb3i03lg3INGV-b5zj0A6kq68XkQwdfts5bwK6oG1BCqSwlDza=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
         name: 'นางพิมพ์ภัช กัณหาสุระ', 
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
@@ -74,7 +83,16 @@ const STATIC_PERSONNEL_DATA = [
         education: '- ศศ.บ.(เกียรตินิยมอันดับ ๒) ภาษาอังกฤษ มหาวิทยาลัยราชภัฏอุดรธานี\n- ศษ.บ.การแนะแนว มหาวิทยาลัยสุโขทัยธรรมาธิราช\n- ศษ.ม.บริหารการศึกษา วิทยาลัยพิชญบัณฑิต',
         class: 'มัธยมศึกษาปีที่ 2',
         tel: '082-345-6789',
-        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPSXHwKmL5eA5hwh_HSJcf0C-fBN9AxfRgs4KvP0ESZpMKozyi0ZKdUbAGrJM8tq28laI7a5ix19-loN-f8yfTl25ispNxksoGWH--0Mgce-oq_-Y8QVpWQPDsquDuHP5MET-mxreZgiuKnJ1HmKvwS=w693-h923-s-no-gm?authuser=0'
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczP3S_eGS1o4F-ash-yLX6bPFzpWF_WhD7uwaK0Z8zmN7Lx8eIJFp2U8UVVB3H9qNwkK4SGxnSEyaMqCAIrOgSvh786CaKie0s2ZkkvaCymmMgmNO2Sv4z0MZSX40gUxeSI6IOFyb01zMQzfP3fKHYam=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางสาววิมลดา นาสมยนต์', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการ',
+        education: '- ค.บ.(เกียรตินิยมอันดับ ๒) ดนตรีศึกษา',
+        class: 'ประถมศึกษาปีที่ 4',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMmjRUj2wUPjQqckqr1TTB4sAwDZxHjKjgtj8dwuvMUfmsnF2MH4l_ifjOkr4EcpIwZAwSC1Eu8i0aNWBPpmMDVlrcTddy3idAC79sMXQyj2hVZRngB5ZUh3CUa79IrFPEjZPl6NnEadJ7kNMGdHGy1=w693-h923-s-no-gm?authuser=0'
     },
 ];
 
