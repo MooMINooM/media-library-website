@@ -180,18 +180,6 @@ const STATIC_SCHOOL_BOARD_DATA = [
     { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
-// --- Static data for Student Council Structure ---
-const STATIC_STUDENT_COUNCIL_DATA = [
-    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-];
-
-// --- Static data for School Board Structure ---
-const STATIC_SCHOOL_BOARD_DATA = [
-    { name: 'ประธานกรรมการ', role: 'ประธานกรรมการสถานศึกษา', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-];
-
 // --- Static data for Student Information ---
 const STATIC_STUDENT_DATA = [
     { grade: 'อนุบาล 2', boys: 2, girls: 7, total: 9 },
@@ -588,28 +576,20 @@ function renderSchoolBoardList() {
 
     const president = boardData[0];
     if (president) {
-        const presidentSection = document.createElement('div');
-        presidentSection.className = 'mb-8';
-        presidentSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">ประธานกรรมการ</h3>`;
         const presidentContainer = document.createElement('div');
-        presidentContainer.className = 'flex justify-center';
+        presidentContainer.className = 'flex justify-center mb-8';
         presidentContainer.appendChild(createCard(president, 0, true));
-        presidentSection.appendChild(presidentContainer);
-        container.appendChild(presidentSection);
+        container.appendChild(presidentContainer);
     }
 
     const otherMembers = boardData.slice(1);
     if (otherMembers.length > 0) {
-        const othersSection = document.createElement('div');
-        othersSection.className = 'mt-8 border-t pt-6';
-        othersSection.innerHTML = `<h3 class="text-xl font-semibold text-center mb-4 text-blue-800">คณะกรรมการ</h3>`;
         const othersContainer = document.createElement('div');
-        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6';
+        othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 border-t pt-6';
         otherMembers.forEach((member, index) => {
             othersContainer.appendChild(createCard(member, index + 1));
         });
-        othersSection.appendChild(othersContainer);
-        container.appendChild(othersSection);
+        container.appendChild(othersContainer);
     }
 }
 
