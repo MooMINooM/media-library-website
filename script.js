@@ -11,7 +11,7 @@ const STATIC_PERSONNEL_DATA = [
         education: '- ค.บ.ภาษาอังกฤษ มหาวิทยาลัยราชภัฏอุดรธานี\n- กศ.ม.การบริหารการศึกษา มหาวิทยาลัยมหาสารคาม',
         class: '-',
         tel: '081-234-5678',
-        imageUrl: 'YOUR_IMAGE_URL_HERE' 
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczM2HELcaPEIJuj0jR2qHvYmQmbveaCqqoND2vtSH6LGlRkDGL4JIZzmzP09FNq5ElNFNijen3AmNDKiT9Kw2J4zeD83RnNpO6D62PKEUk6ucWG7S29mwiYM1mXyx4op0auWBt6qwJltkqvVd2AkacZd=w693-h923-s-no-gm?authuser=0' 
     },
     { 
         name: 'นายสมยศ บุญประคม', 
@@ -20,7 +20,7 @@ const STATIC_PERSONNEL_DATA = [
         education: '- ค.บ.พลศึกษา วิทยาลัยครูอุดรธานี\n- กศ.ม.เทคโนโลยีทางการศึกษา มหาวิทยาลัยมหาสารคาม',
         class: '-',
         tel: '082-345-6789',
-        imageUrl: 'YOUR_IMAGE_URL_HERE'
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOfU073oWUhWyzdyJnZV3lYv3a3JlgZ_5lwebsbvRvJg9ve3FD7HgmxAYyq50xzFZ6mWS9MHFje9ShC493sAUw2qj-xPFlWjhcHPR3r9mmkDk669snXrECd1ktlkiTqGUIvBO_gM1L9RcL0Ph9uFhLT=w693-h923-s-no-gm?authuser=0'
     },
     { 
         name: 'นางมัณฑนา บุญประคม', 
@@ -29,25 +29,25 @@ const STATIC_PERSONNEL_DATA = [
         education: '- ค.บ.(เกียรตินิยมอันดับ ๒) ประถมศึกษา วิทยาลัยครูอุบลราชธานี\n- ศษ.ม.หลักสูตรและการสอน วิทยาลัยพิชญบัณฑิต',
         class: 'ประถมศึกษาปีที่ 1',
         tel: '082-345-6789',
-        imageUrl: 'YOUR_IMAGE_URL_HERE'
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNyYJV9Sb9Jyn0-_x-bGrS_8VnwVBMHUmvPER5u9kgyk-7mMJ94fNo8aNaXfcfu0U4vHs0lyPn7WH3KKSVs4-TAp-L4FEJEap7h_zie1xG22tHCS_byYJMleWLigxrWz3vxUz8JlaYW4pYmTF2rmsjP=w693-h923-s-no-gm?authuser=0'
     },
      { 
         name: 'นางบัณฑิตา วรจิตร', 
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
-        education: '- ค.บ. การศึกษาปฐมวัย มหาวิทยาลัยราชภัฏอุดรธานี\n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยกรุงเทพธนบุรี',
+        education: '- ค.บ.การศึกษาปฐมวัย มหาวิทยาลัยราชภัฏอุดรธานี\n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยกรุงเทพธนบุรี',
         class: 'อนุบาล 3',
         tel: '082-345-6789',
-        imageUrl: 'YOUR_IMAGE_URL_HERE'
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOvZ8qI-FnKs1JheUxJTIVNbO42g4VYJJaU4kkczY0Swg0RzvZCP_zL54pG1c2IWIJFmngjGaOKj3_HzzX8JAe9K-kubp5QdO5P2-a2WY1gxb1HOWWpPbot15bq8VY8vfHzsUJzF7lQhfm-x5r1HJFz=w693-h923-s-no-gm?authuser=0'
     },
     { 
         name: 'นางปริฉัตร ไชยอุบล', 
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
-        education: '- วท.บ. วิทยาศาสตร์สิ่งแวดล้อม มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิต วิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี \n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยรามคำแหง',
+        education: '- วท.บ.วิทยาศาสตร์สิ่งแวดล้อม มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิต วิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี \n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยรามคำแหง',
         class: 'อนุบาล 3',
         tel: '082-345-6789',
-        imageUrl: 'YOUR_IMAGE_URL_HERE'
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOiOOQOJolSM3KBrQfY3-n7cvLQ746I3_YQtsTy5G00moXHhh8Cji4WV4GvCEMcJUuevM9r-Jje4ET62SUkN6widCgmojbgx_oJwpLcLaWYNQBnNfXiLTF-1pb6HSVIgvmdJQPo2f_E5EMojv7ruDtE=w693-h923-s-no-gm?authuser=0'
     },
 ];
 
