@@ -30,7 +30,7 @@ const STATIC_STUDENT_COUNCIL_DATA = [
     { name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
-// --- 🌟 NEW: Static data for School Board Structure 🌟 ---
+// --- Static data for School Board Structure ---
 const STATIC_SCHOOL_BOARD_DATA = [
     { name: 'ประธานกรรมการ', role: 'ประธานกรรมการสถานศึกษา', imageUrl: 'YOUR_IMAGE_URL_HERE' },
     { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
@@ -239,13 +239,18 @@ function renderPersonnelList() {
     }
 }
 
+// 🌟 UPDATED: showPersonnelModal no longer uses list-disc
 function showPersonnelModal(person) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
     const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-    const educationList = person.education ? person.education.split('\n').map(edu => `<li>${edu.trim()}</li>`).join('') : '<li>-</li>';
-    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><ul class="text-gray-500 list-disc list-inside">${educationList}</ul><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
+    
+    const educationList = person.education 
+        ? person.education.split('\n').map(edu => `<div>${edu.trim()}</div>`).join('') 
+        : '-';
+
+    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><div class="text-gray-500">${educationList}</div><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
     modal.classList.remove('hidden');
 }
 
