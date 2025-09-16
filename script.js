@@ -45,9 +45,36 @@ const STATIC_PERSONNEL_DATA = [
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
         education: '- วท.บ.วิทยาศาสตร์สิ่งแวดล้อม มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิต วิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี \n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยรามคำแหง',
-        class: 'อนุบาล 3',
+        class: 'ประถมศึกษาปีที่ 6',
         tel: '082-345-6789',
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOiOOQOJolSM3KBrQfY3-n7cvLQ746I3_YQtsTy5G00moXHhh8Cji4WV4GvCEMcJUuevM9r-Jje4ET62SUkN6widCgmojbgx_oJwpLcLaWYNQBnNfXiLTF-1pb6HSVIgvmdJQPo2f_E5EMojv7ruDtE=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางพิมพ์ภัช กัณหาสุระ', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการพิเศษ',
+        education: '- ค.บ.คอมพิวเตอร์ศึกษา มหาวิทยาลัยราชภัฏอุดรธานี\n- ค.ม.หลักสูตรและการสอน มหาวิทยาลัยราชภัฏอุดรธานี',
+        class: 'มัธยมศึกษาปีที่ 1',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPoPKS-0rz95sqlyF9LT0vLoBhnfycS1EiPnbw9grWvR1vFjST5FviPQHZvpGJd-96kNRHEapLdzrolk-_Qe-etcg21DH7rWA52jphI1wIsewOWhGV5ZxQwfJ30Hn8gpqRI65KbN3H_Jz3lkqd5mJBf=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางสุดดารัตน์ ไทยมา', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการ',
+        education: '- ศศ.บ.ประวัติศาสตร์ มหาวิทยาลัยนเรศวร\n- บธ.บ.การท่องเที่ยว มหาวิทยาลัยนเรศวร\n- ศษ.ม.หลักสูตรและการสอน มหาวิทยาลัยกรุงเทพธนบุรี',
+        class: 'ประถมศึกษาปีที่ 5',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPSXHwKmL5eA5hwh_HSJcf0C-fBN9AxfRgs4KvP0ESZpMKozyi0ZKdUbAGrJM8tq28laI7a5ix19-loN-f8yfTl25ispNxksoGWH--0Mgce-oq_-Y8QVpWQPDsquDuHP5MET-mxreZgiuKnJ1HmKvwS=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นายธีรโชติ พันธ์เดช', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการ',
+        education: '- ศศ.บ.(เกียรตินิยมอันดับ ๒) ภาษาอังกฤษ มหาวิทยาลัยราชภัฏอุดรธานี\n- ศษ.บ.การแนะแนว มหาวิทยาลัยสุโขทัยธรรมาธิราช\n- ศษ.ม.บริหารการศึกษา วิทยาลัยพิชญบัณฑิต',
+        class: 'มัธยมศึกษาปีที่ 2',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPSXHwKmL5eA5hwh_HSJcf0C-fBN9AxfRgs4KvP0ESZpMKozyi0ZKdUbAGrJM8tq28laI7a5ix19-loN-f8yfTl25ispNxksoGWH--0Mgce-oq_-Y8QVpWQPDsquDuHP5MET-mxreZgiuKnJ1HmKvwS=w693-h923-s-no-gm?authuser=0'
     },
 ];
 
