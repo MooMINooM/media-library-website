@@ -180,7 +180,19 @@ const STATIC_SCHOOL_BOARD_DATA = [
     { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
-// --- 🌟 NEW: Static data for Student Information 🌟 ---
+// --- Static data for Student Council Structure ---
+const STATIC_STUDENT_COUNCIL_DATA = [
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'รองประธานฝ่ายวิชาการ', class: 'ประถมศึกษาปีที่ 5', role: 'รองประธานนักเรียนฝ่ายวิชาการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+];
+
+// --- Static data for School Board Structure ---
+const STATIC_SCHOOL_BOARD_DATA = [
+    { name: 'ประธานกรรมการ', role: 'ประธานกรรมการสถานศึกษา', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+];
+
+// --- Static data for Student Information ---
 const STATIC_STUDENT_DATA = [
     { grade: 'อนุบาล 2', boys: 2, girls: 7, total: 9 },
     { grade: 'อนุบาล 3', boys: 11, girls: 7, total: 18 },
@@ -256,13 +268,12 @@ function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
 
-    // --- 🌟 UPDATED: Simplified page loading logic ---
     switch (pageId) {
         case 'personnel-list':
             renderPersonnelList();
             break;
         case 'students':
-            renderStudentChart(); // Now uses static data, no need to load
+            renderStudentChart();
             break;
         case 'student-council':
             renderStudentCouncilList();
@@ -394,7 +405,7 @@ function showPersonnelModal(person) {
 
 // --- STUDENT PAGE WITH CHART ---
 function renderStudentChart() {
-    const studentList = STATIC_STUDENT_DATA; // Use static data
+    const studentList = STATIC_STUDENT_DATA;
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
     const ctx = document.getElementById('studentChart').getContext('2d');
