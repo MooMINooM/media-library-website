@@ -1,6 +1,6 @@
 // --- Static data for Personnel Structure ---
 export const STATIC_PERSONNEL_DATA = [
-    { 
+   { 
         name: 'นางสาวสุพิศน์ พันธุนันท์', 
         role: 'ผู้อำนวยการสถานศึกษา',
         academicStanding: 'ชำนาญการพิเศษ',
