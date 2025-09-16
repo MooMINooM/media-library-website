@@ -5,10 +5,10 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unp
 // --- Static data for Personnel Structure ---
 const STATIC_PERSONNEL_DATA = [
     { 
-        name: 'นายสมชาย ใจดี', 
+        name: 'นางสาวสุพิศน์ พันธุนันท์', 
         role: 'ผู้อำนวยการสถานศึกษา',
         academicStanding: 'ชำนาญการพิเศษ',
-        education: 'ค.ม. การบริหารการศึกษา',
+        education: '- ค.บ.ภาษาอังกฤษ มหาวิทยาลัยราชภัฏอุดรธานี', '- กศ.บ.การบริหารการศึกษา มหาวิทยาลัยมหาสารคาม',
         class: '-',
         tel: '081-234-5678',
         imageUrl: 'YOUR_IMAGE_URL_HERE' 
