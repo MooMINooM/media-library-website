@@ -10,6 +10,8 @@ import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 let teacherAchievementsCache = [];
 let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
+// 🌟 ADDED: Cache for personnel data to ensure it's loaded reliably
+let personnelDataCache = [];
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,8 +51,12 @@ async function showPage(pageId) {
     }
 
     switch (pageId) {
+        // 🌟 UPDATED: Logic for loading personnel data 🌟
         case 'personnel-list':
-            UI.renderPersonnelList();
+            if (personnelDataCache.length === 0) {
+                personnelDataCache = Data.STATIC_PERSONNEL_DATA;
+            }
+            UI.renderPersonnelList(personnelDataCache);
             break;
         case 'students':
             UI.renderStudentChart();
@@ -130,7 +136,7 @@ function setupEventListeners() {
         const personnelCard = e.target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
-            const selectedPerson = Data.STATIC_PERSONNEL_DATA[index];
+            const selectedPerson = personnelDataCache[index];
             if (selectedPerson) UI.showPersonnelModal(selectedPerson);
         }
 
