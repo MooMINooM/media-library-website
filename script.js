@@ -180,11 +180,23 @@ const STATIC_SCHOOL_BOARD_DATA = [
     { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
+// --- 🌟 NEW: Static data for Student Information 🌟 ---
+const STATIC_STUDENT_DATA = [
+    { grade: 'อนุบาล 2', boys: 15, girls: 12, total: 27 },
+    { grade: 'อนุบาล 3', boys: 16, girls: 14, total: 30 },
+    { grade: 'ประถมศึกษาปีที่ 1', boys: 20, girls: 18, total: 38 },
+    { grade: 'ประถมศึกษาปีที่ 2', boys: 19, girls: 21, total: 40 },
+    { grade: 'ประถมศึกษาปีที่ 3', boys: 22, girls: 20, total: 42 },
+    { grade: 'ประถมศึกษาปีที่ 4', boys: 18, girls: 19, total: 37 },
+    { grade: 'ประถมศึกษาปีที่ 5', boys: 21, girls: 22, total: 43 },
+    { grade: 'ประถมศึกษาปีที่ 6', boys: 20, girls: 23, total: 43 },
+];
+
+
 // --- Global Caches & State ---
-let studentDataCache = [];
 let teacherAchievementsCache = [];
 let studentChartInstance = null;
-let studentDataInterval = null;
+
 
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
@@ -229,10 +241,6 @@ function setupNavigation() {
 }
 
 function showPage(pageId) {
-    if (studentDataInterval) {
-        clearInterval(studentDataInterval);
-        studentDataInterval = null;
-    }
     document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) activePage.classList.remove('hidden');
@@ -245,13 +253,13 @@ function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
 
+    // --- 🌟 UPDATED: Simplified page loading logic ---
     switch (pageId) {
         case 'personnel-list':
             renderPersonnelList();
             break;
         case 'students':
-            loadStudentData();
-            studentDataInterval = setInterval(() => loadStudentData(true), 300000);
+            renderStudentChart(); // Now uses static data, no need to load
             break;
         case 'student-council':
             renderStudentCouncilList();
@@ -382,41 +390,29 @@ function showPersonnelModal(person) {
 }
 
 // --- STUDENT PAGE WITH CHART ---
-async function loadStudentData(isRefresh = false) {
-    const loadingEl = document.getElementById('students-loading');
-    if (!isRefresh) {
-        loadingEl.textContent = 'กำลังโหลดข้อมูล...';
-        loadingEl.classList.remove('hidden');
-    }
-    try {
-        const url = `${API_URL}?sheet=students&v=${new Date().getTime()}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        if (result.error) throw new Error(result.error);
-        studentDataCache = result.data;
-        renderStudentChart(studentDataCache);
-    } catch (error) {
-        console.error('Error loading student data:', error);
-        loadingEl.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
-    }
-}
-function renderStudentChart(studentList) {
+function renderStudentChart() {
+    const studentList = STATIC_STUDENT_DATA; // Use static data
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
     const ctx = document.getElementById('studentChart').getContext('2d');
+    
     loadingEl.classList.add('hidden');
     summaryContainer.innerHTML = '';
+
     if (!studentList || studentList.length === 0) {
         summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
         return;
     }
+
     const labels = studentList.map(s => s.grade || '');
     const boysData = studentList.map(s => parseInt(s.boys) || 0);
     const girlsData = studentList.map(s => parseInt(s.girls) || 0);
     const totalData = studentList.map(s => parseInt(s.total) || 0);
+
     const totalBoys = boysData.reduce((sum, count) => sum + count, 0);
     const totalGirls = girlsData.reduce((sum, count) => sum + count, 0);
     const grandTotal = totalBoys + totalGirls;
+
     summaryContainer.innerHTML = `
         <div class="bg-blue-50 p-4 rounded-lg shadow">
             <h3 class="text-xl font-bold text-blue-800">${totalBoys.toLocaleString()}</h3>
@@ -431,9 +427,11 @@ function renderStudentChart(studentList) {
             <p class="text-sm text-gray-600">นักเรียนทั้งหมด</p>
         </div>
     `;
+
     if (studentChartInstance) {
         studentChartInstance.destroy();
     }
+
     studentChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -466,13 +464,8 @@ function renderStudentChart(studentList) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'จำนวนนักเรียน (คน)' }
-                },
-                x: {
-                    title: { display: true, text: 'ระดับชั้น' }
-                }
+                y: { beginAtZero: true, title: { display: true, text: 'จำนวนนักเรียน (คน)' } },
+                x: { title: { display: true, text: 'ระดับชั้น' } }
             },
             plugins: {
                 legend: { position: 'top' },
