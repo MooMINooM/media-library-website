@@ -265,35 +265,69 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
+// --- 🌟 UPDATED: Innovations Renderer 🌟 ---
 export function renderInnovations(innovationsList) {
     const container = document.getElementById('innovations-container');
     const loadingEl = document.getElementById('innovations-loading');
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
+
     if (!innovationsList || innovationsList.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบคลังนวัตกรรม</p>';
         return;
     }
+
     innovationsList.forEach(item => {
         const card = document.createElement('a');
         card.href = item.fileUrl || '#';
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
         card.className = 'block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden';
+
         const coverImageUrl = getDirectGoogleDriveUrl(item.coverImageUrl) || `https://placehold.co/600x400/EBF8FF/3182CE?text=${encodeURIComponent(item.category || 'นวัตกรรม')}`;
         const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+        
+        // Format the date for better readability
+        let formattedDate = '-';
+        if (item.uploadDate) {
+            try {
+                formattedDate = new Date(item.uploadDate).toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                });
+            } catch(e) { /* Keep default date */ }
+        }
+
         card.innerHTML = `
-            <img 
-                src="${coverImageUrl}" 
-                alt="ปกของ ${item.title}" 
-                class="w-full h-40 object-cover"
-                onerror="this.onerror=null; this.src='${errorImageUrl}';"
-            >
-            <div class="p-4">
-                <p class="text-xs font-semibold text-blue-600 uppercase">${item.category || 'ไม่มีหมวดหมู่'}</p>
+            <div class="relative">
+                <img 
+                    src="${coverImageUrl}" 
+                    alt="ปกของ ${item.title}" 
+                    class="w-full h-40 object-cover"
+                    onerror="this.onerror=null; this.src='${errorImageUrl}';"
+                >
+                <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">${item.category || 'ทั่วไป'}</div>
+            </div>
+            <div class="p-4 flex flex-col h-full">
                 <h4 class="font-bold text-lg text-gray-800 mt-1 truncate" title="${item.title}">${item.title || 'ไม่มีชื่อเรื่อง'}</h4>
                 <p class="text-sm text-gray-600 mt-1 line-clamp-2 h-10">${item.description || ''}</p>
-                <p class="text-xs text-gray-500 mt-2">โดย: ${item.creator || '-'}</p>
+                
+                <div class="mt-3 text-xs text-gray-500 space-y-1">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-5.243-7.243l10.486 4.494M4.757 12h14.486"></path></svg>
+                        <span>วิชา: ${item.subject || '-'}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v7"></path></svg>
+                        <span>ระดับชั้น: ${item.grade || '-'}</span>
+                    </div>
+                </div>
+
+                <div class="border-t mt-3 pt-2 text-xs text-gray-500 flex justify-between items-center">
+                    <span>โดย: ${item.creator || '-'}</span>
+                    <span>${formattedDate}</span>
+                </div>
             </div>
         `;
         container.appendChild(card);
