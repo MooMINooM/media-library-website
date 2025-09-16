@@ -44,7 +44,7 @@ const STATIC_PERSONNEL_DATA = [
         name: 'นางปริฉัตร ไชยอุบล', 
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
-        education: '- วท.บ.วิทยาศาสตร์สิ่งแวดล้อม มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิต วิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี \n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยรามคำแหง',
+        education: '- วท.บ.วิทยาศาสตร์สิ่งแวดล้อม มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิตวิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี \n- ศษ.ม.การบริหารการศึกษา มหาวิทยาลัยรามคำแหง',
         class: 'ประถมศึกษาปีที่ 6',
         tel: '082-345-6789',
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOiOOQOJolSM3KBrQfY3-n7cvLQ746I3_YQtsTy5G00moXHhh8Cji4WV4GvCEMcJUuevM9r-Jje4ET62SUkN6widCgmojbgx_oJwpLcLaWYNQBnNfXiLTF-1pb6HSVIgvmdJQPo2f_E5EMojv7ruDtE=w693-h923-s-no-gm?authuser=0'
@@ -53,7 +53,7 @@ const STATIC_PERSONNEL_DATA = [
         name: 'นายวิรุฬห์ บงแก้ว', 
         role: 'ครู',
         academicStanding: 'ชำนาญการพิเศษ',
-        education: '- ค.บ.วิทยาศาสตร์ มหาวิทยาลัยราชภัฏอุดรธานี',
+        education: '- ค.บ.วิทยาศาสตร์ มหาวิทยาลัยราชภัฏเลย',
         class: 'มัธยมศึกษาปีที่ 3',
         tel: '082-345-6789',
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPNb6WJYiWbSEVCkhL3cGUFvkXCEgVEwt46pJKAt1gtaGOX6OsGWWVNP1cl-moxubzYdel9uyFhMU0isvWDfH16NA9JwsyGjC9fiONb3i03lg3INGV-b5zj0A6kq68XkQwdfts5bwK6oG1BCqSwlDza=w693-h923-s-no-gm?authuser=0'
@@ -66,6 +66,15 @@ const STATIC_PERSONNEL_DATA = [
         class: 'มัธยมศึกษาปีที่ 1',
         tel: '082-345-6789',
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPoPKS-0rz95sqlyF9LT0vLoBhnfycS1EiPnbw9grWvR1vFjST5FviPQHZvpGJd-96kNRHEapLdzrolk-_Qe-etcg21DH7rWA52jphI1wIsewOWhGV5ZxQwfJ30Hn8gpqRI65KbN3H_Jz3lkqd5mJBf=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางปิยะพร โพธิ์วงษ์', 
+        role: 'ครู',
+        academicStanding: 'ชำนาญการพิเศษ',
+        education: '- ค.บ.การศึกษาปฐมวัย มหาวิทยาลัยราชภัฏอุดรธานี',
+        class: 'อนุบาล 2',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMS1B234kUdNZdcofvLK1WQGDt1C8sOvPcCk6Izg1fCntJWKsopzFOCXASXb9beR5K1pBGWiyMZHIMAFFuoh22l377JDR4scqOCaq4meEFI8nSr_FyOuVWR31S2Uv87sm6JrPgtEqZN5ikc6c1jAuGV=w693-h923-s-no-gm?authuser=0'
     },
     { 
         name: 'นางสุดดารัตน์ ไทยมา', 
@@ -89,10 +98,73 @@ const STATIC_PERSONNEL_DATA = [
         name: 'นางสาววิมลดา นาสมยนต์', 
         role: 'ครู',
         academicStanding: 'ชำนาญการ',
-        education: '- ค.บ.(เกียรตินิยมอันดับ ๒) ดนตรีศึกษา',
+        education: '- ค.บ.(เกียรตินิยมอันดับ ๒) ดนตรีศึกษา มหาวิทยาลัยราชภัฏมหาสารคาม',
         class: 'ประถมศึกษาปีที่ 4',
         tel: '082-345-6789',
         imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMmjRUj2wUPjQqckqr1TTB4sAwDZxHjKjgtj8dwuvMUfmsnF2MH4l_ifjOkr4EcpIwZAwSC1Eu8i0aNWBPpmMDVlrcTddy3idAC79sMXQyj2hVZRngB5ZUh3CUa79IrFPEjZPl6NnEadJ7kNMGdHGy1=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นายดอกคูณ พูดเพราะ', 
+        role: 'ครู',
+        academicStanding: '-',
+        education: '- วท.บ.คณิตศาสตร์ มหาวิทยาลัยราชภัฏอุดรธานี\n- ป.บัณฑิตวิชาชีพครู มหาวิทยาลัยราชภัฏอุดรธานี',
+        class: 'ประถมศึกษาปีที่ 6',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMsOzLIk7mORWFfmsVQHQX8cXANSQ4pcKT7FMqOViL2eup1ay8zEYApWl5hxIIipt_ISFroy6PQfuw6bNjnQrW13Z84e7_rVkeeoy_1_vO2pXY5o_dzt28aERhQXENPRIWcB-HXQxnzsaiwKS8XxHuX=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางสาวมณีรัตน์ อาจสมดี', 
+        role: 'ครู',
+        academicStanding: '-',
+        education: '- ศษ.บ.ภาษาอังกฤษ มหาวิทยาลัยรามคำแหง',
+        class: 'ประถมศึกษาปีที่ 2',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOEdF1ISV1dx24tAgpwDEGK8-igunNHDlrygUA4r7-cIYncFJOWloOHxLT6DWTpBR6uZjoJiJfJrvjG6sasW4PJy2ekN3_8_2H_eWkVpU1S5ovaZEe8JjyWy-BgxJgp4UUqKjMZVqJtJRZtUoNdBWbC=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นายญาณวุฒิ บุตรสมบัติ', 
+        role: 'ครู',
+        academicStanding: '-',
+        education: '- กศ.บ.คณิตศาสตร์ มหาวิทยาลัยมหาสารคาม',
+        class: 'ประถมศึกษาปีที่ 3',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOb5YshtBJ8QpSBiohDDXNTBZxaZWNZl_V-FOQ9G_690GRa5cFdUyxRwAbUC5yh422QaTSLU5eRp_xdU5e3hO5qrViPuEWB5PA7q1A5Xd13yU5czu_Ea7BcU3YerXjUXv65PTneb7cfZrjqvA-sNrbP=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นายวุฒิพงษ์ เจนสระคู', 
+        role: 'ครูผู้ช่วย',
+        academicStanding: '-',
+        education: '- ค.บ.ภาษาไทย มหาวิทยาลัยราชภัฏเลย',
+        class: 'ประถมศึกษาปีที่ 2',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczMVYN45CYqXeGQAiM9yp31NqOzduG_XdHAh1fZL9GM_z7WUP4-p-EE46wlb0mX8E7cRBZtyMjTuQTykSgexsBgWoGgLTzcTrCW54ea-DnkZshCE5JbVpCQH2R1FOGZCdFZYjZ-Z5SpMX4tvjOPLbgjy=w331-h402-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางสาววิภาพร อุดทา', 
+        role: 'ครูผู้ช่วย',
+        academicStanding: '-',
+        education: '- ค.บ.ภาษาไทย มหาวิทยาลัยนครพนม',
+        class: 'ประถมศึกษาปีที่ 1',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPG3vOyzHs4ws5YWyGe-L03mC3mrTCG9NPLpefm5DRR97YVeV2yw_NDxUOpv6chVfrgqqKqLz_JRwXrtm8L5_OpPgVHdNAS67LLVQyhLzav2-8HN_OMwuOTjd8bP2FMwIlVOH2p_4Q7gqLI0qHd0Txn=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นางสาวอรุณ สายอ่อนตา', 
+        role: 'ครูธุรการ',
+        academicStanding: '-',
+        education: '- ค.บ.วิทยาศาสตร์ทั่วไป มหาวิทยาลัยราชภัฏเลย',
+        class: '-',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczNv3nxrVxEm29uVlNVcCakHOvOdafJ93eWwrkfre-W5TYVL3aDgx_1N1SSPpUO0mg7JsSB7ZcvoJMX2pMx1hcR5d4Yas1RIItsibRrsqyQ1ZY0eS7baQ6Vkyz_4BI9gMgUUaeKtD_-xyI8gilGUoeC_=w693-h923-s-no-gm?authuser=0'
+    },
+    { 
+        name: 'นายสุชาติ อาสาสะนา', 
+        role: 'ช่างไม้ 4',
+        academicStanding: '-',
+        education: '- ปวส.ไฟฟ้ากำลัง',
+        class: '-',
+        tel: '082-345-6789',
+        imageUrl: 'https://lh3.googleusercontent.com/pw/AP1GczOxWP1amBpdQMTQeuJIN7691QPuD-OQPV5MJUimVHddz4QwYRVd1Uk7Jz7u7hU9SZ_HHuBzlWP-IDskqAN9NcIIZYNM3ZCno11yNPvScx9UeLvUIpuB2A9x6zcniVGcB8kmIaVjD4BDXTXcSd8DyeYT=w693-h923-s-no-gm?authuser=0'
     },
 ];
 
