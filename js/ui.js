@@ -1,6 +1,7 @@
 // This file is responsible for all UI updates and rendering.
 
-import { STATIC_PERSONNEL_DATA, STATIC_STUDENT_COUNCIL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_DATA } from './data.js';
+// 🌟 REMOVED: STATIC_PERSONNEL_DATA is now passed in as an argument
+import { STATIC_STUDENT_COUNCIL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_DATA } from './data.js';
 
 let studentChartInstance = null;
 
@@ -49,12 +50,13 @@ export function setupModal() {
 }
 
 // --- RENDER FUNCTIONS ---
-export function renderPersonnelList() {
+// 🌟 UPDATED: Function now accepts personnelList as an argument
+export function renderPersonnelList(personnelList) {
     const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
-    const personnelList = STATIC_PERSONNEL_DATA;
+    
     if (!personnelList || personnelList.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลบุคลากร</p>';
         return;
@@ -95,7 +97,7 @@ export function showPersonnelModal(person) {
     const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
     const educationList = person.education ? person.education.split('\n').map(edu => `<div>${edu.trim()}</div>`).join('') : '-';
-    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><div class="text-gray-500">${educationList}</div><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
+    modalContent.innerHTML = `<div class="p-6"><div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><div class="text-gray-500">${educationList}</div><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div></div>`;
     modal.classList.remove('hidden');
 }
 
@@ -184,7 +186,7 @@ export function showStudentCouncilModal(member) {
     const modalContent = document.getElementById('detail-modal-content');
     const imageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p><p class="text-md text-gray-500 mt-1">${member.class || ''}</p></div>`;
+    modalContent.innerHTML = `<div class="p-6"><div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p><p class="text-md text-gray-500 mt-1">${member.class || ''}</p></div></div>`;
     modal.classList.remove('hidden');
 }
 
@@ -232,7 +234,7 @@ export function showSchoolBoardModal(member) {
     const modalContent = document.getElementById('detail-modal-content');
     const imageUrl = getDirectGoogleDriveUrl(member.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-    modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p></div>`;
+    modalContent.innerHTML = `<div class="p-6"><div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p></div></div>`;
     modal.classList.remove('hidden');
 }
 
@@ -265,7 +267,27 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-// --- 🌟 UPDATED: Innovations Renderer and Modal 🌟 ---
+export function populateInnovationFilters(innovationsList) {
+    const categoryFilter = document.getElementById('innovations-category-filter');
+    const subjectFilter = document.getElementById('innovations-subject-filter');
+    const gradeFilter = document.getElementById('innovations-grade-filter');
+
+    const populateSelect = (selectElement, items, defaultOptionText) => {
+        const uniqueItems = [...new Set(items.map(item => item).filter(Boolean))];
+        selectElement.innerHTML = `<option value="">${defaultOptionText}</option>`;
+        uniqueItems.sort().forEach(item => {
+            const option = document.createElement('option');
+            option.value = item;
+            option.textContent = item;
+            selectElement.appendChild(option);
+        });
+    };
+
+    populateSelect(categoryFilter, innovationsList.map(i => i.category), 'ทุกหมวดหมู่');
+    populateSelect(subjectFilter, innovationsList.map(i => i.subject), 'ทุกวิชา');
+    populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ทุกระดับชั้น');
+}
+
 export function renderInnovations(innovationsList) {
     const container = document.getElementById('innovations-container');
     const loadingEl = document.getElementById('innovations-loading');
@@ -273,14 +295,14 @@ export function renderInnovations(innovationsList) {
     container.innerHTML = '';
 
     if (!innovationsList || innovationsList.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบคลังนวัตกรรม</p>';
+        container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนวัตกรรมที่ตรงตามเงื่อนไข</p>';
         return;
     }
 
     innovationsList.forEach((item, index) => {
-        const card = document.createElement('div'); // Changed to DIV
-        card.className = 'innovation-card block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer'; // Added class and cursor
-        card.dataset.index = index; // Added index
+        const card = document.createElement('div');
+        card.className = 'innovation-card block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer';
+        card.dataset.index = index;
 
         const coverImageUrl = getDirectGoogleDriveUrl(item.coverImageUrl) || `https://placehold.co/600x400/EBF8FF/3182CE?text=${encodeURIComponent(item.category || 'นวัตกรรม')}`;
         const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
@@ -367,7 +389,7 @@ export function showInnovationModal(item) {
 
                 <div class="mt-6 text-center">
                     <a href="${item.fileUrl || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                         เปิดไฟล์นวัตกรรม
                     </a>
                 </div>
