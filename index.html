@@ -80,20 +80,21 @@
                         <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+2" alt="ประวัติโรงเรียน 2" class="shadow-md w-full h-52 object-cover">
                         <img src="https://placehold.co/600x400/EBF8FF/3182CE?text=รูปภาพ+3" alt="ประวัติโรงเรียน 3" class="shadow-md w-full h-52 object-cover">
                     </div>
-                </div>
+                 </div>
             </section>
 
-            <!-- 🌟 UPDATED: General Info page with corrected layout 🌟 -->
             <section id="page-info" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">ข้อมูลทั่วไปของโรงเรียน</h2>
                     
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-center transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-start transform hover:scale-105 hover:shadow-xl transition-all duration-300">
                             <h3 class="font-bold text-lg text-gray-700 mb-4">ตราสัญลักษณ์</h3>
                             <img src="https://lh3.googleusercontent.com/pw/AP1GczPR-8FwYzuoQw-6o_gEugQ1Wwm1o3pgF_URm_aYB_XYEqkAauVHRrhnxC3VWVFE7q6_bOIr94lIAmcjVlwe_3m277WT7u7OZi76bAS_Xdud1U8Pkf1CvbKhFJu5WJJQT0IVV8XefEo29ULYx4qCC846=w456-h648-s-no?authuser=1" alt="ตราสัญลักษณ์โรงเรียน" class="w-32 h-32 object-contain">
                         </div>
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-center transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+
+                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-start transform hover:scale-105 hover:shadow-xl transition-all duration-300">
                             <h3 class="font-bold text-lg text-gray-700 mb-4">สีประจำโรงเรียน</h3>
                             <div class="flex items-center gap-4">
                                 <div class="w-16 h-16 bg-blue-600 rounded-full shadow-inner"></div>
@@ -101,23 +102,32 @@
                             </div>
                             <p class="mt-3 font-semibold text-gray-600">ฟ้า - ขาว</p>
                         </div>
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col justify-center items-center transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-start transform hover:scale-105 hover:shadow-xl transition-all duration-300">
                             <h3 class="font-bold text-lg text-gray-700 mb-2">คำขวัญ</h3>
                             <p class="text-sm text-gray-500 mt-1">เรียนดี มีวินัย ใฝ่ศึกษา จรรยางาม</p>
                         </div>
+
+                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col items-center justify-start transform hover:scale-105 hover:shadow-xl transition-all duration-300">
+                            <h3 class="font-bold text-lg text-gray-700 mb-4">เพลงมาร์ชโรงเรียน</h3>
+                            <audio controls class="w-full">
+                                <source src="YOUR_AUDIO_FILE.mp3" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+
                     </div>
 
-                    <!-- Lower section now uses a grid layout -->
-                    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col">
+                    <div class="mt-8 space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="font-bold text-xl text-blue-800 mb-2">ปรัชญา (Philosophy)</h3>
                             <p class="text-gray-600">"สุวิชชาโน ภวํโหติ" (ผู้รู้ดีเป็นผู้เจริญ)</p>
                         </div>
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col">
+                        <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="font-bold text-xl text-blue-800 mb-2">วิสัยทัศน์ (Vision)</h3>
                             <p class="text-gray-600">พัฒนาผู้เรียน ให้มีสุขภาพสมบูรณ์ แข็งแรง มีคุณธรรม เลิศล้ำวิชาการ ชุมชนมีส่วนร่วม</p>
                         </div>
-                        <div class="bg-gray-50 p-6 rounded-lg flex flex-col">
+                        <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="font-bold text-xl text-blue-800 mb-2">พันธกิจ (Mission)</h3>
                             <ul class="list-disc list-inside text-gray-600 space-y-1 text-left">
                                 <li>พัฒนานักเรียนในทุกด้าน เต็มตามศักยภาพ ด้วยวิธีการที่หลากหลาย ให้มีความรู้และทักษะตามหลักสูตร มีคุณธรรม จริยธรรมและคุณลักษณะอันพึงประสงค์ สามารถดํารงชีวิตอยู่ในสังคมได้อย่างมีความสุขและเป็นพลเมืองดีของชาติ</li>
@@ -183,7 +193,7 @@
 
     <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
-            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">×</button>
             <div id="detail-modal-content" class="p-6"></div>
         </div>
     </div>
@@ -191,4 +201,3 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
