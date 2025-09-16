@@ -4,10 +4,12 @@
 import * as Data from './js/data.js';
 import * as API from './js/api.js';
 import * as UI from './js/ui.js';
+import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 
 // --- Global Caches ---
 let teacherAchievementsCache = [];
 let innovationsDataCache = [];
+let currentlyDisplayedInnovations = [];
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupDropdowns();
     UI.setupModal();
     setupEventListeners();
+    setupInnovationFilterListeners();
     showPage('home');
 });
 
@@ -37,7 +40,6 @@ async function showPage(pageId) {
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) activePage.classList.remove('hidden');
 
-    // Highlight active link logic...
     document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
@@ -46,7 +48,6 @@ async function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
 
-    // Load data based on the page
     switch (pageId) {
         case 'personnel-list':
             UI.renderPersonnelList();
@@ -72,20 +73,57 @@ async function showPage(pageId) {
             }
             break;
         case 'innovations':
-             if (innovationsDataCache.length > 0) {
-                UI.renderInnovations(innovationsDataCache);
-            } else {
-                try {
-                    const data = await API.loadInnovationsData();
-                    innovationsDataCache = data;
-                    UI.renderInnovations(innovationsDataCache);
-                } catch (e) { console.error(e); }
+             if (innovationsDataCache.length === 0) { 
+                innovationsDataCache = STATIC_INNOVATIONS_DATA;
+                UI.populateInnovationFilters(innovationsDataCache);
             }
+            applyInnovationFilters();
             break;
     }
 }
 
-// --- EVENT LISTENERS for dynamic content ---
+function applyInnovationFilters() {
+    const searchValue = document.getElementById('innovations-search-input').value.toLowerCase();
+    const categoryValue = document.getElementById('innovations-category-filter').value;
+    const subjectValue = document.getElementById('innovations-subject-filter').value;
+    const gradeValue = document.getElementById('innovations-grade-filter').value;
+
+    const filteredData = innovationsDataCache.filter(item => {
+        const matchesSearch = !searchValue || 
+                              (item.title && item.title.toLowerCase().includes(searchValue)) ||
+                              (item.creator && item.creator.toLowerCase().includes(searchValue));
+        const matchesCategory = !categoryValue || item.category === categoryValue;
+        const matchesSubject = !subjectValue || item.subject === subjectValue;
+        const matchesGrade = !gradeValue || item.grade === gradeValue;
+
+        return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
+    });
+
+    currentlyDisplayedInnovations = filteredData;
+    UI.renderInnovations(filteredData);
+}
+
+function setupInnovationFilterListeners() {
+    const searchInput = document.getElementById('innovations-search-input');
+    const categoryFilter = document.getElementById('innovations-category-filter');
+    const subjectFilter = document.getElementById('innovations-subject-filter');
+    const gradeFilter = document.getElementById('innovations-grade-filter');
+    const resetBtn = document.getElementById('innovations-reset-btn');
+
+    searchInput.addEventListener('input', applyInnovationFilters);
+    categoryFilter.addEventListener('change', applyInnovationFilters);
+    subjectFilter.addEventListener('change', applyInnovationFilters);
+    gradeFilter.addEventListener('change', applyInnovationFilters);
+
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        subjectFilter.value = '';
+        gradeFilter.value = '';
+        applyInnovationFilters();
+    });
+}
+
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
@@ -110,11 +148,10 @@ function setupEventListeners() {
             if (selectedMember) UI.showSchoolBoardModal(selectedMember);
         }
 
-        // 🌟 ADDED: Event listener for innovation cards 🌟
         const innovationCard = e.target.closest('.innovation-card');
         if (innovationCard) {
             const index = innovationCard.dataset.index;
-            const selectedInnovation = innovationsDataCache[index];
+            const selectedInnovation = currentlyDisplayedInnovations[index];
             if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
         }
     });
