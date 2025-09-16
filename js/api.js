@@ -21,7 +21,5 @@ export async function loadTeacherAchievementsData() {
     return fetchData('performance');
 }
 
-export async function loadInnovationsData() {
-    return fetchData('innovations');
-}
+// 🌟 REMOVED: The loadInnovationsData function is no longer needed.
 
