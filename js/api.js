@@ -16,7 +16,7 @@ async function fetchData(sheetName) {
     return result.data;
 }
 
-// Specific functions for each data type
+// Specific functions for each data type that needs fetching
 export async function loadTeacherAchievementsData() {
     return fetchData('performance');
 }
