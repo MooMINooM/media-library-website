@@ -178,11 +178,7 @@ const STATIC_STUDENT_COUNCIL_DATA = [
 const STATIC_SCHOOL_BOARD_DATA = [
     { name: 'ประธานกรรมการ', role: 'ประธานกรรมการสถานศึกษา', imageUrl: 'YOUR_IMAGE_URL_HERE' },
     { name: 'กรรมการผู้ทรงคุณวุฒิ', role: 'กรรมการผู้ทรงคุณวุฒิ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { name: 'กรรมการผู้แทนผู้ปกครอง', role: 'กรรมการผู้แทนผู้ปกครอง', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { name: 'กรรมการผู้แทนครู', role: 'กรรมการผู้แทนครู', imageUrl: 'YOUR_IMAGE_URL_HERE' },
-    { name: 'กรรมการและเลขานุการ', role: 'กรรมการและเลขานุการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
-
 
 // --- Global Caches & State ---
 let studentDataCache = [];
@@ -204,23 +200,18 @@ function setupDropdowns() {
     dropdowns.forEach(dropdown => {
         const toggle = dropdown.querySelector('.dropdown-toggle');
         const menu = dropdown.querySelector('.dropdown-menu');
-        
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
             closeAllDropdowns(menu);
             menu.classList.toggle('hidden');
         });
     });
-    window.addEventListener('click', () => {
-        closeAllDropdowns();
-    });
+    window.addEventListener('click', () => closeAllDropdowns());
 }
 
 function closeAllDropdowns(exceptMenu = null) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (menu !== exceptMenu) {
-            menu.classList.add('hidden');
-        }
+        if (menu !== exceptMenu) menu.classList.add('hidden');
     });
 }
 
@@ -242,24 +233,18 @@ function showPage(pageId) {
         clearInterval(studentDataInterval);
         studentDataInterval = null;
     }
-    document.querySelectorAll('.page-content').forEach(page => {
-        page.classList.add('hidden');
-    });
+    document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
     const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) {
-        activePage.classList.remove('hidden');
-    }
-    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => {
-        link.classList.remove('active');
-    });
+    if (activePage) activePage.classList.remove('hidden');
+
+    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
         activeLink.classList.add('active');
         const parentDropdown = activeLink.closest('.dropdown');
-        if (parentDropdown) {
-            parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
-        }
+        if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
+
     switch (pageId) {
         case 'personnel-list':
             renderPersonnelList();
@@ -280,7 +265,7 @@ function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS, MODAL, UTILITY FUNCTIONS ---
+// --- EVENT LISTENERS, MODAL, UTILITY ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
@@ -305,6 +290,7 @@ function setupEventListeners() {
         }
     });
 }
+
 function setupModal() {
     const modal = document.getElementById('detail-modal');
     const closeBtn = document.getElementById('detail-modal-close-btn');
@@ -313,6 +299,7 @@ function setupModal() {
         if (e.target === modal) modal.classList.add('hidden');
     });
 }
+
 function getDirectGoogleDriveUrl(url) {
     if (!url || !url.includes('drive.google.com')) return url;
     try {
@@ -383,16 +370,12 @@ function renderPersonnelList() {
     }
 }
 
-// 🌟 UPDATED: showPersonnelModal no longer uses list-disc
 function showPersonnelModal(person) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
     const imageUrl = getDirectGoogleDriveUrl(person.imageUrl) || 'https://placehold.co/200x200/EBF8FF/3182CE?text=?';
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
-    
-    const educationList = person.education 
-        ? person.education.split('\n').map(edu => `<div>${edu.trim()}</div>`).join('') 
-        : '-';
+    const educationList = person.education ? person.education.split('\n').map(edu => `<div>${edu.trim()}</div>`).join('') : '-';
 
     modalContent.innerHTML = `<div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><div class="text-gray-500">${educationList}</div><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div>`;
     modal.classList.remove('hidden');
