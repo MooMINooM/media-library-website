@@ -166,7 +166,25 @@ export const STATIC_PERSONNEL_DATA = [
 
 // --- Static data for Student Council Structure ---
 export const STATIC_STUDENT_COUNCIL_DATA = [
-    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 3', role: 'ประธานนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 3', role: 'รองประธานนักเรียนฝ่ายการเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 2', role: 'รองประธานนักเรียนฝ่ายกิจกรรม', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'รองประธานนักเรียนฝ่ายอาคารและสถานที่', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'รองประธานนักเรียนฝ่ายสารวัตรนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 2', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 3', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 4', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 5', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'ประถมศึกษาปีที่ 6', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 1', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 2', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 2', role: 'กรรมการนักเรียน', imageUrl: 'YOUR_IMAGE_URL_HERE' },
+    { name: 'ประธานนักเรียน', class: 'มัธยมศึกษาปีที่ 2', role: 'กรรมการนักเรียนและเลขานุการ', imageUrl: 'YOUR_IMAGE_URL_HERE' },
 ];
 
 // --- Static data for School Board Structure ---
@@ -188,3 +206,4 @@ export const STATIC_STUDENT_DATA = [
     { grade: 'มัธยมศึกษาปีที่ 2', boys: 4, girls: 12, total: 16 },
     { grade: 'มัธยมศึกษาปีที่ 3', boys: 0, girls: 3, total: 3 },
 ];
+
