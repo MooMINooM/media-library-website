@@ -109,6 +109,14 @@ function setupEventListeners() {
             const selectedMember = Data.STATIC_SCHOOL_BOARD_DATA[index];
             if (selectedMember) UI.showSchoolBoardModal(selectedMember);
         }
+
+        // 🌟 ADDED: Event listener for innovation cards 🌟
+        const innovationCard = e.target.closest('.innovation-card');
+        if (innovationCard) {
+            const index = innovationCard.dataset.index;
+            const selectedInnovation = innovationsDataCache[index];
+            if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
+        }
     });
 }
 
