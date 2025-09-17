@@ -5,13 +5,15 @@ import * as Data from './js/data.js';
 import * as API from './js/api.js';
 import * as UI from './js/ui.js';
 import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
+import { STATIC_NEWS_DATA } from './js/news.js';
 
 // --- Global Caches ---
 let teacherAchievementsCache = [];
 let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
-// 🌟 ADDED: Cache for personnel data to ensure it's loaded reliably
 let personnelDataCache = [];
+// 🌟 ADDED: Cache for news data
+let newsDataCache = [];
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,7 +53,6 @@ async function showPage(pageId) {
     }
 
     switch (pageId) {
-        // 🌟 UPDATED: Logic for loading personnel data 🌟
         case 'personnel-list':
             if (personnelDataCache.length === 0) {
                 personnelDataCache = Data.STATIC_PERSONNEL_DATA;
@@ -84,6 +85,13 @@ async function showPage(pageId) {
                 UI.populateInnovationFilters(innovationsDataCache);
             }
             applyInnovationFilters();
+            break;
+        // 🌟 ADDED: Case to handle the news page 🌟
+        case 'news':
+            if (newsDataCache.length === 0) {
+                newsDataCache = STATIC_NEWS_DATA;
+            }
+            UI.renderNews(newsDataCache);
             break;
     }
 }
