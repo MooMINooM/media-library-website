@@ -19,9 +19,23 @@ function getDirectGoogleDriveUrl(url) {
 }
 
 // --- DROPDOWN & MODAL SETUP ---
-export function closeAllDropdowns() {
+export function setupDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns(menu);
+            menu.classList.toggle('hidden');
+        });
+    });
+    window.addEventListener('click', () => closeAllDropdowns());
+}
+
+export function closeAllDropdowns(exceptMenu = null) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.classList.add('hidden');
+        if (menu !== exceptMenu) menu.classList.add('hidden');
     });
 }
 
@@ -30,6 +44,7 @@ export function setupModal() {
     const closeBtn = document.getElementById('detail-modal-close-btn');
     closeBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
+        // Clear content to prevent old data flashing
         document.getElementById('detail-modal-content').innerHTML = ''; 
     });
     modal.addEventListener('click', (e) => {
@@ -41,46 +56,6 @@ export function setupModal() {
 }
 
 // --- RENDER FUNCTIONS ---
-export function renderHomeNews(newsList) {
-    const container = document.getElementById('home-news-container');
-    if (!container) return; // Exit if container not found
-
-    container.innerHTML = '';
-    if (!newsList || newsList.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีข่าวสาร</p>';
-        return;
-    }
-
-    const sortedNews = newsList.sort((a, b) => new Date(b.date) - new Date(a.date));
-    const latestNews = sortedNews.slice(0, 3); // Get latest 3 news items
-
-    latestNews.forEach(item => {
-        const newsItem = document.createElement('a');
-        newsItem.href = item.url || '#';
-        newsItem.target = '_blank';
-        newsItem.rel = 'noopener noreferrer';
-        newsItem.className = 'block p-3 rounded-md hover:bg-gray-100 transition-colors duration-200';
-
-        let formattedDate = '-';
-        if (item.date) {
-            try {
-                formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'short', day: 'numeric',
-                });
-            } catch (e) { /* keep default */ }
-        }
-
-        newsItem.innerHTML = `
-            <div class="flex justify-between items-start gap-4">
-                <p class="font-semibold text-gray-800">${item.title || 'ไม่มีหัวข้อ'}</p>
-                <p class="text-sm text-gray-500 text-right min-w-max flex-shrink-0">${formattedDate}</p>
-            </div>
-        `;
-        container.appendChild(newsItem);
-    });
-}
-
-
 export function renderPersonnelList(personnelList) {
     const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -172,12 +147,13 @@ export function renderStudentChart() {
     });
 }
 
-export function renderStudentCouncilList(councilList) {
+export function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
-    if (!councilList || councilList.length === 0) {
+    const boardData = STATIC_STUDENT_COUNCIL_DATA;
+    if (!boardData || boardData.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลคณะกรรมการสภานักเรียน</p>';
         return;
     }
@@ -193,14 +169,14 @@ export function renderStudentCouncilList(councilList) {
         cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="mt-2"><h4 class="font-bold text-blue-800 ${nameSize}">${member.name || 'N/A'}</h4><p class="text-sm text-gray-600">${member.role || '-'}</p><p class="text-xs text-gray-500 mt-1">${member.class || ''}</p></div>`;
         return cardItem;
     };
-    const president = councilList[0];
+    const president = boardData[0];
     if (president) {
         const presidentContainer = document.createElement('div');
         presidentContainer.className = 'flex justify-center mb-8';
         presidentContainer.appendChild(createCard(president, 0, true));
         container.appendChild(presidentContainer);
     }
-    const otherMembers = councilList.slice(1);
+    const otherMembers = boardData.slice(1);
     if (otherMembers.length > 0) {
         const othersContainer = document.createElement('div');
         othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 border-t pt-6';
@@ -219,12 +195,13 @@ export function showStudentCouncilModal(member) {
     modal.classList.remove('hidden');
 }
 
-export function renderSchoolBoardList(boardList) {
+export function renderSchoolBoardList() {
     const container = document.getElementById('school-board-container');
     const loadingEl = document.getElementById('school-board-loading');
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
-    if (!boardList || boardList.length === 0) {
+    const boardData = STATIC_SCHOOL_BOARD_DATA;
+    if (!boardData || boardData.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลคณะกรรมการสถานศึกษา</p>';
         return;
     }
@@ -240,14 +217,14 @@ export function renderSchoolBoardList(boardList) {
         cardItem.innerHTML = `<img src="${finalImageUrl}" alt="รูปภาพของ ${member.name}" class="${imageSize} rounded-full object-cover border-4 border-gray-200" onerror="this.onerror=null; this.src='${errorImageUrl}';"><div class="mt-2"><h4 class="font-bold text-blue-800 ${nameSize}">${member.name || 'N/A'}</h4><p class="text-sm text-gray-600">${member.role || '-'}</p></div>`;
         return cardItem;
     };
-    const president = boardList[0];
+    const president = boardData[0];
     if (president) {
         const presidentContainer = document.createElement('div');
         presidentContainer.className = 'flex justify-center mb-8';
         presidentContainer.appendChild(createCard(president, 0, true));
         container.appendChild(presidentContainer);
     }
-    const otherMembers = boardList.slice(1);
+    const otherMembers = boardData.slice(1);
     if (otherMembers.length > 0) {
         const othersContainer = document.createElement('div');
         othersContainer.className = 'grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 border-t pt-6';
@@ -264,23 +241,6 @@ export function showSchoolBoardModal(member) {
     const errorImageUrl = 'https://placehold.co/200x200/FEE2E2/DC2626?text=Link%20Error';
     modalContent.innerHTML = `<div class="p-6"><div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${member.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${member.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${member.role || '-'}</p></div></div>`;
     modal.classList.remove('hidden');
-}
-
-export function renderDirectorHistory(directorList) {
-    const container = document.getElementById('director-history-container');
-    const loadingEl = document.getElementById('director-history-loading');
-    loadingEl.classList.add('hidden');
-    container.innerHTML = '<div class="overflow-x-auto"><table class="min-w-full bg-white"><thead><tr class="bg-gray-100"><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-สกุล</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ปีที่ดำรงตำแหน่ง</th></tr></thead><tbody class="divide-y divide-gray-200"></tbody></table></div>';
-    const tableBody = container.querySelector('tbody');
-    if (!directorList || directorList.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">ไม่พบข้อมูล</td></tr>';
-        return;
-    }
-    directorList.forEach((director, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap">${index + 1}</td><td class="px-6 py-4 whitespace-nowrap">${director.name}</td><td class="px-6 py-4 whitespace-nowrap">${director.term}</td>`;
-        tableBody.appendChild(row);
-    });
 }
 
 export function renderTeacherAchievements(achievementsList) {
@@ -336,7 +296,9 @@ export function renderNews(newsList) {
         if (item.date) {
             try {
                 formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'long', day: 'numeric',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
                 });
             } catch (e) { /* keep default */ }
         }
@@ -357,7 +319,6 @@ export function populateInnovationFilters(innovationsList) {
     const gradeFilter = document.getElementById('innovations-grade-filter');
 
     const populateSelect = (selectElement, items, defaultOptionText) => {
-        if (!selectElement) return;
         const uniqueItems = [...new Set(items.map(item => item).filter(Boolean))];
         selectElement.innerHTML = `<option value="">${defaultOptionText}</option>`;
         uniqueItems.sort().forEach(item => {
@@ -403,7 +364,12 @@ export function renderInnovations(innovationsList) {
 
         card.innerHTML = `
             <div class="relative pointer-events-none">
-                <img src="${coverImageUrl}" alt="ปกของ ${item.title}" class="w-full h-40 object-cover" onerror="this.onerror=null; this.src='${errorImageUrl}';">
+                <img 
+                    src="${coverImageUrl}" 
+                    alt="ปกของ ${item.title}" 
+                    class="w-full h-40 object-cover"
+                    onerror="this.onerror=null; this.src='${errorImageUrl}';"
+                >
                 <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">${item.category || 'ทั่วไป'}</div>
             </div>
             <div class="p-4 flex flex-col h-full pointer-events-none">
@@ -419,6 +385,7 @@ export function renderInnovations(innovationsList) {
                         <span>ระดับชั้น: ${item.grade || '-'}</span>
                     </div>
                 </div>
+                <!-- 🌟 UPDATED: Creator and Date on separate lines 🌟 -->
                 <div class="border-t mt-3 pt-2 text-xs text-gray-500">
                     <p>โดย: ${item.creator || '-'}</p>
                     <p>${formattedDate}</p>
@@ -446,7 +413,12 @@ export function showInnovationModal(item) {
 
     modalContent.innerHTML = `
         <div>
-            <img src="${coverImageUrl}" alt="ปกของ ${item.title}" class="w-full h-48 object-cover rounded-t-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';">
+            <img 
+                src="${coverImageUrl}" 
+                alt="ปกของ ${item.title}" 
+                class="w-full h-48 object-cover rounded-t-lg"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
             <div class="p-6">
                 <p class="text-sm font-semibold text-blue-600 uppercase">${item.category || 'ไม่มีหมวดหมู่'}</p>
                 <h3 class="text-2xl font-bold text-gray-800 mt-1">${item.title || 'ไม่มีชื่อเรื่อง'}</h3>
