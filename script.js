@@ -47,10 +47,12 @@ async function showPage(pageId) {
             UI.renderStudentChart();
             break;
         case 'student-council':
-            UI.renderStudentCouncilList();
+            // 🌟 FIX: Pass the required data to the render function
+            UI.renderStudentCouncilList(STATIC_STUDENT_COUNCIL_DATA);
             break;
         case 'school-board':
-            UI.renderSchoolBoardList();
+            // 🌟 FIX: Pass the required data to the render function
+            UI.renderSchoolBoardList(STATIC_SCHOOL_BOARD_DATA);
             break;
         case 'director-history':
             UI.renderDirectorHistory(STATIC_DIRECTOR_HISTORY_DATA);
@@ -93,15 +95,20 @@ function setupEventListeners() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // --- 🌟 NEW: Handle Dropdown Toggles 🌟 ---
+        // --- Handle Dropdown Toggles ---
         const dropdownToggle = target.closest('.dropdown-toggle');
         if (dropdownToggle) {
             e.preventDefault();
-            const menu = dropdownToggle.nextElementSibling;
-            const isHidden = menu.classList.contains('hidden');
-            UI.closeAllDropdowns(); // Close all other dropdowns
-            if (isHidden) { // If the one we clicked was hidden, show it
-                menu.classList.remove('hidden');
+            const parentDropdown = dropdownToggle.closest('.dropdown');
+            if (parentDropdown) {
+                const menu = parentDropdown.querySelector('.dropdown-menu');
+                if (menu) {
+                    const isHidden = menu.classList.contains('hidden');
+                    UI.closeAllDropdowns(); // Close all other dropdowns
+                    if (isHidden) { // If the one we clicked was hidden, show it
+                        menu.classList.remove('hidden');
+                    }
+                }
             }
             return; // Stop processing this click
         }
@@ -221,5 +228,4 @@ function filterInnovations() {
         return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
     });
 }
-
 
