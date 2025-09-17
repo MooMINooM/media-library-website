@@ -329,9 +329,9 @@ export function populateInnovationFilters(innovationsList) {
         });
     };
 
-    populateSelect(categoryFilter, innovationsList.map(i => i.category), 'ทุกหมวดหมู่');
-    populateSelect(subjectFilter, innovationsList.map(i => i.subject), 'ทุกวิชา');
-    populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ทุกระดับชั้น');
+    populateSelect(categoryFilter, innovationsList.map(i => i.category), 'หมวดหมู่ทั้งหมด');
+    populateSelect(subjectFilter, innovationsList.map(i => i.subject), 'รายวิชาทั้งหมด');
+    populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ระดับชั้นทั้งหมด');
 }
 
 export function renderInnovations(innovationsList) {
