@@ -95,7 +95,7 @@ function setupEventListeners() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // --- Handle Dropdown Toggles ---
+        // --- 🌟 ROBUST FIX: Handle Dropdown Toggles 🌟 ---
         const dropdownToggle = target.closest('.dropdown-toggle');
         if (dropdownToggle) {
             e.preventDefault();
