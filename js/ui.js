@@ -1,6 +1,5 @@
 // This file is responsible for all UI updates and rendering.
 
-// 🌟 REMOVED: STATIC_PERSONNEL_DATA is now passed in as an argument
 import { STATIC_STUDENT_COUNCIL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_DATA } from './data.js';
 
 let studentChartInstance = null;
@@ -43,14 +42,20 @@ export function closeAllDropdowns(exceptMenu = null) {
 export function setupModal() {
     const modal = document.getElementById('detail-modal');
     const closeBtn = document.getElementById('detail-modal-close-btn');
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        // Clear content to prevent old data flashing
+        document.getElementById('detail-modal-content').innerHTML = ''; 
+    });
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.add('hidden');
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            document.getElementById('detail-modal-content').innerHTML = '';
+        }
     });
 }
 
 // --- RENDER FUNCTIONS ---
-// 🌟 UPDATED: Function now accepts personnelList as an argument
 export function renderPersonnelList(personnelList) {
     const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -264,6 +269,48 @@ export function renderTeacherAchievements(achievementsList) {
             </div>
         `;
         container.appendChild(card);
+    });
+}
+
+// 🌟 ADDED: Function to render news list 🌟
+export function renderNews(newsList) {
+    const container = document.getElementById('news-container');
+    const loadingEl = document.getElementById('news-loading');
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!newsList || newsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข่าวประชาสัมพันธ์</p>';
+        return;
+    }
+
+    const sortedNews = newsList.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    sortedNews.forEach(item => {
+        const newsItem = document.createElement('a');
+        newsItem.href = item.url || '#';
+        newsItem.target = '_blank';
+        newsItem.rel = 'noopener noreferrer';
+        newsItem.className = 'block bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-blue-50 hover:shadow-md transition-all duration-300';
+
+        let formattedDate = '-';
+        if (item.date) {
+            try {
+                formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+            } catch (e) { /* keep default */ }
+        }
+
+        newsItem.innerHTML = `
+            <div class="flex justify-between items-center flex-wrap gap-2">
+                <h4 class="text-lg font-semibold text-blue-800 group-hover:underline">${item.title || 'ไม่มีหัวข้อ'}</h4>
+                <div class="text-sm text-gray-500 text-right min-w-max ml-4">${formattedDate}</div>
+            </div>
+        `;
+        container.appendChild(newsItem);
     });
 }
 
