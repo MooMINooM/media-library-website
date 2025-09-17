@@ -5,7 +5,7 @@ export const STATIC_INNOVATIONS_DATA = [
         creator: 'นายญาณวุฒิ บุตรสมบัติ',
         category: 'สื่อดิจิทัล',
         subject: 'คณิตศาสตร์',
-        grade: 'ประถมศึกษาปีที่ 1 - มัธยมศึกษาปีที่ 3',
+        grade: 'ทุกระดับชั้น',
         uploadDate: '2025-08-15',
         description: 'Mathopoly คือการบูรณาการเกมเศรษฐีเข้ากับการแก้โจทย์คณิตศาสตร์ โดยมีพื้นหลังเป็นนักคณิตศาสตร์คนสำคัญของโลกในแต่ละยุคสมัย',
         fileUrl: 'https://moominoom.github.io/Mathopoly/',
