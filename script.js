@@ -13,7 +13,7 @@ let allInnovations = []; // Use this as the primary source of truth for innovati
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
-    setupNavigation();
+    // setupNavigation is removed; its logic is now inside setupEventListeners
     UI.setupDropdowns();
     UI.setupModal();
     setupEventListeners();
@@ -22,17 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // --- NAVIGATION ---
-function setupNavigation() {
-    const mainNav = document.getElementById('main-nav');
-    mainNav.addEventListener('click', (e) => {
-        if (e.target.matches('a[data-page]')) {
-            e.preventDefault();
-            const pageId = e.target.dataset.page;
-            showPage(pageId);
-            UI.closeAllDropdowns();
-        }
-    });
-}
+// The setupNavigation function has been removed and its logic consolidated into setupEventListeners for better performance and reliability.
 
 async function showPage(pageId) {
     document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
@@ -101,20 +91,40 @@ async function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS ---
+// --- EVENT LISTENERS (Consolidated for reliability) ---
 function setupEventListeners() {
-    const mainContent = document.getElementById('main-content');
-    mainContent.addEventListener('click', (e) => {
-        // Card click listeners
-        const personnelCard = e.target.closest('.personnel-card');
+    // A single, powerful event listener on the body to handle all clicks (Event Delegation)
+    document.body.addEventListener('click', (e) => {
+        const target = e.target;
+
+        // 1. Handle Navigation Links (from main nav and dropdowns)
+        const navLink = target.closest('a[data-page]');
+        if (navLink) {
+            e.preventDefault();
+            const pageId = navLink.dataset.page;
+            showPage(pageId);
+            UI.closeAllDropdowns(); // From ui.js, for closing dropdowns after click
+            return;
+        }
+
+        // 2. Handle Homepage Quick Links
+        const pageLinkElement = target.closest('[data-page-link]');
+        if (pageLinkElement) {
+            const pageId = pageLinkElement.dataset.pageLink;
+            if (pageId) showPage(pageId);
+            return;
+        }
+
+        // 3. Handle Card Clicks (delegated from main-content)
+        const personnelCard = target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
             const selectedPerson = STATIC_PERSONNEL_DATA[index];
             if (selectedPerson) UI.showPersonnelModal(selectedPerson);
-            return; 
+            return;
         }
 
-        const councilCard = e.target.closest('.student-council-card');
+        const councilCard = target.closest('.student-council-card');
         if (councilCard) {
             const index = councilCard.dataset.index;
             const selectedMember = STATIC_STUDENT_COUNCIL_DATA[index];
@@ -122,7 +132,7 @@ function setupEventListeners() {
             return;
         }
 
-        const boardCard = e.target.closest('.school-board-card');
+        const boardCard = target.closest('.school-board-card');
         if (boardCard) {
             const index = boardCard.dataset.index;
             const selectedMember = STATIC_SCHOOL_BOARD_DATA[index];
@@ -130,7 +140,7 @@ function setupEventListeners() {
             return;
         }
 
-        const innovationCard = e.target.closest('.innovation-card');
+        const innovationCard = target.closest('.innovation-card');
         if (innovationCard) {
             const index = innovationCard.dataset.index;
             const currentlyDisplayedInnovations = filterInnovations();
@@ -138,42 +148,36 @@ function setupEventListeners() {
             if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
             return;
         }
-        
-        // Homepage link listener
-        const pageLinkElement = e.target.closest('[data-page-link]');
-        if (pageLinkElement) {
-            const pageId = pageLinkElement.dataset.pageLink;
-            if (pageId) showPage(pageId);
-            return;
-        }
     });
 
-    // --- Innovations Filter Logic (Attaching listeners to the filter container) ---
+    // --- Innovations Filter Logic (for non-click events like 'input' and 'change') ---
     const filterContainer = document.getElementById('innovations-filter-container');
-    
-    // This check prevents errors if the filter container isn't on the page
     if (filterContainer) {
+        // Handle search input as the user types
         filterContainer.addEventListener('input', (e) => {
             if (e.target.matches('#innovations-search-input')) {
                 filterAndRenderInnovations();
             }
         });
 
+        // Handle dropdown filter changes
         filterContainer.addEventListener('change', (e) => {
             if (e.target.matches('select')) {
                 filterAndRenderInnovations();
             }
         });
 
-        filterContainer.addEventListener('click', (e) => {
-            if (e.target.matches('#innovations-reset-btn')) {
+        // Handle reset button click
+        const resetButton = filterContainer.querySelector('#innovations-reset-btn');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
                 document.getElementById('innovations-search-input').value = '';
                 document.getElementById('innovations-category-filter').value = '';
                 document.getElementById('innovations-subject-filter').value = '';
                 document.getElementById('innovations-grade-filter').value = '';
                 filterAndRenderInnovations();
-            }
-        });
+            });
+        }
     }
 }
 
