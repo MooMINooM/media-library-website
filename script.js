@@ -38,7 +38,7 @@ async function showPage(pageId) {
     // Load data based on the page
     switch (pageId) {
         case 'home':
-            UI.renderHomePageNews(STATIC_NEWS_DATA);
+            UI.renderHomeNews(STATIC_NEWS_DATA);
             break;
         case 'personnel-list':
             UI.renderPersonnelList(STATIC_PERSONNEL_DATA);
@@ -221,4 +221,5 @@ function filterInnovations() {
         return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
     });
 }
+
 
