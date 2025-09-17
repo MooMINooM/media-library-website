@@ -84,6 +84,15 @@ async function showPage(pageId) {
                 allInnovations = STATIC_INNOVATIONS_DATA;
                 UI.populateInnovationFilters(allInnovations);
             }
+            // Reset filters and render all innovations when first navigating to the page
+            const searchInput = document.getElementById('innovations-search-input');
+            const categoryFilter = document.getElementById('innovations-category-filter');
+            const subjectFilter = document.getElementById('innovations-subject-filter');
+            const gradeFilter = document.getElementById('innovations-grade-filter');
+            if(searchInput) searchInput.value = '';
+            if(categoryFilter) categoryFilter.value = '';
+            if(subjectFilter) subjectFilter.value = '';
+            if(gradeFilter) gradeFilter.value = '';
             UI.renderInnovations(allInnovations);
             break;
         case 'news':
@@ -92,15 +101,17 @@ async function showPage(pageId) {
     }
 }
 
-// --- EVENT LISTENERS for dynamic content ---
+// --- EVENT LISTENERS ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
+        // Card click listeners
         const personnelCard = e.target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
             const selectedPerson = STATIC_PERSONNEL_DATA[index];
             if (selectedPerson) UI.showPersonnelModal(selectedPerson);
+            return; 
         }
 
         const councilCard = e.target.closest('.student-council-card');
@@ -108,6 +119,7 @@ function setupEventListeners() {
             const index = councilCard.dataset.index;
             const selectedMember = STATIC_STUDENT_COUNCIL_DATA[index];
             if (selectedMember) UI.showStudentCouncilModal(selectedMember);
+            return;
         }
 
         const boardCard = e.target.closest('.school-board-card');
@@ -115,67 +127,84 @@ function setupEventListeners() {
             const index = boardCard.dataset.index;
             const selectedMember = STATIC_SCHOOL_BOARD_DATA[index];
             if (selectedMember) UI.showSchoolBoardModal(selectedMember);
+            return;
         }
 
         const innovationCard = e.target.closest('.innovation-card');
         if (innovationCard) {
             const index = innovationCard.dataset.index;
-            // The index must correspond to the currently filtered list, so we need to re-filter to find the correct item
             const currentlyDisplayedInnovations = filterInnovations();
             const selectedInnovation = currentlyDisplayedInnovations[index];
             if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
+            return;
         }
         
-        // --- 🌟 NEW: Event listener for homepage links 🌟 ---
+        // Homepage link listener
         const pageLinkElement = e.target.closest('[data-page-link]');
         if (pageLinkElement) {
             const pageId = pageLinkElement.dataset.pageLink;
-            if (pageId) {
-                showPage(pageId);
-            }
+            if (pageId) showPage(pageId);
+            return;
         }
     });
 
-    // --- Innovations Filter Logic ---
-    const innovationsSearchInput = document.getElementById('innovations-search-input');
-    const innovationsCategoryFilter = document.getElementById('innovations-category-filter');
-    const innovationsSubjectFilter = document.getElementById('innovations-subject-filter');
-    const innovationsGradeFilter = document.getElementById('innovations-grade-filter');
-    const innovationsResetBtn = document.getElementById('innovations-reset-btn');
+    // --- Innovations Filter Logic (Attaching listeners to the filter container) ---
+    const filterContainer = document.getElementById('innovations-filter-container');
+    
+    // This check prevents errors if the filter container isn't on the page
+    if (filterContainer) {
+        filterContainer.addEventListener('input', (e) => {
+            if (e.target.matches('#innovations-search-input')) {
+                filterAndRenderInnovations();
+            }
+        });
 
-    function filterAndRenderInnovations() {
-        const filteredData = filterInnovations();
-        UI.renderInnovations(filteredData);
-    }
+        filterContainer.addEventListener('change', (e) => {
+            if (e.target.matches('select')) {
+                filterAndRenderInnovations();
+            }
+        });
 
-    function filterInnovations() {
-        const searchTerm = innovationsSearchInput.value.toLowerCase();
-        const category = innovationsCategoryFilter.value;
-        const subject = innovationsSubjectFilter.value;
-        const grade = innovationsGradeFilter.value;
-
-        return allInnovations.filter(item => {
-            const matchesSearch = searchTerm === '' ||
-                (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                (item.creator && item.creator.toLowerCase().includes(searchTerm));
-            const matchesCategory = category === '' || item.category === category;
-            const matchesSubject = subject === '' || item.subject === subject;
-            const matchesGrade = grade === '' || item.grade === grade;
-            return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
+        filterContainer.addEventListener('click', (e) => {
+            if (e.target.matches('#innovations-reset-btn')) {
+                document.getElementById('innovations-search-input').value = '';
+                document.getElementById('innovations-category-filter').value = '';
+                document.getElementById('innovations-subject-filter').value = '';
+                document.getElementById('innovations-grade-filter').value = '';
+                filterAndRenderInnovations();
+            }
         });
     }
+}
 
-    innovationsSearchInput.addEventListener('input', filterAndRenderInnovations);
-    innovationsCategoryFilter.addEventListener('change', filterAndRenderInnovations);
-    innovationsSubjectFilter.addEventListener('change', filterAndRenderInnovations);
-    innovationsGradeFilter.addEventListener('change', filterAndRenderInnovations);
-    
-    innovationsResetBtn.addEventListener('click', () => {
-        innovationsSearchInput.value = '';
-        innovationsCategoryFilter.value = '';
-        innovationsSubjectFilter.value = '';
-        innovationsGradeFilter.value = '';
-        filterAndRenderInnovations();
+
+// --- FILTER FUNCTIONS (Specific to Innovations) ---
+
+function filterAndRenderInnovations() {
+    const filteredData = filterInnovations();
+    UI.renderInnovations(filteredData);
+}
+
+function filterInnovations() {
+    const searchInput = document.getElementById('innovations-search-input');
+    const categoryFilter = document.getElementById('innovations-category-filter');
+    const subjectFilter = document.getElementById('innovations-subject-filter');
+    const gradeFilter = document.getElementById('innovations-grade-filter');
+
+    // Ensure elements exist before trying to read their values
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const category = categoryFilter ? categoryFilter.value : '';
+    const subject = subjectFilter ? subjectFilter.value : '';
+    const grade = gradeFilter ? gradeFilter.value : '';
+
+    return allInnovations.filter(item => {
+        const matchesSearch = searchTerm === '' ||
+            (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+            (item.creator && item.creator.toLowerCase().includes(searchTerm));
+        const matchesCategory = category === '' || item.category === category;
+        const matchesSubject = subject === '' || item.subject === subject;
+        const matchesGrade = grade === '' || item.grade === grade;
+        return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
     });
 }
 
