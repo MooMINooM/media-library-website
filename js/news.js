@@ -2,7 +2,7 @@
 export const STATIC_NEWS_DATA = [
     {
         title: 'พิธีไหว้ครูประจำปีการศึกษา 2568',
-        link: 'https://www.facebook.com/', // Placeholder link
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczPLc7YnQ3J4PvHz4rG77gF3dmfkkpdLGZUkgtat3ncD9wC9wb3OegXqwGhPpuKDbZtTGCzjzF9-ZJsGA2BfNhyg-1VOcxZZyyahBdrGhfOKafUyzx0aZv57_NrtSKMsSGTiwGvUS74qCRntC6vtSxY=w653-h923-s-no-gm?authuser=1', // Placeholder link
         date: '2025-06-12'
     },
     {
