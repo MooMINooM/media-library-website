@@ -12,7 +12,6 @@ let teacherAchievementsCache = [];
 let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
-// 🌟 ADDED: Cache for news data
 let newsDataCache = [];
 
 // --- Initial Setup ---
@@ -53,11 +52,20 @@ async function showPage(pageId) {
     }
 
     switch (pageId) {
+        case 'home':
+            if (newsDataCache.length === 0) {
+                newsDataCache = STATIC_NEWS_DATA;
+            }
+            UI.renderHomePageNews(newsDataCache);
+            break;
         case 'personnel-list':
             if (personnelDataCache.length === 0) {
                 personnelDataCache = Data.STATIC_PERSONNEL_DATA;
             }
             UI.renderPersonnelList(personnelDataCache);
+            break;
+        case 'director-history':
+            UI.renderDirectorHistory();
             break;
         case 'students':
             UI.renderStudentChart();
@@ -86,7 +94,6 @@ async function showPage(pageId) {
             }
             applyInnovationFilters();
             break;
-        // 🌟 ADDED: Case to handle the news page 🌟
         case 'news':
             if (newsDataCache.length === 0) {
                 newsDataCache = STATIC_NEWS_DATA;
@@ -141,6 +148,12 @@ function setupInnovationFilterListeners() {
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
+        const pageLinkCard = e.target.closest('[data-page-link]');
+        if (pageLinkCard) {
+            const pageId = pageLinkCard.dataset.pageLink;
+            showPage(pageId);
+        }
+
         const personnelCard = e.target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
