@@ -56,7 +56,7 @@ export function setupModal() {
 
 // --- RENDER FUNCTIONS ---
 
-// 🌟 ADDED: Function to render latest 5 news on the homepage 🌟
+// 🌟 UPDATED: ฟังก์ชันแสดงข่าวล่าสุด 5 ข่าวในหน้าแรก (ป้องกันลิงก์เสีย) 🌟
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -73,15 +73,20 @@ export function renderHomeNews(newsList) {
         .slice(0, 5);
 
     latestNews.forEach(news => {
-        const newsElement = document.createElement('a');
-        newsElement.href = news.link; // Use 'link' to match news.js
-        newsElement.target = '_blank';
-        newsElement.rel = 'noopener noreferrer';
-        newsElement.className = 'block p-3 rounded-md hover:bg-gray-100 transition-colors duration-200';
+        const hasLink = news.link && news.link.trim() !== '#' && news.link.trim() !== '';
+        const newsElement = document.createElement(hasLink ? 'a' : 'div');
 
+        if (hasLink) {
+            newsElement.href = news.link;
+            newsElement.target = '_blank';
+            newsElement.rel = 'noopener noreferrer';
+        }
+
+        newsElement.className = 'block p-3 rounded-md hover:bg-gray-100 transition-colors duration-200';
+        
         newsElement.innerHTML = `
             <div class="flex justify-between items-start gap-4">
-                <p class="font-semibold text-blue-800 hover:text-blue-600">${news.title || 'ไม่มีหัวข้อ'}</p>
+                <p class="font-semibold text-blue-800 ${hasLink ? 'hover:text-blue-600' : ''}">${news.title || 'ไม่มีหัวข้อ'}</p>
                 <p class="text-sm text-gray-500 whitespace-nowrap">${news.date || ''}</p>
             </div>
         `;
@@ -306,9 +311,14 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
+
+// 🌟 UPDATED: ฟังก์ชันแสดงข่าวทั้งหมด (ป้องกันลิงก์เสีย) 🌟
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     const loadingEl = document.getElementById('news-loading');
+    
+    if (!container || !loadingEl) return;
+
     loadingEl.classList.add('hidden');
     container.innerHTML = '';
 
@@ -316,37 +326,42 @@ export function renderNews(newsList) {
         container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข่าวประชาสัมพันธ์</p>';
         return;
     }
-
-    const sortedNews = newsList.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const sortedNews = [...newsList].sort((a, b) => new Date(b.date) - new Date(a.date));
 
     sortedNews.forEach(item => {
-        const newsItem = document.createElement('a');
-        // 🌟 FIXED: Changed item.url to item.link 🌟
-        newsItem.href = item.link || '#';
-        newsItem.target = '_blank';
-        newsItem.rel = 'noopener noreferrer';
-        newsItem.className = 'block bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-blue-50 hover:shadow-md transition-all duration-300 group';
-
+        const hasLink = item.link && item.link.trim() !== '#' && item.link.trim() !== '';
+        
+        const newsCard = document.createElement('div');
+        newsCard.className = 'bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4';
+        
         let formattedDate = '-';
         if (item.date) {
             try {
                 formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
+                    year: 'numeric', month: 'long', day: 'numeric',
                 });
             } catch (e) { /* keep default */ }
         }
 
-        newsItem.innerHTML = `
-            <div class="flex justify-between items-center flex-wrap gap-2">
-                <h4 class="text-lg font-semibold text-blue-800 group-hover:underline">${item.title || 'ไม่มีหัวข้อ'}</h4>
-                <div class="text-sm text-gray-500 text-right min-w-max ml-4">${formattedDate}</div>
+        newsCard.innerHTML = `
+            <div>
+                <p class="text-xs text-gray-500 mb-1">${formattedDate}</p>
+                <h3 class="font-bold text-lg text-gray-800">${item.title || 'ไม่มีหัวข้อ'}</h3>
             </div>
+            ${hasLink ? `
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="mt-2 sm:mt-0 inline-block bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap">
+                อ่านเพิ่มเติม
+            </a>` : `
+            <span class="mt-2 sm:mt-0 inline-block bg-gray-300 text-gray-600 font-semibold px-4 py-2 rounded-md cursor-not-allowed whitespace-nowrap">
+                ไม่มีลิงก์
+            </span>`
+            }
         `;
-        container.appendChild(newsItem);
+        container.appendChild(newsCard);
     });
 }
+
 
 export function populateInnovationFilters(innovationsList) {
     const categoryFilter = document.getElementById('innovations-category-filter');
