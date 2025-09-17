@@ -56,7 +56,6 @@ export function setupModal() {
 
 // --- RENDER FUNCTIONS ---
 
-// 🌟 UPDATED: ฟังก์ชันแสดงข่าวล่าสุด 5 ข่าวในหน้าแรก (ป้องกันลิงก์เสีย) 🌟
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -282,6 +281,60 @@ export function showSchoolBoardModal(member) {
     modal.classList.remove('hidden');
 }
 
+// 🌟 ADDED: ฟังก์ชันสำหรับหน้าทำเนียบต่างๆ 🌟
+export function renderHistoryTable(tbodyId, data) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.className = 'px-6 py-4 text-center text-gray-500';
+        td.textContent = 'ไม่พบข้อมูล';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.no || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.position || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.start || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.end || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+export function setupHistorySearch(inputId, tbodyId, allData) {
+    const searchInput = document.getElementById(inputId);
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+
+        if (!searchTerm) {
+            renderHistoryTable(tbodyId, allData);
+            return;
+        }
+
+        const filteredData = allData.filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const position = (item.position || '').toLowerCase();
+            return name.includes(searchTerm) || position.includes(searchTerm);
+        });
+
+        renderHistoryTable(tbodyId, filteredData);
+    });
+}
+
+
 export function renderTeacherAchievements(achievementsList) {
     const container = document.getElementById('teacher-achievements-container');
     const loadingEl = document.getElementById('teacher-achievements-loading');
@@ -311,8 +364,6 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-
-// 🌟 UPDATED: ฟังก์ชันแสดงข่าวทั้งหมด (ป้องกันลิงก์เสีย) 🌟
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     const loadingEl = document.getElementById('news-loading');
