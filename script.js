@@ -13,8 +13,7 @@ let allInnovations = []; // Use this as the primary source of truth for innovati
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
-    // setupNavigation is removed; its logic is now inside setupEventListeners
-    UI.setupDropdowns();
+    // UI.setupDropdowns() is no longer needed as its logic is centralized in setupEventListeners
     UI.setupModal();
     setupEventListeners();
     showPage('home');
@@ -22,8 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // --- NAVIGATION ---
-// The setupNavigation function has been removed and its logic consolidated into setupEventListeners for better performance and reliability.
-
 async function showPage(pageId) {
     document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
     const activePage = document.getElementById(`page-${pageId}`);
@@ -41,7 +38,7 @@ async function showPage(pageId) {
     // Load data based on the page
     switch (pageId) {
         case 'home':
-            UI.renderHomeNews(STATIC_NEWS_DATA);
+            UI.renderHomePageNews(STATIC_NEWS_DATA);
             break;
         case 'personnel-list':
             UI.renderPersonnelList(STATIC_PERSONNEL_DATA);
@@ -74,7 +71,6 @@ async function showPage(pageId) {
                 allInnovations = STATIC_INNOVATIONS_DATA;
                 UI.populateInnovationFilters(allInnovations);
             }
-            // Reset filters and render all innovations when first navigating to the page
             const searchInput = document.getElementById('innovations-search-input');
             const categoryFilter = document.getElementById('innovations-category-filter');
             const subjectFilter = document.getElementById('innovations-subject-filter');
@@ -97,17 +93,35 @@ function setupEventListeners() {
     document.body.addEventListener('click', (e) => {
         const target = e.target;
 
-        // 1. Handle Navigation Links (from main nav and dropdowns)
+        // --- 🌟 NEW: Handle Dropdown Toggles 🌟 ---
+        const dropdownToggle = target.closest('.dropdown-toggle');
+        if (dropdownToggle) {
+            e.preventDefault();
+            const menu = dropdownToggle.nextElementSibling;
+            const isHidden = menu.classList.contains('hidden');
+            UI.closeAllDropdowns(); // Close all other dropdowns
+            if (isHidden) { // If the one we clicked was hidden, show it
+                menu.classList.remove('hidden');
+            }
+            return; // Stop processing this click
+        }
+        
+        // If a click is not on a toggle, and not inside a dropdown menu, close all dropdowns.
+        if (!target.closest('.dropdown')) {
+            UI.closeAllDropdowns();
+        }
+
+        // Handle Navigation Links (from main nav and dropdowns)
         const navLink = target.closest('a[data-page]');
         if (navLink) {
             e.preventDefault();
             const pageId = navLink.dataset.page;
             showPage(pageId);
-            UI.closeAllDropdowns(); // From ui.js, for closing dropdowns after click
+            UI.closeAllDropdowns();
             return;
         }
 
-        // 2. Handle Homepage Quick Links
+        // Handle Homepage Quick Links
         const pageLinkElement = target.closest('[data-page-link]');
         if (pageLinkElement) {
             const pageId = pageLinkElement.dataset.pageLink;
@@ -115,7 +129,7 @@ function setupEventListeners() {
             return;
         }
 
-        // 3. Handle Card Clicks (delegated from main-content)
+        // Handle Card Clicks
         const personnelCard = target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
@@ -153,23 +167,20 @@ function setupEventListeners() {
     // --- Innovations Filter Logic (for non-click events like 'input' and 'change') ---
     const filterContainer = document.getElementById('innovations-filter-container');
     if (filterContainer) {
-        // Handle search input as the user types
         filterContainer.addEventListener('input', (e) => {
             if (e.target.matches('#innovations-search-input')) {
                 filterAndRenderInnovations();
             }
         });
 
-        // Handle dropdown filter changes
         filterContainer.addEventListener('change', (e) => {
             if (e.target.matches('select')) {
                 filterAndRenderInnovations();
             }
         });
-
-        // Handle reset button click
+        
         const resetButton = filterContainer.querySelector('#innovations-reset-btn');
-        if (resetButton) {
+        if(resetButton) {
             resetButton.addEventListener('click', () => {
                 document.getElementById('innovations-search-input').value = '';
                 document.getElementById('innovations-category-filter').value = '';
@@ -195,7 +206,6 @@ function filterInnovations() {
     const subjectFilter = document.getElementById('innovations-subject-filter');
     const gradeFilter = document.getElementById('innovations-grade-filter');
 
-    // Ensure elements exist before trying to read their values
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     const category = categoryFilter ? categoryFilter.value : '';
     const subject = subjectFilter ? subjectFilter.value : '';
