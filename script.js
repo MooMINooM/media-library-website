@@ -6,6 +6,10 @@ import * as API from './js/api.js';
 import * as UI from './js/ui.js';
 import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
+// 🌟 ADDED: Import ข้อมูลใหม่สำหรับหน้าทำเนียบ
+import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
+import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+
 
 // --- Global Caches ---
 let teacherAchievementsCache = [];
@@ -21,6 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupModal();
     setupEventListeners();
     setupInnovationFilterListeners();
+    // 🌟 ADDED: เรียกใช้ฟังก์ชัน setup สำหรับช่องค้นหาของหน้าทำเนียบ
+    UI.setupHistorySearch(
+        'director-search-input', 
+        'director-history-table-body', 
+        STATIC_DIRECTOR_HISTORY_DATA
+    );
+    UI.setupHistorySearch(
+        'personnel-history-search-input', 
+        'personnel-history-table-body', 
+        STATIC_PERSONNEL_HISTORY_DATA
+    );
     showPage('home');
 });
 
@@ -52,16 +67,12 @@ async function showPage(pageId) {
     }
 
     switch (pageId) {
-        // 🌟 CHANGE 1: Added case for 'home' to render latest news 🌟
         case 'home':
             if (newsDataCache.length === 0) {
                 newsDataCache = STATIC_NEWS_DATA;
             }
-            // Assuming you have a function in ui.js to render *just a few* news items
-            // This function needs to be created in your ui.js file.
             UI.renderHomeNews(newsDataCache);
             break;
-
         case 'personnel-list':
             if (personnelDataCache.length === 0) {
                 personnelDataCache = Data.STATIC_PERSONNEL_DATA;
@@ -100,6 +111,15 @@ async function showPage(pageId) {
                 newsDataCache = STATIC_NEWS_DATA;
             }
             UI.renderNews(newsDataCache);
+            break;
+        // 🌟 ADDED: Case สำหรับจัดการหน้าทำเนียบใหม่ 🌟
+        case 'director-history':
+            document.getElementById('director-search-input').value = ''; // Clear search box
+            UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
+            break;
+        case 'personnel-history':
+            document.getElementById('personnel-history-search-input').value = ''; // Clear search box
+            UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
     }
 }
@@ -150,17 +170,15 @@ function setupEventListeners() {
     // Listen on the entire body for better event handling
     document.body.addEventListener('click', (e) => {
         
-        // 🌟 CHANGE 2: Added handler for quick links on the homepage 🌟
         const pageLinkElement = e.target.closest('[data-page-link]');
         if (pageLinkElement) {
             const pageId = pageLinkElement.dataset.pageLink;
             if (pageId) {
                 showPage(pageId);
             }
-            return; // Stop further processing if it's a page link
+            return;
         }
         
-        // --- Existing card click handlers ---
         const personnelCard = e.target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
