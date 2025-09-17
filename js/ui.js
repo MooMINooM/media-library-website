@@ -44,7 +44,6 @@ export function setupModal() {
     const closeBtn = document.getElementById('detail-modal-close-btn');
     closeBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
-        // Clear content to prevent old data flashing
         document.getElementById('detail-modal-content').innerHTML = ''; 
     });
     modal.addEventListener('click', (e) => {
@@ -56,6 +55,41 @@ export function setupModal() {
 }
 
 // --- RENDER FUNCTIONS ---
+
+// 🌟 ADDED: Function to render latest 5 news on the homepage 🌟
+export function renderHomeNews(newsList) {
+    const container = document.getElementById('home-news-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    if (!newsList || newsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีข่าวประชาสัมพันธ์</p>';
+        return;
+    }
+
+    const latestNews = [...newsList]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+    latestNews.forEach(news => {
+        const newsElement = document.createElement('a');
+        newsElement.href = news.link; // Use 'link' to match news.js
+        newsElement.target = '_blank';
+        newsElement.rel = 'noopener noreferrer';
+        newsElement.className = 'block p-3 rounded-md hover:bg-gray-100 transition-colors duration-200';
+
+        newsElement.innerHTML = `
+            <div class="flex justify-between items-start gap-4">
+                <p class="font-semibold text-blue-800 hover:text-blue-600">${news.title || 'ไม่มีหัวข้อ'}</p>
+                <p class="text-sm text-gray-500 whitespace-nowrap">${news.date || ''}</p>
+            </div>
+        `;
+        container.appendChild(newsElement);
+    });
+}
+
+
 export function renderPersonnelList(personnelList) {
     const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
@@ -287,10 +321,11 @@ export function renderNews(newsList) {
 
     sortedNews.forEach(item => {
         const newsItem = document.createElement('a');
-        newsItem.href = item.url || '#';
+        // 🌟 FIXED: Changed item.url to item.link 🌟
+        newsItem.href = item.link || '#';
         newsItem.target = '_blank';
         newsItem.rel = 'noopener noreferrer';
-        newsItem.className = 'block bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-blue-50 hover:shadow-md transition-all duration-300';
+        newsItem.className = 'block bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-blue-50 hover:shadow-md transition-all duration-300 group';
 
         let formattedDate = '-';
         if (item.date) {
@@ -385,7 +420,6 @@ export function renderInnovations(innovationsList) {
                         <span>ระดับชั้น: ${item.grade || '-'}</span>
                     </div>
                 </div>
-                <!-- 🌟 UPDATED: Creator and Date on separate lines 🌟 -->
                 <div class="border-t mt-3 pt-2 text-xs text-gray-500">
                     <p>โดย: ${item.creator || '-'}</p>
                     <p>${formattedDate}</p>
@@ -445,4 +479,3 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
-
