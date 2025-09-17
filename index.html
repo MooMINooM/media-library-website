@@ -185,24 +185,48 @@
             <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
             <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
 
-            <section id="page-news" class="page-content hidden"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2></section>
-            
+            <!-- 🌟 UPDATED: News section with container 🌟 -->
+            <section id="page-news" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ข่าวประชาสัมพันธ์</h2>
+                    <div id="news-container" class="mt-6 space-y-4"></div>
+                    <p id="news-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
             <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
-            
             <section id="page-innovations" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คลังนวัตกรรม</h2>
-                    
-                    <!-- 🌟 ADDED: Innovations Filter Bar 🌟 -->
-                    <div id="innovations-filter-bar" class="mb-6 p-4 bg-gray-50 rounded-lg flex flex-wrap items-center gap-4">
-                        <input type="text" id="innovations-search-input" placeholder="ค้นหาตามชื่อเรื่องหรือผู้สร้าง..." class="flex-grow p-2 border rounded-md">
-                        <select id="innovations-category-filter" class="p-2 border rounded-md"></select>
-                        <select id="innovations-subject-filter" class="p-2 border rounded-md"></select>
-                        <select id="innovations-grade-filter" class="p-2 border rounded-md"></select>
-                        <button id="innovations-reset-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">ล้างค่า</button>
+            
+                    <div id="innovations-filter-container" class="mt-6 mb-8 p-4 bg-gray-50 rounded-lg border">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label for="innovations-search-input" class="block text-sm font-medium text-gray-700">ค้นหา</label>
+                                <input type="text" id="innovations-search-input" placeholder="ชื่อ, ผู้สร้าง..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="innovations-category-filter" class="block text-sm font-medium text-gray-700">หมวดหมู่</label>
+                                <select id="innovations-category-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <option value="">ทั้งหมด</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="innovations-subject-filter" class="block text-sm font-medium text-gray-700">วิชา</label>
+                                <select id="innovations-subject-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <option value="">ทั้งหมด</option>
+                                </select>
+                            </div>
+                           <div>
+                                <label for="innovations-grade-filter" class="block text-sm font-medium text-gray-700">ระดับชั้น</label>
+                                <select id="innovations-grade-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <option value="">ทั้งหมด</option>
+                                </select>
+                            </div>
+                            <button id="innovations-reset-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300">ล้างค่า</button>
+                        </div>
                     </div>
-
-                    <div id="innovations-container" class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+            
+                    <div id="innovations-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div>
                     <p id="innovations-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
@@ -211,9 +235,9 @@
     </div>
 
     <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
-            <button id="detail-modal-close-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
-            <div id="detail-modal-content" class="p-0 sm:p-2"></div>
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+            <button id="detail-modal-close-btn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            <div id="detail-modal-content"></div>
         </div>
     </div>
     
