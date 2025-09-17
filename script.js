@@ -1,18 +1,15 @@
 // This is the main controller file.
 // It imports functions from other modules and coordinates everything.
 
-import * as Data from './js/data.js';
-import * as API from './js/api.js';
-import * as UI from './js/ui.js';
+import { STATIC_PERSONNEL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_COUNCIL_DATA, STATIC_DIRECTOR_HISTORY_DATA } from './js/data.js';
 import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
+import * as API from './js/api.js';
+import * as UI from './js/ui.js';
 
 // --- Global Caches ---
 let teacherAchievementsCache = [];
-let innovationsDataCache = [];
-let currentlyDisplayedInnovations = [];
-let personnelDataCache = [];
-let newsDataCache = [];
+let allInnovations = []; // Use this as the primary source of truth for innovations
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupDropdowns();
     UI.setupModal();
     setupEventListeners();
-    setupInnovationFilterListeners();
     showPage('home');
 });
 
@@ -43,6 +39,7 @@ async function showPage(pageId) {
     const activePage = document.getElementById(`page-${pageId}`);
     if (activePage) activePage.classList.remove('hidden');
 
+    // Highlight active link logic...
     document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
     const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
     if (activeLink) {
@@ -51,21 +48,13 @@ async function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
 
+    // Load data based on the page
     switch (pageId) {
         case 'home':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
-            UI.renderHomePageNews(newsDataCache);
+            UI.renderHomeNews(STATIC_NEWS_DATA);
             break;
         case 'personnel-list':
-            if (personnelDataCache.length === 0) {
-                personnelDataCache = Data.STATIC_PERSONNEL_DATA;
-            }
-            UI.renderPersonnelList(personnelDataCache);
-            break;
-        case 'director-history':
-            UI.renderDirectorHistory();
+            UI.renderPersonnelList(STATIC_PERSONNEL_DATA);
             break;
         case 'students':
             UI.renderStudentChart();
@@ -75,6 +64,9 @@ async function showPage(pageId) {
             break;
         case 'school-board':
             UI.renderSchoolBoardList();
+            break;
+        case 'director-history':
+            UI.renderDirectorHistory(STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'teacher-achievements':
             if (teacherAchievementsCache.length > 0) {
@@ -88,99 +80,102 @@ async function showPage(pageId) {
             }
             break;
         case 'innovations':
-             if (innovationsDataCache.length === 0) { 
-                innovationsDataCache = STATIC_INNOVATIONS_DATA;
-                UI.populateInnovationFilters(innovationsDataCache);
+            if (allInnovations.length === 0) {
+                allInnovations = STATIC_INNOVATIONS_DATA;
+                UI.populateInnovationFilters(allInnovations);
             }
-            applyInnovationFilters();
+            UI.renderInnovations(allInnovations);
             break;
         case 'news':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
-            UI.renderNews(newsDataCache);
+            UI.renderNews(STATIC_NEWS_DATA);
             break;
     }
 }
 
-function applyInnovationFilters() {
-    const searchValue = document.getElementById('innovations-search-input').value.toLowerCase();
-    const categoryValue = document.getElementById('innovations-category-filter').value;
-    const subjectValue = document.getElementById('innovations-subject-filter').value;
-    const gradeValue = document.getElementById('innovations-grade-filter').value;
-
-    const filteredData = innovationsDataCache.filter(item => {
-        const matchesSearch = !searchValue || 
-                              (item.title && item.title.toLowerCase().includes(searchValue)) ||
-                              (item.creator && item.creator.toLowerCase().includes(searchValue));
-        const matchesCategory = !categoryValue || item.category === categoryValue;
-        const matchesSubject = !subjectValue || item.subject === subjectValue;
-        const matchesGrade = !gradeValue || item.grade === gradeValue;
-
-        return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
-    });
-
-    currentlyDisplayedInnovations = filteredData;
-    UI.renderInnovations(filteredData);
-}
-
-function setupInnovationFilterListeners() {
-    const searchInput = document.getElementById('innovations-search-input');
-    const categoryFilter = document.getElementById('innovations-category-filter');
-    const subjectFilter = document.getElementById('innovations-subject-filter');
-    const gradeFilter = document.getElementById('innovations-grade-filter');
-    const resetBtn = document.getElementById('innovations-reset-btn');
-
-    searchInput.addEventListener('input', applyInnovationFilters);
-    categoryFilter.addEventListener('change', applyInnovationFilters);
-    subjectFilter.addEventListener('change', applyInnovationFilters);
-    gradeFilter.addEventListener('change', applyInnovationFilters);
-
-    resetBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        subjectFilter.value = '';
-        gradeFilter.value = '';
-        applyInnovationFilters();
-    });
-}
-
+// --- EVENT LISTENERS for dynamic content ---
 function setupEventListeners() {
     const mainContent = document.getElementById('main-content');
     mainContent.addEventListener('click', (e) => {
-        const pageLinkCard = e.target.closest('[data-page-link]');
-        if (pageLinkCard) {
-            const pageId = pageLinkCard.dataset.pageLink;
-            showPage(pageId);
-        }
-
         const personnelCard = e.target.closest('.personnel-card');
         if (personnelCard) {
             const index = personnelCard.dataset.index;
-            const selectedPerson = personnelDataCache[index];
+            const selectedPerson = STATIC_PERSONNEL_DATA[index];
             if (selectedPerson) UI.showPersonnelModal(selectedPerson);
         }
 
         const councilCard = e.target.closest('.student-council-card');
         if (councilCard) {
             const index = councilCard.dataset.index;
-            const selectedMember = Data.STATIC_STUDENT_COUNCIL_DATA[index];
+            const selectedMember = STATIC_STUDENT_COUNCIL_DATA[index];
             if (selectedMember) UI.showStudentCouncilModal(selectedMember);
         }
 
         const boardCard = e.target.closest('.school-board-card');
         if (boardCard) {
             const index = boardCard.dataset.index;
-            const selectedMember = Data.STATIC_SCHOOL_BOARD_DATA[index];
+            const selectedMember = STATIC_SCHOOL_BOARD_DATA[index];
             if (selectedMember) UI.showSchoolBoardModal(selectedMember);
         }
 
         const innovationCard = e.target.closest('.innovation-card');
         if (innovationCard) {
             const index = innovationCard.dataset.index;
+            // The index must correspond to the currently filtered list, so we need to re-filter to find the correct item
+            const currentlyDisplayedInnovations = filterInnovations();
             const selectedInnovation = currentlyDisplayedInnovations[index];
             if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
         }
+        
+        // --- 🌟 NEW: Event listener for homepage links 🌟 ---
+        const pageLinkElement = e.target.closest('[data-page-link]');
+        if (pageLinkElement) {
+            const pageId = pageLinkElement.dataset.pageLink;
+            if (pageId) {
+                showPage(pageId);
+            }
+        }
+    });
+
+    // --- Innovations Filter Logic ---
+    const innovationsSearchInput = document.getElementById('innovations-search-input');
+    const innovationsCategoryFilter = document.getElementById('innovations-category-filter');
+    const innovationsSubjectFilter = document.getElementById('innovations-subject-filter');
+    const innovationsGradeFilter = document.getElementById('innovations-grade-filter');
+    const innovationsResetBtn = document.getElementById('innovations-reset-btn');
+
+    function filterAndRenderInnovations() {
+        const filteredData = filterInnovations();
+        UI.renderInnovations(filteredData);
+    }
+
+    function filterInnovations() {
+        const searchTerm = innovationsSearchInput.value.toLowerCase();
+        const category = innovationsCategoryFilter.value;
+        const subject = innovationsSubjectFilter.value;
+        const grade = innovationsGradeFilter.value;
+
+        return allInnovations.filter(item => {
+            const matchesSearch = searchTerm === '' ||
+                (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                (item.creator && item.creator.toLowerCase().includes(searchTerm));
+            const matchesCategory = category === '' || item.category === category;
+            const matchesSubject = subject === '' || item.subject === subject;
+            const matchesGrade = grade === '' || item.grade === grade;
+            return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
+        });
+    }
+
+    innovationsSearchInput.addEventListener('input', filterAndRenderInnovations);
+    innovationsCategoryFilter.addEventListener('change', filterAndRenderInnovations);
+    innovationsSubjectFilter.addEventListener('change', filterAndRenderInnovations);
+    innovationsGradeFilter.addEventListener('change', filterAndRenderInnovations);
+    
+    innovationsResetBtn.addEventListener('click', () => {
+        innovationsSearchInput.value = '';
+        innovationsCategoryFilter.value = '';
+        innovationsSubjectFilter.value = '';
+        innovationsGradeFilter.value = '';
+        filterAndRenderInnovations();
     });
 }
 
