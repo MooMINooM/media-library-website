@@ -272,7 +272,6 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-// 🌟 ADDED: Function to render news list 🌟
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     const loadingEl = document.getElementById('news-loading');
@@ -386,9 +385,10 @@ export function renderInnovations(innovationsList) {
                         <span>ระดับชั้น: ${item.grade || '-'}</span>
                     </div>
                 </div>
-                <div class="border-t mt-3 pt-2 text-xs text-gray-500 flex justify-between items-center">
-                    <span>โดย: ${item.creator || '-'}</span>
-                    <span>${formattedDate}</span>
+                <!-- 🌟 UPDATED: Creator and Date on separate lines 🌟 -->
+                <div class="border-t mt-3 pt-2 text-xs text-gray-500">
+                    <p>โดย: ${item.creator || '-'}</p>
+                    <p>${formattedDate}</p>
                 </div>
             </div>
         `;
