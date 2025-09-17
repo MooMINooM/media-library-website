@@ -31,6 +31,7 @@
                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" data-page="history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ประวัติความเป็นมา</a>
                         <a href="#" data-page="info" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ข้อมูลทั่วไป</a>
+                        <a href="#" data-page="director-history" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">ทำเนียบผู้บริหาร</a>
                         <a href="#" data-page="structure" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">โครงสร้างการบริหาร</a>
                         <a href="#" data-page="school-board" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสถานศึกษา</a>
                         <a href="#" data-page="student-council" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คณะกรรมการสภานักเรียน</a>
@@ -67,7 +68,80 @@
 
     <div class="container mx-auto p-4">
         <main id="main-content">
-            <section id="page-home" class="page-content bg-white rounded-lg shadow-md p-6"><h2 class="section-title">ยินดีต้อนรับ</h2></section>
+            <!-- 🌟 UPDATED: Home page design 🌟 -->
+            <section id="page-home" class="page-content space-y-12">
+                <!-- 1. Hero Section -->
+                <div class="relative bg-blue-800 rounded-lg shadow-lg overflow-hidden text-white p-8 md:p-16 text-center">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('https://placehold.co/1200x400/3182CE/FFFFFF?text=ภาพบรรยากาศโรงเรียน');"></div>
+                    <div class="relative z-10">
+                        <h2 class="text-4xl md:text-5xl font-extrabold drop-shadow-md">ยินดีต้อนรับสู่</h2>
+                        <h1 class="text-3xl md:text-4xl font-bold mt-2 drop-shadow-md">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
+                        <p class="mt-4 max-w-2xl mx-auto text-lg text-blue-100">แหล่งเรียนรู้คุณภาพ เคียงคู่คุณธรรม นำชุมชนพัฒนา</p>
+                    </div>
+                </div>
+        
+                <!-- 2. Quick Links Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <!-- Link 1: News -->
+                    <div data-page-link="news" class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="bg-blue-100 text-blue-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                            <!-- Icon: Newspaper -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h6M7 8h6" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mt-4">ข่าวประชาสัมพันธ์</h3>
+                        <p class="text-gray-500 text-sm mt-1">ติดตามกิจกรรมและข่าวสารล่าสุดจากทางโรงเรียน</p>
+                    </div>
+                    <!-- Link 2: Innovations -->
+                    <div data-page-link="innovations" class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="bg-green-100 text-green-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                            <!-- Icon: Lightbulb -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mt-4">คลังนวัตกรรม</h3>
+                        <p class="text-gray-500 text-sm mt-1">สำรวจสื่อการสอนและผลงานสร้างสรรค์จากคณะครู</p>
+                    </div>
+                    <!-- Link 3: Personnel -->
+                    <div data-page-link="personnel-list" class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="bg-purple-100 text-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                            <!-- Icon: Users -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.122-1.28-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.122-1.28.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mt-4">ข้อมูลบุคลากร</h3>
+                        <p class="text-gray-500 text-sm mt-1">รู้จักคณะผู้บริหารและคณาจารย์ของเรา</p>
+                    </div>
+                </div>
+                
+                <!-- 3. Latest News & School Vision Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Latest News -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="section-title">ข่าวสารล่าสุด</h3>
+                        <div id="home-news-container" class="space-y-4 mt-4">
+                            <!-- News items will be injected here by script.js -->
+                        </div>
+                         <div class="text-right mt-6">
+                            <button data-page-link="news" class="text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                                อ่านข่าวทั้งหมด &rarr;
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- School Vision -->
+                    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-center items-center text-center">
+                         <h3 class="section-title mb-4">วิสัยทัศน์ (Vision)</h3>
+                         <p class="text-gray-600 italic text-lg">
+                            "พัฒนาผู้เรียน ให้มีสุขภาพสมบูรณ์ แข็งแรง มีคุณธรรม เลิศล้ำวิชาการ ชุมชนมีส่วนร่วม"
+                         </p>
+                         <img src="https://lh3.googleusercontent.com/pw/AP1GczPR-8FwYzuoQw-6o_gEugQ1Wwm1o3pgF_URm_aYB_XYEqkAauVHRrhnxC3VWVFE7q6_bOIr94lIAmcjVlwe_3m277WT7u7OZi76bAS_Xdud1U8Pkf1CvbKhFJu5WJJQT0IVV8XefEo29ULYx4qCC846=w456-h648-s-no?authuser=1" alt="ตราสัญลักษณ์โรงเรียน" class="w-24 h-24 object-contain mt-6 opacity-80">
+                    </div>
+                </div>
+            </section>
             
             <section id="page-history" class="page-content hidden">
                  <div class="bg-white rounded-lg shadow-md p-6">
@@ -123,6 +197,7 @@
                             <h3 class="font-bold text-xl text-blue-800 mb-2">อัตลักษณ์ (Philosophy)</h3>
                             <p class="text-gray-600">แต่งกายดี ยิ้มง่าย ไหว้สวย</p>
                         </div>
+                    <div class="mt-8 space-y-6">
                         <div class="bg-gray-50 p-6 rounded-lg">
                             <h3 class="font-bold text-xl text-blue-800 mb-2">ปรัชญา (Philosophy)</h3>
                             <p class="text-gray-600">"สุวิชชาโน ภวํโหติ" (ผู้รู้ดีเป็นผู้เจริญ)</p>
@@ -144,6 +219,14 @@
                 </div>
             </section>
             
+            <section id="page-director-history" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">ทำเนียบผู้บริหาร</h2>
+                    <div id="director-history-container" class="mt-6"></div>
+                    <p id="director-history-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
+                </div>
+            </section>
+
             <section id="page-structure" class="page-content hidden"><h2 class="section-title">โครงสร้างการบริหาร</h2></section>
             <section id="page-school-board" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
@@ -189,7 +272,6 @@
             <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
             <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
 
-            <!-- 🌟 UPDATED: News section with container 🌟 -->
             <section id="page-news" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">ข่าวประชาสัมพันธ์</h2>
