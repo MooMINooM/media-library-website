@@ -1,6 +1,6 @@
 // This file is responsible for all UI updates and rendering.
 
-import { STATIC_STUDENT_COUNCIL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_DATA } from './data.js';
+import { STATIC_STUDENT_COUNCIL_DATA, STATIC_SCHOOL_BOARD_DATA, STATIC_STUDENT_DATA, STATIC_DIRECTOR_HISTORY_DATA } from './data.js';
 
 let studentChartInstance = null;
 
@@ -104,6 +104,51 @@ export function showPersonnelModal(person) {
     const educationList = person.education ? person.education.split('\n').map(edu => `<div>${edu.trim()}</div>`).join('') : '-';
     modalContent.innerHTML = `<div class="p-6"><div class="text-center"><img src="${imageUrl}" alt="รูปภาพของ ${person.name}" class="w-40 h-40 rounded-full mx-auto mb-4 object-cover border-4 border-blue-200 shadow-lg" onerror="this.onerror=null; this.src='${errorImageUrl}';"><h3 class="text-2xl font-bold text-blue-800">${person.name || 'N/A'}</h3><p class="text-gray-600 text-lg">${person.role || '-'}</p><p class="text-md text-gray-500 mt-1">${person.academicStanding || ''}</p></div><hr class="my-4"><div class="text-sm text-left grid grid-cols-[auto_1fr] gap-x-4 items-start"><strong class="text-gray-600 text-right">วุฒิการศึกษา:</strong><div class="text-gray-500">${educationList}</div><strong class="text-gray-600 text-right">ห้องประจำชั้น:</strong><span class="text-gray-500">${person.class || '-'}</span><strong class="text-gray-600 text-right">โทร:</strong><span class="text-gray-500">${person.tel || '-'}</span></div></div>`;
     modal.classList.remove('hidden');
+}
+
+export function renderDirectorHistory() {
+    const container = document.getElementById('director-history-container');
+    const loadingEl = document.getElementById('director-history-loading');
+    const directorList = STATIC_DIRECTOR_HISTORY_DATA;
+
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!directorList || directorList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูลทำเนียบผู้บริหาร</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    table.className = 'min-w-full divide-y divide-gray-200';
+    
+    const thead = document.createElement('thead');
+    thead.className = 'bg-gray-50';
+    thead.innerHTML = `
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รายนามผู้บริหาร</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ระยะเวลาดำรงตำแหน่ง</th>
+        </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    tbody.className = 'bg-white divide-y divide-gray-200';
+
+    directorList.forEach((director, index) => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+        row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${director.name}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${director.period}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
 }
 
 export function renderStudentChart() {
@@ -313,6 +358,48 @@ export function renderNews(newsList) {
     });
 }
 
+export function renderHomePageNews(newsList) {
+    const container = document.getElementById('home-news-container');
+    if (!container) return; 
+    container.innerHTML = '';
+
+    if (!newsList || newsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">ยังไม่มีข่าวสารล่าสุด</p>';
+        return;
+    }
+
+    const latestNews = newsList
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 3);
+
+    latestNews.forEach(item => {
+        const newsItem = document.createElement('a');
+        newsItem.href = item.url || '#';
+        newsItem.target = '_blank';
+        newsItem.rel = 'noopener noreferrer';
+        newsItem.className = 'block border-b pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0 hover:bg-gray-50 p-2 rounded-md transition-colors';
+
+        let formattedDate = '-';
+        if (item.date) {
+            try {
+                formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+            } catch (e) { /* keep default */ }
+        }
+
+        newsItem.innerHTML = `
+            <div class="flex justify-between items-start">
+                <p class="text-md font-semibold text-gray-700 group-hover:underline">${item.title || 'ไม่มีหัวข้อ'}</p>
+                <p class="text-xs text-gray-500 text-right min-w-max ml-4 whitespace-nowrap">${formattedDate}</p>
+            </div>
+        `;
+        container.appendChild(newsItem);
+    });
+}
+
 export function populateInnovationFilters(innovationsList) {
     const categoryFilter = document.getElementById('innovations-category-filter');
     const subjectFilter = document.getElementById('innovations-subject-filter');
@@ -329,9 +416,9 @@ export function populateInnovationFilters(innovationsList) {
         });
     };
 
-    populateSelect(categoryFilter, innovationsList.map(i => i.category), 'หมวดหมู่ทั้งหมด');
-    populateSelect(subjectFilter, innovationsList.map(i => i.subject), 'รายวิชาทั้งหมด');
-    populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ระดับชั้นทั้งหมด');
+    populateSelect(categoryFilter, innovationsList.map(i => i.category), 'ทุกหมวดหมู่');
+    populateSelect(subjectFilter, innovationsList.map(i => i.subject), 'ทุกวิชา');
+    populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ทุกระดับชั้น');
 }
 
 export function renderInnovations(innovationsList) {
@@ -385,7 +472,6 @@ export function renderInnovations(innovationsList) {
                         <span>ระดับชั้น: ${item.grade || '-'}</span>
                     </div>
                 </div>
-                <!-- 🌟 UPDATED: Creator and Date on separate lines 🌟 -->
                 <div class="border-t mt-3 pt-2 text-xs text-gray-500">
                     <p>โดย: ${item.creator || '-'}</p>
                     <p>${formattedDate}</p>
