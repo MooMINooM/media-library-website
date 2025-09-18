@@ -213,7 +213,7 @@
                                 </tr>
                             </thead>
                             <tbody id="director-history-table-body" class="bg-white divide-y divide-gray-200">
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                                 </tr>
                             </thead>
                             <tbody id="personnel-history-table-body" class="bg-white divide-y divide-gray-200">
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -297,39 +297,7 @@
                     <p id="news-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
-            
-            <!-- 🌟 UPDATED: Section สำหรับหน้าเอกสาร 🌟 -->
-            <section id="page-documents" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">คลังเอกสารดาวน์โหลด</h2>
-            
-                    <!-- Filter Controls -->
-                    <div id="documents-filter-container" class="mt-6 mb-8 p-4 bg-gray-50 rounded-lg border">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                            <div class="md:col-span-2">
-                                <label for="documents-search-input" class="block text-sm font-medium text-gray-700">ค้นหาชื่อเอกสาร</label>
-                                <input type="text" id="documents-search-input" placeholder="เช่น แผนปฏิบัติการ, คำสั่ง..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                            </div>
-                            <div>
-                                <label for="documents-category-filter" class="block text-sm font-medium text-gray-700">หมวดหมู่</label>
-                                <select id="documents-category-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                    <!-- Options will be populated by JS -->
-                                </select>
-                            </div>
-                            <div>
-                                <button id="documents-reset-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300">ล้างค่า</button>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <!-- Document List -->
-                    <div id="documents-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Document cards will be injected here by script.js -->
-                    </div>
-                    <p id="documents-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
-                </div>
-            </section>
-
+            <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
             <section id="page-innovations" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คลังนวัตกรรม</h2>
@@ -378,4 +346,3 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
