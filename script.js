@@ -8,6 +8,7 @@ import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+// 🌟 ADDED: Import ข้อมูลเอกสาร
 import { STATIC_DOCS_DATA } from './js/docs.js';
 
 
@@ -17,6 +18,7 @@ let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
 let newsDataCache = [];
+// 🌟 ADDED: Cache สำหรับเอกสาร
 let documentsDataCache = [];
 
 // --- Initial Setup ---
@@ -62,6 +64,7 @@ async function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
     
+    // Load documents data if not already loaded
     if (documentsDataCache.length === 0) {
         documentsDataCache = STATIC_DOCS_DATA;
     }
@@ -75,8 +78,6 @@ async function showPage(pageId) {
             if (personnelDataCache.length === 0) personnelDataCache = Data.STATIC_PERSONNEL_DATA;
             UI.renderPersonnelList(personnelDataCache);
             break;
-        
-        // 🌟 RE-ADDED: Restored missing page handlers 🌟
         case 'students':
             UI.renderStudentChart();
             break;
@@ -97,7 +98,6 @@ async function showPage(pageId) {
                 } catch (e) { console.error(e); }
             }
             break;
-
         case 'innovations':
              if (innovationsDataCache.length === 0) { 
                 innovationsDataCache = STATIC_INNOVATIONS_DATA;
@@ -110,20 +110,22 @@ async function showPage(pageId) {
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
+            document.getElementById('director-search-input').value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
+            document.getElementById('personnel-history-search-input').value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
             
+        // 🌟 UPDATED: Handle new document sub-pages 🌟
         case 'documents-orders':
+            document.getElementById('documents-orders-search').value = '';
             applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container');
             break;
         case 'documents-forms':
+             document.getElementById('documents-forms-search').value = '';
             applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container');
-            break;
-        case 'documents-plans':
-            applyDocumentSearch('แผนงาน', 'documents-plans-search', 'documents-plans-container');
             break;
     }
 }
@@ -149,12 +151,15 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
+// 🌟 ADDED: New generic function for document searching 🌟
 function applyDocumentSearch(category, searchInputId, containerId) {
     const searchInput = document.getElementById(searchInputId);
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
 
+    // Filter by the specific category first
     const categoryData = documentsDataCache.filter(doc => doc.category === category);
     
+    // Then, filter by the search term
     const filteredData = categoryData.filter(item => {
         return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
     });
@@ -184,6 +189,7 @@ function setupInnovationFilterListeners() {
     });
 }
 
+// 🌟 ADDED: New function to setup search for all document pages 🌟
 function setupDocumentSearchListeners() {
     const ordersSearch = document.getElementById('documents-orders-search');
     if(ordersSearch) {
@@ -193,11 +199,6 @@ function setupDocumentSearchListeners() {
     const formsSearch = document.getElementById('documents-forms-search');
     if(formsSearch) {
         formsSearch.addEventListener('input', () => applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container'));
-    }
-    
-    const plansSearch = document.getElementById('documents-plans-search');
-    if(plansSearch) {
-        plansSearch.addEventListener('input', () => applyDocumentSearch('แผนงาน', 'documents-plans-search', 'documents-plans-container'));
     }
 }
 
