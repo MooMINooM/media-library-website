@@ -281,7 +281,6 @@ export function showSchoolBoardModal(member) {
     modal.classList.remove('hidden');
 }
 
-// 🌟 ADDED: ฟังก์ชันสำหรับหน้าทำเนียบต่างๆ 🌟
 export function renderHistoryTable(tbodyId, data) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -545,3 +544,4 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
+
