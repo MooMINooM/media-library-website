@@ -110,31 +110,37 @@ async function showPage(pageId) {
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
-            document.getElementById('director-search-input').value = '';
+            // 🌟 FIXED: Added a check to prevent script crash
+            const directorSearch = document.getElementById('director-search-input');
+            if (directorSearch) directorSearch.value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
-            document.getElementById('personnel-history-search-input').value = '';
+            // 🌟 FIXED: Added a check to prevent script crash
+            const personnelSearch = document.getElementById('personnel-history-search-input');
+            if (personnelSearch) personnelSearch.value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
             
         case 'documents-orders':
-            document.getElementById('documents-orders-search').value = '';
+            // 🌟 FIXED: Added a check to prevent script crash
+            const ordersSearch = document.getElementById('documents-orders-search');
+            if (ordersSearch) ordersSearch.value = '';
             applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container');
             break;
         case 'documents-forms':
-             document.getElementById('documents-forms-search').value = '';
+            // 🌟 FIXED: Added a check to prevent script crash
+            const formsSearch = document.getElementById('documents-forms-search');
+            if (formsSearch) formsSearch.value = '';
             applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container');
             break;
 
-        // 🌟 FIXED: Added all missing cases for navigation 🌟
         case 'history':
         case 'info':
         case 'structure':
         case 'student-achievements':
         case 'school-achievements':
             // These pages are static HTML, no specific action is needed here.
-            // The page switching logic is already handled above the switch statement.
             break;
     }
 }
