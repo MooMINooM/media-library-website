@@ -8,7 +8,6 @@ import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
-// 🌟 ADDED: Import ข้อมูลเอกสาร
 import { STATIC_DOCS_DATA } from './js/docs.js';
 
 
@@ -18,7 +17,6 @@ let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
 let newsDataCache = [];
-// 🌟 ADDED: Cache สำหรับเอกสาร
 let documentsDataCache = [];
 
 // --- Initial Setup ---
@@ -31,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
     UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
     
-    // 🌟 ADDED: Setup search listeners for each document category
     setupDocumentSearchListeners();
     
     showPage('home');
@@ -64,7 +61,6 @@ async function showPage(pageId) {
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
     
-    // Load documents data if not already loaded
     if (documentsDataCache.length === 0) {
         documentsDataCache = STATIC_DOCS_DATA;
     }
@@ -110,26 +106,22 @@ async function showPage(pageId) {
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
-            // 🌟 FIXED: Added a check to prevent script crash
             const directorSearch = document.getElementById('director-search-input');
             if (directorSearch) directorSearch.value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
-            // 🌟 FIXED: Added a check to prevent script crash
             const personnelSearch = document.getElementById('personnel-history-search-input');
             if (personnelSearch) personnelSearch.value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
             
         case 'documents-orders':
-            // 🌟 FIXED: Added a check to prevent script crash
             const ordersSearch = document.getElementById('documents-orders-search');
             if (ordersSearch) ordersSearch.value = '';
             applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container');
             break;
         case 'documents-forms':
-            // 🌟 FIXED: Added a check to prevent script crash
             const formsSearch = document.getElementById('documents-forms-search');
             if (formsSearch) formsSearch.value = '';
             applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container');
@@ -140,7 +132,6 @@ async function showPage(pageId) {
         case 'structure':
         case 'student-achievements':
         case 'school-achievements':
-            // These pages are static HTML, no specific action is needed here.
             break;
     }
 }
