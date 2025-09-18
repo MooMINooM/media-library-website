@@ -8,6 +8,7 @@ import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+// 🌟 ADDED: Import ข้อมูลเอกสาร
 import { STATIC_DOCS_DATA } from './js/docs.js';
 
 
@@ -17,6 +18,7 @@ let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
 let newsDataCache = [];
+// 🌟 ADDED: Cache สำหรับเอกสาร
 let documentsDataCache = [];
 
 // --- Initial Setup ---
@@ -26,11 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupModal();
     setupEventListeners();
     setupInnovationFilterListeners();
-    UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
-    UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
-    
-    setupDocumentSearchListeners();
-    
+    UI.setupHistorySearch(
+        'director-search-input', 
+        'director-history-table-body', 
+        STATIC_DIRECTOR_HISTORY_DATA
+    );
+    UI.setupHistorySearch(
+        'personnel-history-search-input', 
+        'personnel-history-table-body', 
+        STATIC_PERSONNEL_HISTORY_DATA
+    );
+    // 🌟 ADDED: เรียกใช้ setup สำหรับตัวกรองเอกสาร
+    setupDocumentFilterListeners();
     showPage('home');
 });
 
@@ -60,18 +69,18 @@ async function showPage(pageId) {
         const parentDropdown = activeLink.closest('.dropdown');
         if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
     }
-    
-    if (documentsDataCache.length === 0) {
-        documentsDataCache = STATIC_DOCS_DATA;
-    }
 
     switch (pageId) {
         case 'home':
-            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
+            if (newsDataCache.length === 0) {
+                newsDataCache = STATIC_NEWS_DATA;
+            }
             UI.renderHomeNews(newsDataCache);
             break;
         case 'personnel-list':
-            if (personnelDataCache.length === 0) personnelDataCache = Data.STATIC_PERSONNEL_DATA;
+            if (personnelDataCache.length === 0) {
+                personnelDataCache = Data.STATIC_PERSONNEL_DATA;
+            }
             UI.renderPersonnelList(personnelDataCache);
             break;
         case 'students':
@@ -102,36 +111,26 @@ async function showPage(pageId) {
             applyInnovationFilters();
             break;
         case 'news':
-            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
+            if (newsDataCache.length === 0) {
+                newsDataCache = STATIC_NEWS_DATA;
+            }
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
-            const directorSearch = document.getElementById('director-search-input');
-            if (directorSearch) directorSearch.value = '';
+            document.getElementById('director-search-input').value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
-            const personnelSearch = document.getElementById('personnel-history-search-input');
-            if (personnelSearch) personnelSearch.value = '';
+            document.getElementById('personnel-history-search-input').value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
-            
-        case 'documents-orders':
-            const ordersSearch = document.getElementById('documents-orders-search');
-            if (ordersSearch) ordersSearch.value = '';
-            applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container');
-            break;
-        case 'documents-forms':
-            const formsSearch = document.getElementById('documents-forms-search');
-            if (formsSearch) formsSearch.value = '';
-            applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container');
-            break;
-
-        case 'history':
-        case 'info':
-        case 'structure':
-        case 'student-achievements':
-        case 'school-achievements':
+        // 🌟 ADDED: Case สำหรับหน้าเอกสาร 🌟
+        case 'documents':
+            if (documentsDataCache.length === 0) { 
+                documentsDataCache = STATIC_DOCS_DATA;
+                UI.populateDocumentFilters(documentsDataCache);
+            }
+            applyDocumentFilters();
             break;
     }
 }
@@ -157,19 +156,19 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
-function applyDocumentSearch(category, searchInputId, containerId) {
-    const searchInput = document.getElementById(searchInputId);
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+// 🌟 ADDED: ฟังก์ชันใหม่สำหรับกรองข้อมูลเอกสาร 🌟
+function applyDocumentFilters() {
+    const searchValue = document.getElementById('documents-search-input').value.toLowerCase();
+    const categoryValue = document.getElementById('documents-category-filter').value;
 
-    const categoryData = documentsDataCache.filter(doc => doc.category === category);
-    
-    const filteredData = categoryData.filter(item => {
-        return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
+    const filteredData = documentsDataCache.filter(item => {
+        const matchesSearch = !searchValue || (item.title && item.title.toLowerCase().includes(searchValue));
+        const matchesCategory = !categoryValue || item.category === categoryValue;
+        return matchesSearch && matchesCategory;
     });
 
-    UI.renderDocuments(filteredData, containerId);
+    UI.renderDocuments(filteredData);
 }
-
 
 function setupInnovationFilterListeners() {
     const searchInput = document.getElementById('innovations-search-input');
@@ -192,20 +191,25 @@ function setupInnovationFilterListeners() {
     });
 }
 
-function setupDocumentSearchListeners() {
-    const ordersSearch = document.getElementById('documents-orders-search');
-    if(ordersSearch) {
-        ordersSearch.addEventListener('input', () => applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container'));
-    }
+// 🌟 ADDED: ฟังก์ชันใหม่สำหรับดักจับ event ของตัวกรองเอกสาร 🌟
+function setupDocumentFilterListeners() {
+    const searchInput = document.getElementById('documents-search-input');
+    const categoryFilter = document.getElementById('documents-category-filter');
+    const resetBtn = document.getElementById('documents-reset-btn');
 
-    const formsSearch = document.getElementById('documents-forms-search');
-    if(formsSearch) {
-        formsSearch.addEventListener('input', () => applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container'));
-    }
+    searchInput.addEventListener('input', applyDocumentFilters);
+    categoryFilter.addEventListener('change', applyDocumentFilters);
+
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        applyDocumentFilters();
+    });
 }
 
 
 function setupEventListeners() {
+    // Listen on the entire body for better event handling
     document.body.addEventListener('click', (e) => {
         
         const pageLinkElement = e.target.closest('[data-page-link]');
@@ -250,4 +254,3 @@ function setupEventListeners() {
         }
     });
 }
-
