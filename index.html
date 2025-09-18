@@ -58,15 +58,7 @@
                 </div>
 
                 <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
-                
-                <div class="relative dropdown">
-                    <button class="nav-link dropdown-toggle inline-flex items-center">เอกสาร ▼</button>
-                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="#" data-page="documents-official" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">เอกสารทางราชการ</a>
-                        <a href="#" data-page="documents-forms" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">แบบฟอร์ม</a>
-                    </div>
-                </div>
-
+                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
                 <a href="#" data-page="innovations" class="nav-link">คลังนวัตกรรม</a>
                 
                 <div class="relative dropdown">
@@ -306,25 +298,35 @@
                 </div>
             </section>
             
-            <section id="page-documents-official" class="page-content hidden">
+            <!-- 🌟 UPDATED: Section สำหรับหน้าเอกสาร 🌟 -->
+            <section id="page-documents" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">เอกสารทางราชการ</h2>
-                    <div class="my-4">
-                        <input type="search" id="documents-official-search" placeholder="ค้นหาเอกสาร..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <h2 class="section-title">คลังเอกสารดาวน์โหลด</h2>
+            
+                    <!-- Filter Controls -->
+                    <div id="documents-filter-container" class="mt-6 mb-8 p-4 bg-gray-50 rounded-lg border">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label for="documents-search-input" class="block text-sm font-medium text-gray-700">ค้นหาชื่อเอกสาร</label>
+                                <input type="text" id="documents-search-input" placeholder="เช่น แผนปฏิบัติการ, คำสั่ง..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="documents-category-filter" class="block text-sm font-medium text-gray-700">หมวดหมู่</label>
+                                <select id="documents-category-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <!-- Options will be populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <button id="documents-reset-btn" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-300">ล้างค่า</button>
+                            </div>
+                        </div>
                     </div>
-                    <div id="documents-official-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+                    <!-- Document List -->
+                    <div id="documents-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Document cards will be injected here by script.js -->
                     </div>
-                </div>
-            </section>
-
-            <section id="page-documents-forms" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">แบบฟอร์ม</h2>
-                    <div class="my-4">
-                        <input type="search" id="documents-forms-search" placeholder="ค้นหาแบบฟอร์ม..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    </div>
-                    <div id="documents-forms-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
+                    <p id="documents-loading" class="text-center text-gray-500 mt-4 col-span-full">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
 
@@ -376,4 +378,3 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
