@@ -1,4 +1,4 @@
-// js/docs.js
+// js/files.js
 // ไฟล์สำหรับเก็บข้อมูลเอกสารทั้งหมด
 
 export const STATIC_DOCS_DATA = [
