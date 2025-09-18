@@ -412,6 +412,67 @@ export function renderNews(newsList) {
     });
 }
 
+export function populateDocumentFilters(docsList) {
+    const categoryFilter = document.getElementById('documents-category-filter');
+    if (!categoryFilter) return;
+
+    const categories = [...new Set(docsList.map(doc => doc.category).filter(Boolean))];
+    
+    categoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>'; // Reset
+    
+    categories.sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+}
+
+export function renderDocuments(docsList) {
+    const container = document.getElementById('documents-container');
+    const loadingEl = document.getElementById('documents-loading');
+    if (!container || !loadingEl) return;
+
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!docsList || docsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบเอกสารที่ตรงตามเงื่อนไข</p>';
+        return;
+    }
+
+    docsList.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
+
+        let formattedDate = '-';
+        if (doc.uploadDate) {
+            try {
+                formattedDate = new Date(doc.uploadDate).toLocaleDateString('th-TH', {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                });
+            } catch (e) { /* keep default */ }
+        }
+
+        card.innerHTML = `
+            <div>
+                <p class="text-xs font-semibold text-blue-600 uppercase">${doc.category || 'ทั่วไป'}</p>
+                <h4 class="font-bold text-gray-800 text-lg mt-1" title="${doc.title}">${doc.title || 'ไม่มีชื่อเรื่อง'}</h4>
+                <p class="text-sm text-gray-500 mt-2">วันที่: ${formattedDate}</p>
+            </div>
+            <div class="mt-4 text-right">
+                <a href="${doc.fileUrl || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    ดาวน์โหลด
+                </a>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
 
 export function populateInnovationFilters(innovationsList) {
     const categoryFilter = document.getElementById('innovations-category-filter');
@@ -544,52 +605,3 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
-
-// 🌟 START: เพิ่มฟังก์ชันสำหรับแสดงผลเอกสาร 🌟
-export function renderDocuments(documentList, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    if (!documentList || documentList.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500">ไม่พบข้อมูล</p>';
-        return;
-    }
-
-    const sortedDocs = [...documentList].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    sortedDocs.forEach(item => {
-        const hasLink = item.url && item.url.trim() !== '#' && item.url.trim() !== '';
-        
-        const docCard = document.createElement('div');
-        docCard.className = 'bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4';
-        
-        let formattedDate = '-';
-        if (item.date) {
-            try {
-                formattedDate = new Date(item.date).toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'long', day: 'numeric',
-                });
-            } catch (e) { /* keep default */ }
-        }
-
-        docCard.innerHTML = `
-            <div>
-                <p class="text-xs text-gray-500 mb-1">${formattedDate}</p>
-                <h3 class="font-bold text-lg text-gray-800">${item.title || 'ไม่มีหัวข้อ'}</h3>
-            </div>
-            ${hasLink ? `
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-2 sm:mt-0 inline-flex items-center bg-green-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-green-700 transition-colors whitespace-nowrap">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                ดาวน์โหลด
-            </a>` : `
-            <span class="mt-2 sm:mt-0 inline-block bg-gray-300 text-gray-600 font-semibold px-4 py-2 rounded-md cursor-not-allowed whitespace-nowrap">
-                ไม่มีไฟล์
-            </span>`
-            }
-        `;
-        container.appendChild(docCard);
-    });
-}
-// 🌟 END: เพิ่มฟังก์ชันสำหรับแสดงผลเอกสาร 🌟
