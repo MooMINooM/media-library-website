@@ -76,15 +76,11 @@ async function showPage(pageId) {
 
     switch (pageId) {
         case 'home':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
+            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
             UI.renderHomeNews(newsDataCache);
             break;
         case 'personnel-list':
-            if (personnelDataCache.length === 0) {
-                personnelDataCache = Data.STATIC_PERSONNEL_DATA;
-            }
+            if (personnelDataCache.length === 0) personnelDataCache = Data.STATIC_PERSONNEL_DATA;
             UI.renderPersonnelList(personnelDataCache);
             break;
         case 'students':
@@ -113,9 +109,7 @@ async function showPage(pageId) {
             applyInnovationFilters();
             break;
         case 'news':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
+            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
@@ -180,7 +174,7 @@ function applyDocumentSearch(dataSource, searchInputId, containerId) {
     const searchInput = document.getElementById(searchInputId);
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    if (!dataSource) return; // Add a guard clause
+    if (!dataSource) return;
 
     const filteredData = dataSource.filter(item => {
         return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
