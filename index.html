@@ -58,7 +58,16 @@
                 </div>
 
                 <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
-                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
+                
+                <!-- 🌟 UPDATED: เมนูเอกสาร 🌟 -->
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">เอกสาร ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="documents-official" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">เอกสารทางราชการ</a>
+                        <a href="#" data-page="documents-forms" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">แบบฟอร์ม</a>
+                    </div>
+                </div>
+
                 <a href="#" data-page="innovations" class="nav-link">คลังนวัตกรรม</a>
                 
                 <div class="relative dropdown">
@@ -213,7 +222,7 @@
                                 </tr>
                             </thead>
                             <tbody id="director-history-table-body" class="bg-white divide-y divide-gray-200">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -237,7 +246,7 @@
                                 </tr>
                             </thead>
                             <tbody id="personnel-history-table-body" class="bg-white divide-y divide-gray-200">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -297,7 +306,29 @@
                     <p id="news-loading" class="text-center text-gray-500 mt-4">กำลังโหลดข้อมูล...</p>
                 </div>
             </section>
-            <section id="page-documents" class="page-content hidden"><h2 class="section-title">เอกสาร</h2></section>
+            
+            <section id="page-documents-orders" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">เอกสาร (คำสั่ง)</h2>
+                    <div class="my-4">
+                        <input type="search" id="documents-orders-search" placeholder="ค้นหาคำสั่ง..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    </div>
+                    <div id="documents-orders-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-documents-forms" class="page-content hidden">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="section-title">เอกสาร (แบบฟอร์ม)</h2>
+                    <div class="my-4">
+                        <input type="search" id="documents-forms-search" placeholder="ค้นหาแบบฟอร์ม..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    </div>
+                    <div id="documents-forms-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                </div>
+            </section>
+
             <section id="page-innovations" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="section-title">คลังนวัตกรรม</h2>
@@ -346,3 +377,4 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
