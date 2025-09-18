@@ -6,9 +6,10 @@ import * as API from './js/api.js';
 import * as UI from './js/ui.js';
 import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
-// 🌟 ADDED: Import ข้อมูลใหม่สำหรับหน้าทำเนียบ
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+// 🌟 ADDED: Import ข้อมูลเอกสาร
+import { STATIC_DOCS_DATA } from './js/docs.js';
 
 
 // --- Global Caches ---
@@ -17,6 +18,8 @@ let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
 let newsDataCache = [];
+// 🌟 ADDED: Cache สำหรับเอกสาร
+let documentsDataCache = [];
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupModal();
     setupEventListeners();
     setupInnovationFilterListeners();
-    // 🌟 ADDED: เรียกใช้ฟังก์ชัน setup สำหรับช่องค้นหาของหน้าทำเนียบ
     UI.setupHistorySearch(
         'director-search-input', 
         'director-history-table-body', 
@@ -36,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'personnel-history-table-body', 
         STATIC_PERSONNEL_HISTORY_DATA
     );
+    // 🌟 ADDED: เรียกใช้ setup สำหรับตัวกรองเอกสาร
+    setupDocumentFilterListeners();
     showPage('home');
 });
 
@@ -112,14 +116,21 @@ async function showPage(pageId) {
             }
             UI.renderNews(newsDataCache);
             break;
-        // 🌟 ADDED: Case สำหรับจัดการหน้าทำเนียบใหม่ 🌟
         case 'director-history':
-            document.getElementById('director-search-input').value = ''; // Clear search box
+            document.getElementById('director-search-input').value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
-            document.getElementById('personnel-history-search-input').value = ''; // Clear search box
+            document.getElementById('personnel-history-search-input').value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
+            break;
+        // 🌟 ADDED: Case สำหรับหน้าเอกสาร 🌟
+        case 'documents':
+            if (documentsDataCache.length === 0) { 
+                documentsDataCache = STATIC_DOCS_DATA;
+                UI.populateDocumentFilters(documentsDataCache);
+            }
+            applyDocumentFilters();
             break;
     }
 }
@@ -145,6 +156,20 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
+// 🌟 ADDED: ฟังก์ชันใหม่สำหรับกรองข้อมูลเอกสาร 🌟
+function applyDocumentFilters() {
+    const searchValue = document.getElementById('documents-search-input').value.toLowerCase();
+    const categoryValue = document.getElementById('documents-category-filter').value;
+
+    const filteredData = documentsDataCache.filter(item => {
+        const matchesSearch = !searchValue || (item.title && item.title.toLowerCase().includes(searchValue));
+        const matchesCategory = !categoryValue || item.category === categoryValue;
+        return matchesSearch && matchesCategory;
+    });
+
+    UI.renderDocuments(filteredData);
+}
+
 function setupInnovationFilterListeners() {
     const searchInput = document.getElementById('innovations-search-input');
     const categoryFilter = document.getElementById('innovations-category-filter');
@@ -166,6 +191,23 @@ function setupInnovationFilterListeners() {
     });
 }
 
+// 🌟 ADDED: ฟังก์ชันใหม่สำหรับดักจับ event ของตัวกรองเอกสาร 🌟
+function setupDocumentFilterListeners() {
+    const searchInput = document.getElementById('documents-search-input');
+    const categoryFilter = document.getElementById('documents-category-filter');
+    const resetBtn = document.getElementById('documents-reset-btn');
+
+    searchInput.addEventListener('input', applyDocumentFilters);
+    categoryFilter.addEventListener('change', applyDocumentFilters);
+
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        applyDocumentFilters();
+    });
+}
+
+
 function setupEventListeners() {
     // Listen on the entire body for better event handling
     document.body.addEventListener('click', (e) => {
@@ -176,7 +218,7 @@ function setupEventListeners() {
             if (pageId) {
                 showPage(pageId);
             }
-            return;
+            return; 
         }
         
         const personnelCard = e.target.closest('.personnel-card');
@@ -212,3 +254,4 @@ function setupEventListeners() {
         }
     });
 }
+
