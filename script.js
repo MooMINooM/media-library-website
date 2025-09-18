@@ -19,7 +19,9 @@ import { STATIC_NEWS_DATA } from './js/news.js';
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+import { STATIC_FILES_DATA } from './js/files.js';
 
+import { STATIC_DOCUMENT_DATA } from './js/docs.js';
 
 
 
