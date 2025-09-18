@@ -118,7 +118,6 @@ async function showPage(pageId) {
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
             
-        // 🌟 UPDATED: Handle new document sub-pages 🌟
         case 'documents-orders':
             document.getElementById('documents-orders-search').value = '';
             applyDocumentSearch('คำสั่ง', 'documents-orders-search', 'documents-orders-container');
@@ -126,6 +125,16 @@ async function showPage(pageId) {
         case 'documents-forms':
              document.getElementById('documents-forms-search').value = '';
             applyDocumentSearch('แบบฟอร์ม', 'documents-forms-search', 'documents-forms-container');
+            break;
+
+        // 🌟 FIXED: Added all missing cases for navigation 🌟
+        case 'history':
+        case 'info':
+        case 'structure':
+        case 'student-achievements':
+        case 'school-achievements':
+            // These pages are static HTML, no specific action is needed here.
+            // The page switching logic is already handled above the switch statement.
             break;
     }
 }
@@ -151,15 +160,12 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
-// 🌟 ADDED: New generic function for document searching 🌟
 function applyDocumentSearch(category, searchInputId, containerId) {
     const searchInput = document.getElementById(searchInputId);
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
 
-    // Filter by the specific category first
     const categoryData = documentsDataCache.filter(doc => doc.category === category);
     
-    // Then, filter by the search term
     const filteredData = categoryData.filter(item => {
         return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
     });
@@ -189,7 +195,6 @@ function setupInnovationFilterListeners() {
     });
 }
 
-// 🌟 ADDED: New function to setup search for all document pages 🌟
 function setupDocumentSearchListeners() {
     const ordersSearch = document.getElementById('documents-orders-search');
     if(ordersSearch) {
@@ -248,4 +253,3 @@ function setupEventListeners() {
         }
     });
 }
-
