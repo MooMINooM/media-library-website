@@ -65,7 +65,6 @@
                     <div class="dropdown-menu hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" data-page="documents-orders" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">คำสั่ง</a>
                         <a href="#" data-page="documents-forms" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">แบบฟอร์ม</a>
-                        <a href="#" data-page="documents-plans" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">แผนงาน</a>
                     </div>
                 </div>
 
@@ -85,56 +84,55 @@
 
     <div class="container mx-auto p-4">
         <main id="main-content">
-            <!-- ... (โค้ดส่วนอื่นๆ ของหน้า page-home, page-history ฯลฯ เหมือนเดิม) ... -->
+            <!-- Home Page and other sections are here... -->
+            <section id="page-home" class="page-content"><!-- ... home page content ... --></section>
+            <section id="page-history" class="page-content hidden"><!-- ... history page content ... --></section>
+            <section id="page-info" class="page-content hidden"><!-- ... info page content ... --></section>
+            <section id="page-director-history" class="page-content hidden"><!-- ... director history content ... --></section>
+            <section id="page-personnel-history" class="page-content hidden"><!-- ... personnel history content ... --></section>
+            <section id="page-structure" class="page-content hidden"><!-- ... structure content ... --></section>
+            <section id="page-school-board" class="page-content hidden"><!-- ... school board content ... --></section>
+            <section id="page-student-council" class="page-content hidden"><!-- ... student council content ... --></section>
+            <section id="page-personnel-list" class="page-content hidden"><!-- ... personnel list content ... --></section>
+            <section id="page-students" class="page-content hidden"><!-- ... students page content ... --></section>
+            <section id="page-teacher-achievements" class="page-content hidden"><!-- ... teacher achievements content ... --></section>
+            <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
+            <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
+            <section id="page-news" class="page-content hidden"><!-- ... news page content ... --></section>
+            <section id="page-innovations" class="page-content hidden"><!-- ... innovations page content ... --></section>
 
-            <!-- 🌟 DELETED: ลบ section "page-documents" เก่าออก -->
-
-            <!-- 🌟 ADDED: Section ใหม่สำหรับ "คำสั่ง" 🌟 -->
+            <!-- 🌟 ADDED: New sections for document sub-pages 🌟 -->
             <section id="page-documents-orders" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">เอกสารคำสั่ง</h2>
+                    <h2 class="section-title">เอกสาร (คำสั่ง)</h2>
                     <div class="my-4">
-                        <input type="search" id="documents-orders-search" placeholder="ค้นหาชื่อคำสั่ง..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <input type="search" id="documents-orders-search" placeholder="ค้นหาคำสั่ง..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                     </div>
-                    <div id="documents-orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Document cards will be injected here -->
+                    <div id="documents-orders-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Document cards will be rendered here -->
                     </div>
                 </div>
             </section>
 
-            <!-- 🌟 ADDED: Section ใหม่สำหรับ "แบบฟอร์ม" 🌟 -->
             <section id="page-documents-forms" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">เอกสารแบบฟอร์ม</h2>
+                    <h2 class="section-title">เอกสาร (แบบฟอร์ม)</h2>
                     <div class="my-4">
-                        <input type="search" id="documents-forms-search" placeholder="ค้นหาชื่อแบบฟอร์ม..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <input type="search" id="documents-forms-search" placeholder="ค้นหาแบบฟอร์ม..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                     </div>
-                    <div id="documents-forms-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Document cards will be injected here -->
+                    <div id="documents-forms-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Document cards will be rendered here -->
                     </div>
                 </div>
             </section>
-
-             <!-- 🌟 ADDED: Section ใหม่สำหรับ "แผนงาน" 🌟 -->
-            <section id="page-documents-plans" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="section-title">เอกสารแผนงาน</h2>
-                    <div class="my-4">
-                        <input type="search" id="documents-plans-search" placeholder="ค้นหาชื่อแผนงาน..." class="block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                    </div>
-                    <div id="documents-plans-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Document cards will be injected here -->
-                    </div>
-                </div>
-            </section>
-            
-            <!-- ... (โค้ดส่วนอื่นๆ ที่เหลือของ main เหมือนเดิม) ... -->
 
         </main>
     </div>
 
-    <!-- ... (โค้ดส่วน modal และ script tag เหมือนเดิม) ... -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <!-- Modal Content... -->
+    </div>
+    
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
