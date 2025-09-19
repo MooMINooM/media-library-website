@@ -665,4 +665,3 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
-
