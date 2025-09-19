@@ -363,7 +363,6 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-// 🌟 ADDED: ฟังก์ชันสำหรับแสดงผลงานนักเรียน 🌟
 export function renderStudentAchievements(achievementsList) {
     const container = document.getElementById('student-achievements-container');
     const loadingEl = document.getElementById('student-achievements-loading');
@@ -401,6 +400,46 @@ export function renderStudentAchievements(achievementsList) {
         container.appendChild(card);
     });
 }
+
+// 🌟 ADDED: ฟังก์ชันสำหรับแสดงผลงานสถานศึกษา 🌟
+export function renderSchoolAchievements(achievementsList) {
+    const container = document.getElementById('school-achievements-container');
+    const loadingEl = document.getElementById('school-achievements-loading');
+    if (!container || !loadingEl) return;
+
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!achievementsList || achievementsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-500 col-span-full">ไม่พบข้อมูลผลงานสถานศึกษา</p>';
+        return;
+    }
+
+    achievementsList.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-slate-200 flex flex-col';
+        
+        const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || 'https://placehold.co/600x400/C7D2FE/312E81?text=ผลงานสถานศึกษา';
+        const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+
+        card.innerHTML = `
+            <img 
+                src="${finalImageUrl}" 
+                alt="รูปภาพผลงาน ${item.title}" 
+                class="w-full h-48 object-cover"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="p-4 flex flex-col flex-grow">
+                <h4 class="font-bold text-slate-800 text-lg">${item.title || '-'}</h4>
+                <p class="text-sm text-slate-500 mt-1">ได้รับจาก: ${item.awardedBy || '-'}</p>
+                <p class="text-slate-600 mt-3 text-sm flex-grow">${item.description || ''}</p>
+                <p class="text-xs text-slate-400 mt-3 text-right">วันที่: ${item.date || '-'}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
 
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
@@ -452,7 +491,6 @@ export function renderNews(newsList) {
 }
 
 
-// 🌟 UPDATED: ฟังก์ชันแสดงผลเอกสารที่รับ containerId 🌟
 export function renderDocuments(docsList, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -628,5 +666,4 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
-คุณช่วยเพิ่มโค้ด ผลงานสถานศึกษา โดยข้อมูลเก็บไว้ที่ saward.js
 
