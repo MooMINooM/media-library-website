@@ -58,7 +58,16 @@
                 </div>
 
                 <a href="#" data-page="news" class="nav-link">ข่าวประชาสัมพันธ์</a>
-                <a href="#" data-page="documents" class="nav-link">เอกสาร</a>
+
+                <!-- 🌟 UPDATED: เปลี่ยนจาก a เป็น div.dropdown 🌟 -->
+                <div class="relative dropdown">
+                    <button class="nav-link dropdown-toggle inline-flex items-center">เอกสาร ▼</button>
+                    <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" data-page="documents-official" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">เอกสารทางราชการ</a>
+                        <a href="#" data-page="documents-forms" class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-800">แบบฟอร์ม</a>
+                    </div>
+                </div>
+
                 <a href="#" data-page="innovations" class="nav-link">คลังนวัตกรรม</a>
                 
                 <div class="relative dropdown">
@@ -287,17 +296,7 @@
                 </div>
             </section>
             
-            <!-- 🌟 UPDATED: Section for Student Achievements 🌟 -->
-            <section id="page-student-achievements" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-lg border border-slate-200 p-8">
-                   <h2 class="section-title">ผลงานนักเรียน</h2>
-                   <div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                       <!-- Student achievement cards will be injected here -->
-                   </div>
-                   <p id="student-achievements-loading" class="text-center text-slate-500 mt-4 col-span-full hidden">กำลังโหลดข้อมูล...</p>
-               </div>
-            </section>
-
+            <section id="page-student-achievements" class="page-content hidden"><h2 class="section-title">ผลงานนักเรียน</h2></section>
             <section id="page-school-achievements" class="page-content hidden"><h2 class="section-title">ผลงานสถานศึกษา</h2></section>
 
             <section id="page-news" class="page-content hidden">
@@ -381,4 +380,5 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+คุณช่วยอัพเดตไฟล์ index ให้แสดงผล ผลงานสถานศึกษาด้วย
 
