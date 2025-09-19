@@ -97,7 +97,8 @@ export function renderHomeNews(newsList) {
 export function renderPersonnelList(personnelList) {
     const container = document.getElementById('personnel-list-container');
     const loadingEl = document.getElementById('personnel-loading');
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if(!container) return;
     container.innerHTML = '';
     
     if (!personnelList || personnelList.length === 0) {
@@ -148,8 +149,9 @@ export function renderStudentChart() {
     const studentList = STATIC_STUDENT_DATA;
     const loadingEl = document.getElementById('students-loading');
     const summaryContainer = document.getElementById('student-summary-container');
-    const ctx = document.getElementById('studentChart').getContext('2d');
-    loadingEl.classList.add('hidden');
+    const ctx = document.getElementById('studentChart')?.getContext('2d');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if (!summaryContainer || !ctx) return;
     summaryContainer.innerHTML = '';
     if (!studentList || studentList.length === 0) {
         summaryContainer.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลนักเรียน</p>';
@@ -188,7 +190,8 @@ export function renderStudentChart() {
 export function renderStudentCouncilList() {
     const container = document.getElementById('student-council-container');
     const loadingEl = document.getElementById('student-council-loading');
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if(!container) return;
     container.innerHTML = '';
     const boardData = STATIC_STUDENT_COUNCIL_DATA;
     if (!boardData || boardData.length === 0) {
@@ -236,7 +239,8 @@ export function showStudentCouncilModal(member) {
 export function renderSchoolBoardList() {
     const container = document.getElementById('school-board-container');
     const loadingEl = document.getElementById('school-board-loading');
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if(!container) return;
     container.innerHTML = '';
     const boardData = STATIC_SCHOOL_BOARD_DATA;
     if (!boardData || boardData.length === 0) {
@@ -337,7 +341,8 @@ export function setupHistorySearch(inputId, tbodyId, allData) {
 export function renderTeacherAchievements(achievementsList) {
     const container = document.getElementById('teacher-achievements-container');
     const loadingEl = document.getElementById('teacher-achievements-loading');
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if(!container) return;
     container.innerHTML = '';
     if (!achievementsList || achievementsList.length === 0) {
         container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลผลงานครู</p>';
@@ -516,7 +521,6 @@ export function renderDocuments(docsList, containerId) {
 
         card.innerHTML = `
             <div>
-                <p class="text-xs font-semibold text-blue-600 uppercase">${doc.category || 'ทั่วไป'}</p>
                 <h4 class="font-bold text-gray-800 text-lg mt-1" title="${doc.title}">${doc.title || 'ไม่มีชื่อเรื่อง'}</h4>
                 <p class="text-sm text-gray-500 mt-2">วันที่: ${formattedDate}</p>
             </div>
@@ -558,7 +562,8 @@ export function populateInnovationFilters(innovationsList) {
 export function renderInnovations(innovationsList) {
     const container = document.getElementById('innovations-container');
     const loadingEl = document.getElementById('innovations-loading');
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
+    if(!container) return;
     container.innerHTML = '';
 
     if (!innovationsList || innovationsList.length === 0) {
@@ -665,3 +670,4 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
+
