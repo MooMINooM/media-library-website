@@ -77,7 +77,7 @@ export const STATIC_NEWS_DATA = [
     },
     {
         title: 'แสดงความยินดีกับคุณครูมัณฑนา บุญประคม เนื่องในโอกาสลื่อนวิทยฐานะครูเชี่ยวชาญ',
-        link: 'https://lh3.googleusercontent.com/pw/AP1GczPv1fjfgcxtni8NSC6RTdE_RkL54O2PLvHsiv_gT0hG5gbRU5btlF6Ry42b9FuYZZoCs6VTUp-m7rv1VnSw3skv-PqbhigBVBEs44wCAPVQkV9eqBIW4PEfNujMlIfJGBpeT6iPO-vdqoC_2xYcLkqT=w653-h923-s-no-gm?authuser=2',
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczOHaaFNuURTKIQVhgSAY1ZqG0dXvU_DI5m8lldngP6QJsmj3rJCpzERQDgZVH5YfNh1yiv2KHvVc-ILruMRhVSiwu3cox0-uLgG2ND_lUQmX-FplgPiZbizAdumDhM7FgIRc5zldKwmgsqoLTMK-plr=w1614-h923-s-no-gm?authuser=1',
         date: '2025-09-11'
     },
 ];
