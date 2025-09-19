@@ -1,26 +1,28 @@
-<!-- ... existing code ... -->
-            <section id="page-teacher-achievements" class="page-content hidden">
-<!-- ... existing code ... -->
-            </section>
-            
-            <section id="page-student-achievements" class="page-content hidden">
-               <div class="bg-white rounded-lg shadow-lg border border-slate-200 p-8">
-                  <h2 class="section-title">ผลงานนักเรียน</h2>
-                  <div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <!-- Student achievement cards will be injected here -->
-                  </div>
-                  <p id="student-achievements-loading" class="text-center text-slate-500 mt-4 col-span-full hidden">กำลังโหลดข้อมูล...</p>
-              </div>
-            </section>
+// js/saward.js
+// ข้อมูลผลงานสถานศึกษา
 
-            <section id="page-school-achievements" class="page-content hidden">
-                <div class="bg-white rounded-lg shadow-lg border border-slate-200 p-8">
-                   <h2 class="section-title">ผลงานสถานศึกษา</h2>
-                   <div id="school-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                       <!-- School achievement cards will be injected here -->
-                   </div>
-                   <p id="school-achievements-loading" class="text-center text-slate-500 mt-4 col-span-full hidden">กำลังโหลดข้อมูล...</p>
-               </div>
-            </section>
+export const STATIC_SCHOOL_AWARDS_DATA = [
+    {
+        title: 'โรงเรียนต้นแบบสภานักเรียน ระดับประเทศ',
+        awardedBy: 'สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน',
+        date: '2025-09-10',
+        description: 'ได้รับรางวัลจากการส่งเสริมกิจกรรมสภานักเรียนอย่างต่อเนื่องและมีประสิทธิภาพ สร้างภาวะผู้นำให้กับนักเรียน',
+        imageUrl: 'https://placehold.co/600x400/C7D2FE/312E81?text=ผลงานสถานศึกษา'
+    },
+    {
+        title: 'สถานศึกษาปลอดภัยดีเด่น',
+        awardedBy: 'กระทรวงแรงงาน',
+        date: '2025-08-20',
+        description: 'มีมาตรการดูแลความปลอดภัยในสถานศึกษาอย่างดีเยี่ยม ทั้งด้านอาคารสถานที่และสภาพแวดล้อม',
+        imageUrl: 'https://placehold.co/600x400/D1FAE5/065F46?text=ผลงานสถานศึกษา'
+    },
+    {
+        title: 'รางวัลโรงเรียนส่งเสริมสุขภาพ ระดับทอง',
+        awardedBy: 'กรมอนามัย กระทรวงสาธารณสุข',
+        date: '2025-07-05',
+        description: 'ส่งเสริมให้นักเรียนและบุคลากรมีสุขภาพที่ดี ผ่านกิจกรรมและโครงการต่างๆ ตลอดปีการศึกษา',
+        imageUrl: 'https://placehold.co/600x400/FEF3C7/92400E?text=ผลงานสถานศึกษา'
+    },
+    // เพิ่มข้อมูลผลงานอื่นๆ ของสถานศึกษาที่นี่...
+];
 
-            <section id="page-news" class="page-content hidden">
