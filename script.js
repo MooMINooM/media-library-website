@@ -8,8 +8,11 @@ import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
 import { STATIC_NEWS_DATA } from './js/news.js';
 import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
+import { STATIC_STUDENT_AWARDS_DATA } from './js/staward.js';
+import { STATIC_SCHOOL_AWARDS_DATA } from './js/saward.js';
 // 🌟 ADDED: Import ข้อมูลเอกสาร
 import { STATIC_DOCS_DATA } from './js/docs.js';
+import { STATIC_FILES_DATA } from './js/files.js';
 
 
 // --- Global Caches ---
@@ -18,8 +21,12 @@ let innovationsDataCache = [];
 let currentlyDisplayedInnovations = [];
 let personnelDataCache = [];
 let newsDataCache = [];
+let studentAchievementsCache = [];
+let schoolAchievementsCache = [];
 // 🌟 ADDED: Cache สำหรับเอกสาร
 let documentsDataCache = [];
+let filesDataCache = [];
+
 
 // --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'personnel-history-table-body', 
         STATIC_PERSONNEL_HISTORY_DATA
     );
-    // 🌟 ADDED: เรียกใช้ setup สำหรับตัวกรองเอกสาร
-    setupDocumentFilterListeners();
+    // 🌟 ADDED: Setup การค้นหาสำหรับหน้าเอกสาร
+    setupDocumentSearchListeners();
     showPage('home');
 });
 
@@ -72,15 +79,11 @@ async function showPage(pageId) {
 
     switch (pageId) {
         case 'home':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
+            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
             UI.renderHomeNews(newsDataCache);
             break;
         case 'personnel-list':
-            if (personnelDataCache.length === 0) {
-                personnelDataCache = Data.STATIC_PERSONNEL_DATA;
-            }
+            if (personnelDataCache.length === 0) personnelDataCache = Data.STATIC_PERSONNEL_DATA;
             UI.renderPersonnelList(personnelDataCache);
             break;
         case 'students':
@@ -93,15 +96,21 @@ async function showPage(pageId) {
             UI.renderSchoolBoardList();
             break;
         case 'teacher-achievements':
-            if (teacherAchievementsCache.length > 0) {
-                UI.renderTeacherAchievements(teacherAchievementsCache);
-            } else {
-                try {
+             if (teacherAchievementsCache.length === 0) {
+                 try {
                     const data = await API.loadTeacherAchievementsData();
                     teacherAchievementsCache = data;
-                    UI.renderTeacherAchievements(teacherAchievementsCache);
                 } catch (e) { console.error(e); }
             }
+            UI.renderTeacherAchievements(teacherAchievementsCache);
+            break;
+        case 'student-achievements':
+            if (studentAchievementsCache.length === 0) studentAchievementsCache = STATIC_STUDENT_AWARDS_DATA;
+            UI.renderStudentAchievements(studentAchievementsCache);
+            break;
+        case 'school-achievements':
+            if (schoolAchievementsCache.length === 0) schoolAchievementsCache = STATIC_SCHOOL_AWARDS_DATA;
+            UI.renderSchoolAchievements(schoolAchievementsCache);
             break;
         case 'innovations':
              if (innovationsDataCache.length === 0) { 
@@ -111,26 +120,38 @@ async function showPage(pageId) {
             applyInnovationFilters();
             break;
         case 'news':
-            if (newsDataCache.length === 0) {
-                newsDataCache = STATIC_NEWS_DATA;
-            }
+            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
             UI.renderNews(newsDataCache);
             break;
         case 'director-history':
-            document.getElementById('director-search-input').value = '';
+            const directorSearch = document.getElementById('director-search-input');
+            if(directorSearch) directorSearch.value = '';
             UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
             break;
         case 'personnel-history':
-            document.getElementById('personnel-history-search-input').value = '';
+            const personnelSearch = document.getElementById('personnel-history-search-input');
+            if(personnelSearch) personnelSearch.value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
-        // 🌟 ADDED: Case สำหรับหน้าเอกสาร 🌟
-        case 'documents':
-            if (documentsDataCache.length === 0) { 
-                documentsDataCache = STATIC_DOCS_DATA;
-                UI.populateDocumentFilters(documentsDataCache);
-            }
-            applyDocumentFilters();
+        
+        // 🌟 ADDED: Case สำหรับหน้าเอกสาร
+        case 'documents-official':
+            if (documentsDataCache.length === 0) documentsDataCache = STATIC_DOCS_DATA;
+            const officialSearch = document.getElementById('documents-official-search');
+            if(officialSearch) officialSearch.value = '';
+            applyDocumentSearch(documentsDataCache, 'documents-official-search', 'documents-official-container');
+            break;
+        case 'documents-forms':
+            if (filesDataCache.length === 0) filesDataCache = STATIC_FILES_DATA;
+            const formsSearch = document.getElementById('documents-forms-search');
+            if(formsSearch) formsSearch.value = '';
+            applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
+            break;
+        
+        // Static pages
+        case 'history':
+        case 'info':
+        case 'structure':
             break;
     }
 }
@@ -156,18 +177,18 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
-// 🌟 ADDED: ฟังก์ชันใหม่สำหรับกรองข้อมูลเอกสาร 🌟
-function applyDocumentFilters() {
-    const searchValue = document.getElementById('documents-search-input').value.toLowerCase();
-    const categoryValue = document.getElementById('documents-category-filter').value;
+// 🌟 ADDED: ฟังก์ชันสำหรับค้นหาเอกสาร
+function applyDocumentSearch(dataSource, searchInputId, containerId) {
+    const searchInput = document.getElementById(searchInputId);
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    const filteredData = documentsDataCache.filter(item => {
-        const matchesSearch = !searchValue || (item.title && item.title.toLowerCase().includes(searchValue));
-        const matchesCategory = !categoryValue || item.category === categoryValue;
-        return matchesSearch && matchesCategory;
+    if (!dataSource) return;
+
+    const filteredData = dataSource.filter(item => {
+        return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
     });
 
-    UI.renderDocuments(filteredData);
+    UI.renderDocuments(filteredData, containerId);
 }
 
 function setupInnovationFilterListeners() {
@@ -191,25 +212,26 @@ function setupInnovationFilterListeners() {
     });
 }
 
-// 🌟 ADDED: ฟังก์ชันใหม่สำหรับดักจับ event ของตัวกรองเอกสาร 🌟
-function setupDocumentFilterListeners() {
-    const searchInput = document.getElementById('documents-search-input');
-    const categoryFilter = document.getElementById('documents-category-filter');
-    const resetBtn = document.getElementById('documents-reset-btn');
+// 🌟 ADDED: Setup การค้นหาสำหรับหน้าเอกสาร
+function setupDocumentSearchListeners() {
+    const officialSearch = document.getElementById('documents-official-search');
+    if (officialSearch) {
+        officialSearch.addEventListener('input', () => {
+            if (documentsDataCache.length === 0) documentsDataCache = STATIC_DOCS_DATA;
+            applyDocumentSearch(documentsDataCache, 'documents-official-search', 'documents-official-container');
+        });
+    }
 
-    searchInput.addEventListener('input', applyDocumentFilters);
-    categoryFilter.addEventListener('change', applyDocumentFilters);
-
-    resetBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        applyDocumentFilters();
-    });
+    const formsSearch = document.getElementById('documents-forms-search');
+    if (formsSearch) {
+        formsSearch.addEventListener('input', () => {
+            if (filesDataCache.length === 0) filesDataCache = STATIC_FILES_DATA;
+            applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
+        });
+    }
 }
 
-
 function setupEventListeners() {
-    // Listen on the entire body for better event handling
     document.body.addEventListener('click', (e) => {
         
         const pageLinkElement = e.target.closest('[data-page-link]');
@@ -218,7 +240,7 @@ function setupEventListeners() {
             if (pageId) {
                 showPage(pageId);
             }
-            return; 
+            return;
         }
         
         const personnelCard = e.target.closest('.personnel-card');
@@ -254,3 +276,4 @@ function setupEventListeners() {
         }
     });
 }
+
