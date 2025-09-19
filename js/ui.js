@@ -363,6 +363,45 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
+// 🌟 ADDED: ฟังก์ชันสำหรับแสดงผลงานนักเรียน 🌟
+export function renderStudentAchievements(achievementsList) {
+    const container = document.getElementById('student-achievements-container');
+    const loadingEl = document.getElementById('student-achievements-loading');
+    if (!container || !loadingEl) return;
+
+    loadingEl.classList.add('hidden');
+    container.innerHTML = '';
+
+    if (!achievementsList || achievementsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-500 col-span-full">ไม่พบข้อมูลผลงานนักเรียน</p>';
+        return;
+    }
+
+    achievementsList.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-slate-200';
+        
+        const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || 'https://placehold.co/600x400/FEF9C3/854D0E?text=ผลงานนักเรียน';
+        const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+
+        card.innerHTML = `
+            <img 
+                src="${finalImageUrl}" 
+                alt="รูปภาพผลงาน ${item.title}" 
+                class="w-full h-48 object-cover"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="p-4">
+                <p class="text-sm font-semibold text-amber-600">${item.level || 'ระดับ'}</p>
+                <h4 class="font-bold text-slate-800 text-lg mt-1">${item.title || '-'}</h4>
+                <p class="text-sm text-slate-600 mt-2">โดย: ${item.students || '-'}</p>
+                <p class="text-xs text-slate-400 mt-2">วันที่: ${item.date || '-'}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     const loadingEl = document.getElementById('news-loading');
@@ -412,28 +451,12 @@ export function renderNews(newsList) {
     });
 }
 
-export function populateDocumentFilters(docsList) {
-    const categoryFilter = document.getElementById('documents-category-filter');
-    if (!categoryFilter) return;
 
-    const categories = [...new Set(docsList.map(doc => doc.category).filter(Boolean))];
-    
-    categoryFilter.innerHTML = '<option value="">ทุกหมวดหมู่</option>'; // Reset
-    
-    categories.sort().forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        categoryFilter.appendChild(option);
-    });
-}
+// 🌟 UPDATED: ฟังก์ชันแสดงผลเอกสารที่รับ containerId 🌟
+export function renderDocuments(docsList, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-export function renderDocuments(docsList) {
-    const container = document.getElementById('documents-container');
-    const loadingEl = document.getElementById('documents-loading');
-    if (!container || !loadingEl) return;
-
-    loadingEl.classList.add('hidden');
     container.innerHTML = '';
 
     if (!docsList || docsList.length === 0) {
@@ -605,3 +628,5 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
+คุณช่วยเพิ่มโค้ด ผลงานสถานศึกษา โดยข้อมูลเก็บไว้ที่ saward.js
+
