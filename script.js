@@ -10,7 +10,6 @@ import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
 import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
 import { STATIC_STUDENT_AWARDS_DATA } from './js/staward.js';
 import { STATIC_SCHOOL_AWARDS_DATA } from './js/saward.js';
-// 🌟 ADDED: Import ข้อมูลเอกสาร
 import { STATIC_DOCS_DATA } from './js/docs.js';
 import { STATIC_FILES_DATA } from './js/files.js';
 
@@ -23,7 +22,6 @@ let personnelDataCache = [];
 let newsDataCache = [];
 let studentAchievementsCache = [];
 let schoolAchievementsCache = [];
-// 🌟 ADDED: Cache สำหรับเอกสาร
 let documentsDataCache = [];
 let filesDataCache = [];
 
@@ -35,18 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupModal();
     setupEventListeners();
     setupInnovationFilterListeners();
-    //  เรียกใช้ฟังก์ชัน setup สำหรับช่องค้นหาของหน้าทำเนียบ
-    UI.setupHistorySearch(
-        'director-search-input', 
-        'director-history-table-body', 
-        STATIC_DIRECTOR_HISTORY_DATA
-    );
-    UI.setupHistorySearch(
-        'personnel-history-search-input', 
-        'personnel-history-table-body', 
-        STATIC_PERSONNEL_HISTORY_DATA
-    );
-    // 🌟 ADDED: เรียกใช้ setup สำหรับช่องค้นหาของหน้าเอกสาร
+    UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
+    UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
     setupDocumentSearchListeners();
     showPage('home');
 });
@@ -134,8 +122,6 @@ async function showPage(pageId) {
             if(personnelSearch) personnelSearch.value = '';
             UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
             break;
-        
-        // 🌟 ADDED: Case สำหรับหน้าเอกสารที่แยกไฟล์กัน
         case 'documents-official':
             if (documentsDataCache.length === 0) documentsDataCache = STATIC_DOCS_DATA;
             const officialSearch = document.getElementById('documents-official-search');
@@ -148,8 +134,6 @@ async function showPage(pageId) {
             if(formsSearch) formsSearch.value = '';
             applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
             break;
-            
-        // 🌟 ADDED: Case สำหรับหน้า Static เพื่อความสมบูรณ์
         case 'history':
         case 'info':
         case 'structure':
@@ -179,7 +163,6 @@ function applyInnovationFilters() {
     UI.renderInnovations(filteredData);
 }
 
-// 🌟 ADDED: ฟังก์ชันสำหรับค้นหาเอกสาร
 function applyDocumentSearch(dataSource, searchInputId, containerId) {
     const searchInput = document.getElementById(searchInputId);
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -215,7 +198,6 @@ function setupInnovationFilterListeners() {
     });
 }
 
-// 🌟 ADDED: Setup การค้นหาสำหรับหน้าเอกสาร
 function setupDocumentSearchListeners() {
     const officialSearch = document.getElementById('documents-official-search');
     if (officialSearch) {
