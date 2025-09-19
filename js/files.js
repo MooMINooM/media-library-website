@@ -1,7 +1,7 @@
 // js/files.js
 // ไฟล์สำหรับเก็บข้อมูลเอกสารทั้งหมด
 
-export const STATIC_DOCS_DATA = [
+export const STATIC_FILES_DATA = [
     {
         title: 'แผนปฏิบัติการประจำปีการศึกษา 2568',
         category: 'แผนปฏิบัติการ',
