@@ -307,7 +307,7 @@ export function renderHistoryTable(tbodyId, data) {
         tr.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.no || '-'}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name || '-'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.position || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.position || '-'}</p>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.start || '-'}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.end || '-'}</td>
         `;
@@ -368,45 +368,66 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
-// 🌟 UPDATED: สร้างรายการผลงานนักเรียนแบบไม่มีรูป
+// 🌟 UPDATED: ฟังก์ชันสำหรับแสดงผลงานนักเรียน 
 export function renderStudentAchievements(achievementsList) {
     const container = document.getElementById('student-achievements-container');
     if (!container) return;
-
     container.innerHTML = '';
 
     if (!achievementsList || achievementsList.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-500">ไม่พบข้อมูลผลงานนักเรียน</p>';
+        container.innerHTML = '<p class="text-center text-slate-500 col-span-full">ไม่พบข้อมูลผลงานที่ตรงตามเงื่อนไข</p>';
         return;
     }
-
-    const listWrapper = document.createElement('div');
-    listWrapper.className = 'bg-white rounded-lg shadow-md border border-slate-200 divide-y divide-slate-200';
+    
+    // Map subjects to icons and colors
+    const subjectInfo = {
+        'คณิตศาสตร์': { icon: `<svg ...></svg>`, color: 'bg-blue-100 text-blue-700' },
+        'วิทยาศาสตร์และเทคโนโลยี': { icon: `<svg ...></svg>`, color: 'bg-green-100 text-green-700' },
+        'ภาษาอังกฤษ': { icon: `<svg ...></svg>`, color: 'bg-red-100 text-red-700' },
+        'ภาษาไทย': { icon: `<svg ...></svg>`, color: 'bg-amber-100 text-amber-700' },
+        'สังคมศึกษา': { icon: `<svg ...></svg>`, color: 'bg-purple-100 text-purple-700' },
+        'สุขศึกษาและพละศึกษา': { icon: `<svg ...></svg>`, color: 'bg-teal-100 text-teal-700' },
+        'ศิลปะ/ดนตรี': { icon: `<svg ...></svg>`, color: 'bg-pink-100 text-pink-700' },
+        'การงานอาชีพ': { icon: `<svg ...></svg>`, color: 'bg-indigo-100 text-indigo-700' },
+        'กิจกรรมพัฒนาผู้เรียน': { icon: `<svg ...></svg>`, color: 'bg-gray-100 text-gray-700' },
+        'Default': { icon: `<svg ...></svg>`, color: 'bg-gray-100 text-gray-700' }
+    };
+    
+    // Replace <svg> placeholders with actual SVG code for each subject icon
+    subjectInfo['คณิตศาสตร์'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h.01M9 17h.01M9 14h.01M12 7a1 1 0 100-2 1 1 0 000 2zm0 10a1 1 0 100-2 1 1 0 000 2zm-3 0a1 1 0 100-2 1 1 0 000 2zm-3-4a1 1 0 100-2 1 1 0 000 2zm0-4a1 1 0 100-2 1 1 0 000 2zm12 8a1 1 0 100-2 1 1 0 000 2zm-3 0a1 1 0 100-2 1 1 0 000 2zm3-4a1 1 0 100-2 1 1 0 000 2zm-3 0a1 1 0 100-2 1 1 0 000 2z" /></svg>`;
+    subjectInfo['วิทยาศาสตร์และเทคโนโลยี'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 00-.517-3.86l-2.387-.477zM11.5 6.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" /></svg>`;
+    subjectInfo['ภาษาอังกฤษ'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m4 0V3m4 4.5a3.5 3.5 0 01-3.5 3.5H8a3.5 3.5 0 01-3.5-3.5V5m11 0a3.5 3.5 0 00-3.5-3.5H8a3.5 3.5 0 00-3.5 3.5m11 0v1.5a3.5 3.5 0 01-3.5 3.5H8a3.5 3.5 0 01-3.5-3.5V5" /></svg>`;
+    subjectInfo['ภาษาไทย'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v11.494M-5.243-7.243L10.486 4.494M4.757 12h14.486" /></svg>`;
+    subjectInfo['สังคมศึกษา'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.707 4.293l.536.536M16.293 4.293l-.536.536M7.707 20.293l.536-.536M16.293 20.293l-.536-.536M12 21a9 9 0 100-18 9 9 0 000 18zM12 11a3 3 0 100-6 3 3 0 000 6z" /></svg>`;
+    subjectInfo['สุขศึกษาและพละศึกษา'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
+    subjectInfo['ศิลปะ/ดนตรี'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12-3" /></svg>`;
+    subjectInfo['การงานอาชีพ'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" /></svg>`;
+    subjectInfo['กิจกรรมพัฒนาผู้เรียน'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2V4a2 2 0 012-2h8a2 2 0 012 2v4z" /></svg>`;
+    subjectInfo['Default'].icon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>`;
 
     achievementsList.forEach((item, index) => {
-        const listItem = document.createElement('div');
-        listItem.className = 'student-achievement-item p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer';
-        listItem.dataset.index = index;
+        const info = subjectInfo[item.subject] || subjectInfo['Default'];
 
-        listItem.innerHTML = `
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-semibold text-blue-700">${item.title || '-'}</p>
-                    <p class="text-sm text-slate-500 mt-1">โดย: ${item.students || '-'}</p>
-                </div>
-                <div class="text-right ml-4 flex-shrink-0">
-                    <p class="text-sm font-medium text-slate-700">${item.level || 'ระดับ'}</p>
-                    <p class="text-xs text-slate-400 mt-1">${item.date || '-'}</p>
-                </div>
+        const card = document.createElement('div');
+        card.className = 'student-achievement-card bg-white rounded-lg shadow-md p-4 flex items-start gap-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer';
+        card.dataset.index = index;
+
+        card.innerHTML = `
+            <div class="flex-shrink-0 w-16 h-16 rounded-lg flex items-center justify-center ${info.color}">
+                ${info.icon}
+            </div>
+            <div class="flex-grow">
+                <p class="font-semibold text-blue-700">${item.title || '-'}</p>
+                <p class="text-sm text-slate-500 mt-1">นักเรียน: ${item.students || '-'}</p>
+                <p class="text-sm text-slate-500">รางวัล: ${item.level || '-'}</p>
             </div>
         `;
-        listWrapper.appendChild(listItem);
+        container.appendChild(card);
     });
-
-    container.appendChild(listWrapper);
 }
 
-// 🌟 ADDED: ฟังก์ชันใหม่สำหรับสร้าง Modal ของผลงานนักเรียน
+
+// 🌟 ADDED: ฟังก์ชันสำหรับสร้าง Modal ของผลงานนักเรียน
 export function showStudentAchievementModal(item) {
     const modal = document.getElementById('detail-modal');
     const modalContent = document.getElementById('detail-modal-content');
@@ -426,9 +447,11 @@ export function showStudentAchievementModal(item) {
             <div class="p-6">
                 <p class="text-sm font-semibold text-amber-600">${item.level || 'ระดับ'}</p>
                 <h3 class="text-2xl font-bold text-slate-800 mt-1">${item.title || 'ไม่มีชื่อเรื่อง'}</h3>
-                <div class="mt-4 border-t pt-4 text-sm text-slate-700 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
+                <div class="mt-4 border-t pt-4 text-slate-700 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-start">
                     <strong class="text-right text-slate-500">นักเรียน:</strong>
                     <span>${item.students || '-'}</span>
+                    <strong class="text-right text-slate-500">ครูผู้ดูแล:</strong>
+                    <span>${item.teacher || '-'}</span>
                     <strong class="text-right text-slate-500">วันที่:</strong>
                     <span>${item.date || '-'}</span>
                 </div>
@@ -437,6 +460,7 @@ export function showStudentAchievementModal(item) {
     `;
     modal.classList.remove('hidden');
 }
+
 
 export function renderSchoolAchievements(achievementsList) {
     const container = document.getElementById('school-achievements-container');
@@ -483,7 +507,7 @@ export function renderNews(newsList) {
     
     if (!container || !loadingEl) return;
 
-    loadingEl.classList.add('hidden');
+    if(loadingEl) loadingEl.classList.add('hidden');
     container.innerHTML = '';
 
     if (!newsList || newsList.length === 0) {
@@ -591,6 +615,23 @@ export function populateInnovationFilters(innovationsList) {
     populateSelect(gradeFilter, innovationsList.map(i => i.grade), 'ทุกระดับชั้น');
 }
 
+// 🌟 ADDED: ฟังก์ชันสำหรับสร้างตัวกรองหน้าผลงานนักเรียน
+export function populateStudentAchievementFilters(awardsList) {
+    const subjectFilter = document.getElementById('student-achievements-subject-filter');
+    if (!subjectFilter) return;
+
+    const subjects = [...new Set(awardsList.map(item => item.subject).filter(Boolean))];
+    
+    subjectFilter.innerHTML = '<option value="">ทุกกลุ่มสาระ</option>'; 
+    
+    subjects.sort().forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectFilter.appendChild(option);
+    });
+}
+
 export function renderInnovations(innovationsList) {
     const container = document.getElementById('innovations-container');
     const loadingEl = document.getElementById('innovations-loading');
@@ -693,7 +734,7 @@ export function showInnovationModal(item) {
 
                 <div class="mt-6 text-center">
                     <a href="${item.fileUrl || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24" 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002 2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                         เปิดไฟล์นวัตกรรม
                     </a>
                 </div>
