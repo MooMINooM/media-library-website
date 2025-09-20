@@ -264,7 +264,6 @@ function setupEventListeners() {
         const achievementItem = e.target.closest('.student-achievement-item');
         if (achievementItem) {
             const index = achievementItem.dataset.index;
-            // The studentAchievementsCache is already populated when the page is shown
             const selectedAchievement = studentAchievementsCache[index];
             if (selectedAchievement) {
                 UI.showStudentAchievementModal(selectedAchievement);
