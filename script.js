@@ -24,6 +24,8 @@ let studentAchievementsCache = [];
 let schoolAchievementsCache = [];
 let documentsDataCache = [];
 let filesDataCache = [];
+// 🌟 ADDED: Cache for filtered student achievements
+let currentlyDisplayedStudentAchievements = [];
 
 
 // --- Initial Setup ---
@@ -36,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
     UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
     setupDocumentSearchListeners();
+    // 🌟 ADDED: Setup for student achievement filters
+    setupStudentAchievementFilterListeners();
     showPage('home');
 });
 
@@ -94,8 +98,11 @@ async function showPage(pageId) {
             UI.renderTeacherAchievements(teacherAchievementsCache);
             break;
         case 'student-achievements':
-            if (studentAchievementsCache.length === 0) studentAchievementsCache = STATIC_STUDENT_AWARDS_DATA;
-            UI.renderStudentAchievements(studentAchievementsCache);
+            if (studentAchievementsCache.length === 0) {
+                studentAchievementsCache = STATIC_STUDENT_AWARDS_DATA;
+                UI.populateStudentAchievementFilters(studentAchievementsCache);
+            }
+            applyStudentAchievementFilters();
             break;
         case 'school-achievements':
             if (schoolAchievementsCache.length === 0) schoolAchievementsCache = STATIC_SCHOOL_AWARDS_DATA;
@@ -176,6 +183,21 @@ function applyDocumentSearch(dataSource, searchInputId, containerId) {
     UI.renderDocuments(filteredData, containerId);
 }
 
+// 🌟 ADDED: ฟังก์ชันสำหรับกรองผลงานนักเรียน
+function applyStudentAchievementFilters() {
+    const searchValue = document.getElementById('student-achievements-search-input').value.toLowerCase();
+    const subjectValue = document.getElementById('student-achievements-subject-filter').value;
+
+    const filteredData = studentAchievementsCache.filter(item => {
+        const matchesSearch = !searchValue || (item.title && item.title.toLowerCase().includes(searchValue)) || (item.students && item.students.toLowerCase().includes(searchValue));
+        const matchesSubject = !subjectValue || item.subject === subjectValue;
+        return matchesSearch && matchesSubject;
+    });
+
+    currentlyDisplayedStudentAchievements = filteredData;
+    UI.renderStudentAchievements(filteredData);
+}
+
 
 function setupInnovationFilterListeners() {
     const searchInput = document.getElementById('innovations-search-input');
@@ -212,6 +234,24 @@ function setupDocumentSearchListeners() {
         formsSearch.addEventListener('input', () => {
             if (filesDataCache.length === 0) filesDataCache = STATIC_FILES_DATA;
             applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
+        });
+    }
+}
+
+// 🌟 ADDED: ฟังก์ชันสำหรับดักจับ event ของตัวกรองผลงานนักเรียน
+function setupStudentAchievementFilterListeners() {
+    const searchInput = document.getElementById('student-achievements-search-input');
+    const subjectFilter = document.getElementById('student-achievements-subject-filter');
+    const resetBtn = document.getElementById('student-achievements-reset-btn');
+
+    if (searchInput) searchInput.addEventListener('input', applyStudentAchievementFilters);
+    if (subjectFilter) subjectFilter.addEventListener('change', applyStudentAchievementFilters);
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            if (subjectFilter) subjectFilter.value = '';
+            applyStudentAchievementFilters();
         });
     }
 }
@@ -260,11 +300,11 @@ function setupEventListeners() {
             return;
         }
 
-        // 🌟 ADDED: Event listener for student achievement list items 🌟
-        const achievementItem = e.target.closest('.student-achievement-item');
-        if (achievementItem) {
-            const index = achievementItem.dataset.index;
-            const selectedAchievement = studentAchievementsCache[index];
+        // 🌟 FIXED: Changed class name to match ui.js 🌟
+        const achievementCard = e.target.closest('.student-achievement-card');
+        if (achievementCard) {
+            const index = achievementCard.dataset.index;
+            const selectedAchievement = currentlyDisplayedStudentAchievements[index];
             if (selectedAchievement) {
                 UI.showStudentAchievementModal(selectedAchievement);
             }
@@ -272,3 +312,4 @@ function setupEventListeners() {
         }
     });
 }
+
