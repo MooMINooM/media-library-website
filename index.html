@@ -300,10 +300,33 @@
                 </div>
             </section>
             
+            <!-- 🌟 UPDATED: Section for Student Achievements 🌟 -->
             <section id="page-student-achievements" class="page-content hidden">
                 <div class="bg-white rounded-lg shadow-lg border border-slate-200 p-8">
                    <h2 class="section-title">ผลงานนักเรียน</h2>
-                   <div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                   
+                   <!-- Filter Controls -->
+                   <div id="student-achievements-filter-container" class="mt-6 mb-8 p-4 bg-slate-100 rounded-lg border border-slate-200">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div class="md:col-span-2">
+                                <label for="student-achievements-search-input" class="block text-sm font-medium text-slate-700">ค้นหาชื่อผลงาน</label>
+                                <input type="text" id="student-achievements-search-input" placeholder="เช่น แข่งขัน, ประกวด..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="student-achievements-subject-filter" class="block text-sm font-medium text-slate-700">กลุ่มสาระ</label>
+                                <select id="student-achievements-subject-filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    <!-- Options will be populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <button id="student-achievements-reset-btn" class="w-full bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-2 px-4 rounded transition duration-300">ล้างค่า</button>
+                            </div>
+                        </div>
+                    </div>
+
+                   <!-- Achievement List/Grid -->
+                   <div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <!-- Student achievement cards will be injected here -->
                    </div>
                    <p id="student-achievements-loading" class="text-center text-slate-500 mt-4 col-span-full hidden">กำลังโหลดข้อมูล...</p>
                </div>
