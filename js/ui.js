@@ -368,42 +368,74 @@ export function renderTeacherAchievements(achievementsList) {
     });
 }
 
+// 🌟 UPDATED: สร้างรายการผลงานนักเรียนแบบไม่มีรูป
 export function renderStudentAchievements(achievementsList) {
     const container = document.getElementById('student-achievements-container');
-    const loadingEl = document.getElementById('student-achievements-loading');
-    if (!container || !loadingEl) return;
+    if (!container) return;
 
-    loadingEl.classList.add('hidden');
     container.innerHTML = '';
 
     if (!achievementsList || achievementsList.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-500 col-span-full">ไม่พบข้อมูลผลงานนักเรียน</p>';
+        container.innerHTML = '<p class="text-center text-slate-500">ไม่พบข้อมูลผลงานนักเรียน</p>';
         return;
     }
 
-    achievementsList.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-slate-200';
-        
-        const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || 'https://placehold.co/600x400/FEF9C3/854D0E?text=ผลงานนักเรียน';
-        const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+    const listWrapper = document.createElement('div');
+    listWrapper.className = 'bg-white rounded-lg shadow-md border border-slate-200 divide-y divide-slate-200';
 
-        card.innerHTML = `
+    achievementsList.forEach((item, index) => {
+        const listItem = document.createElement('div');
+        listItem.className = 'student-achievement-item p-4 hover:bg-slate-50 transition-colors duration-200 cursor-pointer';
+        listItem.dataset.index = index;
+
+        listItem.innerHTML = `
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-semibold text-blue-700">${item.title || '-'}</p>
+                    <p class="text-sm text-slate-500 mt-1">โดย: ${item.students || '-'}</p>
+                </div>
+                <div class="text-right ml-4 flex-shrink-0">
+                    <p class="text-sm font-medium text-slate-700">${item.level || 'ระดับ'}</p>
+                    <p class="text-xs text-slate-400 mt-1">${item.date || '-'}</p>
+                </div>
+            </div>
+        `;
+        listWrapper.appendChild(listItem);
+    });
+
+    container.appendChild(listWrapper);
+}
+
+// 🌟 ADDED: ฟังก์ชันใหม่สำหรับสร้าง Modal ของผลงานนักเรียน
+export function showStudentAchievementModal(item) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    if (!modal || !modalContent) return;
+
+    const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || 'https://placehold.co/600x400/FEF9C3/854D0E?text=ผลงานนักเรียน';
+    const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+
+    modalContent.innerHTML = `
+        <div>
             <img 
                 src="${finalImageUrl}" 
                 alt="รูปภาพผลงาน ${item.title}" 
-                class="w-full h-48 object-cover"
+                class="w-full h-64 object-cover rounded-t-lg bg-slate-100"
                 onerror="this.onerror=null; this.src='${errorImageUrl}';"
             >
-            <div class="p-4">
+            <div class="p-6">
                 <p class="text-sm font-semibold text-amber-600">${item.level || 'ระดับ'}</p>
-                <h4 class="font-bold text-slate-800 text-lg mt-1">${item.title || '-'}</h4>
-                <p class="text-sm text-slate-600 mt-2">โดย: ${item.students || '-'}</p>
-                <p class="text-xs text-slate-400 mt-2">วันที่: ${item.date || '-'}</p>
+                <h3 class="text-2xl font-bold text-slate-800 mt-1">${item.title || 'ไม่มีชื่อเรื่อง'}</h3>
+                <div class="mt-4 border-t pt-4 text-sm text-slate-700 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center">
+                    <strong class="text-right text-slate-500">นักเรียน:</strong>
+                    <span>${item.students || '-'}</span>
+                    <strong class="text-right text-slate-500">วันที่:</strong>
+                    <span>${item.date || '-'}</span>
+                </div>
             </div>
-        `;
-        container.appendChild(card);
-    });
+        </div>
+    `;
+    modal.classList.remove('hidden');
 }
 
 export function renderSchoolAchievements(achievementsList) {
