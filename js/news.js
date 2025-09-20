@@ -76,7 +76,7 @@ export const STATIC_NEWS_DATA = [
         date: '2025-08-21'
     },
     {
-        title: 'แสดงความยินดีกับคุณครูมัณฑนา บุญประคม เนื่องในโอกาสลื่อนวิทยฐานะครูเชี่ยวชาญ',
+        title: 'แสดงความยินดีกับคุณครูมัณฑนา บุญประคม เนื่องในโอกาสเลื่อนวิทยฐานะครูเชี่ยวชาญ',
         link: 'https://lh3.googleusercontent.com/pw/AP1GczOHaaFNuURTKIQVhgSAY1ZqG0dXvU_DI5m8lldngP6QJsmj3rJCpzERQDgZVH5YfNh1yiv2KHvVc-ILruMRhVSiwu3cox0-uLgG2ND_lUQmX-FplgPiZbizAdumDhM7FgIRc5zldKwmgsqoLTMK-plr=w1614-h923-s-no-gm?authuser=1',
         date: '2025-09-11'
     },
