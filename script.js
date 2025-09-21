@@ -12,6 +12,8 @@ import { STATIC_STUDENT_AWARDS_DATA } from './js/staward.js';
 import { STATIC_SCHOOL_AWARDS_DATA } from './js/saward.js';
 import { STATIC_DOCS_DATA } from './js/docs.js';
 import { STATIC_FILES_DATA } from './js/files.js';
+// 🌟 ADDED: Import ข้อมูลผลงานครูจากไฟล์ใหม่
+import { STATIC_TEACHER_AWARDS_DATA } from './js/taward.js';
 
 
 // --- Global Caches ---
@@ -24,7 +26,6 @@ let studentAchievementsCache = [];
 let schoolAchievementsCache = [];
 let documentsDataCache = [];
 let filesDataCache = [];
-// 🌟 ADDED: Cache for filtered student achievements
 let currentlyDisplayedStudentAchievements = [];
 
 
@@ -38,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
     UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
     setupDocumentSearchListeners();
-    // 🌟 ADDED: Setup for student achievement filters
     setupStudentAchievementFilterListeners();
     showPage('home');
 });
@@ -88,12 +88,10 @@ async function showPage(pageId) {
         case 'school-board':
             UI.renderSchoolBoardList();
             break;
+        // 🌟 UPDATED: เปลี่ยนมาใช้ข้อมูลจาก taward.js แทนการเรียก API
         case 'teacher-achievements':
             if (teacherAchievementsCache.length === 0) {
-                 try {
-                    const data = await API.loadTeacherAchievementsData();
-                    teacherAchievementsCache = data;
-                } catch (e) { console.error(e); }
+                teacherAchievementsCache = STATIC_TEACHER_AWARDS_DATA;
             }
             UI.renderTeacherAchievements(teacherAchievementsCache);
             break;
@@ -183,7 +181,6 @@ function applyDocumentSearch(dataSource, searchInputId, containerId) {
     UI.renderDocuments(filteredData, containerId);
 }
 
-// 🌟 ADDED: ฟังก์ชันสำหรับกรองผลงานนักเรียน
 function applyStudentAchievementFilters() {
     const searchValue = document.getElementById('student-achievements-search-input').value.toLowerCase();
     const subjectValue = document.getElementById('student-achievements-subject-filter').value;
@@ -238,7 +235,6 @@ function setupDocumentSearchListeners() {
     }
 }
 
-// 🌟 ADDED: ฟังก์ชันสำหรับดักจับ event ของตัวกรองผลงานนักเรียน
 function setupStudentAchievementFilterListeners() {
     const searchInput = document.getElementById('student-achievements-search-input');
     const subjectFilter = document.getElementById('student-achievements-subject-filter');
@@ -300,7 +296,6 @@ function setupEventListeners() {
             return;
         }
 
-        // 🌟 FIXED: Changed class name to match ui.js 🌟
         const achievementCard = e.target.closest('.student-achievement-card');
         if (achievementCard) {
             const index = achievementCard.dataset.index;
