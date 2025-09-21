@@ -144,6 +144,7 @@ async function showPage(pageId) {
         case 'history':
         case 'info':
         case 'structure':
+            // Static pages, no specific JS action needed.
             break;
     }
 }
