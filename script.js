@@ -91,7 +91,6 @@ async function showPage(pageId) {
         case 'school-board':
             UI.renderSchoolBoardList();
             break;
-        // 🌟 UPDATED: Changed to apply filters on page load
         case 'teacher-achievements':
             if (teacherAchievementsCache.length === 0) {
                 teacherAchievementsCache = STATIC_TEACHER_AWARDS_DATA;
@@ -331,7 +330,7 @@ function setupEventListeners() {
             }
             return;
         }
-
+        
         // 🌟 ADDED: Event listener for teacher achievement cards 🌟
         const teacherAchievementCard = e.target.closest('.teacher-achievement-card');
         if (teacherAchievementCard) {
