@@ -348,26 +348,63 @@ export function renderTeacherAchievements(achievementsList) {
         container.innerHTML = '<p class="text-center text-gray-500 col-span-full">ไม่พบข้อมูลผลงานครู</p>';
         return;
     }
-    achievementsList.forEach(item => {
+    achievementsList.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
+        card.className = 'teacher-achievement-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-slate-200 flex flex-col cursor-pointer';
+        card.dataset.index = index;
+
+        const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || `https://placehold.co/600x400/BFDBFE/1E3A8A?text=${encodeURIComponent(item.name || 'ผลงานครู')}`;
+        const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+        
         card.innerHTML = `
-            <div>
+            <img 
+                src="${finalImageUrl}" 
+                alt="รูปภาพผลงาน ${item.project}" 
+                class="w-full h-40 object-cover pointer-events-none"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="p-4 flex flex-col flex-grow pointer-events-none">
                 <h4 class="font-bold text-slate-800 text-lg">${item.name || '-'}</h4>
-                <p class="text-sm text-slate-600 mt-1">${item.project || '-'}</p>
-            </div>
-            <div class="mt-4 text-right">
-                <a href="${item.fileUrl || '#'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    ดูเกียรติบัตร
-                </a>
+                <p class="text-sm text-slate-600 mt-1 flex-grow">${item.project || '-'}</p>
+                <p class="text-xs text-slate-400 mt-2 text-right">${item.date || ''}</p>
             </div>
         `;
         container.appendChild(card);
     });
 }
+
+export function showTeacherAchievementModal(item) {
+    const modal = document.getElementById('detail-modal');
+    const modalContent = document.getElementById('detail-modal-content');
+    if (!modal || !modalContent) return;
+
+    const finalImageUrl = getDirectGoogleDriveUrl(item.imageUrl) || 'https://placehold.co/600x400/BFDBFE/1E3A8A?text=ผลงานครู';
+    const errorImageUrl = 'https://placehold.co/600x400/FEE2E2/DC2626?text=Image%20Error';
+
+    modalContent.innerHTML = `
+        <div>
+            <img 
+                src="${finalImageUrl}" 
+                alt="รูปภาพผลงาน ${item.project}" 
+                class="w-full h-64 object-cover rounded-t-lg bg-slate-100"
+                onerror="this.onerror=null; this.src='${errorImageUrl}';"
+            >
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-slate-800">${item.name || 'ไม่มีชื่อ'}</h3>
+                <p class="text-md text-slate-600 mt-1">${item.project || 'ไม่มีชื่อผลงาน'}</p>
+                <div class="mt-4 border-t pt-4 text-slate-700 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-start">
+                    <strong class="text-right text-slate-500">ได้รับจาก:</strong>
+                    <span>${item.awardedBy || '-'}</span>
+                    <strong class="text-right text-slate-500">วันที่:</strong>
+                    <span>${item.date || '-'}</span>
+                </div>
+                <p class="text-slate-600 mt-4">${item.description || ''}</p>
+            </div>
+        </div>
+    `;
+    modal.classList.remove('hidden');
+}
+
 
 export function renderStudentAchievements(achievementsList) {
     const container = document.getElementById('student-achievements-container');
@@ -722,3 +759,4 @@ export function showInnovationModal(item) {
     `;
     modal.classList.remove('hidden');
 }
+
