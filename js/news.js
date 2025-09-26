@@ -80,4 +80,24 @@ export const STATIC_NEWS_DATA = [
         link: 'https://lh3.googleusercontent.com/pw/AP1GczOHaaFNuURTKIQVhgSAY1ZqG0dXvU_DI5m8lldngP6QJsmj3rJCpzERQDgZVH5YfNh1yiv2KHvVc-ILruMRhVSiwu3cox0-uLgG2ND_lUQmX-FplgPiZbizAdumDhM7FgIRc5zldKwmgsqoLTMK-plr=w1614-h923-s-no-gm?authuser=1',
         date: '2025-09-11'
     },
+    {
+        title: 'อบรมเชิงปฏิบัติการพัฒนาศักยภาพแกนนำผู้อำนวยการเล่น (Play Worker) ประจำปี 2568',
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczN1AoHw_-t6ZNUmRIfM2fbuEoAVlcGQoNPj4XS32RbuDPop_OA792kZTOen4O3MDKleeDrK-afTPaQUB1oO2cOvBX7BFY6yuWjTgAoPbMslrg2-TSApYtfnkndhoINye2L7lgTmnEW1lLhJ1sLvIYaC=w653-h923-s-no-gm?authuser=1',
+        date: '2025-09-14'
+    },
+    {
+        title: 'โครงการพัฒนาทักษะอาชีพของนักเรียน ประจำปีการศึกษา 2568',
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczNIP3avN9gKZnnWhLAHmjiADpDqj651WGYKNdbAohYmVnIHgchlaBoq0UxYYgV_vKH-I3WGszwgztQUTr2SPclULnWc4_rDZekh80mHROUj33n5XmR1JQsxRwYB3A1zfI1rozyHXtWvbEtPmsKWOU09=w653-h923-s-no-gm?authuser=1',
+        date: '2025-09-19'
+    },
+    {
+        title: 'กิจกรรมเล่นอิสระสร้างสุข (Happy Play) จังหวัดหนองบัวลำภู ประจำปี 2568',
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczOrLA7G2JzgTsPu03ceTOLr1e34LTg46MKGq0XENp8ddoPhgoagoxv0bxkBZSjSEon_A31cgNZWTfhNp87_oVJDpwsPA3Xr4AqO5581PKljXg4akI-3vmn63oQrur38X_yTlgmGtGAeUM4qo1dQtavq=w653-h923-s-no-gm?authuser=1',
+        date: '2025-09-19'
+    },
+    {
+        title: 'ผอ.เขตเยี่ยมเพื่อนครูโรงเรียนบ้านภูพระโนนผักหวาน ประจำปีการศึกษา 2568',
+        link: 'https://lh3.googleusercontent.com/pw/AP1GczPKwOAMU7d0fCf9KmsPSmX4hh5bGQWEqOuPGrMzBqktnTfP3xNYTsmscDPcOQ-P8wQJLjM4vgrJIwiEPuxyd8qvDzHmyswvuGzebDlUwzCkcmzPMIi6wkyUvCFNGFdG_8dPHalq92XAC5ntgQrRKzKl=w653-h923-s-no-gm?authuser=1',
+        date: '2025-09-22'
+    },
 ];
