@@ -94,6 +94,7 @@ async function showPage(pageId) {
         case 'teacher-achievements':
             if (teacherAchievementsCache.length === 0) {
                 teacherAchievementsCache = STATIC_TEACHER_AWARDS_DATA;
+                UI.populateTeacherAchievementFilters(teacherAchievementsCache);
             }
             applyTeacherAchievementFilters();
             break;
