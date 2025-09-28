@@ -84,9 +84,9 @@ export function renderHomeNews(newsList) {
         newsElement.className = 'block p-3 rounded-md hover:bg-gray-100 transition-colors duration-200';
         
         newsElement.innerHTML = `
-            <div class="flex justify-between items-start gap-4">
+            <div class="grid grid-cols-[1fr_auto] gap-4 items-start">
                 <p class="font-semibold text-blue-800 ${hasLink ? 'hover:text-blue-600' : ''}">${news.title || 'ไม่มีหัวข้อ'}</p>
-                <p class="text-sm text-gray-500 whitespace-nowrap">${news.date || ''}</p>
+                <p class="text-sm text-gray-500 whitespace-nowrap text-right">${news.date || ''}</p>
             </div>
         `;
         container.appendChild(newsElement);
@@ -538,7 +538,7 @@ export function renderNews(newsList) {
         const hasLink = item.link && item.link.trim() !== '#' && item.link.trim() !== '';
         
         const newsCard = document.createElement('div');
-        newsCard.className = 'bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4';
+        newsCard.className = 'bg-white rounded-lg shadow p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] items-center gap-4';
         
         let formattedDate = '-';
         if (item.date) {
@@ -555,10 +555,10 @@ export function renderNews(newsList) {
                 <h3 class="font-bold text-lg text-gray-800">${item.title || 'ไม่มีหัวข้อ'}</h3>
             </div>
             ${hasLink ? `
-            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="mt-2 sm:mt-0 inline-block bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap">
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="justify-self-end inline-block bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap">
                 อ่านเพิ่มเติม
             </a>` : `
-            <span class="mt-2 sm:mt-0 inline-block bg-gray-300 text-gray-600 font-semibold px-4 py-2 rounded-md cursor-not-allowed whitespace-nowrap">
+            <span class="justify-self-end inline-block bg-gray-300 text-gray-600 font-semibold px-4 py-2 rounded-md cursor-not-allowed whitespace-nowrap">
                 ไม่มีลิงก์
             </span>`
             }
