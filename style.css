@@ -1,46 +1,18 @@
-/* style.css (ฉบับปรับปรุง)
-  นี่คือไฟล์สำหรับวางรากฐานดีไซน์ใหม่ และเก็บคลาสที่ใช้บ่อย
-*/
-
-/* 1. Base Styles & Typography
-  - กำหนดฟอนต์หลัก, สีพื้นหลัง, และสีตัวอักษรเริ่มต้น
-  - ใช้สีพื้นหลัง bg-slate-50 ที่นุ่มนวล และสีตัวอักษร text-slate-700 ที่อ่านสบายตา
-*/
 body {
     font-family: 'Sarabun', sans-serif;
-    @apply bg-slate-50 text-slate-700 antialiased;
 }
 
-/* 2. Reusable Component: Section Title
-  - ปรับดีไซน์หัวข้อหลักให้ดูเรียบง่ายแต่โดดเด่น
-  - ใช้เส้นขอบที่บางลงและสีที่นุ่มนวลขึ้น เพิ่มระยะห่างด้านล่างให้โปร่งขึ้น
-*/
-.section-title {
-    @apply text-2xl md:text-3xl font-bold text-slate-800 border-b border-slate-200 pb-4 mb-8;
-}
-
-/* 3. Reusable Component: Navigation Link
-  - สร้างคลาสสำหรับเมนูหลักโดยเฉพาะ
-  - เพิ่ม hover effect ที่สวยงาม และสถานะ 'active' ที่ชัดเจน
-*/
+/* Base style for navigation links */
 .nav-link {
-    @apply font-medium text-slate-600 py-2 px-3 rounded-md transition-colors duration-200;
+    @apply text-slate-700 font-medium py-2 px-3 rounded-md transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700;
 }
 
-.nav-link:hover {
-    @apply bg-slate-100 text-slate-900;
-}
-
+/* Style for the active/current page link */
 .nav-link.active {
-    @apply bg-blue-50 text-blue-700;
+    @apply text-blue-600 font-bold bg-blue-50;
 }
 
-
-/* Utility Class (คงเดิม)
-*/
-.line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+/* Style for section titles like "ประวัติความเป็นมา", "ผลงานครู", etc. */
+.section-title {
+    @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4;
 }
