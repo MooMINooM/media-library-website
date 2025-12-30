@@ -6,196 +6,284 @@
     <title>ระบบจัดการข้อมูลโรงเรียน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>body{font-family:'Sarabun',sans-serif;}</style>
+    <style>body{font-family:'Sarabun',sans-serif;} .active-menu { @apply bg-blue-800 text-white; }</style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-100 flex h-screen overflow-hidden">
 
-    <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">⚙️</span>
-                <h1 class="text-xl font-bold">Admin Panel</h1>
+    <aside class="w-64 bg-white shadow-xl flex flex-col z-20 hidden md:flex">
+        <div class="p-6 border-b flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">A</div>
+            <div>
+                <h1 class="font-bold text-gray-800">Admin Panel</h1>
+                <p class="text-xs text-gray-500">โรงเรียนบ้านภูพระฯ</p>
             </div>
-            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-bold transition">ออกจากระบบ</button>
         </div>
-    </nav>
-
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-            <label class="block text-gray-700 text-lg font-bold mb-2">เลือกเมนูที่ต้องการแก้ไขข้อมูล:</label>
-            <select id="category-select" onchange="renderForm()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50 text-lg">
-                <option value="" disabled selected>-- กรุณาเลือก --</option>
-                <optgroup label="📰 ประชาสัมพันธ์">
-                    <option value="news">ข่าวประชาสัมพันธ์</option>
-                </optgroup>
-                <optgroup label="👥 บุคลากร">
-                    <option value="personnel">บุคลากรปัจจุบัน</option>
-                    <option value="director_history">ทำเนียบผู้บริหาร</option>
-                    <option value="personnel_history">ทำเนียบบุคลากร (ประวัติ)</option>
-                </optgroup>
-                <optgroup label="🏆 ผลงาน">
-                    <option value="teacher_awards">ผลงานครู</option>
-                    <option value="student_awards">ผลงานนักเรียน</option>
-                    <option value="school_awards">ผลงานสถานศึกษา</option>
-                </optgroup>
-                <optgroup label="💡 วิชาการ & อื่นๆ">
-                    <option value="innovations">คลังนวัตกรรม</option>
-                    <option value="documents">เอกสารทางราชการ</option>
-                    <option value="forms">แบบฟอร์ม</option>
-                    <option value="board">คณะกรรมการสถานศึกษา</option>
-                    <option value="council">สภานักเรียน</option>
-                </optgroup>
-            </select>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+            <button onclick="loadSection('info')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-school w-5"></i> ข้อมูลโรงเรียน
+            </button>
+            <button onclick="loadSection('news')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-newspaper w-5"></i> ข่าวประชาสัมพันธ์
+            </button>
+            <button onclick="loadSection('personnel')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-users w-5"></i> บุคลากร
+            </button>
+            <div class="pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">ผลงาน & วิชาการ</div>
+            <button onclick="loadSection('teacher_awards')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-medal w-5"></i> ผลงานครู
+            </button>
+            <button onclick="loadSection('student_awards')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-trophy w-5"></i> ผลงานนักเรียน
+            </button>
+            <button onclick="loadSection('innovations')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3">
+                <i class="fa-solid fa-lightbulb w-5"></i> นวัตกรรม
+            </button>
+        </nav>
+        <div class="p-4 border-t">
+            <button onclick="logout()" class="w-full bg-red-50 text-red-600 py-2 rounded-lg hover:bg-red-100 font-bold transition">ออกจากระบบ</button>
         </div>
+    </aside>
 
-        <div id="form-container" class="bg-white rounded-xl shadow-md p-6 hidden animate-fade-in-up">
-            <h2 id="form-title" class="text-2xl font-bold text-blue-800 mb-6 border-b pb-2"></h2>
-            <form id="data-form" class="space-y-4">
-                <div id="dynamic-fields" class="grid grid-cols-1 gap-4">
-                    </div>
-                
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="submitData()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg transform hover:-translate-y-1">
-                        💾 บันทึกข้อมูล
-                    </button>
-                    <button type="reset" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-bold">ล้างค่า</button>
-                </div>
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="bg-white shadow-sm p-4 md:hidden flex justify-between items-center z-10">
+            <span class="font-bold">Admin Panel</span>
+            <button class="text-gray-600"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-10" id="main-area">
+            <div class="text-center text-gray-500 mt-20">
+                <i class="fa-solid fa-arrow-left text-4xl mb-4 animate-bounce-x"></i>
+                <p>กรุณาเลือกเมนูทางซ้ายเพื่อจัดการข้อมูล</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 m-4 relative animate-fade-in-up">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 id="modal-title" class="text-2xl font-bold mb-6 text-gray-800">จัดการข้อมูล</h2>
+            <form id="data-form" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <input type="hidden" name="id" id="field-id">
+                <div id="form-fields"></div>
             </form>
+            <div class="mt-6 flex gap-3">
+                <button type="button" onclick="submitForm()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold shadow-lg transition">บันทึก</button>
+                <button type="button" onclick="closeModal()" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-bold">ยกเลิก</button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // ⚠️ ใส่ URL ของ Google Apps Script ที่ Deploy แล้วตรงนี้
+        // ⚠️ ใส่ URL ใหม่ที่ได้จากการ Deploy Code.gs
         const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
 
-        // โครงสร้างฟอร์มของแต่ละหมวดหมู่
-        const FORM_CONFIG = {
-            news: { title: "เพิ่มข่าวประชาสัมพันธ์", fields: [
-                { name: "title", label: "หัวข้อข่าว", type: "text" },
-                { name: "date", label: "วันที่", type: "date" },
-                { name: "link", label: "ลิงก์รายละเอียด (ถ้ามี)", type: "url" },
-                { name: "image", label: "ลิงก์รูปภาพปก", type: "url" }
-            ]},
-            personnel: { title: "เพิ่มบุคลากรปัจจุบัน", fields: [
-                { name: "name", label: "ชื่อ-นามสกุล", type: "text" },
-                { name: "role", label: "ตำแหน่ง (เช่น ครู, ผอ.)", type: "text" },
-                { name: "academic", label: "วิทยฐานะ (เช่น ชำนาญการ)", type: "text" },
-                { name: "class", label: "ประจำชั้น (ถ้ามี)", type: "text" },
-                { name: "image", label: "ลิงก์รูปโปรไฟล์", type: "url" }
-            ]},
-            teacher_awards: { title: "เพิ่มผลงานครู", fields: [
-                { name: "name", label: "ชื่อครู", type: "text" },
-                { name: "project", label: "ชื่อผลงาน/รางวัล", type: "text" },
-                { name: "level", label: "ระดับรางวัล (เช่น ระดับชาติ)", type: "text" },
-                { name: "date", label: "วันที่ได้รับ", type: "date" },
-                { name: "image", label: "ลิงก์รูปผลงาน", type: "url" }
-            ]},
-            student_awards: { title: "เพิ่มผลงานนักเรียน", fields: [
-                { name: "title", label: "ชื่อรางวัล", type: "text" },
-                { name: "students", label: "ชื่อนักเรียน", type: "text" },
-                { name: "subject", label: "กลุ่มสาระฯ", type: "text" },
-                { name: "level", label: "ระดับ", type: "text" },
-                { name: "image", label: "ลิงก์รูปผลงาน", type: "url" }
-            ]},
-            innovations: { title: "เพิ่มนวัตกรรม", fields: [
-                { name: "title", label: "ชื่อนวัตกรรม", type: "text" },
-                { name: "creator", label: "ผู้จัดทำ", type: "text" },
-                { name: "category", label: "หมวดหมู่", type: "text" },
-                { name: "subject", label: "รายวิชา", type: "text" },
-                { name: "link", label: "ลิงก์ดาวน์โหลด/ดูผลงาน", type: "url" },
-                { name: "coverImageUrl", label: "ลิงก์รูปปก", type: "url" }
-            ]},
-            documents: { title: "เพิ่มเอกสารราชการ", fields: [
-                { name: "title", label: "ชื่อเอกสาร", type: "text" },
-                { name: "category", label: "หมวดหมู่ (คำสั่ง/ประกาศ)", type: "text" },
-                { name: "uploadDate", label: "วันที่", type: "date" },
-                { name: "fileUrl", label: "ลิงก์ไฟล์ (PDF/Drive)", type: "url" }
-            ]},
-            // สามารถเพิ่มหมวดหมู่อื่นๆ ได้ตามต้องการโดยใช้ pattern เดียวกัน
+        // Config ของแต่ละหน้า (ฟิลด์ข้อมูล)
+        const SCHEMAS = {
+            info: { 
+                title: "ข้อมูลโรงเรียน", 
+                fields: [
+                    { key: "key", label: "หัวข้อ (เช่น history, vision - ห้ามซ้ำ)", type: "text", readonly: true },
+                    { key: "label", label: "ชื่อแสดงผล", type: "text" },
+                    { key: "value", label: "เนื้อหา/รายละเอียด", type: "textarea" },
+                ],
+                canAdd: true // ปกติข้อมูลโรงเรียนจะเป็น Key ตายตัว แต่อาจเพิ่มได้
+            },
+            news: {
+                title: "ข่าวประชาสัมพันธ์",
+                fields: [
+                    { key: "title", label: "หัวข้อข่าว", type: "text" },
+                    { key: "date", label: "วันที่", type: "date" },
+                    { key: "image", label: "ลิงก์รูปภาพ", type: "url" },
+                    { key: "link", label: "ลิงก์อ่านต่อ (ถ้ามี)", type: "url" }
+                ]
+            },
+            personnel: {
+                title: "บุคลากร",
+                fields: [
+                    { key: "name", label: "ชื่อ-สกุล", type: "text" },
+                    { key: "role", label: "ตำแหน่ง", type: "text" },
+                    { key: "class", label: "ประจำชั้น", type: "text" },
+                    { key: "image", label: "ลิงก์รูปโปรไฟล์", type: "url" }
+                ]
+            },
+            teacher_awards: {
+                title: "ผลงานครู",
+                fields: [
+                    { key: "name", label: "ชื่อครู", type: "text" },
+                    { key: "project", label: "ชื่อรางวัล", type: "text" },
+                    { key: "date", label: "วันที่", type: "date" },
+                    { key: "image", label: "รูปผลงาน", type: "url" }
+                ]
+            },
+            // เพิ่ม Schema อื่นๆ ตามต้องการ
         };
-        
-        // เพิ่ม Default Config ให้หมวดที่เหลือใช้ Form พื้นฐาน
-        const DEFAULT_CONFIG = { title: "เพิ่มข้อมูล", fields: [
-            { name: "title", label: "ชื่อ/หัวข้อ", type: "text" },
-            { name: "description", label: "รายละเอียด", type: "text" },
-            { name: "link", label: "ลิงก์", type: "url" }
-        ]};
 
-        // ตรวจสอบ Login
+        let currentSection = '';
+        let currentData = [];
+
+        // Check Login
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
         function logout() { localStorage.removeItem('isLoggedIn'); window.location.href = 'index.html'; }
 
-        // ฟังก์ชันสร้างฟอร์มตามหมวดที่เลือก
-        function renderForm() {
-            const category = document.getElementById('category-select').value;
-            const container = document.getElementById('form-container');
-            const titleEl = document.getElementById('form-title');
-            const fieldsContainer = document.getElementById('dynamic-fields');
-            
-            if (!category) { container.classList.add('hidden'); return; }
+        // Load Section
+        async function loadSection(section) {
+            currentSection = section;
+            const schema = SCHEMAS[section] || SCHEMAS['news']; // Fallback
 
-            // ดึง Config หรือใช้ Default ถ้าไม่มี
-            const config = FORM_CONFIG[category] || DEFAULT_CONFIG;
+            // UI Updates
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('bg-blue-100', 'text-blue-800', 'font-bold'));
+            event.currentTarget.classList.add('bg-blue-100', 'text-blue-800', 'font-bold');
             
-            // ตั้งชื่อหัวข้อ
-            titleEl.textContent = config.title;
-            
-            // สร้างช่องกรอกข้อมูล
-            fieldsContainer.innerHTML = config.fields.map(field => `
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-1">${field.label}</label>
-                    <input type="${field.type}" name="${field.name}" 
-                           class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition" 
-                           placeholder="${field.label}..." required>
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">${schema.title}</h2>
+                    <button onclick="openModal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> เพิ่มข้อมูล
+                    </button>
                 </div>
-            `).join('');
+                <div id="loading" class="text-center py-10"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500"></i></div>
+                <div id="table-container" class="bg-white rounded-xl shadow overflow-hidden hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ข้อมูล</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200" id="table-body"></tbody>
+                    </table>
+                </div>
+            `;
 
-            container.classList.remove('hidden');
+            // Fetch Data
+            try {
+                const res = await fetch(`${API_URL}?action=getData&sheet=${section}`);
+                currentData = await res.json();
+                renderTable();
+            } catch (e) {
+                Swal.fire('Error', 'โหลดข้อมูลไม่สำเร็จ', 'error');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('table-container').classList.remove('hidden');
+            }
         }
 
-        // ฟังก์ชันส่งข้อมูล
-        async function submitData() {
-            const category = document.getElementById('category-select').value;
-            const form = document.getElementById('data-form');
-            const btn = document.querySelector('button[onclick="submitData()"]');
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
             
-            if (!form.checkValidity()) {
-                Swal.fire('กรุณากรอกข้อมูล', 'โปรดกรอกข้อมูลให้ครบถ้วน', 'warning');
+            if (currentData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">ยังไม่มีข้อมูล</td></tr>`;
                 return;
             }
 
-            // เตรียมข้อมูล
-            const formData = new FormData(form);
-            const dataObj = Object.fromEntries(formData.entries());
+            const schema = SCHEMAS[currentSection] || SCHEMAS['news'];
+            const displayKey = schema.fields[0].key; // ใช้ field แรกเป็นหัวข้อแสดงผล
+
+            currentData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-900">${item[displayKey] || '-'}</div>
+                        <div class="text-sm text-gray-500 truncate max-w-md">${Object.values(item).slice(1,3).join(' | ')}</div>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editItem('${item.id}')" class="text-blue-600 hover:text-blue-900 bg-blue-100 px-3 py-1 rounded"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteItem('${item.id}')" class="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Modal Functions
+        function openModal(isEdit = false, id = null) {
+            const schema = SCHEMAS[currentSection] || SCHEMAS['news'];
+            const container = document.getElementById('form-fields');
+            document.getElementById('modal-title').innerText = isEdit ? `แก้ไข ${schema.title}` : `เพิ่ม ${schema.title}`;
+            document.getElementById('field-id').value = id || '';
             
-            // เปลี่ยนสถานะปุ่ม
-            const originalBtnText = btn.innerHTML;
-            btn.innerHTML = '⏳ กำลังบันทึก...';
+            let item = {};
+            if (isEdit && id) {
+                item = currentData.find(d => String(d.id) === String(id)) || {};
+            }
+
+            container.innerHTML = schema.fields.map(f => `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">${f.label}</label>
+                    ${f.type === 'textarea' 
+                        ? `<textarea name="${f.key}" rows="4" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500">${item[f.key] || ''}</textarea>`
+                        : `<input type="${f.type}" name="${f.key}" value="${item[f.key] || ''}" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500">`
+                    }
+                </div>
+            `).join('');
+
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        window.editItem = (id) => openModal(true, id);
+
+        window.deleteItem = async (id) => {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: "ข้อมูลจะถูกลบถาวร",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'ลบข้อมูล'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'deleteData', type: currentSection, id: id })
+                    });
+                    loadSection(currentSection); // Reload
+                    Swal.fire('ลบสำเร็จ', '', 'success');
+                } catch(e) {
+                    Swal.fire('Error', e.message, 'error');
+                }
+            }
+        };
+
+        window.submitForm = async () => {
+            const form = document.getElementById('data-form');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+            delete data.id; // แยก ID ออกจาก Data
+
+            const action = id ? 'editData' : 'addData';
+            
+            // Show Loading Button
+            const btn = document.querySelector('button[onclick="submitForm()"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'กำลังบันทึก...';
             btn.disabled = true;
 
             try {
-                // ส่งไปหา Google Apps Script
                 await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        action: 'addData',
-                        type: category, // ใช้ค่า category เป็นชื่อ Sheet
-                        data: dataObj
-                    })
+                    body: JSON.stringify({ action: action, type: currentSection, id: id, data: data })
                 });
-
-                Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-                form.reset();
-            } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
+                closeModal();
+                loadSection(currentSection);
+                Swal.fire('บันทึกสำเร็จ', '', 'success');
+            } catch (e) {
+                Swal.fire('Error', e.message, 'error');
             } finally {
-                btn.innerHTML = originalBtnText;
+                btn.innerText = originalText;
                 btn.disabled = false;
             }
-        }
+        };
     </script>
 </body>
 </html>
