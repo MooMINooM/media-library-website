@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbz8hsStyHFm6Mm4B21N-K8HY1I0o4cIpuDYE9DW8OlbOu4W2rDh7J-i7XNwxodfeikN/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxdQD269SiCnYGEFo4P_da7_QrCXLRKb8YtP7mS-14MvshthK3pZxRovT0CBd7iMr6G1w/exec';
 
 export async function fetchFromSheet(sheetName) {
     try {
