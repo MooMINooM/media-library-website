@@ -3,100 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบหลังบ้าน - โรงเรียนบ้านภูพระโนนผักหวาน</title>
+    <title>ระบบจัดการข้อมูลโรงเรียน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>body{font-family:'Sarabun',sans-serif;}</style>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-700 text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Admin Dashboard (Krumin)</h1>
-            <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">ออกจากระบบ</button>
+<body class="bg-gray-50 min-h-screen">
+
+    <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">⚙️</span>
+                <h1 class="text-xl font-bold">Admin Panel</h1>
+            </div>
+            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-bold transition">ออกจากระบบ</button>
         </div>
     </nav>
 
-    <div class="container mx-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <button onclick="showSection('news')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-blue-500 text-left">
-                <h3 class="text-xl font-bold">จัดการข่าวประชาสัมพันธ์</h3>
-                <p class="text-gray-500">เพิ่ม/ลบ ข่าวสารหน้าเว็บ</p>
-            </button>
-            <button onclick="showSection('personnel')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-green-500 text-left">
-                <h3 class="text-xl font-bold">จัดการบุคลากร</h3>
-                <p class="text-gray-500">แก้ไขข้อมูลครู</p>
-            </button>
-            <button onclick="showSection('achievements')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-yellow-500 text-left">
-                <h3 class="text-xl font-bold">จัดการผลงาน</h3>
-                <p class="text-gray-500">เพิ่มผลงานครู/นักเรียน</p>
-            </button>
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <label class="block text-gray-700 text-lg font-bold mb-2">เลือกเมนูที่ต้องการแก้ไขข้อมูล:</label>
+            <select id="category-select" onchange="renderForm()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50 text-lg">
+                <option value="" disabled selected>-- กรุณาเลือก --</option>
+                <optgroup label="📰 ประชาสัมพันธ์">
+                    <option value="news">ข่าวประชาสัมพันธ์</option>
+                </optgroup>
+                <optgroup label="👥 บุคลากร">
+                    <option value="personnel">บุคลากรปัจจุบัน</option>
+                    <option value="director_history">ทำเนียบผู้บริหาร</option>
+                    <option value="personnel_history">ทำเนียบบุคลากร (ประวัติ)</option>
+                </optgroup>
+                <optgroup label="🏆 ผลงาน">
+                    <option value="teacher_awards">ผลงานครู</option>
+                    <option value="student_awards">ผลงานนักเรียน</option>
+                    <option value="school_awards">ผลงานสถานศึกษา</option>
+                </optgroup>
+                <optgroup label="💡 วิชาการ & อื่นๆ">
+                    <option value="innovations">คลังนวัตกรรม</option>
+                    <option value="documents">เอกสารทางราชการ</option>
+                    <option value="forms">แบบฟอร์ม</option>
+                    <option value="board">คณะกรรมการสถานศึกษา</option>
+                    <option value="council">สภานักเรียน</option>
+                </optgroup>
+            </select>
         </div>
 
-        <div id="news-section" class="bg-white p-6 rounded-lg shadow hidden">
-            <h2 class="text-2xl font-bold mb-4 text-blue-800">เพิ่มข่าวประชาสัมพันธ์</h2>
-            <form id="add-news-form" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">หัวข้อข่าว</label>
-                    <input type="text" name="title" class="w-full border p-2 rounded" required>
+        <div id="form-container" class="bg-white rounded-xl shadow-md p-6 hidden animate-fade-in-up">
+            <h2 id="form-title" class="text-2xl font-bold text-blue-800 mb-6 border-b pb-2"></h2>
+            <form id="data-form" class="space-y-4">
+                <div id="dynamic-fields" class="grid grid-cols-1 gap-4">
+                    </div>
+                
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="submitData()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg transform hover:-translate-y-1">
+                        💾 บันทึกข้อมูล
+                    </button>
+                    <button type="reset" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-bold">ล้างค่า</button>
                 </div>
-                <div>
-                    <label class="block text-gray-700">วันที่</label>
-                    <input type="date" name="date" class="w-full border p-2 rounded" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700">ลิงก์รูปภาพ/เอกสาร (URL)</label>
-                    <input type="url" name="link" class="w-full border p-2 rounded">
-                </div>
-                <button type="button" onclick="submitData('news')" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">บันทึกข้อมูล</button>
             </form>
         </div>
-        
-        <div id="loading" class="hidden text-center mt-4 text-gray-600">กำลังบันทึกข้อมูล...</div>
+
     </div>
 
     <script>
+        // ⚠️ ใส่ URL ของ Google Apps Script ที่ Deploy แล้วตรงนี้
+        const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
+
+        // โครงสร้างฟอร์มของแต่ละหมวดหมู่
+        const FORM_CONFIG = {
+            news: { title: "เพิ่มข่าวประชาสัมพันธ์", fields: [
+                { name: "title", label: "หัวข้อข่าว", type: "text" },
+                { name: "date", label: "วันที่", type: "date" },
+                { name: "link", label: "ลิงก์รายละเอียด (ถ้ามี)", type: "url" },
+                { name: "image", label: "ลิงก์รูปภาพปก", type: "url" }
+            ]},
+            personnel: { title: "เพิ่มบุคลากรปัจจุบัน", fields: [
+                { name: "name", label: "ชื่อ-นามสกุล", type: "text" },
+                { name: "role", label: "ตำแหน่ง (เช่น ครู, ผอ.)", type: "text" },
+                { name: "academic", label: "วิทยฐานะ (เช่น ชำนาญการ)", type: "text" },
+                { name: "class", label: "ประจำชั้น (ถ้ามี)", type: "text" },
+                { name: "image", label: "ลิงก์รูปโปรไฟล์", type: "url" }
+            ]},
+            teacher_awards: { title: "เพิ่มผลงานครู", fields: [
+                { name: "name", label: "ชื่อครู", type: "text" },
+                { name: "project", label: "ชื่อผลงาน/รางวัล", type: "text" },
+                { name: "level", label: "ระดับรางวัล (เช่น ระดับชาติ)", type: "text" },
+                { name: "date", label: "วันที่ได้รับ", type: "date" },
+                { name: "image", label: "ลิงก์รูปผลงาน", type: "url" }
+            ]},
+            student_awards: { title: "เพิ่มผลงานนักเรียน", fields: [
+                { name: "title", label: "ชื่อรางวัล", type: "text" },
+                { name: "students", label: "ชื่อนักเรียน", type: "text" },
+                { name: "subject", label: "กลุ่มสาระฯ", type: "text" },
+                { name: "level", label: "ระดับ", type: "text" },
+                { name: "image", label: "ลิงก์รูปผลงาน", type: "url" }
+            ]},
+            innovations: { title: "เพิ่มนวัตกรรม", fields: [
+                { name: "title", label: "ชื่อนวัตกรรม", type: "text" },
+                { name: "creator", label: "ผู้จัดทำ", type: "text" },
+                { name: "category", label: "หมวดหมู่", type: "text" },
+                { name: "subject", label: "รายวิชา", type: "text" },
+                { name: "link", label: "ลิงก์ดาวน์โหลด/ดูผลงาน", type: "url" },
+                { name: "coverImageUrl", label: "ลิงก์รูปปก", type: "url" }
+            ]},
+            documents: { title: "เพิ่มเอกสารราชการ", fields: [
+                { name: "title", label: "ชื่อเอกสาร", type: "text" },
+                { name: "category", label: "หมวดหมู่ (คำสั่ง/ประกาศ)", type: "text" },
+                { name: "uploadDate", label: "วันที่", type: "date" },
+                { name: "fileUrl", label: "ลิงก์ไฟล์ (PDF/Drive)", type: "url" }
+            ]},
+            // สามารถเพิ่มหมวดหมู่อื่นๆ ได้ตามต้องการโดยใช้ pattern เดียวกัน
+        };
+        
+        // เพิ่ม Default Config ให้หมวดที่เหลือใช้ Form พื้นฐาน
+        const DEFAULT_CONFIG = { title: "เพิ่มข้อมูล", fields: [
+            { name: "title", label: "ชื่อ/หัวข้อ", type: "text" },
+            { name: "description", label: "รายละเอียด", type: "text" },
+            { name: "link", label: "ลิงก์", type: "url" }
+        ]};
+
         // ตรวจสอบ Login
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'index.html';
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+        function logout() { localStorage.removeItem('isLoggedIn'); window.location.href = 'index.html'; }
+
+        // ฟังก์ชันสร้างฟอร์มตามหมวดที่เลือก
+        function renderForm() {
+            const category = document.getElementById('category-select').value;
+            const container = document.getElementById('form-container');
+            const titleEl = document.getElementById('form-title');
+            const fieldsContainer = document.getElementById('dynamic-fields');
+            
+            if (!category) { container.classList.add('hidden'); return; }
+
+            // ดึง Config หรือใช้ Default ถ้าไม่มี
+            const config = FORM_CONFIG[category] || DEFAULT_CONFIG;
+            
+            // ตั้งชื่อหัวข้อ
+            titleEl.textContent = config.title;
+            
+            // สร้างช่องกรอกข้อมูล
+            fieldsContainer.innerHTML = config.fields.map(field => `
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">${field.label}</label>
+                    <input type="${field.type}" name="${field.name}" 
+                           class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition" 
+                           placeholder="${field.label}..." required>
+                </div>
+            `).join('');
+
+            container.classList.remove('hidden');
         }
 
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            window.location.href = 'index.html';
-        }
+        // ฟังก์ชันส่งข้อมูล
+        async function submitData() {
+            const category = document.getElementById('category-select').value;
+            const form = document.getElementById('data-form');
+            const btn = document.querySelector('button[onclick="submitData()"]');
+            
+            if (!form.checkValidity()) {
+                Swal.fire('กรุณากรอกข้อมูล', 'โปรดกรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
 
-        function showSection(section) {
-            document.querySelectorAll('div[id$="-section"]').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById(`${section}-section`);
-            if(target) target.classList.remove('hidden');
-        }
-
-        async function submitData(type) {
-            // URL ของ Web App จาก Google Apps Script (ต้องไป Deploy ก่อน)
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8hsStyHFm6Mm4B21N-K8HY1I0o4cIpuDYE9DW8OlbOu4W2rDh7J-i7XNwxodfeikN/exec'; 
-
-            const form = document.getElementById(`add-${type}-form`);
+            // เตรียมข้อมูล
             const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            data.action = 'addData'; // บอก Script ว่าเป็นการเพิ่มข้อมูล
-            data.type = type; // บอกประเภท (news, personnel)
-
-            document.getElementById('loading').classList.remove('hidden');
+            const dataObj = Object.fromEntries(formData.entries());
+            
+            // เปลี่ยนสถานะปุ่ม
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '⏳ กำลังบันทึก...';
+            btn.disabled = true;
 
             try {
-                // Google Apps Script รับ POST ต้องใช้ config นี้
-                const response = await fetch(SCRIPT_URL, {
+                // ส่งไปหา Google Apps Script
+                await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        action: 'addData',
+                        type: category, // ใช้ค่า category เป็นชื่อ Sheet
+                        data: dataObj
+                    })
                 });
-                const result = await response.json();
-                alert('บันทึกข้อมูลสำเร็จ!');
+
+                Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
                 form.reset();
             } catch (error) {
-                console.error(error);
-                alert('เกิดข้อผิดพลาดในการบันทึก (ตรวจสอบ Console)');
+                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
             } finally {
-                document.getElementById('loading').classList.add('hidden');
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
             }
         }
     </script>
