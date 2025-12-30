@@ -1,6 +1,6 @@
 // js/api.js
 // ⚠️ เปลี่ยน URL ตรงนี้เป็น URL ล่าสุดที่คุณเพิ่ง Deploy แบบ "Anyone"
-const API_URL = 'https://script.google.com/macros/s/AKfycbwKvirrtzdFaVAKbvpS8Z9fW0z8w420x8822xpOTnwOmQ08u6g8y-hLsy-l_GhlMqG3EA/exec'; 
+const API_URL = 'https://script.google.com/macros/s/AKfycbx0JR74pvjdbcSu8GfHRQQudUb4IO-rDQsJkkZQnL704LXm2PLW_DSJcm34LjCteFBD8g/exec'; 
 
 // ฟังก์ชันอื่นๆ คงเดิม...
 export async function fetchData(sheetName) {
