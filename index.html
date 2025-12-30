@@ -24,34 +24,50 @@
         body {
             @apply font-sans bg-slate-50 text-slate-800;
         }
-        /* ลิงก์เมนู */
+        
+        /* --- เมนู Nav Link --- */
         .nav-link {
-            @apply text-slate-700 font-medium py-2 px-3 rounded-md transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer select-none;
+            @apply text-slate-700 font-medium py-3 px-3 rounded-md transition-colors duration-200 hover:text-blue-700 cursor-pointer select-none flex items-center gap-1;
         }
         .nav-link.active {
             @apply text-blue-600 font-bold bg-blue-50;
         }
-        /* หัวข้อ */
-        .section-title {
-            @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4 mb-6;
-        }
-        /* การ์ด */
-        .card-hover {
-            @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-        }
-        /* Dropdown */
+
+        /* --- ✨ ส่วนสำคัญ: ตั้งค่า Dropdown ให้เด้งตอนเอาเมาส์ชี้ (Hover) --- */
+        
+        /* 1. ซ่อนเมนูไว้ก่อน */
         .dropdown-menu {
-            @apply hidden absolute bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50 mt-2 animate-fade-in;
+            @apply hidden absolute bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50 animate-fade-in;
+            top: 100%; /* ให้อยู่ใต้ปุ่มพอดี */
+            left: 0;
+            margin-top: 0px; /* ลดช่องว่างไม่ให้เมาส์หลุด */
         }
+
+        /* 2. สั่งให้แสดงเมื่อเอาเมาส์ชี้ที่กล่องแม่ (.dropdown) */
         .dropdown:hover .dropdown-menu {
             @apply block;
         }
+
+        /* 3. เปลี่ยนสีปุ่มแม่เมื่อเมาส์ชี้ หรือเมื่อเมนูเปิดอยู่ */
+        .dropdown:hover .dropdown-toggle {
+            @apply text-blue-600 bg-blue-50;
+        }
+
+        /* --- Animation --- */
         @keyframes fade-in {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
             animation: fade-in 0.2s ease-out forwards;
+        }
+
+        /* --- อื่นๆ --- */
+        .section-title {
+            @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4 mb-6;
+        }
+        .card-hover {
+            @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
         }
     </style>
 </head>
@@ -68,12 +84,12 @@
                     </div>
                 </a>
 
-                <nav id="main-nav" class="hidden lg:flex items-center gap-1">
-                    <a href="#" data-page="home" class="nav-link">หน้าแรก</a>
+                <nav id="main-nav" class="hidden lg:flex items-center gap-2">
+                    <a href="#" data-page="home" class="nav-link hover:bg-blue-50">หน้าแรก</a>
 
-                    <div class="relative dropdown group">
-                        <button class="nav-link dropdown-toggle flex items-center gap-1">
-                            โรงเรียน <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle">
+                            โรงเรียน <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i>
                         </button>
                         <div class="dropdown-menu">
                             <a href="#" data-page="history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ประวัติความเป็นมา</a>
@@ -84,9 +100,9 @@
                         </div>
                     </div>
 
-                    <div class="relative dropdown group">
-                        <button class="nav-link dropdown-toggle flex items-center gap-1">
-                            บุคลากร <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle">
+                            บุคลากร <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i>
                         </button>
                         <div class="dropdown-menu">
                             <a href="#" data-page="personnel-list" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">บุคลากรปัจจุบัน</a>
@@ -95,11 +111,11 @@
                         </div>
                     </div>
 
-                    <a href="#" data-page="students" class="nav-link">นักเรียน</a>
+                    <a href="#" data-page="students" class="nav-link hover:bg-blue-50">นักเรียน</a>
 
-                    <div class="relative dropdown group">
-                        <button class="nav-link dropdown-toggle flex items-center gap-1">
-                            ผลงาน <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle">
+                            ผลงาน <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i>
                         </button>
                         <div class="dropdown-menu w-48">
                             <a href="#" data-page="teacher-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานครู</a>
@@ -108,35 +124,46 @@
                         </div>
                     </div>
 
-                    <a href="#" data-page="news" class="nav-link">ข่าวสาร</a>
+                    <a href="#" data-page="news" class="nav-link hover:bg-blue-50">ข่าวสาร</a>
                     
-                    <div class="relative dropdown group">
-                        <button class="nav-link dropdown-toggle flex items-center gap-1">
-                            เอกสาร <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle">
+                            เอกสาร <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i>
                         </button>
-                        <div class="dropdown-menu w-48 right-0">
+                        <div class="dropdown-menu w-48 right-0 left-auto">
                             <a href="#" data-page="documents-official" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">เอกสารราชการ</a>
                             <a href="#" data-page="documents-forms" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">แบบฟอร์ม</a>
                         </div>
                     </div>
                     
-                    <a href="#" data-page="innovations" class="nav-link">นวัตกรรม</a>
+                    <a href="#" data-page="innovations" class="nav-link hover:bg-blue-50">นวัตกรรม</a>
 
-                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-bold shadow-md transition transform hover:scale-105 flex items-center gap-2 text-sm">
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 rounded-full shadow-md transition transform hover:scale-105 flex items-center justify-center text-sm" title="เข้าสู่ระบบ">
                         <i class="fa-solid fa-lock"></i>
                     </button>
                 </nav>
 
-                <button class="lg:hidden text-gray-600 text-2xl focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <button class="lg:hidden text-gray-600 text-2xl focus:outline-none p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
 
             <div id="mobile-menu" class="hidden lg:hidden bg-gray-50 border-t p-4 space-y-2">
                 <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
-                <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ข่าวสาร</a>
-                <a href="#" data-page="personnel-list" class="block py-2 px-4 rounded hover:bg-white text-gray-700">บุคลากร</a>
-                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-2 px-4 text-blue-600 font-bold">เข้าสู่ระบบผู้ดูแล</button>
+                
+                <div class="border-t pt-2 mt-2">
+                    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-1">โรงเรียน</p>
+                    <a href="#" data-page="history" class="block py-2 px-6 text-sm text-gray-600 hover:text-blue-600">ประวัติโรงเรียน</a>
+                    <a href="#" data-page="info" class="block py-2 px-6 text-sm text-gray-600 hover:text-blue-600">ข้อมูลทั่วไป</a>
+                </div>
+
+                <div class="border-t pt-2 mt-2">
+                    <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-1">บุคลากร</p>
+                    <a href="#" data-page="personnel-list" class="block py-2 px-6 text-sm text-gray-600 hover:text-blue-600">บุคลากรปัจจุบัน</a>
+                </div>
+
+                <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
+                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-3 px-4 text-blue-600 font-bold bg-blue-50 rounded-lg mt-2">เข้าสู่ระบบผู้ดูแล</button>
             </div>
         </div>
     </header>
