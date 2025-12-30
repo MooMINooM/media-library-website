@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบหลังบ้าน - โรงเรียนบ้านภูพระโนนผักหวาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Sarabun',sans-serif;}</style>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-700 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Admin Dashboard (Krumin)</h1>
+            <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">ออกจากระบบ</button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <button onclick="showSection('news')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-blue-500 text-left">
+                <h3 class="text-xl font-bold">จัดการข่าวประชาสัมพันธ์</h3>
+                <p class="text-gray-500">เพิ่ม/ลบ ข่าวสารหน้าเว็บ</p>
+            </button>
+            <button onclick="showSection('personnel')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-green-500 text-left">
+                <h3 class="text-xl font-bold">จัดการบุคลากร</h3>
+                <p class="text-gray-500">แก้ไขข้อมูลครู</p>
+            </button>
+            <button onclick="showSection('achievements')" class="p-6 bg-white rounded-lg shadow hover:shadow-lg border-l-4 border-yellow-500 text-left">
+                <h3 class="text-xl font-bold">จัดการผลงาน</h3>
+                <p class="text-gray-500">เพิ่มผลงานครู/นักเรียน</p>
+            </button>
+        </div>
+
+        <div id="news-section" class="bg-white p-6 rounded-lg shadow hidden">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">เพิ่มข่าวประชาสัมพันธ์</h2>
+            <form id="add-news-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">หัวข้อข่าว</label>
+                    <input type="text" name="title" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">วันที่</label>
+                    <input type="date" name="date" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">ลิงก์รูปภาพ/เอกสาร (URL)</label>
+                    <input type="url" name="link" class="w-full border p-2 rounded">
+                </div>
+                <button type="button" onclick="submitData('news')" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">บันทึกข้อมูล</button>
+            </form>
+        </div>
+        
+        <div id="loading" class="hidden text-center mt-4 text-gray-600">กำลังบันทึกข้อมูล...</div>
+    </div>
+
+    <script>
+        // ตรวจสอบ Login
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html';
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('div[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`${section}-section`);
+            if(target) target.classList.remove('hidden');
+        }
+
+        async function submitData(type) {
+            // URL ของ Web App จาก Google Apps Script (ต้องไป Deploy ก่อน)
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec'; 
+
+            const form = document.getElementById(`add-${type}-form`);
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.action = 'addData'; // บอก Script ว่าเป็นการเพิ่มข้อมูล
+            data.type = type; // บอกประเภท (news, personnel)
+
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                // Google Apps Script รับ POST ต้องใช้ config นี้
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert('บันทึกข้อมูลสำเร็จ!');
+                form.reset();
+            } catch (error) {
+                console.error(error);
+                alert('เกิดข้อผิดพลาดในการบันทึก (ตรวจสอบ Console)');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
