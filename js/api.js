@@ -1,25 +1,12 @@
-// This file is responsible for all communication with external APIs, like Google Sheets.
+const API_URL = 'https://script.google.com/macros/s/AKfycbz8hsStyHFm6Mm4B21N-K8HY1I0o4cIpuDYE9DW8OlbOu4W2rDh7J-i7XNwxodfeikN/exec';
 
-const API_URL = 'https://script.google.com/macros/s/AKfycby7CsU7Kck9nUY-uC_R6unpMu9dDrOnuOaQUzi0fto4kSnYhl63xHmr7wrJXwDzxSotow/exec';
-
-// A generic function to fetch data from any sheet
-async function fetchData(sheetName) {
-    if (!API_URL) throw new Error("API_URL is not configured.");
-    
-    // Add a cache-busting parameter to ensure we get fresh data
-    const url = `${API_URL}?sheet=${sheetName}&v=${new Date().getTime()}`;
-    const response = await fetch(url);
-    const result = await response.json();
-
-    if (result.error) throw new Error(result.error);
-    
-    return result.data;
+export async function fetchFromSheet(sheetName) {
+    try {
+        const response = await fetch(`${API_URL}?action=getData&sheet=${sheetName}`);
+        const result = await response.json();
+        return result;
+    } catch (e) {
+        console.error("Fetch Error:", e);
+        return [];
+    }
 }
-
-// Specific functions for each data type that needs fetching
-export async function loadTeacherAchievementsData() {
-    return fetchData('performance');
-}
-
-// 🌟 REMOVED: The loadInnovationsData function is no longer needed.
-
