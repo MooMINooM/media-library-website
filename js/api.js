@@ -1,12 +1,14 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxdQD269SiCnYGEFo4P_da7_QrCXLRKb8YtP7mS-14MvshthK3pZxRovT0CBd7iMr6G1w/exec';
+// ใส่ URL ของ Google Apps Script ที่ Deploy ล่าสุด
+const API_URL = 'https://script.google.com/macros/s/AKfycbz8FQ_Y05PRYEJJrYULFPYDUdpWJssiTgz2UTrq1gz11hVpEqE9xPqjmIaKM8xp67eUXA/exec';
 
-export async function fetchFromSheet(sheetName) {
+export async function fetchData(sheetName) {
+    if (!API_URL) return [];
     try {
         const response = await fetch(`${API_URL}?action=getData&sheet=${sheetName}`);
-        const result = await response.json();
-        return result;
-    } catch (e) {
-        console.error("Fetch Error:", e);
+        const data = await response.json();
+        return data.error ? [] : data;
+    } catch (error) {
+        console.error("API Error:", error);
         return [];
     }
 }
