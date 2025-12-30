@@ -1,353 +1,119 @@
-// This is the main controller file.
-// It imports functions from other modules and coordinates everything.
+import { fetchData } from './js/api.js';
 
-import * as Data from './js/data.js';
-import * as API from './js/api.js';
-import * as UI from './js/ui.js';
-import { STATIC_INNOVATIONS_DATA } from './js/inno.js';
-import { STATIC_NEWS_DATA } from './js/news.js';
-import { STATIC_DIRECTOR_HISTORY_DATA } from './js/direc.js';
-import { STATIC_PERSONNEL_HISTORY_DATA } from './js/member.js';
-import { STATIC_STUDENT_AWARDS_DATA } from './js/staward.js';
-import { STATIC_SCHOOL_AWARDS_DATA } from './js/saward.js';
-import { STATIC_DOCS_DATA } from './js/docs.js';
-import { STATIC_FILES_DATA } from './js/files.js';
-import { STATIC_TEACHER_AWARDS_DATA } from './js/taward.js';
+// Global Cache
+const cache = {};
 
-
-// --- Global Caches ---
-let teacherAchievementsCache = [];
-let innovationsDataCache = [];
-let currentlyDisplayedInnovations = [];
-let personnelDataCache = [];
-let newsDataCache = [];
-let studentAchievementsCache = [];
-let schoolAchievementsCache = [];
-let documentsDataCache = [];
-let filesDataCache = [];
-let currentlyDisplayedStudentAchievements = [];
-let currentlyDisplayedTeacherAchievements = [];
-
-
-// --- Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
-    setupNavigation();
-    UI.setupDropdowns();
-    UI.setupModal();
-    setupEventListeners();
-    setupInnovationFilterListeners();
-    UI.setupHistorySearch('director-search-input', 'director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
-    UI.setupHistorySearch('personnel-history-search-input', 'personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
-    setupDocumentSearchListeners();
-    setupStudentAchievementFilterListeners();
-    setupTeacherAchievementFilterListeners();
-    showPage('home');
+    // Navigation Logic
+    document.querySelectorAll('[data-page], [data-page-link]').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = el.dataset.page || el.dataset.pageLink;
+            showPage(page);
+        });
+    });
+
+    // Load Home Data
+    loadHomeNews();
 });
 
-
-// --- NAVIGATION ---
-function setupNavigation() {
-    const mainNav = document.getElementById('main-nav');
-    mainNav.addEventListener('click', (e) => {
-        if (e.target.matches('a[data-page]')) {
-            e.preventDefault();
-            const pageId = e.target.dataset.page;
-            showPage(pageId);
-            UI.closeAllDropdowns();
-        }
-    });
-}
-
 async function showPage(pageId) {
-    document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
-    const activePage = document.getElementById(`page-${pageId}`);
-    if (activePage) activePage.classList.remove('hidden');
+    // Hide all contents
+    document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById('generic-page').classList.add('hidden');
+    window.scrollTo(0, 0);
 
-    document.querySelectorAll('#main-nav a[data-page], #main-nav button.dropdown-toggle').forEach(link => link.classList.remove('active'));
-    const activeLink = document.querySelector(`#main-nav a[data-page="${pageId}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-        const parentDropdown = activeLink.closest('.dropdown');
-        if (parentDropdown) parentDropdown.querySelector('.dropdown-toggle').classList.add('active');
-    }
-
-    switch (pageId) {
-        case 'home':
-            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
-            UI.renderHomeNews(newsDataCache);
-            break;
-        case 'personnel-list':
-            if (personnelDataCache.length === 0) personnelDataCache = Data.STATIC_PERSONNEL_DATA;
-            UI.renderPersonnelList(personnelDataCache);
-            break;
-        case 'students':
-            UI.renderStudentChart();
-            break;
-        case 'student-council':
-            UI.renderStudentCouncilList();
-            break;
-        case 'school-board':
-            UI.renderSchoolBoardList();
-            break;
-        case 'teacher-achievements':
-            if (teacherAchievementsCache.length === 0) {
-                teacherAchievementsCache = STATIC_TEACHER_AWARDS_DATA;
-                UI.populateTeacherAchievementFilters(teacherAchievementsCache);
-            }
-            applyTeacherAchievementFilters();
-            break;
-        case 'student-achievements':
-            if (studentAchievementsCache.length === 0) {
-                studentAchievementsCache = STATIC_STUDENT_AWARDS_DATA;
-                UI.populateStudentAchievementFilters(studentAchievementsCache);
-            }
-            applyStudentAchievementFilters();
-            break;
-        case 'school-achievements':
-            if (schoolAchievementsCache.length === 0) schoolAchievementsCache = STATIC_SCHOOL_AWARDS_DATA;
-            UI.renderSchoolAchievements(schoolAchievementsCache);
-            break;
-        case 'innovations':
-             if (innovationsDataCache.length === 0) { 
-                innovationsDataCache = STATIC_INNOVATIONS_DATA;
-                UI.populateInnovationFilters(innovationsDataCache);
-            }
-            applyInnovationFilters();
-            break;
-        case 'news':
-            if (newsDataCache.length === 0) newsDataCache = STATIC_NEWS_DATA;
-            UI.renderNews(newsDataCache);
-            break;
-        case 'director-history':
-            const directorSearch = document.getElementById('director-search-input');
-            if(directorSearch) directorSearch.value = '';
-            UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA);
-            break;
-        case 'personnel-history':
-            const personnelSearch = document.getElementById('personnel-history-search-input');
-            if(personnelSearch) personnelSearch.value = '';
-            UI.renderHistoryTable('personnel-history-table-body', STATIC_PERSONNEL_HISTORY_DATA);
-            break;
-        case 'documents-official':
-            if (documentsDataCache.length === 0) documentsDataCache = STATIC_DOCS_DATA;
-            const officialSearch = document.getElementById('documents-official-search');
-            if(officialSearch) officialSearch.value = '';
-            applyDocumentSearch(documentsDataCache, 'documents-official-search', 'documents-official-container');
-            break;
-        case 'documents-forms':
-            if (filesDataCache.length === 0) filesDataCache = STATIC_FILES_DATA;
-            const formsSearch = document.getElementById('documents-forms-search');
-            if(formsSearch) formsSearch.value = '';
-            applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
-            break;
-        case 'history':
-        case 'info':
-        case 'structure':
-            // Static pages, no specific JS action needed.
-            break;
-    }
+    // Handle Specific Pages
+    if (pageId === 'home') {
+        document.getElementById('page-home').classList.remove('hidden');
+    } else if (pageId === 'info') {
+        document.getElementById('page-info').classList.remove('hidden');
+        loadSchoolInfo();
+    } else {
+        // Generic List Pages (News, Personnel, etc.)
+        renderGenericPage(pageId);
+    }
 }
 
-function applyInnovationFilters() {
-    const searchValue = document.getElementById('innovations-search-input').value.toLowerCase();
-    const categoryValue = document.getElementById('innovations-category-filter').value;
-    const subjectValue = document.getElementById('innovations-subject-filter').value;
-    const gradeValue = document.getElementById('innovations-grade-filter').value;
-
-    const filteredData = innovationsDataCache.filter(item => {
-        const matchesSearch = !searchValue || 
-                              (item.title && item.title.toLowerCase().includes(searchValue)) ||
-                              (item.creator && item.creator.toLowerCase().includes(searchValue));
-        const matchesCategory = !categoryValue || item.category === categoryValue;
-        const matchesSubject = !subjectValue || item.subject === subjectValue;
-        const matchesGrade = !gradeValue || item.grade === gradeValue;
-
-        return matchesSearch && matchesCategory && matchesSubject && matchesGrade;
-    });
-
-    currentlyDisplayedInnovations = filteredData;
-    UI.renderInnovations(filteredData);
+async function loadHomeNews() {
+    const container = document.getElementById('home-news-container');
+    const data = await getData('news');
+    if (!data.length) { container.innerHTML = '<p class="text-gray-500 text-center">ยังไม่มีข่าวสาร</p>'; return; }
+    
+    container.innerHTML = data.slice(0, 3).map(news => `
+        <div class="flex gap-4 items-start border-b pb-4 last:border-0">
+            <div class="bg-blue-100 text-blue-600 rounded-lg p-3 shrink-0"><i class="fa-regular fa-calendar-alt"></i></div>
+            <div>
+                <h3 class="font-bold text-gray-800 hover:text-blue-600 cursor-pointer">${news.title}</h3>
+                <p class="text-sm text-gray-500">${new Date(news.date).toLocaleDateString('th-TH')}</p>
+            </div>
+        </div>
+    `).join('');
 }
 
-function applyDocumentSearch(dataSource, searchInputId, containerId) {
-    const searchInput = document.getElementById(searchInputId);
-    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+async function loadSchoolInfo() {
+    const container = document.getElementById('info-content');
+    const data = await getData('info');
+    if (!data.length) return;
 
-    if (!dataSource) return;
-
-    const filteredData = dataSource.filter(item => {
-        return !searchTerm || (item.title && item.title.toLowerCase().includes(searchTerm));
-    });
-
-    UI.renderDocuments(filteredData, containerId);
+    container.innerHTML = data.map(info => `
+        <div class="mb-8 p-6 bg-blue-50 rounded-xl border-l-4 border-blue-500">
+            <h3 class="text-xl font-bold text-blue-900 mb-3">${info.label}</h3>
+            <p class="whitespace-pre-line leading-relaxed">${info.value}</p>
+        </div>
+    `).join('');
 }
 
-function applyStudentAchievementFilters() {
-    const searchValue = document.getElementById('student-achievements-search-input').value.toLowerCase();
-    const subjectValue = document.getElementById('student-achievements-subject-filter').value;
+async function renderGenericPage(pageId) {
+    const section = document.getElementById('generic-page');
+    const contentArea = document.getElementById('page-content-area');
+    const loader = document.getElementById('loading-indicator');
+    const title = document.getElementById('page-title');
 
-    const filteredData = studentAchievementsCache.filter(item => {
-        const matchesSearch = !searchValue || (item.title && item.title.toLowerCase().includes(searchValue)) || (item.students && item.students.toLowerCase().includes(searchValue));
-        const matchesSubject = !subjectValue || item.subject === subjectValue;
-        return matchesSearch && matchesSubject;
-    });
+    // Setup UI
+    section.classList.remove('hidden');
+    contentArea.innerHTML = '';
+    loader.classList.remove('hidden');
+    
+    // Map Titles
+    const titles = { news: "ข่าวประชาสัมพันธ์", personnel: "บุคลากร", teacher_awards: "ผลงานครู", student_awards: "ผลงานนักเรียน" };
+    title.innerText = titles[pageId] || "ข้อมูล";
 
-    currentlyDisplayedStudentAchievements = filteredData;
-    UI.renderStudentAchievements(filteredData);
+    // Fetch Data
+    const data = await getData(pageId);
+    loader.classList.add('hidden');
+
+    if (!data.length) {
+        contentArea.innerHTML = '<p class="col-span-full text-center text-gray-500">ไม่พบข้อมูล</p>';
+        return;
+    }
+
+    // Render Cards based on Type
+    contentArea.innerHTML = data.map(item => {
+        // Universal Card Template
+        const img = item.image || item.coverImageUrl || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+        const titleText = item.title || item.name || 'ไม่มีชื่อ';
+        const subText = item.role || item.project || item.date || '';
+
+        return `
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 border border-gray-100 flex flex-col">
+                <div class="h-48 overflow-hidden bg-gray-100 relative group">
+                    <img src="${img}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="p-5 flex-grow">
+                    <h3 class="font-bold text-lg text-gray-800 mb-2 line-clamp-2">${titleText}</h3>
+                    <p class="text-sm text-gray-500">${subText}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-function applyTeacherAchievementFilters() {
-    const searchValue = document.getElementById('teacher-achievements-search-input').value.toLowerCase();
-    const levelValue = document.getElementById('teacher-achievements-level-filter').value;
-
-    const filteredData = teacherAchievementsCache.filter(item => {
-        const matchesSearch = !searchValue ||
-            (item.name && item.name.toLowerCase().includes(searchValue)) ||
-            (item.project && item.project.toLowerCase().includes(searchValue));
-        const matchesLevel = !levelValue || item.level === levelValue;
-        return matchesSearch && matchesLevel;
-    });
-
-    currentlyDisplayedTeacherAchievements = filteredData;
-    UI.renderTeacherAchievements(filteredData);
-}
-
-
-function setupInnovationFilterListeners() {
-    const searchInput = document.getElementById('innovations-search-input');
-    const categoryFilter = document.getElementById('innovations-category-filter');
-    const subjectFilter = document.getElementById('innovations-subject-filter');
-    const gradeFilter = document.getElementById('innovations-grade-filter');
-    const resetBtn = document.getElementById('innovations-reset-btn');
-
-    searchInput.addEventListener('input', applyInnovationFilters);
-    categoryFilter.addEventListener('change', applyInnovationFilters);
-    subjectFilter.addEventListener('change', applyInnovationFilters);
-    gradeFilter.addEventListener('change', applyInnovationFilters);
-
-    resetBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        subjectFilter.value = '';
-        gradeFilter.value = '';
-        applyInnovationFilters();
-    });
-}
-
-function setupDocumentSearchListeners() {
-    const officialSearch = document.getElementById('documents-official-search');
-    if (officialSearch) {
-        officialSearch.addEventListener('input', () => {
-            if (documentsDataCache.length === 0) documentsDataCache = STATIC_DOCS_DATA;
-            applyDocumentSearch(documentsDataCache, 'documents-official-search', 'documents-official-container');
-        });
-    }
-
-    const formsSearch = document.getElementById('documents-forms-search');
-    if (formsSearch) {
-        formsSearch.addEventListener('input', () => {
-            if (filesDataCache.length === 0) filesDataCache = STATIC_FILES_DATA;
-            applyDocumentSearch(filesDataCache, 'documents-forms-search', 'documents-forms-container');
-        });
-    }
-}
-
-function setupStudentAchievementFilterListeners() {
-    const searchInput = document.getElementById('student-achievements-search-input');
-    const subjectFilter = document.getElementById('student-achievements-subject-filter');
-    const resetBtn = document.getElementById('student-achievements-reset-btn');
-
-    if (searchInput) searchInput.addEventListener('input', applyStudentAchievementFilters);
-    if (subjectFilter) subjectFilter.addEventListener('change', applyStudentAchievementFilters);
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            if (subjectFilter) subjectFilter.value = '';
-            applyStudentAchievementFilters();
-        });
-    }
-}
-
-function setupTeacherAchievementFilterListeners() {
-    const searchInput = document.getElementById('teacher-achievements-search-input');
-    const levelFilter = document.getElementById('teacher-achievements-level-filter');
-    const resetBtn = document.getElementById('teacher-achievements-reset-btn');
-
-    if (searchInput) searchInput.addEventListener('input', applyTeacherAchievementFilters);
-    if (levelFilter) levelFilter.addEventListener('change', applyTeacherAchievementFilters);
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            if (levelFilter) levelFilter.value = '';
-            applyTeacherAchievementFilters();
-        });
-    }
-}
-
-function setupEventListeners() {
-    document.body.addEventListener('click', (e) => {
-        
-        const pageLinkElement = e.target.closest('[data-page-link]');
-        if (pageLinkElement) {
-            const pageId = pageLinkElement.dataset.pageLink;
-            if (pageId) {
-                showPage(pageId);
-            }
-            return;
-        }
-        
-        const personnelCard = e.target.closest('.personnel-card');
-        if (personnelCard) {
-            const index = personnelCard.dataset.index;
-            const selectedPerson = personnelDataCache[index];
-            if (selectedPerson) UI.showPersonnelModal(selectedPerson);
-            return;
-        }
-
-        const councilCard = e.target.closest('.student-council-card');
-        if (councilCard) {
-            const index = councilCard.dataset.index;
-            const selectedMember = Data.STATIC_STUDENT_COUNCIL_DATA[index];
-            if (selectedMember) UI.showStudentCouncilModal(selectedMember);
-            return;
-        }
-
-        const boardCard = e.target.closest('.school-board-card');
-        if (boardCard) {
-            const index = boardCard.dataset.index;
-            const selectedMember = Data.STATIC_SCHOOL_BOARD_DATA[index];
-            if (selectedMember) UI.showSchoolBoardModal(selectedMember);
-            return;
-        }
-
-        const innovationCard = e.target.closest('.innovation-card');
-        if (innovationCard) {
-            const index = innovationCard.dataset.index;
-            const selectedInnovation = currentlyDisplayedInnovations[index];
-            if (selectedInnovation) UI.showInnovationModal(selectedInnovation);
-            return;
-        }
-
-        const achievementCard = e.target.closest('.student-achievement-card');
-        if (achievementCard) {
-            const index = achievementCard.dataset.index;
-            const selectedAchievement = currentlyDisplayedStudentAchievements[index];
-            if (selectedAchievement) {
-                UI.showStudentAchievementModal(selectedAchievement);
-            }
-            return;
-        }
-        
-        const teacherAchievementCard = e.target.closest('.teacher-achievement-card');
-        if (teacherAchievementCard) {
-            const index = teacherAchievementCard.dataset.index;
-            const selectedAchievement = currentlyDisplayedTeacherAchievements[index];
-            if (selectedAchievement) {
-                UI.showTeacherAchievementModal(selectedAchievement);
-            }
-            return;
-        }
-    });
+async function getData(sheetName) {
+    if (cache[sheetName]) return cache[sheetName];
+    try {
+        const result = await fetchData(sheetName);
+        cache[sheetName] = result;
+        return result;
+    } catch (e) { console.error(e); return []; }
 }
