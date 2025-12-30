@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>โรงเรียนบ้านภูพระโนนผักหวาน</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script>
         tailwind.config = {
             theme: {
@@ -18,222 +20,292 @@
             }
         }
     </script>
-    <style>
-        /* CSS ธรรมดาที่ Browser เข้าใจแน่นอน */
-        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .hero-bg { 
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://placehold.co/1920x600/1e3a8a/ffffff?text=School+Background'); 
-            background-size: cover; 
-            background-position: center; 
+    <style type="text/tailwindcss">
+        body {
+            @apply font-sans bg-slate-50 text-slate-800;
         }
-        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
-        /* Animation */
-        @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px); }
+        /* ลิงก์เมนู */
+        .nav-link {
+            @apply text-slate-700 font-medium py-2 px-3 rounded-md transition-colors duration-200 hover:bg-blue-50 hover:text-blue-700 cursor-pointer select-none;
+        }
+        .nav-link.active {
+            @apply text-blue-600 font-bold bg-blue-50;
+        }
+        /* หัวข้อ */
+        .section-title {
+            @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4 mb-6;
+        }
+        /* การ์ด */
+        .card-hover {
+            @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+        }
+        /* Dropdown */
+        .dropdown-menu {
+            @apply hidden absolute bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50 mt-2 animate-fade-in;
+        }
+        .dropdown:hover .dropdown-menu {
+            @apply block;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+        .animate-fade-in {
+            animation: fade-in 0.2s ease-out forwards;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen font-sans">
+<body class="flex flex-col min-h-screen">
 
-    <header class="fixed w-full top-0 z-50 glass-nav shadow-sm transition-all duration-300" id="main-header">
+    <header class="bg-white shadow-sm sticky top-0 z-40">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-20">
-                <a href="#" onclick="showPage('home')" class="flex items-center gap-3 cursor-pointer">
-                    <img src="https://lh3.googleusercontent.com/pw/AP1GczPR-8FwYzuoQw-6o_gEugQ1Wwm1o3pgF_URm_aYB_XYEqkAauVHRrhnxC3VWVFE7q6_bOIr94lIAmcjVlwe_3m277WT7u7OZi76bAS_Xdud1U8Pkf1CvbKhFJu5WJJQT0IVV8XefEo29ULYx4qCC846=w456-h648-s-no?authuser=1" alt="Logo" class="h-12 w-12 object-contain">
+                <a href="#" data-page="home" class="flex items-center gap-3 group">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczPR-8FwYzuoQw-6o_gEugQ1Wwm1o3pgF_URm_aYB_XYEqkAauVHRrhnxC3VWVFE7q6_bOIr94lIAmcjVlwe_3m277WT7u7OZi76bAS_Xdud1U8Pkf1CvbKhFJu5WJJQT0IVV8XefEo29ULYx4qCC846=w456-h648-s-no?authuser=1" alt="Logo" class="h-12 w-12 object-contain group-hover:scale-105 transition">
                     <div class="hidden md:block">
                         <h1 class="text-xl font-bold text-blue-900 leading-tight">โรงเรียนบ้านภูพระโนนผักหวาน</h1>
                         <p class="text-xs text-gray-500">สพป.หนองบัวลำภู เขต 2</p>
                     </div>
                 </a>
 
-                <nav class="hidden md:flex items-center gap-1">
-                    <a href="#" data-page="home" class="text-gray-700 font-medium px-3 py-2 rounded hover:text-blue-600 hover:bg-blue-50 transition duration-300">หน้าแรก</a>
-                    
-                    <div class="relative group">
-                        <button class="text-gray-700 font-medium px-3 py-2 rounded hover:text-blue-600 hover:bg-blue-50 transition duration-300 flex items-center gap-1">
-                            โรงเรียน <i class="fa-solid fa-chevron-down text-xs"></i>
+                <nav id="main-nav" class="hidden lg:flex items-center gap-1">
+                    <a href="#" data-page="home" class="nav-link">หน้าแรก</a>
+
+                    <div class="relative dropdown group">
+                        <button class="nav-link dropdown-toggle flex items-center gap-1">
+                            โรงเรียน <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
                         </button>
-                        <div class="absolute hidden group-hover:block top-full left-0 bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50">
-                            <a href="#" data-page="history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-600">ประวัติโรงเรียน</a>
-                            <a href="#" data-page="info" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-600">ข้อมูลทั่วไป</a>
-                            <a href="#" data-page="board" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-600">คณะกรรมการสถานศึกษา</a>
+                        <div class="dropdown-menu">
+                            <a href="#" data-page="history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ประวัติความเป็นมา</a>
+                            <a href="#" data-page="info" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ข้อมูลทั่วไป</a>
+                            <a href="#" data-page="structure" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">โครงสร้างการบริหาร</a>
+                            <a href="#" data-page="school-board" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">คณะกรรมการสถานศึกษา</a>
+                            <a href="#" data-page="student-council" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">สภานักเรียน</a>
                         </div>
                     </div>
 
-                    <div class="relative group">
-                        <button class="text-gray-700 font-medium px-3 py-2 rounded hover:text-blue-600 hover:bg-blue-50 transition duration-300 flex items-center gap-1">
-                            บุคลากร <i class="fa-solid fa-chevron-down text-xs"></i>
+                    <div class="relative dropdown group">
+                        <button class="nav-link dropdown-toggle flex items-center gap-1">
+                            บุคลากร <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
                         </button>
-                        <div class="absolute hidden group-hover:block top-full left-0 bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50">
-                            <a href="#" data-page="personnel-list" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-600">คณะครูและบุคลากร</a>
-                            <a href="#" data-page="director_history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 hover:text-blue-600">ทำเนียบผู้บริหาร</a>
+                        <div class="dropdown-menu">
+                            <a href="#" data-page="personnel-list" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">บุคลากรปัจจุบัน</a>
+                            <a href="#" data-page="director-history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ทำเนียบผู้บริหาร</a>
+                            <a href="#" data-page="personnel-history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ทำเนียบบุคลากร</a>
                         </div>
                     </div>
 
-                    <a href="#" data-page="news" class="text-gray-700 font-medium px-3 py-2 rounded hover:text-blue-600 hover:bg-blue-50 transition duration-300">ข่าวสาร</a>
-                    <a href="#" data-page="student_awards" class="text-gray-700 font-medium px-3 py-2 rounded hover:text-blue-600 hover:bg-blue-50 transition duration-300">ผลงานนักเรียน</a>
+                    <a href="#" data-page="students" class="nav-link">นักเรียน</a>
+
+                    <div class="relative dropdown group">
+                        <button class="nav-link dropdown-toggle flex items-center gap-1">
+                            ผลงาน <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                        </button>
+                        <div class="dropdown-menu w-48">
+                            <a href="#" data-page="teacher-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานครู</a>
+                            <a href="#" data-page="student-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานนักเรียน</a>
+                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานสถานศึกษา</a>
+                        </div>
+                    </div>
+
+                    <a href="#" data-page="news" class="nav-link">ข่าวสาร</a>
                     
-                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-4 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-bold shadow-md transition transform hover:scale-105 flex items-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> ผู้ดูแลระบบ
+                    <div class="relative dropdown group">
+                        <button class="nav-link dropdown-toggle flex items-center gap-1">
+                            เอกสาร <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                        </button>
+                        <div class="dropdown-menu w-48 right-0">
+                            <a href="#" data-page="documents-official" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">เอกสารราชการ</a>
+                            <a href="#" data-page="documents-forms" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">แบบฟอร์ม</a>
+                        </div>
+                    </div>
+                    
+                    <a href="#" data-page="innovations" class="nav-link">นวัตกรรม</a>
+
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full font-bold shadow-md transition transform hover:scale-105 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-lock"></i>
                     </button>
                 </nav>
 
-                <button class="md:hidden text-gray-700 text-2xl" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <button class="lg:hidden text-gray-600 text-2xl focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
 
-            <div id="mobile-menu" class="hidden md:hidden bg-white border-t p-4 space-y-2 shadow-lg rounded-b-xl absolute left-0 right-0 top-20">
-                <a href="#" data-page="home" class="block py-2 text-gray-700 hover:text-blue-600">หน้าแรก</a>
-                <div class="border-t pt-2">
-                    <p class="text-xs text-gray-400 font-bold uppercase mb-1">โรงเรียน</p>
-                    <a href="#" data-page="history" class="block py-2 pl-4 text-gray-700 hover:text-blue-600">ประวัติโรงเรียน</a>
-                    <a href="#" data-page="info" class="block py-2 pl-4 text-gray-700 hover:text-blue-600">ข้อมูลทั่วไป</a>
-                </div>
-                <div class="border-t pt-2">
-                    <p class="text-xs text-gray-400 font-bold uppercase mb-1">บุคลากร</p>
-                    <a href="#" data-page="personnel-list" class="block py-2 pl-4 text-gray-700 hover:text-blue-600">คณะครู</a>
-                </div>
-                <a href="#" data-page="news" class="block py-2 text-gray-700 hover:text-blue-600 border-t">ข่าวสาร</a>
-                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full mt-2 bg-blue-600 text-white py-2 rounded-lg">ผู้ดูแลระบบ</button>
+            <div id="mobile-menu" class="hidden lg:hidden bg-gray-50 border-t p-4 space-y-2">
+                <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
+                <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ข่าวสาร</a>
+                <a href="#" data-page="personnel-list" class="block py-2 px-4 rounded hover:bg-white text-gray-700">บุคลากร</a>
+                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-2 px-4 text-blue-600 font-bold">เข้าสู่ระบบผู้ดูแล</button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow pt-20">
-        
-        <section id="page-home" class="page-content">
-            <div class="hero-bg h-[500px] flex items-center justify-center text-center text-white px-4 relative overflow-hidden">
-                <div class="relative z-10 max-w-3xl animate-fade-in-up">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">ยินดีต้อนรับสู่รั้ว "ภูพระ"</h1>
-                    <p class="text-lg md:text-xl font-light mb-8 text-blue-100">แหล่งเรียนรู้คู่คุณธรรม น้อมนำปรัชญาเศรษฐกิจพอเพียง</p>
-                    <a href="#" data-page="info" class="bg-yellow-400 text-blue-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-300 transition inline-block">
-                        รู้จักเราให้มากขึ้น
-                    </a>
-                </div>
-            </div>
-
-            <div class="container mx-auto px-4 py-12 -mt-20 relative z-20">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="md:col-span-2 bg-white rounded-2xl shadow-xl p-8 card-hover border border-gray-100">
-                        <div class="flex justify-between items-center mb-6 border-b pb-4">
-                            <h2 class="text-2xl font-bold text-blue-800"><i class="fa-solid fa-bullhorn mr-2"></i> ข่าวประชาสัมพันธ์</h2>
-                            <a href="#" data-page="news" class="text-blue-500 hover:text-blue-700 text-sm font-semibold">ดูทั้งหมด ></a>
-                        </div>
-                        <div id="home-news-container" class="space-y-4">
-                            <div class="text-center py-4 text-gray-400">กำลังโหลดข่าวสาร...</div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6">
-                         <div class="bg-white rounded-2xl shadow-xl p-6 text-center card-hover border border-gray-100">
-                             <img src="https://placehold.co/150x150/e2e8f0/64748b?text=Director" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-100 object-cover">
-                             <h3 class="font-bold text-lg text-gray-800">ผู้อำนวยการโรงเรียน</h3>
-                             <p class="text-sm text-gray-500 mb-4">นางสาวสุพิศน์ พันธุนันท์</p>
-                             <a href="#" data-page="director_history" class="text-blue-600 text-sm hover:underline">ดูทำเนียบผู้บริหาร</a>
-                         </div>
-
-                         <div class="bg-blue-600 rounded-2xl shadow-xl p-6 text-white text-center">
-                             <h3 class="font-bold text-xl mb-4">บริการออนไลน์</h3>
-                             <div class="grid grid-cols-2 gap-4">
-                                 <a href="#" data-page="documents-official" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition backdrop-blur-sm cursor-pointer">
-                                     <i class="fa-solid fa-file-pdf text-2xl mb-2"></i><br>เอกสาร
-                                 </a>
-                                 <a href="#" data-page="innovations" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition backdrop-blur-sm cursor-pointer">
-                                     <i class="fa-solid fa-lightbulb text-2xl mb-2"></i><br>นวัตกรรม
-                                 </a>
+    <div class="container mx-auto p-4 md:p-8 flex-grow">
+        <main id="main-content">
+            
+            <section id="page-home" class="page-content">
+                 <div class="space-y-8">
+                     <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl shadow-xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+                         <div class="relative z-10">
+                             <h2 class="text-3xl md:text-5xl font-bold mb-4">ยินดีต้อนรับสู่รั้ว "ภูพระ"</h2>
+                             <p class="text-blue-100 text-lg md:text-xl font-light">แหล่งเรียนรู้คู่คุณธรรม น้อมนำปรัชญาเศรษฐกิจพอเพียง</p>
+                             <div class="mt-8 flex justify-center gap-4">
+                                 <button data-page-link="info" class="bg-white text-blue-700 font-bold py-2 px-6 rounded-full hover:bg-yellow-300 hover:text-blue-800 transition shadow-lg">รู้จักเรา</button>
+                                 <button data-page-link="innovations" class="bg-blue-500 bg-opacity-30 border border-white text-white font-bold py-2 px-6 rounded-full hover:bg-white hover:text-blue-700 transition">นวัตกรรม</button>
                              </div>
                          </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                         <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+                     </div>
 
-        <section id="generic-page" class="hidden container mx-auto px-4 py-10 min-h-[60vh]">
-            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                <h2 id="page-title" class="text-3xl font-bold text-gray-800 mb-6 border-l-8 border-blue-500 pl-4">หัวข้อหน้า</h2>
-                <div id="page-content-area" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
-                <div id="loading-indicator" class="text-center py-20 hidden">
-                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-                    <p class="mt-4 text-gray-500">กำลังโหลดข้อมูล...</p>
-                </div>
-            </div>
-        </section>
+                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                         <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                             <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                    <span class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-regular fa-newspaper"></i></span>
+                                    ข่าวสารล่าสุด
+                                </h3>
+                                <button data-page-link="news" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                                     ดูทั้งหมด →
+                                </button>
+                             </div>
+                             <div id="home-news-container" class="space-y-3">
+                                 <div class="text-center py-10 text-gray-400">กำลังโหลดข้อมูล...</div>
+                             </div>
+                         </div>
+                         
+                         <div class="space-y-4">
+                             <div data-page-link="personnel-list" class="card-hover bg-white rounded-2xl shadow-md p-5 flex items-center gap-4 cursor-pointer border border-gray-50">
+                                 <div class="bg-purple-100 text-purple-600 rounded-xl w-12 h-12 flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">บุคลากร</h4>
+                                     <p class="text-xs text-gray-500">คณะครูและผู้บริหาร</p>
+                                 </div>
+                             </div>
+                             
+                             <div data-page-link="teacher-achievements" class="card-hover bg-white rounded-2xl shadow-md p-5 flex items-center gap-4 cursor-pointer border border-gray-50">
+                                 <div class="bg-yellow-100 text-yellow-600 rounded-xl w-12 h-12 flex items-center justify-center text-xl"><i class="fa-solid fa-trophy"></i></div>
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">ผลงานครู</h4>
+                                     <p class="text-xs text-gray-500">รางวัลและความภาคภูมิใจ</p>
+                                 </div>
+                             </div>
 
-        <section id="page-info" class="page-content hidden container mx-auto px-4 py-10">
-             <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                 <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">ข้อมูลทั่วไป</h2>
-                 <div id="info-content" class="space-y-8 prose max-w-none text-gray-600">
-                     <div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+                             <div data-page-link="documents-official" class="card-hover bg-white rounded-2xl shadow-md p-5 flex items-center gap-4 cursor-pointer border border-gray-50">
+                                 <div class="bg-red-100 text-red-600 rounded-xl w-12 h-12 flex items-center justify-center text-xl"><i class="fa-solid fa-file-pdf"></i></div>
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">เอกสาร</h4>
+                                     <p class="text-xs text-gray-500">ดาวน์โหลดเอกสารราชการ</p>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
                  </div>
-             </div>
-        </section>
+            </section>
+            
+            <section id="page-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ประวัติความเป็นมา</h2><p class="text-gray-500">เนื้อหา...</p></div></section>
+            <section id="page-info" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ข้อมูลทั่วไป</h2><p class="text-gray-500">เนื้อหา...</p></div></section>
+            <section id="page-structure" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">โครงสร้างการบริหาร</h2></div></section>
+            <section id="page-school-board" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2><div id="school-board-container" class="mt-4"></div></div></section>
+            <section id="page-student-council" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">สภานักเรียน</h2><div id="student-council-container" class="mt-4"></div></div></section>
+            
+            <section id="page-personnel-list" class="page-content hidden">
+                 <div class="bg-white rounded-2xl shadow p-8">
+                     <h2 class="section-title">บุคลากรปัจจุบัน</h2> 
+                     <div id="personnel-list-container" class="mt-6"></div>
+                     <p id="personnel-loading" class="text-center text-slate-500 mt-10">กำลังโหลดข้อมูล...</p>
+                 </div>
+            </section>
 
-        <section id="page-personnel-list" class="page-content hidden container mx-auto px-4 py-10">
-            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8 border-l-8 border-blue-500 pl-4">บุคลากรปัจจุบัน</h2>
-                <div id="personnel-list-container">
-                    <div class="text-center py-10"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+            <section id="page-director-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบผู้บริหาร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="director-history-table-body"></tbody></table></div></div></section>
+            <section id="page-personnel-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบบุคลากร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="personnel-history-table-body"></tbody></table></div></div></section>
+            
+            <section id="page-students" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <h2 class="section-title">ข้อมูลนักเรียน</h2>
+                    <div id="student-summary-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6"></div>
+                    <div class="h-[400px]"><canvas id="studentChart"></canvas></div>
                 </div>
-            </div>
-        </section>
+            </section>
+            
+            <section id="page-teacher-achievements" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                   <h2 class="section-title">ผลงานครู</h2>
+                   <div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+               </div>
+            </section>
+            
+            <section id="page-student-achievements" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                   <h2 class="section-title">ผลงานนักเรียน</h2>
+                   <div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+               </div>
+            </section>
 
-    </main>
+            <section id="page-school-achievements" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                   <h2 class="section-title">ผลงานสถานศึกษา</h2>
+                   <div id="school-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+               </div>
+            </section>
 
-    <footer class="bg-gray-900 text-white pt-16 pb-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-                <div>
-                    <h3 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">ติดต่อเรา</h3>
-                    <p class="text-gray-400 leading-relaxed">
-                        <i class="fa-solid fa-map-marker-alt mr-2"></i> โรงเรียนบ้านภูพระโนนผักหวาน<br>
-                        ต.บ้านพร้าว อ.เมือง จ.หนองบัวลำภู 39000
-                    </p>
+            <section id="page-news" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <h2 class="section-title">ข่าวประชาสัมพันธ์</h2>
+                    <div id="news-container" class="mt-6 space-y-4"></div>
                 </div>
-                <div>
-                    <h3 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">เมนูลัด</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" data-page="home" class="hover:text-white transition">หน้าแรก</a></li>
-                        <li><a href="#" data-page="news" class="hover:text-white transition">ข่าวประชาสัมพันธ์</a></li>
-                        <li><a href="#" data-page="personnel-list" class="hover:text-white transition">บุคลากร</a></li>
-                    </ul>
+            </section>
+            
+            <section id="page-documents-official" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <h2 class="section-title">เอกสารราชการ</h2>
+                    <input type="search" id="documents-official-search" placeholder="ค้นหา..." class="w-full p-2 border rounded mb-4">
+                    <div id="documents-official-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
-                <div>
-                    <h3 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">เกี่ยวกับระบบ</h3>
-                    <p class="text-gray-400 text-sm">
-                        พัฒนาระบบโดย: Krumin<br>
-                        Version 2.0 (Dynamic Cloud System)
-                    </p>
+            </section>
+
+            <section id="page-documents-forms" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <h2 class="section-title">แบบฟอร์ม</h2>
+                    <input type="search" id="documents-forms-search" placeholder="ค้นหา..." class="w-full p-2 border rounded mb-4">
+                    <div id="documents-forms-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
-            </div>
-            <div class="text-center text-gray-600 text-sm pt-8 border-t border-gray-800">
-                © 2025 Ban Phu Phra Non Phak Wan School. All rights reserved.
-            </div>
+            </section>
+
+            <section id="page-innovations" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <h2 class="section-title">คลังนวัตกรรม</h2>
+                    <input type="search" id="innovations-search-input" placeholder="ค้นหา..." class="w-full p-2 border rounded mb-6">
+                    <div id="innovations-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-300 py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 โรงเรียนบ้านภูพระโนนผักหวาน</p>
+            <p class="text-sm text-slate-500 mt-2">สพป.หนองบัวลำภู เขต 2</p>
         </div>
     </footer>
 
-    <div id="login-modal" class="fixed inset-0 bg-black/80 hidden z-[100] flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 relative animate-fade-in-up">
-            <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
-            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">เข้าสู่ระบบผู้ดูแล</h2>
+    <div id="login-modal" class="fixed inset-0 bg-black/80 hidden z-[100] flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 relative animate-fade-in">
+            <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">เข้าสู่ระบบ</h2>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <input type="text" id="username" placeholder="Username" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                 <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition">Login</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition">เข้าสู่ระบบ</button>
             </form>
         </div>
     </div>
     
-    <div id="detail-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-fade-in-up">
-            <button id="detail-modal-close-btn" class="absolute top-4 right-4 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-full w-8 h-8 flex items-center justify-center transition">
-                <i class="fa-solid fa-times"></i>
-            </button>
+    <div id="detail-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-fade-in">
+            <button id="detail-modal-close-btn" class="absolute top-4 right-4 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fa-solid fa-times"></i></button>
             <div id="detail-modal-content"></div>
         </div>
     </div>
