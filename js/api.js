@@ -1,14 +1,12 @@
-// ใส่ URL ของ Google Apps Script ที่ Deploy ล่าสุด
-const API_URL = 'https://script.google.com/macros/s/AKfycbz8FQ_Y05PRYEJJrYULFPYDUdpWJssiTgz2UTrq1gz11hVpEqE9xPqjmIaKM8xp67eUXA/exec';
+// js/api.js
+// ⚠️ เปลี่ยน URL ตรงนี้เป็น URL ล่าสุดที่คุณเพิ่ง Deploy แบบ "Anyone"
+const API_URL = 'https://script.google.com/macros/s/AKfycbz8FQ_Y05PRYEJJrYULFPYDUdpWJssiTgz2UTrq1gz11hVpEqE9xPqjmIaKM8xp67eUXA/exec'; 
 
+// ฟังก์ชันอื่นๆ คงเดิม...
 export async function fetchData(sheetName) {
-    if (!API_URL) return [];
-    try {
-        const response = await fetch(`${API_URL}?action=getData&sheet=${sheetName}`);
-        const data = await response.json();
-        return data.error ? [] : data;
-    } catch (error) {
-        console.error("API Error:", error);
-        return [];
-    }
+    if (!API_URL) throw new Error("API_URL is not configured.");
+    const response = await fetch(`${API_URL}?action=getData&sheet=${sheetName}`); // แก้ URL parameter ให้ตรงกับ Code.gs
+    const result = await response.json();
+    if (result.error) throw new Error(result.error);
+    return result; // แก้การ return ให้ตรงกับโครงสร้างข้อมูล
 }
