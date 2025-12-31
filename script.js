@@ -3,11 +3,40 @@ import * as UI from './js/ui.js';
 
 const cache = {};
 
+// ✅ 1. ตั้งค่า Script เล่นเพลง (Global Scope)
+// เพื่อให้ปุ่ม HTML onclick="toggleMusic()" มองเห็นฟังก์ชันนี้
+let isMusicPlaying = false;
+window.toggleMusic = function() {
+    const audio = document.getElementById('school-song');
+    const btnIcon = document.getElementById('music-icon');
+    const indicator = document.getElementById('music-indicator');
+    
+    if (!audio || !audio.src) return; // ถ้าไม่มีไฟล์เพลง ก็ไม่ทำอะไร
+
+    if (isMusicPlaying) {
+        audio.pause();
+        btnIcon.classList.remove('fa-pause');
+        btnIcon.classList.add('fa-play');
+        if(indicator) indicator.classList.add('hidden');
+    } else {
+        // Browser ส่วนใหญ่บล็อก autoplay ต้องมี user interaction ก่อนถึงจะเล่นได้
+        audio.play().catch(e => {
+            alert("กรุณาคลิกที่หน้าเว็บหนึ่งครั้งเพื่อให้เสียงเริ่มเล่นได้ครับ");
+            console.error(e);
+        });
+        btnIcon.classList.remove('fa-play');
+        btnIcon.classList.add('fa-pause');
+        if(indicator) indicator.classList.remove('hidden');
+    }
+    isMusicPlaying = !isMusicPlaying;
+};
+
+// 2. เริ่มทำงานเมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     showPage('home');
     
-    // ✅ โหลดข้อมูลโรงเรียน (VTR, Social) อัตโนมัติ
+    // ✅ โหลดข้อมูลโรงเรียน (เพลง, สี, VTR) ทันที
     loadData('school_info', UI.renderSchoolInfo);
 });
 
@@ -28,7 +57,6 @@ function handleMenuClick(e) {
         document.getElementById('mobile-menu').classList.add('hidden');
     }
     
-    // Shortcuts & Links
     const button = e.target.closest('button[data-page-link]');
     if(button) { e.preventDefault(); showPage(button.dataset.pageLink); }
     const card = e.target.closest('div[data-page-link]');
@@ -47,13 +75,11 @@ async function showPage(pageId) {
     switch (pageId) {
         case 'home': await loadData('news', UI.renderHomeNews); break;
         case 'news': await loadData('news', UI.renderNews); break;
-        // ✅ ใช้ renderPersonGrid สำหรับบุคลากร
         case 'personnel-list': await loadData('personnel', (data) => UI.renderPersonGrid(data, 'personnel-list-container')); break;
-        // ✅ เมนูใหม่
         case 'school-board': await loadData('school_board', (data) => UI.renderPersonGrid(data, 'school-board-container')); break;
         case 'student-council': await loadData('student_council', (data) => UI.renderPersonGrid(data, 'student-council-container')); break;
         case 'students': await loadData('student_data', UI.renderStudentChart); break;
-        // เมนูเดิม
+        case 'history': await loadData('school_info', UI.renderSchoolInfo); break; // ✅ หน้าประวัติก็โหลดข้อมูลโรงเรียน
         case 'director-history': await loadData('director_history', (data) => UI.renderHistoryTable('director-history-table-body', data)); break;
         case 'personnel-history': await loadData('personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data)); break;
         case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
