@@ -324,14 +324,14 @@
     <script type="module" src="script.js"></script>
 
     <script>
-        // ⚠️⚠️ ตั้งค่า Supabase ตรงนี้ (เอามาจาก Supabase Dashboard > Settings > API) ⚠️⚠️
-        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        // ⚠️⚠️ อย่าลืมใส่ค่า URL และ KEY ของคุณตรงนี้ ⚠️⚠️
+        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
-        // สร้าง Client
-        let supabase;
+        // ✅ เปลี่ยนชื่อตัวแปรเป็น supabaseClient เพื่อแก้ Error ชื่อซ้ำ
+        let supabaseClient;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(PROJECT_URL, ANON_KEY);
         } catch (e) {
             console.error("Supabase Init Error:", e);
         }
@@ -347,7 +347,8 @@
             btn.disabled = true;
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                // ใช้ supabaseClient แทน supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
@@ -360,6 +361,7 @@
 
             } catch (error) {
                 alert("เข้าสู่ระบบไม่สำเร็จ: " + error.message);
+                console.error(error);
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
