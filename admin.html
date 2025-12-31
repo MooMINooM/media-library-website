@@ -182,9 +182,13 @@
                 fields: [
                     { key: "title", label: "ชื่อนวัตกรรม", type: "text", required: true },
                     { key: "creator", label: "ผู้จัดทำ", type: "text" },
-                    { key: "category", label: "หมวดหมู่", type: "text" },
-                    { key: "coverImageUrl", label: "ลิงก์รูปปก", type: "url" },
-                    { key: "fileUrl", label: "ลิงก์ไฟล์/เว็บ", type: "url" }
+                    { key: "category", label: "หมวดหมู่ (เช่น สื่อการสอน, วิจัย)", type: "text" },
+                    // ✅ เพิ่ม 2 บรรทัดนี้ครับ
+                    { key: "subject", label: "วิชา", type: "text" }, 
+                    { key: "class", label: "ระดับชั้น (เช่น ป.1, ม.1)", type: "text" },
+                    // -----------------------
+                    { key: "coverImageUrl", label: "ลิงก์รูปปก (URL)", type: "url" },
+                    { key: "fileUrl", label: "ลิงก์ไฟล์/เว็บ (URL)", type: "url" }
                 ]
             }
         };
