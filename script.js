@@ -32,16 +32,15 @@ window.toggleMusic = function() {
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     showPage('home');
+    // โหลดข้อมูลโรงเรียนทันที เพื่อให้ VTR/Song/Footer มาก่อน
     loadData('school_info', UI.renderSchoolInfo);
 });
 
 function setupNavigation() {
-    // ✅ ดักฟังการคลิกทั้ง document เพื่อให้ปุ่มที่ไม่อยู่ใน Nav (เช่น ปุ่มลัดหน้า Home) ทำงานได้
     document.addEventListener('click', handleMenuClick);
 }
 
 function handleMenuClick(e) {
-    // 1. Link เมนูหลัก (Nav Link)
     const link = e.target.closest('a[data-page]');
     if (link) {
         e.preventDefault();
@@ -51,22 +50,10 @@ function handleMenuClick(e) {
         if(mobileMenu) mobileMenu.classList.add('hidden');
         return;
     }
-    
-    // 2. ✅ Card เมนูลัด (Shortcuts in Home)
     const card = e.target.closest('div[data-page-link]');
-    if(card) {
-         e.preventDefault();
-         showPage(card.dataset.pageLink);
-         return;
-    }
-
-    // 3. ปุ่มกดทั่วไป (Buttons)
+    if(card) { e.preventDefault(); showPage(card.dataset.pageLink); return; }
     const button = e.target.closest('button[data-page-link]');
-    if(button) {
-         e.preventDefault();
-         showPage(button.dataset.pageLink);
-         return;
-    }
+    if(button) { e.preventDefault(); showPage(button.dataset.pageLink); return; }
 }
 
 async function showPage(pageId) {
@@ -78,14 +65,18 @@ async function showPage(pageId) {
     const activeLink = document.querySelector(`a[data-page="${pageId}"]`);
     if (activeLink) activeLink.classList.add('active');
 
+    // โหลดข้อมูลตามหน้า
     switch (pageId) {
         case 'home': await loadData('news', UI.renderHomeNews); break;
         case 'news': await loadData('news', UI.renderNews); break;
+        // ใช้ renderPersonGrid ที่แก้ Logic แล้ว
         case 'personnel-list': await loadData('personnel', (data) => UI.renderPersonGrid(data, 'personnel-list-container')); break;
         case 'school-board': await loadData('school_board', (data) => UI.renderPersonGrid(data, 'school-board-container')); break;
         case 'student-council': await loadData('student_council', (data) => UI.renderPersonGrid(data, 'student-council-container')); break;
         case 'students': await loadData('student_data', UI.renderStudentChart); break;
+        // ✅ หน้า History ต้องโหลด school_info
         case 'history': await loadData('school_info', UI.renderSchoolInfo); break;
+        // อื่นๆ
         case 'director-history': await loadData('director_history', (data) => UI.renderHistoryTable('director-history-table-body', data)); break;
         case 'personnel-history': await loadData('personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data)); break;
         case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
@@ -106,5 +97,6 @@ async function loadData(tableName, renderCallback) {
             cache[tableName] = [];
         }
     }
+    // ส่งข้อมูลไป render
     if (typeof renderCallback === 'function') renderCallback(cache[tableName]);
 }
