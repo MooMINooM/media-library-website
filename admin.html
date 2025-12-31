@@ -217,7 +217,8 @@
             currentSection = section;
             const schema = SCHEMAS[section] || SCHEMAS['news'];
 
-            // UI: Highlight Menu
+        // UI: Highlight Menu
+        if (typeof event !== 'undefined' && event && event.currentTarget) {
             document.querySelectorAll('.menu-item').forEach(el => {
                 el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
                 el.classList.add('text-gray-700', 'hover:bg-blue-50');
