@@ -1,6 +1,6 @@
 // js/ui.js
 
-// 1. ข่าวหน้าแรก (5 รายการ)
+// 1. แสดงข่าวหน้าแรก (5 รายการ)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -13,7 +13,6 @@ export function renderHomeNews(newsList) {
     const limitNews = newsList.slice(0, 5);
     limitNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-        const linkUrl = (news.link && news.link !== '#') ? news.link : 'javascript:void(0)';
         const cursorClass = (news.link && news.link !== '#') ? 'cursor-pointer hover:bg-gray-50' : '';
         const div = document.createElement('div');
         div.className = `border-b border-gray-100 pb-3 mb-3 last:border-0 ${cursorClass} transition rounded p-2`;
@@ -31,7 +30,7 @@ export function renderHomeNews(newsList) {
     });
 }
 
-// 2. หน้าข่าวทั้งหมด
+// 2. แสดงข่าวทั้งหมด
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     if (!container) return;
@@ -65,34 +64,58 @@ export function renderNews(newsList) {
     });
 }
 
-// 3. หน้าบุคลากร
-export function renderPersonnelList(data) {
-    const container = document.getElementById('personnel-list-container');
+// 3. ✅ แสดงข้อมูลโรงเรียน (VTR + Social)
+export function renderSchoolInfo(dataList) {
+    if (!dataList || dataList.length === 0) return;
+    const info = dataList[0]; 
+
+    // VTR
+    const vtrContainer = document.getElementById('vtr-container');
+    const vtrIframe = document.getElementById('vtr-iframe');
+    if (info.vtr_url && vtrContainer && vtrIframe) {
+        let videoId = '';
+        if (info.vtr_url.includes('v=')) videoId = info.vtr_url.split('v=')[1].split('&')[0];
+        else if (info.vtr_url.includes('youtu.be/')) videoId = info.vtr_url.split('youtu.be/')[1];
+        
+        if (videoId) {
+            vtrIframe.src = `https://www.youtube.com/embed/${videoId}`;
+            vtrContainer.classList.remove('hidden');
+        }
+    }
+
+    // Social
+    const fbBtn = document.getElementById('footer-fb');
+    const ytBtn = document.getElementById('footer-yt');
+    if (info.facebook && fbBtn) { fbBtn.href = info.facebook; fbBtn.classList.remove('hidden'); }
+    if (info.youtube && ytBtn) { ytBtn.href = info.youtube; ytBtn.classList.remove('hidden'); }
+}
+
+// 4. ✅ แสดงตารางบุคคลแบบ Grid (ใช้กับ Personnel, School Board, Student Council)
+export function renderPersonGrid(data, containerId) {
+    const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
-    if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500">กำลังปรับปรุงข้อมูล</p>';
-        return;
-    }
+    if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
+
     const sortedData = [...data].sort((a, b) => a.id - b.id);
-    const directors = sortedData.filter(p => p.role && p.role.includes('ผู้อำนวยการ'));
-    const others = sortedData.filter(p => !p.role || !p.role.includes('ผู้อำนวยการ'));
-    const createCard = (p, isDirector = false) => `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1 ${isDirector ? 'border-blue-200 bg-blue-50/30' : ''}">
-            <div class="w-32 h-32 rounded-full overflow-hidden border-4 ${isDirector ? 'border-blue-200' : 'border-gray-100'} mb-4 shadow-inner bg-gray-200">
-                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user text-4xl"></i></div>'}
+    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
+    
+    sortedData.forEach(p => {
+        html += `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1">
+                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 mb-4 shadow-inner bg-gray-200">
+                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user text-4xl"></i></div>'}
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">${p.name}</h3>
+                <p class="text-blue-600 font-medium text-sm">${p.role}</p>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-1">${p.name}</h3>
-            <p class="text-blue-600 font-medium text-sm">${p.role}</p>
-        </div>
-    `;
-    let html = '';
-    if (directors.length > 0) { html += '<div class="flex justify-center mb-10 gap-6 flex-wrap">'; directors.forEach(d => html += createCard(d, true)); html += '</div>'; }
-    if (others.length > 0) { html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">'; others.forEach(p => html += createCard(p)); html += '</div>'; }
+        `;
+    });
+    html += '</div>';
     container.innerHTML = html;
 }
 
-// 4. ตารางประวัติ
+// 5. แสดงประวัติ (Table)
 export function renderHistoryTable(tbodyId, data) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -112,7 +135,7 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
-// 5. ผลงานต่างๆ
+// 6. ผลงาน (Achievements)
 function renderAchievements(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -141,7 +164,7 @@ export function renderTeacherAchievements(data) { renderAchievements('teacher-ac
 export function renderStudentAchievements(data) { renderAchievements('student-achievements-container', data, 'student'); }
 export function renderSchoolAchievements(data) { renderAchievements('school-achievements-container', data, 'school'); }
 
-// 6. นวัตกรรม
+// 7. นวัตกรรม
 export function renderInnovations(data) {
     const container = document.getElementById('innovations-container');
     if (!container) return;
@@ -170,7 +193,7 @@ export function renderInnovations(data) {
     });
 }
 
-// 7. เอกสาร
+// 8. เอกสาร
 export function renderDocuments(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -194,17 +217,13 @@ export function renderDocuments(data, containerId) {
     });
 }
 
-// ✅ 8. กราฟนักเรียน (ใหม่ล่าสุด)
+// 9. ✅ กราฟข้อมูลนักเรียน
 export function renderStudentChart(data) {
     const container = document.getElementById('student-summary-container');
     const chartCanvas = document.getElementById('studentChart');
-    if (!data || data.length === 0) {
-        if(container) container.innerHTML = '<p class="text-center text-gray-400 col-span-3">ยังไม่มีข้อมูลนักเรียน</p>';
-        return;
-    }
+    if (!data || data.length === 0) { if(container) container.innerHTML = '<p class="text-center text-gray-400 col-span-3">ยังไม่มีข้อมูลนักเรียน</p>'; return; }
 
-    data.sort((a, b) => a.id - b.id); // เรียงตาม ID
-
+    data.sort((a, b) => a.id - b.id);
     let totalMale = 0, totalFemale = 0;
     data.forEach(d => { totalMale += parseInt(d.male || 0); totalFemale += parseInt(d.female || 0); });
 
@@ -222,10 +241,7 @@ export function renderStudentChart(data) {
             type: 'bar',
             data: {
                 labels: data.map(d => d.grade),
-                datasets: [
-                    { label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#3b82f6', borderRadius: 4 },
-                    { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 4 }
-                ]
+                datasets: [ { label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#3b82f6', borderRadius: 4 }, { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 4 } ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -236,6 +252,6 @@ export function renderStudentChart(data) {
     }
 }
 
-export function setupDropdowns() { /* (ถ้ามีโค้ดเดิมก็ใส่ไว้ตรงนี้) */ }
-export function setupModal() { /* (ถ้ามีโค้ดเดิมก็ใส่ไว้ตรงนี้) */ }
+export function setupDropdowns() {}
+export function setupModal() {}
 export function closeAllDropdowns() { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden')); }
