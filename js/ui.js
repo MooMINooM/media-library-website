@@ -1,39 +1,49 @@
 // js/ui.js
 
-// 1. แสดงข่าวหน้าแรก (5 รายการล่าสุด)
+// 1. ✅ แสดงข่าวหน้าแรก (แก้ให้เหลือ 4 รายการ)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
     container.innerHTML = '';
     
     if (!newsList || newsList.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-400 py-4">ยังไม่มีข่าวประชาสัมพันธ์</p>';
+        container.innerHTML = '<p class="text-center text-gray-400 py-4 text-sm">ยังไม่มีข่าวประชาสัมพันธ์</p>';
         return;
     }
-    // ✅ เรียงใหม่ไปเก่า (ID มากไปน้อย)
+    
+    // เรียงจาก ใหม่ -> เก่า
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
-    const limitNews = sortedNews.slice(0, 5);
+    
+    // ✅ ตัดให้เหลือแค่ 4 อันล่าสุด (เพื่อให้ความสูงพอดีกับเมนูด่วน)
+    const limitNews = sortedNews.slice(0, 4);
 
     limitNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
         const cursorClass = (news.link && news.link !== '#') ? 'cursor-pointer hover:bg-gray-50' : '';
+        
         const div = document.createElement('div');
-        div.className = `border-b border-gray-100 pb-3 mb-3 last:border-0 ${cursorClass} transition rounded p-2`;
+        div.className = `border-b border-gray-100 pb-3 mb-2 last:border-0 last:mb-0 last:pb-0 ${cursorClass} transition rounded p-2 flex gap-3`;
         div.onclick = () => { if(news.link && news.link !== '#') window.open(news.link, '_blank'); };
+        
         div.innerHTML = `
-            <div class="flex justify-between items-start gap-2">
-                <div class="flex-1">
-                    <h4 class="text-sm font-bold text-gray-700 line-clamp-2">${news.title}</h4>
-                    <p class="text-xs text-gray-400 mt-1"><i class="fa-regular fa-clock"></i> ${dateStr}</p>
-                </div>
-                ${news.image ? `<img src="${news.image}" class="w-16 h-12 object-cover rounded-md bg-gray-200">` : ''}
+            <div class="flex-shrink-0 w-16 h-12 bg-gray-100 rounded-md overflow-hidden">
+                ${news.image 
+                    ? `<img src="${news.image}" class="w-full h-full object-cover">` 
+                    : `<div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-regular fa-image"></i></div>`
+                }
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-bold text-gray-700 line-clamp-1">${news.title}</h4>
+                <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <i class="fa-regular fa-clock"></i> ${dateStr}
+                </p>
             </div>
         `;
         container.appendChild(div);
     });
 }
 
-// 2. แสดงข่าวทั้งหมด
+// 2. แสดงข่าวทั้งหมด (หน้าข่าวสารรวม)
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     if (!container) return;
@@ -42,7 +52,7 @@ export function renderNews(newsList) {
         container.innerHTML = '<div class="text-center p-10 bg-gray-50 rounded-xl text-gray-500">ไม่พบข่าวสาร</div>';
         return;
     }
-    // ✅ เรียงใหม่ไปเก่า
+    // เรียงใหม่ไปเก่า
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
 
     sortedNews.forEach(news => {
@@ -70,16 +80,14 @@ export function renderNews(newsList) {
     });
 }
 
-// 3. แสดงข้อมูลโรงเรียน (แก้ไขเรื่องประวัติหาย)
+// 3. แสดงข้อมูลโรงเรียน
 export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
-    // Hero Text
     const mottoEl = document.getElementById('hero-motto');
     if(mottoEl && info.motto) mottoEl.innerText = info.motto;
 
-    // School Age
     if (info.founding_date) {
         const founded = new Date(info.founding_date);
         const now = new Date();
@@ -88,7 +96,6 @@ export function renderSchoolInfo(dataList) {
         if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
-    // Identity Badge
     if(info.identity) {
         const idBadge = document.getElementById('school-identity');
         if(idBadge) {
@@ -97,7 +104,6 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
-    // VTR
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -113,7 +119,6 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
-    // Color Box
     const colorBox = document.getElementById('school-color-box');
     if(colorBox) {
         const c1 = info.color_code || '#ddd';
@@ -122,7 +127,6 @@ export function renderSchoolInfo(dataList) {
         colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
     }
 
-    // Music
     const audio = document.getElementById('school-song');
     if (info.song_url && audio) {
         audio.src = info.song_url;
@@ -130,8 +134,6 @@ export function renderSchoolInfo(dataList) {
         if(controls) controls.classList.remove('hidden');
     }
 
-    // ✅ เนื้อหาหน้าประวัติ (History Page Content)
-    // ตรงนี้สำคัญครับ ต้องเช็คว่า ID ตรงกับใน HTML ไหม
     const histContent = document.getElementById('school-history-content');
     if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติในระบบ';
     
@@ -141,7 +143,6 @@ export function renderSchoolInfo(dataList) {
     const identityContent = document.getElementById('school-identity-content');
     if(identityContent) identityContent.innerText = info.identity || '-';
 
-    // Social Links
     const fbBtn = document.getElementById('footer-fb');
     const ytBtn = document.getElementById('footer-yt');
     if (info.facebook && fbBtn) { fbBtn.href = info.facebook; fbBtn.classList.remove('hidden'); }
@@ -151,21 +152,17 @@ export function renderSchoolInfo(dataList) {
     if(footerName && info.school_name) footerName.innerText = info.school_name;
 }
 
-// 4. ✅ แสดงตารางบุคคลแบบ Grid (แก้ไข: ประธานอยู่กลางเดี่ยวๆ)
+// 4. แสดงตารางบุคคล (ประธานอยู่กลาง)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
 
-    // เรียงตาม ID น้อยไปมาก (1, 2, 3...)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
-    
-    // แยกคนแรก (ประธาน ID=1) ออกมา
     const leader = sortedData[0]; 
     const others = sortedData.slice(1);
 
-    // Helper สร้างการ์ด
     const createCard = (p) => `
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1 h-full">
             <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 mb-4 shadow-inner bg-gray-200">
@@ -177,27 +174,12 @@ export function renderPersonGrid(data, containerId) {
     `;
 
     let html = '';
-
-    // 1. แสดงประธาน (แถวแรก ตรงกลาง)
-    if (leader) {
-        html += `
-            <div class="flex justify-center mb-8">
-                <div class="w-full max-w-xs">
-                    ${createCard(leader)}
-                </div>
-            </div>
-        `;
-    }
-
-    // 2. แสดงคนที่เหลือ (Grid 4 คอลัมน์)
+    if (leader) html += `<div class="flex justify-center mb-8"><div class="w-full max-w-xs">${createCard(leader)}</div></div>`;
     if (others.length > 0) {
         html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
-        others.forEach(p => {
-            html += createCard(p);
-        });
+        others.forEach(p => html += createCard(p));
         html += '</div>';
     }
-
     container.innerHTML = html;
 }
 
@@ -208,9 +190,7 @@ export function renderHistoryTable(tbodyId, data) {
     tbody.innerHTML = '';
     if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">ไม่มีข้อมูล</td></tr>'; return; }
     
-    // เรียง ID น้อยไปมาก (คนเก่า -> คนใหม่)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
-
     sortedData.forEach((item, index) => {
         const timeStr = item.year || `${item.start_date || '-'} ถึง ${item.end_date || 'ปัจจุบัน'}`;
         const tr = document.createElement('tr');
@@ -225,16 +205,14 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
-// 6. ผลงาน (Achievements)
+// 6. ผลงาน
 function renderAchievements(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีข้อมูลผลงาน</div>'; return; }
     
-    // ✅ เรียงใหม่ไปเก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
-
     sortedData.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { month: 'short', year: 'numeric' }) : '';
         const subtitle = type === 'teacher' ? (item.level || '') : (item.students || item.date || '');
@@ -265,9 +243,7 @@ export function renderInnovations(data) {
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center text-gray-500">ไม่พบนวัตกรรม</div>'; return; }
     
-    // ✅ เรียงใหม่ไปเก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
-
     sortedData.forEach(item => {
         const div = document.createElement('div');
         div.className = "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden";
@@ -298,9 +274,7 @@ export function renderDocuments(data, containerId) {
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">ไม่พบเอกสาร</div>'; return; }
     
-    // ✅ เรียงใหม่ไปเก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
-
     sortedData.forEach(doc => {
         const dateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString('th-TH') : '-';
         const icon = doc.title.includes('PDF') ? 'fa-file-pdf text-red-500' : (doc.title.includes('Word') ? 'fa-file-word text-blue-500' : 'fa-file-lines text-gray-500');
