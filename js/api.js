@@ -1,12 +1,39 @@
-// js/api.js
-// ⚠️ เปลี่ยน URL ตรงนี้เป็น URL ล่าสุดที่คุณเพิ่ง Deploy แบบ "Anyone"
-const API_URL = 'https://script.google.com/macros/s/AKfycbx0JR74pvjdbcSu8GfHRQQudUb4IO-rDQsJkkZQnL704LXm2PLW_DSJcm34LjCteFBD8g/exec'; 
+// js/api.js - เชื่อมต่อ Supabase
 
-// ฟังก์ชันอื่นๆ คงเดิม...
-export async function fetchData(sheetName) {
-    if (!API_URL) throw new Error("API_URL is not configured.");
-    const response = await fetch(`${API_URL}?action=getData&sheet=${sheetName}`); // แก้ URL parameter ให้ตรงกับ Code.gs
-    const result = await response.json();
-    if (result.error) throw new Error(result.error);
-    return result; // แก้การ return ให้ตรงกับโครงสร้างข้อมูล
+// ⚠️⚠️ ตั้งค่า Supabase ตรงนี้ (เอามาจาก Supabase Dashboard) ⚠️⚠️
+const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; // เปลี่ยนตรงนี้
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';         // เปลี่ยนตรงนี้ (ที่เป็น anon/public)
+
+// สร้าง Client
+let _supabase = null;
+if (typeof supabase !== 'undefined') {
+    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} else {
+    console.error('Supabase library not loaded! Check index.html');
+}
+
+export async function fetchData(tableName) {
+    if (!_supabase) return [];
+
+    // แปลงชื่อให้ตรงกับ Table ใน Supabase (ต้องตัวพิมพ์เล็กทั้งหมดตามมาตรฐาน Supabase)
+    // เช่น 'News' -> 'news'
+    const table = tableName.toLowerCase();
+
+    try {
+        // ดึงข้อมูลทั้งหมด
+        let { data, error } = await _supabase
+            .from(table)
+            .select('*')
+            .order('id', { ascending: true }); // เรียงตาม ID หรือ date ก็ได้
+
+        if (error) {
+            console.error(`Error fetching ${table}:`, error.message);
+            return [];
+        }
+        
+        return data;
+    } catch (err) {
+        console.error("System Error:", err);
+        return [];
+    }
 }
