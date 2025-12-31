@@ -126,11 +126,10 @@
     </div>
 
     <script>
-        // ⚠️⚠️⚠️ สำคัญ: ใส่ URL และ KEY ของคุณตรงนี้อีกครั้งครับ ⚠️⚠️⚠️
+        // ⚠️⚠️⚠️ ใส่ URL และ KEY ของ Supabase ตรงนี้อีกครั้งนะครับ ⚠️⚠️⚠️
         const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
         
-        // ✅ เปลี่ยนชื่อตัวแปรเป็น supabaseAdmin เพื่อไม่ให้ชนกับ Library
         let supabaseAdmin;
         try {
             supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -177,16 +176,15 @@
                     { key: "image", label: "ลิงก์รูปภาพ", type: "url" }
                 ]
             },
+            // ✅ ปรับปรุงส่วนนวัตกรรม เพิ่ม subject และ class
             innovations: {
                 title: "นวัตกรรม",
                 fields: [
                     { key: "title", label: "ชื่อนวัตกรรม", type: "text", required: true },
                     { key: "creator", label: "ผู้จัดทำ", type: "text" },
-                    { key: "category", label: "หมวดหมู่ (เช่น สื่อการสอน, วิจัย)", type: "text" },
-                    // ✅ เพิ่ม 2 บรรทัดนี้ครับ
-                    { key: "subject", label: "วิชา", type: "text" }, 
-                    { key: "class", label: "ระดับชั้น (เช่น ป.1, ม.1)", type: "text" },
-                    // -----------------------
+                    { key: "category", label: "หมวดหมู่", type: "text" },
+                    { key: "subject", label: "วิชา", type: "text" }, // เพิ่มใหม่
+                    { key: "class", label: "ระดับชั้น", type: "text" }, // เพิ่มใหม่
                     { key: "coverImageUrl", label: "ลิงก์รูปปก (URL)", type: "url" },
                     { key: "fileUrl", label: "ลิงก์ไฟล์/เว็บ (URL)", type: "url" }
                 ]
@@ -198,17 +196,18 @@
 
         // --- Authentication Check ---
         async function checkAuth() {
-            // ใช้ supabaseAdmin แทน
-            const { data: { session } } = await supabaseAdmin.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
+            try {
+                const { data: { session } } = await supabaseAdmin.auth.getSession();
+                if (!session) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                document.getElementById('user-email').innerText = session.user.email;
+            } catch (e) {
+                console.error("Auth check failed", e);
             }
-            document.getElementById('user-email').innerText = session.user.email;
         }
-        
-        // เรียกตรวจสอบทันที (หุ้มด้วย try-catch เพื่อความปลอดภัย)
-        try { checkAuth(); } catch(e) { console.error(e); }
+        checkAuth();
 
         async function logout() {
             await supabaseAdmin.auth.signOut();
@@ -221,14 +220,15 @@
             currentSection = section;
             const schema = SCHEMAS[section] || SCHEMAS['news'];
 
-        // UI: Highlight Menu
-        if (typeof event !== 'undefined' && event && event.currentTarget) {
-            document.querySelectorAll('.menu-item').forEach(el => {
-                el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-                el.classList.add('text-gray-700', 'hover:bg-blue-50');
-            });
-            event.currentTarget.classList.remove('text-gray-700', 'hover:bg-blue-50');
-            event.currentTarget.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+            // UI: Highlight Menu (✅ แก้ไขจุดที่ทำให้ Error: เช็คก่อนว่ามี event หรือไม่)
+            if (typeof event !== 'undefined' && event && event.currentTarget) {
+                 document.querySelectorAll('.menu-item').forEach(el => {
+                    el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                    el.classList.add('text-gray-700', 'hover:bg-blue-50');
+                });
+                event.currentTarget.classList.remove('text-gray-700', 'hover:bg-blue-50');
+                event.currentTarget.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+            }
 
             // UI: Loading
             const main = document.getElementById('main-area');
@@ -242,7 +242,11 @@
 
             if (error) {
                 console.error("Fetch Error:", error);
-                main.innerHTML = `<div class="text-center text-red-500 py-10">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}<br>กรุณาตรวจสอบว่าสร้าง Table ชื่อ '${section}' ใน Supabase แล้วหรือยัง</div>`;
+                main.innerHTML = `<div class="text-center text-red-500 py-10">
+                    <p class="font-bold text-xl mb-2">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
+                    <p class="text-sm bg-red-50 p-2 rounded inline-block text-red-600 border border-red-200">${error.message}</p>
+                    <p class="mt-4 text-gray-500">คำแนะนำ: ตรวจสอบว่าสร้าง Table ชื่อ <b>'${section}'</b> ใน Supabase แล้วหรือยัง</p>
+                </div>`;
                 return;
             }
 
