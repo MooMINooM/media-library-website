@@ -126,20 +126,20 @@
     </div>
 
     <script>
-        // ⚠️⚠️ ตั้งค่า Supabase ตรงนี้ (เอามาจาก Dashboard) ⚠️⚠️
-        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        // ⚠️⚠️⚠️ สำคัญ: ใส่ URL และ KEY ของคุณตรงนี้อีกครั้งครับ ⚠️⚠️⚠️
+        const SUPABASE_URL = 'ใส่_SUPABASE_URL_ที่นี่';
+        const SUPABASE_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
         
-        let supabase;
+        // ✅ เปลี่ยนชื่อตัวแปรเป็น supabaseAdmin เพื่อไม่ให้ชนกับ Library
+        let supabaseAdmin;
         try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         } catch(e) {
             console.error("Supabase Init Error:", e);
-            Swal.fire("System Error", "ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error");
+            Swal.fire("System Error", "ไม่สามารถเชื่อมต่อฐานข้อมูลได้: " + e.message, "error");
         }
 
         // --- Configuration (Schemas) ---
-        // กำหนดโครงสร้างข้อมูลของแต่ละตารางเพื่อให้สร้างฟอร์มอัตโนมัติ
         const SCHEMAS = {
             news: {
                 title: "ข่าวประชาสัมพันธ์",
@@ -194,19 +194,20 @@
 
         // --- Authentication Check ---
         async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
+            // ใช้ supabaseAdmin แทน
+            const { data: { session } } = await supabaseAdmin.auth.getSession();
             if (!session) {
-                // ถ้ายังไม่ล็อกอิน ให้ดีดกลับไปหน้าแรก
                 window.location.href = 'index.html';
                 return;
             }
-            // แสดงอีเมลผู้ใช้
             document.getElementById('user-email').innerText = session.user.email;
         }
-        checkAuth(); // เรียกทันทีที่เปิดหน้า
+        
+        // เรียกตรวจสอบทันที (หุ้มด้วย try-catch เพื่อความปลอดภัย)
+        try { checkAuth(); } catch(e) { console.error(e); }
 
         async function logout() {
-            await supabase.auth.signOut();
+            await supabaseAdmin.auth.signOut();
             window.location.href = 'index.html';
         }
 
@@ -229,15 +230,14 @@
             main.innerHTML = `<div class="h-full flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500"></i></div>`;
 
             // Data: Fetch from Supabase
-            // ใช้ชื่อตารางตาม section (news, personnel)
-            const { data, error } = await supabase
+            const { data, error } = await supabaseAdmin
                 .from(section)
                 .select('*')
-                .order('id', { ascending: false }); // เอาข้อมูลใหม่ขึ้นก่อน
+                .order('id', { ascending: false });
 
             if (error) {
                 console.error("Fetch Error:", error);
-                main.innerHTML = `<div class="text-center text-red-500 py-10">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</div>`;
+                main.innerHTML = `<div class="text-center text-red-500 py-10">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}<br>กรุณาตรวจสอบว่าสร้าง Table ชื่อ '${section}' ใน Supabase แล้วหรือยัง</div>`;
                 return;
             }
 
@@ -247,7 +247,7 @@
 
         function renderTable(schema) {
             const main = document.getElementById('main-area');
-            const displayKey = schema.fields[0].key; // ใช้ฟิลด์แรกเป็นหัวข้อหลัก
+            const displayKey = schema.fields[0].key;
 
             let html = `
                 <div class="animate-fade-in">
@@ -277,10 +277,9 @@
                 html += `<tr><td colspan="3" class="px-6 py-10 text-center text-gray-400">ยังไม่มีข้อมูลในระบบ</td></tr>`;
             } else {
                 currentData.forEach(item => {
-                    // สร้างสรุปข้อมูล (เอา 2 ฟิลด์แรกมาโชว์)
                     let summary = '';
                     if (schema.fields[1]) {
-                        summary = `<div class="text-sm text-gray-500">${item[schema.fields[1].key] || '-'}</div>`;
+                        summary = `<div class="text-sm text-gray-500 truncate max-w-xs">${item[schema.fields[1].key] || '-'}</div>`;
                     }
 
                     html += `
@@ -320,7 +319,6 @@
                 item = currentData.find(d => d.id == id) || {};
             }
 
-            // Generate Form Fields
             container.innerHTML = schema.fields.map(f => {
                 let inputHtml = '';
                 const value = item[f.key] || '';
@@ -370,10 +368,9 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             const id = data.id;
-            delete data.id; // เอา ID ออกจากข้อมูลที่จะบันทึก
+            delete data.id;
 
-            // แสดง Loading ที่ปุ่ม
-            const btn = document.querySelector('#modal button[type="button"]'); // ปุ่มบันทึก
+            const btn = document.querySelector('#modal button[type="button"]');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
             btn.disabled = true;
@@ -382,10 +379,10 @@
                 let error;
                 if (id) {
                     // Update
-                    ({ error } = await supabase.from(currentSection).update(data).eq('id', id));
+                    ({ error } = await supabaseAdmin.from(currentSection).update(data).eq('id', id));
                 } else {
                     // Insert
-                    ({ error } = await supabase.from(currentSection).insert([data]));
+                    ({ error } = await supabaseAdmin.from(currentSection).insert([data]));
                 }
 
                 if (error) throw error;
@@ -398,9 +395,10 @@
                 });
                 
                 closeModal();
-                loadSection(currentSection); // โหลดข้อมูลใหม่
+                loadSection(currentSection);
 
             } catch (err) {
+                console.error(err);
                 Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
             } finally {
                 btn.innerHTML = originalText;
@@ -421,7 +419,7 @@
             });
 
             if (result.isConfirmed) {
-                const { error } = await supabase.from(currentSection).delete().eq('id', id);
+                const { error } = await supabaseAdmin.from(currentSection).delete().eq('id', id);
                 
                 if (error) {
                     Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
