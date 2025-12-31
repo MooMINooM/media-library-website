@@ -1,6 +1,6 @@
 // js/ui.js
 
-// 1. แสดงข่าวหน้าแรก (5 รายการ)
+// 1. แสดงข่าวหน้าแรก (5 รายการล่าสุด)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -10,7 +10,10 @@ export function renderHomeNews(newsList) {
         container.innerHTML = '<p class="text-center text-gray-400 py-4">ยังไม่มีข่าวประชาสัมพันธ์</p>';
         return;
     }
-    const limitNews = newsList.slice(0, 5);
+    // ✅ เรียงใหม่ไปเก่า (ID มากไปน้อย)
+    const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
+    const limitNews = sortedNews.slice(0, 5);
+
     limitNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
         const cursorClass = (news.link && news.link !== '#') ? 'cursor-pointer hover:bg-gray-50' : '';
@@ -39,7 +42,10 @@ export function renderNews(newsList) {
         container.innerHTML = '<div class="text-center p-10 bg-gray-50 rounded-xl text-gray-500">ไม่พบข่าวสาร</div>';
         return;
     }
-    newsList.forEach(news => {
+    // ✅ เรียงใหม่ไปเก่า
+    const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
+
+    sortedNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
         const linkTarget = (news.link && news.link !== '#') ? `href="${news.link}" target="_blank"` : 'href="javascript:void(0)" style="cursor: default;"';
         const div = document.createElement('div');
@@ -64,16 +70,16 @@ export function renderNews(newsList) {
     });
 }
 
-// 3. ✅ แสดงข้อมูลโรงเรียน (VTR, สี, เพลง, ประวัติ)
+// 3. แสดงข้อมูลโรงเรียน (แก้ไขเรื่องประวัติหาย)
 export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
-    // 3.1 ข้อความ Hero Section
+    // Hero Text
     const mottoEl = document.getElementById('hero-motto');
     if(mottoEl && info.motto) mottoEl.innerText = info.motto;
 
-    // 3.2 คำนวณอายุโรงเรียน
+    // School Age
     if (info.founding_date) {
         const founded = new Date(info.founding_date);
         const now = new Date();
@@ -82,7 +88,7 @@ export function renderSchoolInfo(dataList) {
         if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
-    // 3.3 อัตลักษณ์ (โชว์ที่ Hero ด้วยถ้ามี)
+    // Identity Badge
     if(info.identity) {
         const idBadge = document.getElementById('school-identity');
         if(idBadge) {
@@ -91,7 +97,7 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
-    // 3.4 VTR (แปลง Link Youtube)
+    // VTR
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -102,34 +108,32 @@ export function renderSchoolInfo(dataList) {
         if (videoId) {
             vtrIframe.src = `https://www.youtube.com/embed/${videoId}`;
             vtrContainer.classList.remove('hidden');
-            // ซ่อน Placeholder
             const ph = document.getElementById('vtr-placeholder');
             if(ph) ph.style.display = 'none';
         }
     }
 
-    // 3.5 ✅ สีประจำโรงเรียน (รองรับ 2 สี)
+    // Color Box
     const colorBox = document.getElementById('school-color-box');
     if(colorBox) {
         const c1 = info.color_code || '#ddd';
-        const c2 = info.color_code_2 || c1; // ถ้าไม่มีสี 2 ให้ใช้สี 1 (เป็นสีล้วน)
-        // แบ่งครึ่งเฉียง หรือ ตรงๆ ก็ได้ (อันนี้เอาแบบตรง 50/50)
+        const c2 = info.color_code_2 || c1;
         colorBox.style.background = `linear-gradient(to right, ${c1} 50%, ${c2} 50%)`;
         colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
     }
 
-    // 3.6 ✅ เพลงมาร์ช
+    // Music
     const audio = document.getElementById('school-song');
     if (info.song_url && audio) {
         audio.src = info.song_url;
-        // โชว์ปุ่มควบคุมเพลง
         const controls = document.getElementById('music-player-controls');
         if(controls) controls.classList.remove('hidden');
     }
 
-    // 3.7 เนื้อหาประวัติ / พันธกิจ
+    // ✅ เนื้อหาหน้าประวัติ (History Page Content)
+    // ตรงนี้สำคัญครับ ต้องเช็คว่า ID ตรงกับใน HTML ไหม
     const histContent = document.getElementById('school-history-content');
-    if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติ';
+    if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติในระบบ';
     
     const missionContent = document.getElementById('school-mission-content');
     if(missionContent) missionContent.innerText = info.mission || '-';
@@ -137,39 +141,63 @@ export function renderSchoolInfo(dataList) {
     const identityContent = document.getElementById('school-identity-content');
     if(identityContent) identityContent.innerText = info.identity || '-';
 
-    // 3.8 Social Links (Footer)
+    // Social Links
     const fbBtn = document.getElementById('footer-fb');
     const ytBtn = document.getElementById('footer-yt');
     if (info.facebook && fbBtn) { fbBtn.href = info.facebook; fbBtn.classList.remove('hidden'); }
     if (info.youtube && ytBtn) { ytBtn.href = info.youtube; ytBtn.classList.remove('hidden'); }
     
-    // ชื่อโรงเรียนที่ Footer
     const footerName = document.getElementById('footer-school-name');
     if(footerName && info.school_name) footerName.innerText = info.school_name;
 }
 
-// 4. แสดงตารางบุคคลแบบ Grid (Personnel, Board, Council)
+// 4. ✅ แสดงตารางบุคคลแบบ Grid (แก้ไข: ประธานอยู่กลางเดี่ยวๆ)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
 
+    // เรียงตาม ID น้อยไปมาก (1, 2, 3...)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
-    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
     
-    sortedData.forEach(p => {
+    // แยกคนแรก (ประธาน ID=1) ออกมา
+    const leader = sortedData[0]; 
+    const others = sortedData.slice(1);
+
+    // Helper สร้างการ์ด
+    const createCard = (p) => `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1 h-full">
+            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 mb-4 shadow-inner bg-gray-200">
+                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user text-4xl"></i></div>'}
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">${p.name}</h3>
+            <p class="text-blue-600 font-medium text-sm">${p.role}</p>
+        </div>
+    `;
+
+    let html = '';
+
+    // 1. แสดงประธาน (แถวแรก ตรงกลาง)
+    if (leader) {
         html += `
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1">
-                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 mb-4 shadow-inner bg-gray-200">
-                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user text-4xl"></i></div>'}
+            <div class="flex justify-center mb-8">
+                <div class="w-full max-w-xs">
+                    ${createCard(leader)}
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-1">${p.name}</h3>
-                <p class="text-blue-600 font-medium text-sm">${p.role}</p>
             </div>
         `;
-    });
-    html += '</div>';
+    }
+
+    // 2. แสดงคนที่เหลือ (Grid 4 คอลัมน์)
+    if (others.length > 0) {
+        html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
+        others.forEach(p => {
+            html += createCard(p);
+        });
+        html += '</div>';
+    }
+
     container.innerHTML = html;
 }
 
@@ -179,7 +207,11 @@ export function renderHistoryTable(tbodyId, data) {
     if (!tbody) return;
     tbody.innerHTML = '';
     if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">ไม่มีข้อมูล</td></tr>'; return; }
-    data.forEach((item, index) => {
+    
+    // เรียง ID น้อยไปมาก (คนเก่า -> คนใหม่)
+    const sortedData = [...data].sort((a, b) => a.id - b.id);
+
+    sortedData.forEach((item, index) => {
         const timeStr = item.year || `${item.start_date || '-'} ถึง ${item.end_date || 'ปัจจุบัน'}`;
         const tr = document.createElement('tr');
         tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
@@ -199,7 +231,11 @@ function renderAchievements(containerId, data, type) {
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีข้อมูลผลงาน</div>'; return; }
-    data.forEach(item => {
+    
+    // ✅ เรียงใหม่ไปเก่า
+    const sortedData = [...data].sort((a, b) => b.id - a.id);
+
+    sortedData.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { month: 'short', year: 'numeric' }) : '';
         const subtitle = type === 'teacher' ? (item.level || '') : (item.students || item.date || '');
         const div = document.createElement('div');
@@ -228,7 +264,11 @@ export function renderInnovations(data) {
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center text-gray-500">ไม่พบนวัตกรรม</div>'; return; }
-    data.forEach(item => {
+    
+    // ✅ เรียงใหม่ไปเก่า
+    const sortedData = [...data].sort((a, b) => b.id - a.id);
+
+    sortedData.forEach(item => {
         const div = document.createElement('div');
         div.className = "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden";
         div.innerHTML = `
@@ -257,7 +297,11 @@ export function renderDocuments(data, containerId) {
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">ไม่พบเอกสาร</div>'; return; }
-    data.forEach(doc => {
+    
+    // ✅ เรียงใหม่ไปเก่า
+    const sortedData = [...data].sort((a, b) => b.id - a.id);
+
+    sortedData.forEach(doc => {
         const dateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString('th-TH') : '-';
         const icon = doc.title.includes('PDF') ? 'fa-file-pdf text-red-500' : (doc.title.includes('Word') ? 'fa-file-word text-blue-500' : 'fa-file-lines text-gray-500');
         const div = document.createElement('div');
