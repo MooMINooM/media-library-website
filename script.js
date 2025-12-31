@@ -1,120 +1,121 @@
 import { fetchData } from './js/api.js';
 import * as UI from './js/ui.js';
 
-// เก็บข้อมูลไว้ไม่ต้องโหลดซ้ำ (Cache)
 const cache = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
-    UI.setupDropdowns(); // ตรวจสอบว่าใน ui.js มีฟังก์ชันนี้
-    UI.setupModal();     // ตรวจสอบว่าใน ui.js มีฟังก์ชันนี้
-    
-    // เริ่มต้นให้โหลดหน้าแรก (ข่าว)
     showPage('home');
 });
 
 function setupNavigation() {
     const mainNav = document.getElementById('main-nav');
-    if (!mainNav) return;
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    // Desktop Click
+    if (mainNav) {
+        mainNav.addEventListener('click', handleMenuClick);
+    }
+    // Mobile Click
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', handleMenuClick);
+    }
+}
 
-    mainNav.addEventListener('click', (e) => {
-        // ใช้ closest เพื่อให้กดโดนไอคอนหรือตัวหนังสือในปุ่ม ก็ยังทำงานได้
-        const link = e.target.closest('a[data-page]');
-        if (link) {
-            e.preventDefault();
-            const pageId = link.dataset.page;
-            showPage(pageId);
-            
-            // ปิด Dropdown ทั้งหมดเมื่อเลือกเมนูแล้ว
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
-        }
-    });
+function handleMenuClick(e) {
+    const link = e.target.closest('a[data-page]');
+    if (link) {
+        e.preventDefault();
+        const pageId = link.dataset.page;
+        showPage(pageId);
+        UI.closeAllDropdowns();
+        // ปิดเมนูมือถือ (ถ้าเปิดอยู่)
+        document.getElementById('mobile-menu').classList.add('hidden');
+    }
+    
+    // ปุ่มพิเศษอื่นๆ
+    const button = e.target.closest('button[data-page-link]');
+    if(button) {
+         e.preventDefault();
+         showPage(button.dataset.pageLink);
+    }
+    const card = e.target.closest('div[data-page-link]');
+    if(card) {
+         showPage(card.dataset.pageLink);
+    }
 }
 
 async function showPage(pageId) {
-    // 1. ซ่อนเนื้อหาทุกหน้า
+    // 1. ซ่อนทุกหน้า
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
     
     // 2. แสดงหน้าเป้าหมาย
     const targetPage = document.getElementById(`page-${pageId}`);
     if (targetPage) targetPage.classList.remove('hidden');
 
-    // 3. ปรับสีเมนู (Active State)
+    // 3. Active Menu State
     document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
     const activeLink = document.querySelector(`a[data-page="${pageId}"]`);
     if (activeLink) activeLink.classList.add('active');
 
-    // 4. โหลดข้อมูล (ดึงจาก Sheet ชื่อเดียวกับ Case)
-    // หมายเหตุ: ชื่อ Sheet ใน Google Sheet ต้องตรงกับตัวอักษรภาษาอังกฤษด้านล่างนี้ (เช่น News, Personnel)
+    // 4. Load Data
     switch (pageId) {
         case 'home':
+            await loadData('news', UI.renderHomeNews);
+            break;
         case 'news':
-            await loadData('News', UI.renderNews); 
-            if(pageId === 'home') await loadData('News', UI.renderHomeNews);
+            await loadData('news', UI.renderNews);
             break;
-            
         case 'personnel-list':
-            await loadData('Personnel', UI.renderPersonnelList);
+            await loadData('personnel', UI.renderPersonnelList);
             break;
-            
         case 'director-history':
-            // ถ้าคุณยังไม่ได้สร้าง Sheet 'Director_history' ให้สร้าง หรือใช้ Static ไปก่อนได้
-            // UI.renderHistoryTable('director-history-table-body', STATIC_DIRECTOR_HISTORY_DATA); 
-            await loadData('Director_history', (data) => UI.renderHistoryTable('director-history-table-body', data));
+            await loadData('director_history', (data) => UI.renderHistoryTable('director-history-table-body', data));
             break;
-
         case 'personnel-history':
-            await loadData('Personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data));
+            await loadData('personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data));
             break;
-            
         case 'teacher-achievements':
-            await loadData('Teacher_awards', UI.renderTeacherAchievements);
+            await loadData('teacher_awards', UI.renderTeacherAchievements);
             break;
-            
         case 'student-achievements':
-            await loadData('Student_awards', UI.renderStudentAchievements);
+            await loadData('student_awards', UI.renderStudentAchievements);
             break;
-            
         case 'school-achievements':
-            await loadData('School_awards', UI.renderSchoolAchievements);
+            await loadData('school_awards', UI.renderSchoolAchievements);
             break;
-
         case 'innovations':
-            await loadData('Innovations', UI.renderInnovations);
+            await loadData('innovations', UI.renderInnovations);
             break;
-
         case 'documents-official':
-            await loadData('Documents', (data) => UI.renderDocuments(data, 'documents-official-container'));
+            await loadData('documents', (data) => UI.renderDocuments(data, 'documents-official-container'));
             break;
-
         case 'documents-forms':
-            await loadData('Forms', (data) => UI.renderDocuments(data, 'documents-forms-container'));
+            await loadData('forms', (data) => UI.renderDocuments(data, 'documents-forms-container'));
+            break;
+        // ✅ เพิ่มเคสสำหรับนักเรียน
+        case 'students':
+            await loadData('student_data', UI.renderStudentChart);
             break;
     }
 }
 
-// ฟังก์ชันกลางสำหรับโหลดข้อมูล
-async function loadData(sheetName, renderCallback) {
-    // แสดง Loading... (ถ้ามี element id ลงท้ายด้วย -loading ในหน้านั้น)
+async function loadData(tableName, renderCallback) {
+    // Show Loading
     const currentSection = document.querySelector('.page-content:not(.hidden)');
-    const loader = currentSection ? currentSection.querySelector('[id$="-loading"]') : null;
-    if (loader) loader.classList.remove('hidden');
+    // (Optional: หา Element Loading มาแสดงถ้ามี)
 
-    // ดึงข้อมูล
-    if (!cache[sheetName]) {
+    if (!cache[tableName]) {
         try {
-            console.log(`Fetching ${sheetName}...`);
-            cache[sheetName] = await fetchData(sheetName);
+            console.log(`Fetching ${tableName}...`);
+            cache[tableName] = await fetchData(tableName);
         } catch (e) {
             console.error(e);
-            cache[sheetName] = []; // กัน Error ถ้าโหลดไม่ได้
+            cache[tableName] = [];
         }
     }
 
-    if (loader) loader.classList.add('hidden');
-
-    // แสดงผล
     if (typeof renderCallback === 'function') {
-        renderCallback(cache[sheetName]);
+        renderCallback(cache[tableName]);
     }
 }
