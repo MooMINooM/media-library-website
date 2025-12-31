@@ -30,6 +30,9 @@
             <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">ประชาสัมพันธ์</p>
             <button onclick="loadSection('news')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3"><i class="fa-solid fa-newspaper w-5 text-center"></i> ข่าวสาร</button>
             
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">ข้อมูลสารสนเทศ</p>
+            <button onclick="loadSection('student_data')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3"><i class="fa-solid fa-chart-pie w-5 text-center"></i> จำนวนนักเรียน</button>
+
             <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">บุคลากร & ทำเนียบ</p>
             <button onclick="loadSection('personnel')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3"><i class="fa-solid fa-user-tie w-5 text-center"></i> บุคลากรปัจจุบัน</button>
             <button onclick="loadSection('director_history')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3"><i class="fa-solid fa-user-clock w-5 text-center"></i> ทำเนียบผู้บริหาร</button>
@@ -86,13 +89,19 @@
         try { supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } 
         catch(e) { console.error(e); Swal.fire("Error", "Connect DB Failed", "error"); }
 
-        // โครงสร้างข้อมูล (Schemas) - ครบทุกตาราง
+        // โครงสร้างข้อมูล (Schemas)
         const SCHEMAS = {
             news: { title: "ข่าวประชาสัมพันธ์", fields: [
                 { key: "title", label: "หัวข้อข่าว", type: "text", required: true },
                 { key: "date", label: "วันที่", type: "date", required: true },
                 { key: "image", label: "รูปภาพ (URL)", type: "url" },
                 { key: "link", label: "ลิงก์อ่านต่อ (ใส่ # ถ้าไม่มี)", type: "url" }
+            ]},
+            // ✅ เพิ่ม Schema สำหรับข้อมูลนักเรียน
+            student_data: { title: "ข้อมูลจำนวนนักเรียน", fields: [
+                { key: "grade", label: "ระดับชั้น (เช่น อ.2, ป.1, ม.1)", type: "text", required: true },
+                { key: "male", label: "นักเรียนชาย (คน)", type: "number", required: true },
+                { key: "female", label: "นักเรียนหญิง (คน)", type: "number", required: true }
             ]},
             personnel: { title: "บุคลากรปัจจุบัน", fields: [
                 { key: "name", label: "ชื่อ-สกุล", type: "text", required: true },
@@ -176,7 +185,12 @@
             const main = document.getElementById('main-area');
             main.innerHTML = `<div class="h-full flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500"></i></div>`;
 
-            const { data, error } = await supabaseAdmin.from(section).select('*').order('id', { ascending: false });
+            // ดึงข้อมูล (ถ้าเป็นข้อมูลนักเรียน ให้เรียงตาม ID เพื่อให้ระดับชั้นเรียงสวย)
+            let query = supabaseAdmin.from(section).select('*');
+            if(section === 'student_data') query = query.order('id', { ascending: true });
+            else query = query.order('id', { ascending: false });
+
+            const { data, error } = await query;
 
             if (error) {
                 console.error(error);
@@ -241,7 +255,6 @@
             const data = Object.fromEntries(formData.entries());
             const id = data.id; delete data.id;
             
-            // แปลงค่าว่างเป็น null เพื่อไม่ให้ Error
             Object.keys(data).forEach(k => { if(data[k] === '') data[k] = null; });
 
             let error;
