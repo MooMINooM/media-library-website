@@ -64,12 +64,34 @@ export function renderNews(newsList) {
     });
 }
 
-// 3. ✅ แสดงข้อมูลโรงเรียน (VTR + Social)
+// 3. ✅ แสดงข้อมูลโรงเรียน (VTR, สี, เพลง, ประวัติ)
 export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
-    // VTR
+    // 3.1 ข้อความ Hero Section
+    const mottoEl = document.getElementById('hero-motto');
+    if(mottoEl && info.motto) mottoEl.innerText = info.motto;
+
+    // 3.2 คำนวณอายุโรงเรียน
+    if (info.founding_date) {
+        const founded = new Date(info.founding_date);
+        const now = new Date();
+        const age = now.getFullYear() - founded.getFullYear();
+        const ageBadge = document.getElementById('school-age-badge');
+        if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
+    }
+
+    // 3.3 อัตลักษณ์ (โชว์ที่ Hero ด้วยถ้ามี)
+    if(info.identity) {
+        const idBadge = document.getElementById('school-identity');
+        if(idBadge) {
+            idBadge.innerText = info.identity;
+            idBadge.classList.remove('hidden');
+        }
+    }
+
+    // 3.4 VTR (แปลง Link Youtube)
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -80,17 +102,53 @@ export function renderSchoolInfo(dataList) {
         if (videoId) {
             vtrIframe.src = `https://www.youtube.com/embed/${videoId}`;
             vtrContainer.classList.remove('hidden');
+            // ซ่อน Placeholder
+            const ph = document.getElementById('vtr-placeholder');
+            if(ph) ph.style.display = 'none';
         }
     }
 
-    // Social
+    // 3.5 ✅ สีประจำโรงเรียน (รองรับ 2 สี)
+    const colorBox = document.getElementById('school-color-box');
+    if(colorBox) {
+        const c1 = info.color_code || '#ddd';
+        const c2 = info.color_code_2 || c1; // ถ้าไม่มีสี 2 ให้ใช้สี 1 (เป็นสีล้วน)
+        // แบ่งครึ่งเฉียง หรือ ตรงๆ ก็ได้ (อันนี้เอาแบบตรง 50/50)
+        colorBox.style.background = `linear-gradient(to right, ${c1} 50%, ${c2} 50%)`;
+        colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
+    }
+
+    // 3.6 ✅ เพลงมาร์ช
+    const audio = document.getElementById('school-song');
+    if (info.song_url && audio) {
+        audio.src = info.song_url;
+        // โชว์ปุ่มควบคุมเพลง
+        const controls = document.getElementById('music-player-controls');
+        if(controls) controls.classList.remove('hidden');
+    }
+
+    // 3.7 เนื้อหาประวัติ / พันธกิจ
+    const histContent = document.getElementById('school-history-content');
+    if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติ';
+    
+    const missionContent = document.getElementById('school-mission-content');
+    if(missionContent) missionContent.innerText = info.mission || '-';
+
+    const identityContent = document.getElementById('school-identity-content');
+    if(identityContent) identityContent.innerText = info.identity || '-';
+
+    // 3.8 Social Links (Footer)
     const fbBtn = document.getElementById('footer-fb');
     const ytBtn = document.getElementById('footer-yt');
     if (info.facebook && fbBtn) { fbBtn.href = info.facebook; fbBtn.classList.remove('hidden'); }
     if (info.youtube && ytBtn) { ytBtn.href = info.youtube; ytBtn.classList.remove('hidden'); }
+    
+    // ชื่อโรงเรียนที่ Footer
+    const footerName = document.getElementById('footer-school-name');
+    if(footerName && info.school_name) footerName.innerText = info.school_name;
 }
 
-// 4. ✅ แสดงตารางบุคคลแบบ Grid (ใช้กับ Personnel, School Board, Student Council)
+// 4. แสดงตารางบุคคลแบบ Grid (Personnel, Board, Council)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -217,7 +275,7 @@ export function renderDocuments(data, containerId) {
     });
 }
 
-// 9. ✅ กราฟข้อมูลนักเรียน
+// 9. กราฟข้อมูลนักเรียน
 export function renderStudentChart(data) {
     const container = document.getElementById('student-summary-container');
     const chartCanvas = document.getElementById('studentChart');
