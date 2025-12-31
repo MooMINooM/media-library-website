@@ -21,9 +21,12 @@
         body { @apply font-sans bg-slate-50 text-slate-800; }
         .nav-link { @apply text-slate-700 font-medium py-3 px-3 rounded-md transition-colors duration-200 hover:text-blue-700 cursor-pointer select-none flex items-center gap-1; }
         .nav-link.active { @apply text-blue-600 font-bold bg-blue-50; }
+        
+        /* Dropdown & Animations */
         .dropdown-menu { @apply hidden absolute bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50 animate-fade-in; top: 100%; left: 0; margin-top: 0px; }
         .dropdown:hover .dropdown-menu { @apply block; }
         .dropdown:hover .dropdown-toggle { @apply text-blue-600 bg-blue-50; }
+        
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
         .section-title { @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4 mb-6; }
@@ -135,7 +138,8 @@
                              <span class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-brands fa-youtube"></i></span>
                              <h3 class="font-bold text-gray-700">แนะนำโรงเรียน</h3>
                          </div>
-                         <div id="vtr-container" class="bg-black rounded-2xl overflow-hidden shadow-md aspect-video relative group w-full h-full min-h-[320px]"> <iframe id="vtr-iframe" class="w-full h-full absolute inset-0" src="" title="School VTR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                         <div id="vtr-container" class="bg-black rounded-2xl overflow-hidden shadow-md aspect-video relative group w-full h-full min-h-[320px]">
+                             <iframe id="vtr-iframe" class="w-full h-full absolute inset-0" src="" title="School VTR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                              <div class="absolute inset-0 bg-slate-900 flex items-center justify-center text-slate-500" id="vtr-placeholder">
                                  <p class="text-center"><i class="fa-solid fa-circle-play text-4xl mb-2"></i><br>รอโหลดวิดีโอ...</p>
                              </div>
@@ -159,52 +163,26 @@
 
                      <div class="lg:col-span-3 flex flex-col h-full">
                          <div class="mb-3 px-1 flex items-center h-8"><h3 class="font-bold text-gray-700">เมนูด่วน</h3></div>
-                         
                          <div class="flex flex-col gap-3 h-full">
-                             
-                             <div data-page-link="personnel-list" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-purple-200 transition group">
-                                 <div class="bg-purple-50 text-purple-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
-                                     <i class="fa-solid fa-users"></i>
-                                 </div>
-                                 <div>
-                                     <h4 class="font-bold text-gray-800 text-base">บุคลากร</h4>
-                                     <p class="text-xs text-gray-400">ครูและผู้บริหาร</p>
-                                 </div>
-                             </div>
-
-                             <div data-page-link="teacher-achievements" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-yellow-200 transition group">
-                                 <div class="bg-yellow-50 text-yellow-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
-                                     <i class="fa-solid fa-trophy"></i>
-                                 </div>
-                                 <div>
-                                     <h4 class="font-bold text-gray-800 text-base">ผลงานครู</h4>
-                                     <p class="text-xs text-gray-400">รางวัลและความภาคภูมิใจ</p>
-                                 </div>
-                             </div>
-
-                             <div data-page-link="documents-official" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-red-200 transition group">
-                                 <div class="bg-red-50 text-red-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
-                                     <i class="fa-solid fa-file-pdf"></i>
-                                 </div>
-                                 <div>
-                                     <h4 class="font-bold text-gray-800 text-base">เอกสาร</h4>
-                                     <p class="text-xs text-gray-400">ดาวน์โหลดไฟล์ราชการ</p>
-                                 </div>
-                             </div>
-                             
-                             <div data-page-link="innovations" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-green-200 transition group">
-                                 <div class="bg-green-50 text-green-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm">
-                                     <i class="fa-solid fa-lightbulb"></i>
-                                 </div>
-                                 <div>
-                                     <h4 class="font-bold text-gray-800 text-base">นวัตกรรม</h4>
-                                     <p class="text-xs text-gray-400">สื่อการสอนและวิจัย</p>
-                                 </div>
-                             </div>
-
+                             <div data-page-link="personnel-list" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-purple-200 transition group"><div class="bg-purple-50 text-purple-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm"><i class="fa-solid fa-users"></i></div><div><h4 class="font-bold text-gray-800 text-base">บุคลากร</h4><p class="text-xs text-gray-400">ครูและผู้บริหาร</p></div></div>
+                             <div data-page-link="teacher-achievements" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-yellow-200 transition group"><div class="bg-yellow-50 text-yellow-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm"><i class="fa-solid fa-trophy"></i></div><div><h4 class="font-bold text-gray-800 text-base">ผลงานครู</h4><p class="text-xs text-gray-400">รางวัลความภูมิใจ</p></div></div>
+                             <div data-page-link="documents-official" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-red-200 transition group"><div class="bg-red-50 text-red-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm"><i class="fa-solid fa-file-pdf"></i></div><div><h4 class="font-bold text-gray-800 text-base">เอกสาร</h4><p class="text-xs text-gray-400">โหลดไฟล์ราชการ</p></div></div>
+                             <div data-page-link="innovations" class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 cursor-pointer hover:shadow-md hover:border-green-200 transition group"><div class="bg-green-50 text-green-600 rounded-xl w-12 h-12 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-sm"><i class="fa-solid fa-lightbulb"></i></div><div><h4 class="font-bold text-gray-800 text-base">นวัตกรรม</h4><p class="text-xs text-gray-400">สื่อการสอน</p></div></div>
                          </div>
                      </div>
                  </div>
+            </section>
+            
+            <section id="page-history" class="page-content hidden">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 animate-fade-in">
+                    <h2 class="section-title">ประวัติความเป็นมา</h2>
+                    <div id="school-history-content" class="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-line mb-8 min-h-[100px]">กำลังโหลดข้อมูล...</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div class="bg-blue-50 p-6 rounded-xl border border-blue-100"><h3 class="font-bold text-blue-800 text-lg mb-2"><i class="fa-solid fa-flag"></i> พันธกิจ (Mission)</h3><p id="school-mission-content" class="text-gray-700 whitespace-pre-line">-</p></div>
+                         <div class="bg-yellow-50 p-6 rounded-xl border border-yellow-100"><h3 class="font-bold text-yellow-800 text-lg mb-2"><i class="fa-solid fa-fingerprint"></i> อัตลักษณ์</h3><p id="school-identity-content" class="text-gray-700">-</p></div>
+                    </div>
+                    <div class="mt-6 flex items-center gap-4"><span class="font-bold text-gray-700">สีประจำโรงเรียน:</span><div id="school-color-box" class="w-32 h-10 rounded-lg shadow-sm border border-gray-200"></div></div>
+                </div>
             </section>
 
             <section id="page-school-board" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">คณะกรรมการสถานศึกษา</h2><div id="school-board-container" class="mt-6"></div></div></section>
@@ -243,7 +221,6 @@
                     <h3 class="text-white font-bold text-base" id="footer-school-name">โรงเรียนบ้านภูพระโนนผักหวาน</h3>
                     <div id="social-links-container" class="flex gap-3"></div>
                 </div>
-
                 <div class="text-xs text-slate-500 flex flex-wrap justify-center gap-3 mt-1">
                     <span>สพป.หนองบัวลำภู เขต 2</span>
                     <span class="text-slate-700 hidden md:inline">|</span>
@@ -267,7 +244,7 @@
     
     <script type="module" src="script.js"></script>
     <script>
-        // ⚠️⚠️ ใส่ URL / KEY ตรงนี้ ⚠️⚠️
+        // ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
         const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
