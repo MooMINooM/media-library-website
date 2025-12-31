@@ -3,15 +3,13 @@ import * as UI from './js/ui.js';
 
 const cache = {};
 
-// ✅ 1. ตั้งค่า Script เล่นเพลง (Global Scope)
-// เพื่อให้ปุ่ม HTML onclick="toggleMusic()" มองเห็นฟังก์ชันนี้
+// 1. Music Player Script (Global)
 let isMusicPlaying = false;
 window.toggleMusic = function() {
     const audio = document.getElementById('school-song');
     const btnIcon = document.getElementById('music-icon');
     const indicator = document.getElementById('music-indicator');
-    
-    if (!audio || !audio.src) return; // ถ้าไม่มีไฟล์เพลง ก็ไม่ทำอะไร
+    if (!audio || !audio.src) return; 
 
     if (isMusicPlaying) {
         audio.pause();
@@ -19,7 +17,6 @@ window.toggleMusic = function() {
         btnIcon.classList.add('fa-play');
         if(indicator) indicator.classList.add('hidden');
     } else {
-        // Browser ส่วนใหญ่บล็อก autoplay ต้องมี user interaction ก่อนถึงจะเล่นได้
         audio.play().catch(e => {
             alert("กรุณาคลิกที่หน้าเว็บหนึ่งครั้งเพื่อให้เสียงเริ่มเล่นได้ครับ");
             console.error(e);
@@ -31,36 +28,45 @@ window.toggleMusic = function() {
     isMusicPlaying = !isMusicPlaying;
 };
 
-// 2. เริ่มทำงานเมื่อโหลดหน้าเว็บ
+// 2. Main Logic
 document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     showPage('home');
-    
-    // ✅ โหลดข้อมูลโรงเรียน (เพลง, สี, VTR) ทันที
     loadData('school_info', UI.renderSchoolInfo);
 });
 
 function setupNavigation() {
-    const mainNav = document.getElementById('main-nav');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    if (mainNav) mainNav.addEventListener('click', handleMenuClick);
-    if (mobileMenu) mobileMenu.addEventListener('click', handleMenuClick);
+    // ✅ ดักฟังการคลิกทั้ง document เพื่อให้ปุ่มที่ไม่อยู่ใน Nav (เช่น ปุ่มลัดหน้า Home) ทำงานได้
+    document.addEventListener('click', handleMenuClick);
 }
 
 function handleMenuClick(e) {
+    // 1. Link เมนูหลัก (Nav Link)
     const link = e.target.closest('a[data-page]');
     if (link) {
         e.preventDefault();
         showPage(link.dataset.page);
         UI.closeAllDropdowns();
-        document.getElementById('mobile-menu').classList.add('hidden');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if(mobileMenu) mobileMenu.classList.add('hidden');
+        return;
     }
     
-    const button = e.target.closest('button[data-page-link]');
-    if(button) { e.preventDefault(); showPage(button.dataset.pageLink); }
+    // 2. ✅ Card เมนูลัด (Shortcuts in Home)
     const card = e.target.closest('div[data-page-link]');
-    if(card) { showPage(card.dataset.pageLink); }
+    if(card) {
+         e.preventDefault();
+         showPage(card.dataset.pageLink);
+         return;
+    }
+
+    // 3. ปุ่มกดทั่วไป (Buttons)
+    const button = e.target.closest('button[data-page-link]');
+    if(button) {
+         e.preventDefault();
+         showPage(button.dataset.pageLink);
+         return;
+    }
 }
 
 async function showPage(pageId) {
@@ -79,7 +85,7 @@ async function showPage(pageId) {
         case 'school-board': await loadData('school_board', (data) => UI.renderPersonGrid(data, 'school-board-container')); break;
         case 'student-council': await loadData('student_council', (data) => UI.renderPersonGrid(data, 'student-council-container')); break;
         case 'students': await loadData('student_data', UI.renderStudentChart); break;
-        case 'history': await loadData('school_info', UI.renderSchoolInfo); break; // ✅ หน้าประวัติก็โหลดข้อมูลโรงเรียน
+        case 'history': await loadData('school_info', UI.renderSchoolInfo); break;
         case 'director-history': await loadData('director_history', (data) => UI.renderHistoryTable('director-history-table-body', data)); break;
         case 'personnel-history': await loadData('personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data)); break;
         case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
