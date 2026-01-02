@@ -3,13 +3,13 @@
 // ตัวแปรเก็บข้อมูลดิบเพื่อใช้ในการค้นหาและแบ่งหน้า
 let allTeacherData = [];
 let allStudentData = [];
-const ITEMS_PER_PAGE = 6; // 9 รายการต่อหน้า (3x3)
+const ITEMS_PER_PAGE = 6; // ✅ กลับมาใช้ 6 รายการต่อหน้า (สวยงาม ไม่แน่น)
 
 // -------------------------------------------------------------------------
 // 1. ระบบจัดการข้อมูลและการแบ่งหน้า (Core Logic)
 // -------------------------------------------------------------------------
 
-// ฟังก์ชันหลักสำหรับ Render ข้อมูลแบบมีหน้า (ฉบับ Compact: ไม่มีรูป + ไม่ต้อง Scroll)
+// ฟังก์ชันหลักสำหรับ Render ข้อมูลแบบมีหน้า (✅ ดีไซน์ใหม่: สวยงาม พรีเมียม มีรูป)
 function renderPagedData(containerId, data, type, page = 1) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -17,7 +17,7 @@ function renderPagedData(containerId, data, type, page = 1) {
 
     // 1. กรณีไม่มีข้อมูล
     if (!data || data.length === 0) {
-        container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ไม่พบข้อมูลผลงาน</div>';
+        container.innerHTML = '<div class="col-span-full text-center py-16 text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-200"><i class="fa-solid fa-folder-open text-4xl mb-4 opacity-50"></i><p>ไม่พบข้อมูลผลงาน</p></div>';
         return;
     }
 
@@ -32,51 +32,85 @@ function renderPagedData(containerId, data, type, page = 1) {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const pageItems = data.slice(startIndex, endIndex);
 
-    // 3. วาดการ์ดผลงาน (Compact Design: เน้นข้อความ ประหยัดพื้นที่)
+    // 3. วาดการ์ดผลงาน (✅ Premium Design Card)
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
         const name = type === 'teacher' ? item.name : item.students;
         
-        // กำหนดสีธีม: ครู=น้ำเงิน, นักเรียน=ชมพู
+        // ธีมสี: ครู=น้ำเงิน, นักเรียน=ชมพู
         const themeColor = type === 'teacher' ? 'blue' : 'pink';
-        const borderColor = type === 'teacher' ? 'border-blue-500' : 'border-pink-500';
-        const iconColor = type === 'teacher' ? 'text-blue-500' : 'text-pink-500';
-        
+        const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
+
         const div = document.createElement('div');
-        div.className = `achievement-card bg-white rounded-lg shadow-sm border border-gray-200 border-l-[3px] ${borderColor} hover:shadow-md transition relative flex flex-col justify-between p-3 h-full min-h-[130px] group animate-fade-in`;
+        // ใช้ group เพื่อทำ hover effect ทั้งการ์ด
+        div.className = `achievement-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in`;
         
         div.innerHTML = `
-            <div class="absolute top-1 right-1 text-gray-50 text-4xl -z-0 pointer-events-none group-hover:text-gray-100 transition">
-                <i class="fa-solid fa-award"></i>
+            <div class="h-48 bg-gray-100 relative overflow-hidden cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
+                 ${item.image 
+                    ? `<img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-1">` 
+                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50">
+                         <i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i>
+                         <span class="text-xs font-medium">ไม่มีรูปภาพ</span>
+                       </div>`
+                 }
+                 <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10"></div>
+                 
+                 <div class="absolute top-3 right-3 flex gap-2">
+                    ${item.level ? `<span class="bg-white/90 backdrop-blur-sm text-gray-700 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm border border-gray-100">${item.level}</span>` : ''}
+                 </div>
             </div>
 
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-1">
-                    ${item.level ? `<span class="bg-gray-100 text-gray-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-gray-200">${item.level}</span>` : '<span></span>'}
-                    ${item.image ? 
-                        `<a href="${item.image}" target="_blank" class="text-[10px] text-${themeColor}-600 hover:underline font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-file-contract"></i> ดูเกียรติบัตร
-                         </a>` : ''
+            <div class="p-5 flex-grow flex flex-col justify-between relative">
+                
+                <div>
+                    ${item.competition ? `
+                        <div class="mb-2">
+                            <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-yellow-100">
+                                <i class="fa-solid fa-trophy text-yellow-500"></i> ${item.competition}
+                            </span>
+                        </div>` : ''
+                    }
+                    
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
+                        ${item.title || '-'}
+                    </h4>
+
+                    ${item.program ? `
+                        <div class="text-xs text-gray-500 flex items-center gap-1.5 mb-3">
+                            <i class="fa-solid fa-tag text-gray-400"></i>
+                            <span class="line-clamp-1">${item.program}</span>
+                        </div>` : ''
                     }
                 </div>
-
-                <h4 class="text-sm font-bold text-slate-800 leading-tight cursor-pointer hover:text-${themeColor}-600 line-clamp-1 mb-1" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
-                    ${item.title || '-'}
-                </h4>
                 
-                <div class="flex flex-col gap-0.5 text-[10px] text-gray-500 border-l-2 border-gray-200 pl-2 mb-2">
-                    ${item.competition ? `<div class="font-semibold text-${themeColor}-600 truncate"><i class="fa-solid fa-trophy w-3 text-center"></i> ${item.competition}</div>` : ''}
-                    ${item.program ? `<div class="truncate"><i class="fa-solid fa-tag w-3 text-center"></i> ${item.program}</div>` : ''}
-                </div>
-            </div>
+                <div>
+                    <hr class="border-gray-100 my-3 group-hover:border-${themeColor}-100 transition">
 
-            <div class="relative z-10 pt-2 border-t border-dashed border-gray-100 mt-auto">
-                <div class="flex justify-between items-end text-[10px]">
-                    <div class="font-medium text-gray-700 truncate max-w-[70%]">
-                        <i class="fa-solid fa-user ${iconColor} mr-1"></i>${name}
+                    <div class="space-y-1.5 mb-4">
+                        <p class="text-sm font-semibold text-gray-700 flex items-center gap-2 truncate">
+                            <i class="fa-solid ${iconClass} text-${themeColor}-500 w-4 text-center"></i> 
+                            <span>${name}</span>
+                        </p>
+                        ${item.organization ? `
+                            <p class="text-xs text-gray-500 flex items-center gap-2 truncate">
+                                <i class="fa-solid fa-building-columns text-gray-400 w-4 text-center"></i>
+                                <span>${item.organization}</span>
+                            </p>` : ''
+                        }
                     </div>
-                    <div class="text-gray-400 text-[9px]">
-                        ${dateStr}
+
+                    <div class="flex justify-between items-center mt-auto pt-1">
+                        <div class="text-[11px] text-gray-400 flex items-center gap-1.5 font-medium">
+                            <i class="fa-regular fa-calendar"></i>
+                            ${dateStr}
+                        </div>
+                        
+                        ${item.image ? `
+                            <a href="${item.image}" target="_blank" class="flex items-center gap-1.5 text-[11px] bg-${themeColor}-50 text-${themeColor}-600 px-3 py-1.5 rounded-full hover:bg-${themeColor}-100 transition font-bold shadow-sm">
+                                <i class="fa-solid fa-expand"></i> ดูเกียรติบัตร
+                            </a>` : ''
+                        }
                     </div>
                 </div>
             </div>
@@ -90,16 +124,20 @@ function renderPagedData(containerId, data, type, page = 1) {
     }
 }
 
-// ฟังก์ชันสร้างปุ่มกดเปลี่ยนหน้า
+// ฟังก์ชันสร้างปุ่มกดเปลี่ยนหน้า (ดีไซน์ใหม่ เข้ากับธีม)
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
-    nav.className = "col-span-full flex justify-center items-center gap-1.5 mt-2 pt-2 border-t border-gray-100";
+    nav.className = "col-span-full flex justify-center items-center gap-2 mt-8 animate-fade-in";
     
+    const themeColor = type === 'teacher' ? 'blue' : 'pink';
+
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
         const btn = document.createElement('button');
         btn.innerHTML = label;
-        // ปุ่มเล็กกระทัดรัด
-        btn.className = `px-2 py-0.5 rounded text-xs font-bold transition ${isActive ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+        btn.className = `w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 shadow-sm 
+            ${isActive ? `bg-${themeColor}-600 text-white shadow-md scale-110` : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'} 
+            ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:-translate-y-0.5'}`;
+        
         if (!isDisabled && !isActive) {
             btn.onclick = () => renderPagedData(container.id, currentFilteredData, type, targetPage);
         }
@@ -112,7 +150,10 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
             nav.appendChild(createBtn(i, i, i === currentPage));
         } else if (i === currentPage - 2 || i === currentPage + 2) {
-            nav.appendChild(document.createTextNode("..."));
+            const dots = document.createElement('span');
+            dots.className = "text-gray-400 px-2 font-medium";
+            dots.innerText = "...";
+            nav.appendChild(dots);
         }
     }
 
