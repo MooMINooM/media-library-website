@@ -22,7 +22,6 @@
         .nav-link { @apply text-slate-700 font-medium py-3 px-3 rounded-md transition-colors duration-200 hover:text-blue-700 cursor-pointer select-none flex items-center gap-1; }
         .nav-link.active { @apply text-blue-600 font-bold bg-blue-50; }
         
-        /* Dropdown & Animations */
         .dropdown-menu { @apply hidden absolute bg-white shadow-xl rounded-xl py-2 w-56 border border-gray-100 z-50 animate-fade-in; top: 100%; left: 0; margin-top: 0px; }
         .dropdown:hover .dropdown-menu { @apply block; }
         .dropdown:hover .dropdown-toggle { @apply text-blue-600 bg-blue-50; }
@@ -112,7 +111,6 @@
         <main id="main-content">
             
             <section id="page-home" class="page-content">
-                 
                  <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-3xl shadow-lg p-8 md:p-10 text-white relative overflow-hidden mb-8 animate-fade-in">
                      <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
                          <div class="text-center md:text-left">
@@ -192,8 +190,33 @@
             <section id="page-news" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2><div id="news-container" class="mt-6 space-y-4"></div></div></section>
             <section id="page-director-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบผู้บริหาร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="director-history-table-body"></tbody></table></div></div></section>
             <section id="page-personnel-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบบุคลากร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="personnel-history-table-body"></tbody></table></div></div></section>
-            <section id="page-teacher-achievements" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ผลงานครู</h2><div id="teacher-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div></div></section>
-            <section id="page-student-achievements" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ผลงานนักเรียน</h2><div id="student-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div></div></section>
+            
+            <section id="page-teacher-achievements" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0">ผลงานครู</h2>
+                        <div class="relative w-full md:w-64">
+                            <input type="text" onkeyup="filterAchievements('search-teacher', 'teacher-achievements-container')" id="search-teacher" placeholder="ค้นหาชื่อ, รางวัล..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div id="teacher-achievements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+
+            <section id="page-student-achievements" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0">ผลงานนักเรียน</h2>
+                        <div class="relative w-full md:w-64">
+                            <input type="text" onkeyup="filterAchievements('search-student', 'student-achievements-container')" id="search-student" placeholder="ค้นหาชื่อ, รางวัล..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-pink-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div id="student-achievements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+
             <section id="page-school-achievements" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ผลงานสถานศึกษา</h2><div id="school-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div></div></section>
             <section id="page-innovations" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">คลังนวัตกรรม</h2><div id="innovations-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div></section>
             <section id="page-documents-official" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">เอกสารราชการ</h2><div id="documents-official-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></section>
