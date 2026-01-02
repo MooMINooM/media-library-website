@@ -1,102 +1,130 @@
-import { fetchData } from './js/api.js';
+// script.js
 import * as UI from './js/ui.js';
 
-const cache = {};
+// ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
+const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
-// 1. Music Player Script (Global)
-let isMusicPlaying = false;
-window.toggleMusic = function() {
-    const audio = document.getElementById('school-song');
-    const btnIcon = document.getElementById('music-icon');
-    const indicator = document.getElementById('music-indicator');
-    if (!audio || !audio.src) return; 
+let supabase;
+try {
+    supabase = window.supabase.createClient(PROJECT_URL, ANON_KEY);
+} catch (e) {
+    console.error("Supabase init error:", e);
+}
 
-    if (isMusicPlaying) {
-        audio.pause();
-        btnIcon.classList.remove('fa-pause');
-        btnIcon.classList.add('fa-play');
-        if(indicator) indicator.classList.add('hidden');
-    } else {
-        audio.play().catch(e => {
-            alert("กรุณาคลิกที่หน้าเว็บหนึ่งครั้งเพื่อให้เสียงเริ่มเล่นได้ครับ");
-            console.error(e);
-        });
-        btnIcon.classList.remove('fa-play');
-        btnIcon.classList.add('fa-pause');
-        if(indicator) indicator.classList.remove('hidden');
-    }
-    isMusicPlaying = !isMusicPlaying;
-};
-
-// 2. Main Logic
 document.addEventListener('DOMContentLoaded', () => {
+    init();
     setupNavigation();
-    showPage('home');
-    // โหลดข้อมูลโรงเรียนทันที เพื่อให้ VTR/Song/Footer มาก่อน
-    loadData('school_info', UI.renderSchoolInfo);
 });
 
+function init() {
+    showPage('home');
+    setupMobileMenu();
+    // โหลดข้อมูลพื้นฐานเสมอ
+    loadData('school_info', UI.renderSchoolInfo);
+}
+
 function setupNavigation() {
-    document.addEventListener('click', handleMenuClick);
+    // 1. จัดการคลิกเมนูหลัก (Desktop)
+    document.querySelectorAll('#main-nav a[data-page], .dropdown-menu a[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page');
+            showPage(pageId);
+        });
+    });
+
+    // 2. จัดการคลิกจากปุ่มอื่นๆ (เช่น ปุ่ม "รู้จักเรา", "ดูทั้งหมด")
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-page-link]');
+        if (target) {
+            e.preventDefault();
+            showPage(target.getAttribute('data-page-link'));
+        }
+    });
 }
 
-function handleMenuClick(e) {
-    const link = e.target.closest('a[data-page]');
-    if (link) {
-        e.preventDefault();
-        showPage(link.dataset.page);
-        UI.closeAllDropdowns();
-        const mobileMenu = document.getElementById('mobile-menu');
-        if(mobileMenu) mobileMenu.classList.add('hidden');
-        return;
-    }
-    const card = e.target.closest('div[data-page-link]');
-    if(card) { e.preventDefault(); showPage(card.dataset.pageLink); return; }
-    const button = e.target.closest('button[data-page-link]');
-    if(button) { e.preventDefault(); showPage(button.dataset.pageLink); return; }
+function setupMobileMenu() {
+    // Mobile menu links
+    document.querySelectorAll('#mobile-menu a[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page');
+            showPage(pageId);
+            document.getElementById('mobile-menu').classList.add('hidden');
+        });
+    });
 }
 
+// ✅ ฟังก์ชันแสดงหน้า (เพิ่ม Scroll to Top)
 async function showPage(pageId) {
+    // 1. เด้งขึ้นบนสุดทันทีที่เปลี่ยนหน้า
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 2. ปิด Dropdown ทั้งหมด
+    UI.closeAllDropdowns();
+
+    // 3. ซ่อนทุกหน้า
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    
+    // 4. แสดงหน้าเป้าหมาย
     const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) targetPage.classList.remove('hidden');
-
-    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-    const activeLink = document.querySelector(`a[data-page="${pageId}"]`);
-    if (activeLink) activeLink.classList.add('active');
-
-    // โหลดข้อมูลตามหน้า
-    switch (pageId) {
-        case 'home': await loadData('news', UI.renderHomeNews); break;
-        case 'news': await loadData('news', UI.renderNews); break;
-        // ใช้ renderPersonGrid ที่แก้ Logic แล้ว
-        case 'personnel-list': await loadData('personnel', (data) => UI.renderPersonGrid(data, 'personnel-list-container')); break;
-        case 'school-board': await loadData('school_board', (data) => UI.renderPersonGrid(data, 'school-board-container')); break;
-        case 'student-council': await loadData('student_council', (data) => UI.renderPersonGrid(data, 'student-council-container')); break;
-        case 'students': await loadData('student_data', UI.renderStudentChart); break;
-        // ✅ หน้า History ต้องโหลด school_info
-        case 'history': await loadData('school_info', UI.renderSchoolInfo); break;
-        // อื่นๆ
-        case 'director-history': await loadData('director_history', (data) => UI.renderHistoryTable('director-history-table-body', data)); break;
-        case 'personnel-history': await loadData('personnel_history', (data) => UI.renderHistoryTable('personnel-history-table-body', data)); break;
-        case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
-        case 'student-achievements': await loadData('student_awards', UI.renderStudentAchievements); break;
-        case 'school-achievements': await loadData('school_awards', UI.renderSchoolAchievements); break;
-        case 'innovations': await loadData('innovations', UI.renderInnovations); break;
-        case 'documents-official': await loadData('documents', (data) => UI.renderDocuments(data, 'documents-official-container')); break;
-        case 'documents-forms': await loadData('forms', (data) => UI.renderDocuments(data, 'documents-forms-container')); break;
-    }
-}
-
-async function loadData(tableName, renderCallback) {
-    if (!cache[tableName]) {
-        try {
-            cache[tableName] = await fetchData(tableName);
-        } catch (e) {
-            console.error(e);
-            cache[tableName] = [];
+    if (targetPage) {
+        targetPage.classList.remove('hidden');
+        
+        // 5. โหลดข้อมูลตามหน้า
+        switch(pageId) {
+            case 'home': 
+                await loadData('news', UI.renderHomeNews);
+                await loadData('school_info', UI.renderSchoolInfo);
+                break;
+            case 'history': await loadData('school_info', UI.renderSchoolInfo); break;
+            case 'school-board': await loadData('school_board', (d) => UI.renderPersonGrid(d, 'school-board-container')); break;
+            case 'student-council': await loadData('student_council', (d) => UI.renderPersonGrid(d, 'student-council-container')); break;
+            case 'personnel-list': await loadData('personnel', (d) => UI.renderPersonGrid(d, 'personnel-list-container')); break;
+            case 'director-history': await loadData('director_history', (d) => UI.renderHistoryTable('director-history-table-body', d)); break;
+            case 'personnel-history': await loadData('personnel_history', (d) => UI.renderHistoryTable('personnel-history-table-body', d)); break;
+            case 'students': await loadData('student_data', UI.renderStudentChart); break;
+            case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
+            case 'student-achievements': await loadData('student_awards', UI.renderStudentAchievements); break;
+            case 'school-achievements': await loadData('school_awards', UI.renderSchoolAchievements); break;
+            case 'innovations': await loadData('innovations', UI.renderInnovations); break;
+            case 'documents-official': await loadData('documents', (d) => UI.renderDocuments(d, 'documents-official-container')); break;
+            case 'documents-forms': await loadData('forms', (d) => UI.renderDocuments(d, 'documents-forms-container')); break;
+            case 'news': await loadData('news', UI.renderNews); break;
         }
     }
-    // ส่งข้อมูลไป render
-    if (typeof renderCallback === 'function') renderCallback(cache[tableName]);
+}
+
+async function loadData(tableName, callback) {
+    try {
+        const { data, error } = await supabase.from(tableName).select('*');
+        if (error) throw error;
+        callback(data);
+    } catch (err) {
+        console.error(`Error loading ${tableName}:`, err);
+        callback([]); // ส่ง array ว่างไปถ้า error
+    }
+}
+
+// Music Player Logic
+window.toggleMusic = function() {
+    const audio = document.getElementById('school-song');
+    const icon = document.getElementById('music-icon');
+    const indicator = document.getElementById('music-indicator');
+    const controls = document.getElementById('music-player-controls');
+    
+    if (audio.paused) {
+        audio.play().then(() => {
+            icon.classList.replace('fa-play', 'fa-pause');
+            indicator.classList.remove('hidden');
+            controls.classList.remove('hidden');
+        }).catch(e => {
+            alert("กรุณาคลิกที่หน้าเว็บ 1 ครั้งเพื่อให้เสียงเล่นได้ (นโยบาย Browser)");
+        });
+    } else {
+        audio.pause();
+        icon.classList.replace('fa-pause', 'fa-play');
+        indicator.classList.add('hidden');
+    }
 }
