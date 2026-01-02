@@ -201,21 +201,23 @@
                 { key: "name", label: "1. ชื่อ-สกุล ครู", type: "text", required: true },
                 { key: "title", label: "2. ชื่อรางวัล (เช่น รางวัลชนะเลิศ)", type: "text" },
                 { key: "program", label: "3. รายการ (เช่น ศิลปหัตถกรรม)", type: "text" },
-                { key: "level", label: "4. ระดับ", type: "select", options: ["ระดับโรงเรียน", "ระดับกลุ่มโรงเรียน", "ระดับเขตพื้นที่", "ระดับจังหวัด", "ระดับภาค", "ระดับชาติ", "ระดับนานาชาติ"] },
-                { key: "subject", label: "5. กลุ่มสาระการเรียนรู้", type: "text" },
-                { key: "date", label: "6. วันที่ได้รับ", type: "date" },
-                { key: "organization", label: "7. หน่วยงานที่มอบ", type: "text" },
-                { key: "image", label: "8. รูปภาพ/เกียรติบัตร (URL)", type: "url" }
+                { key: "competition", label: "4. รายการแข่ง (ระบุชื่อการแข่ง)", type: "text" }, // ✅ เพิ่มใหม่
+                { key: "level", label: "5. ระดับ", type: "select", options: ["ระดับโรงเรียน", "ระดับกลุ่มโรงเรียน", "ระดับเขตพื้นที่", "ระดับจังหวัด", "ระดับภาค", "ระดับชาติ", "ระดับนานาชาติ"] },
+                { key: "subject", label: "6. กลุ่มสาระการเรียนรู้", type: "text" },
+                { key: "date", label: "7. วันที่ได้รับ", type: "date" },
+                { key: "organization", label: "8. หน่วยงานที่มอบ", type: "text" },
+                { key: "image", label: "9. รูปภาพ/เกียรติบัตร (URL)", type: "url" }
             ]},
             student_awards: { title: "ผลงานนักเรียน", fields: [
                 { key: "students", label: "1. ชื่อ-สกุล นักเรียน", type: "text", required: true },
                 { key: "title", label: "2. ชื่อรางวัล (เช่น เหรียญทอง)", type: "text" },
                 { key: "program", label: "3. รายการ (เช่น แข่งขันคิดเลขเร็ว)", type: "text" },
-                { key: "level", label: "4. ระดับ", type: "select", options: ["ระดับโรงเรียน", "ระดับกลุ่มโรงเรียน", "ระดับเขตพื้นที่", "ระดับจังหวัด", "ระดับภาค", "ระดับชาติ", "ระดับนานาชาติ"] },
-                { key: "subject", label: "5. กลุ่มสาระการเรียนรู้", type: "text" },
-                { key: "date", label: "6. วันที่ได้รับ", type: "date" },
-                { key: "organization", label: "7. หน่วยงานที่มอบ", type: "text" },
-                { key: "image", label: "8. รูปภาพ/เกียรติบัตร (URL)", type: "url" }
+                { key: "competition", label: "4. รายการแข่ง (ระบุชื่อการแข่ง)", type: "text" }, // ✅ เพิ่มใหม่
+                { key: "level", label: "5. ระดับ", type: "select", options: ["ระดับโรงเรียน", "ระดับกลุ่มโรงเรียน", "ระดับเขตพื้นที่", "ระดับจังหวัด", "ระดับภาค", "ระดับชาติ", "ระดับนานาชาติ"] },
+                { key: "subject", label: "6. กลุ่มสาระการเรียนรู้", type: "text" },
+                { key: "date", label: "7. วันที่ได้รับ", type: "date" },
+                { key: "organization", label: "8. หน่วยงานที่มอบ", type: "text" },
+                { key: "image", label: "9. รูปภาพ/เกียรติบัตร (URL)", type: "url" }
             ]},
             school_awards: { title: "ผลงานโรงเรียน", fields: [
                 { key: "title", label: "ชื่อรางวัล", type: "text" },
