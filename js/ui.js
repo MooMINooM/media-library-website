@@ -1,6 +1,7 @@
 // js/ui.js
 
-// 0. ✅ ฟังก์ชันค้นหาและกรอง (Search + Filter)
+// 0. ✅ ฟังก์ชันค้นหาและกรอง (Search + Filter Logic)
+// เรียกใช้จาก onkeyup (ช่องพิมพ์) และ onchange (Dropdown)
 window.filterAchievements = function(inputId, selectId, containerId) {
     const input = document.getElementById(inputId);
     const select = document.getElementById(selectId);
@@ -13,13 +14,13 @@ window.filterAchievements = function(inputId, selectId, containerId) {
 
     for (let i = 0; i < cards.length; i++) {
         const textContent = cards[i].textContent || cards[i].innerText;
-        // ดึงค่าระดับจาก attribute ที่เราฝังไว้
+        // ดึงค่าระดับจาก attribute data-level ที่เราฝังไว้ในการ์ด
         const cardLevel = cards[i].getAttribute('data-level') || "";
 
+        // เช็คเงื่อนไข: ต้องมีคำที่พิมพ์ AND ตรงกับระดับที่เลือก (หรือเลือก all)
         const matchText = textContent.toLowerCase().indexOf(searchText) > -1;
         const matchLevel = (filterLevel === "all") || (cardLevel === filterLevel);
 
-        // ต้องตรงทั้งคำค้นหา และ ระดับที่เลือก
         if (matchText && matchLevel) {
             cards[i].style.display = "";
         } else {
@@ -39,9 +40,9 @@ export function renderHomeNews(newsList) {
         return;
     }
     
-    // เรียงจาก ใหม่ -> เก่า
+    // เรียงจาก ใหม่ -> เก่า (ID มาก -> น้อย)
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
-    const limitNews = sortedNews.slice(0, 4); // ตัดเหลือ 4 อัน
+    const limitNews = sortedNews.slice(0, 4); // ตัดเหลือ 4 อัน เพื่อให้สูงพอดีกับเมนูด่วน
 
     limitNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
@@ -110,9 +111,11 @@ export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
+    // Hero Text
     const mottoEl = document.getElementById('hero-motto');
     if(mottoEl && info.motto) mottoEl.innerText = info.motto;
 
+    // School Age
     if (info.founding_date) {
         const founded = new Date(info.founding_date);
         const now = new Date();
@@ -121,6 +124,7 @@ export function renderSchoolInfo(dataList) {
         if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
+    // Identity Badge
     if(info.identity) {
         const idBadge = document.getElementById('school-identity');
         if(idBadge) {
@@ -129,6 +133,7 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
+    // VTR
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -144,6 +149,7 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
+    // Colors (2 Colors Gradient)
     const colorBox = document.getElementById('school-color-box');
     if(colorBox) {
         const c1 = info.color_code || '#ddd';
@@ -152,6 +158,7 @@ export function renderSchoolInfo(dataList) {
         colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
     }
 
+    // Music
     const audio = document.getElementById('school-song');
     if (info.song_url && audio) {
         audio.src = info.song_url;
@@ -159,6 +166,7 @@ export function renderSchoolInfo(dataList) {
         if(controls) controls.classList.remove('hidden');
     }
 
+    // History Content
     const histContent = document.getElementById('school-history-content');
     if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติในระบบ';
     
@@ -168,6 +176,7 @@ export function renderSchoolInfo(dataList) {
     const identityContent = document.getElementById('school-identity-content');
     if(identityContent) identityContent.innerText = info.identity || '-';
 
+    // Social & Footer Name
     const footerName = document.getElementById('footer-school-name');
     if(footerName && info.school_name) footerName.innerText = info.school_name;
     
@@ -180,16 +189,17 @@ export function renderSchoolInfo(dataList) {
     }
 }
 
-// 4. แสดง Grid บุคลากร (คนแรกเดี่ยว)
+// 4. แสดง Grid บุคลากร (คนแรกเดี่ยว, ที่เหลือ Grid 4)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
 
+    // เรียง ID น้อย -> มาก (1, 2, 3...)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
-    const leader = sortedData[0]; 
-    const others = sortedData.slice(1);
+    const leader = sortedData[0]; // คนที่ 1 (ประธาน/ผอ.)
+    const others = sortedData.slice(1); // คนที่เหลือ
 
     const createCard = (p) => `
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1 h-full">
@@ -202,9 +212,11 @@ export function renderPersonGrid(data, containerId) {
     `;
 
     let html = '';
+    // แสดงคนแรกตรงกลาง
     if (leader) {
         html += `<div class="flex justify-center mb-8"><div class="w-full max-w-xs">${createCard(leader)}</div></div>`;
     }
+    // แสดงคนที่เหลือ
     if (others.length > 0) {
         html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
         others.forEach(p => html += createCard(p));
@@ -220,6 +232,7 @@ export function renderHistoryTable(tbodyId, data) {
     tbody.innerHTML = '';
     if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">ไม่มีข้อมูล</td></tr>'; return; }
     
+    // เรียง ID น้อย -> มาก (เก่า -> ใหม่)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
     sortedData.forEach((item, index) => {
         const timeStr = item.year || `${item.start_date || '-'} ถึง ${item.end_date || 'ปัจจุบัน'}`;
@@ -235,7 +248,7 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
-// 6. ผลงาน (Achievements) ✅ อัปเดตใหม่: โชว์รายการแข่ง + ฝัง data-level
+// 6. ผลงาน (Achievements) ✅ อัปเดต: ชื่อรางวัลเด่น + รายการต่อท้ายตัวเล็ก + Tag รายการแข่ง
 function renderAchievements(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -246,6 +259,7 @@ function renderAchievements(containerId, data, type) {
         return; 
     }
     
+    // เรียง ใหม่ -> เก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
 
     sortedData.forEach(item => {
@@ -253,7 +267,7 @@ function renderAchievements(containerId, data, type) {
         const name = type === 'teacher' ? item.name : item.students;
         
         const div = document.createElement('div');
-        // ✅ ฝัง data-level ไว้สำหรับการกรอง
+        // ฝัง data-level ไว้สำหรับการกรอง
         div.setAttribute('data-level', item.level || ''); 
         div.className = "achievement-card bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden border border-gray-100 flex flex-col h-full";
         div.innerHTML = `
@@ -266,10 +280,12 @@ function renderAchievements(containerId, data, type) {
             </div>
             <div class="p-5 flex-grow flex flex-col gap-2">
                 <div>
-                    ${item.competition ? `<span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded mr-1">${item.competition}</span>` : ''}
-                    <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">${item.program || 'รายการทั่วไป'}</span>
+                    ${item.competition ? `<span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded mb-1 inline-block">${item.competition}</span>` : ''}
                     
-                    <h4 class="font-bold text-gray-800 text-lg leading-tight mt-1 hover:text-blue-600 cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">${item.title || '-'}</h4>
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight hover:text-blue-600 cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
+                        ${item.title || '-'}
+                        ${item.program ? `<span class="font-normal text-sm text-gray-500 ml-1">(${item.program})</span>` : ''}
+                    </h4>
                 </div>
                 
                 <div class="text-sm text-gray-600 space-y-1 mt-2">
