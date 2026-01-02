@@ -3,13 +3,13 @@
 // ตัวแปรเก็บข้อมูลดิบเพื่อใช้ในการค้นหาและแบ่งหน้า
 let allTeacherData = [];
 let allStudentData = [];
-const ITEMS_PER_PAGE = 6; // ✅ กลับมาใช้ 6 รายการต่อหน้า (สวยงาม ไม่แน่น)
+const ITEMS_PER_PAGE = 9; // 
 
 // -------------------------------------------------------------------------
 // 1. ระบบจัดการข้อมูลและการแบ่งหน้า (Core Logic)
 // -------------------------------------------------------------------------
 
-// ฟังก์ชันหลักสำหรับ Render ข้อมูลแบบมีหน้า (✅ ดีไซน์ใหม่: สวยงาม พรีเมียม มีรูป)
+// ฟังก์ชันหลักสำหรับ Render ข้อมูลแบบมีหน้า (Premium Design)
 function renderPagedData(containerId, data, type, page = 1) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -32,7 +32,7 @@ function renderPagedData(containerId, data, type, page = 1) {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const pageItems = data.slice(startIndex, endIndex);
 
-    // 3. วาดการ์ดผลงาน (✅ Premium Design Card)
+    // 3. วาดการ์ดผลงาน
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
         const name = type === 'teacher' ? item.name : item.students;
@@ -42,7 +42,6 @@ function renderPagedData(containerId, data, type, page = 1) {
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
 
         const div = document.createElement('div');
-        // ใช้ group เพื่อทำ hover effect ทั้งการ์ด
         div.className = `achievement-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in`;
         
         div.innerHTML = `
@@ -118,13 +117,13 @@ function renderPagedData(containerId, data, type, page = 1) {
         container.appendChild(div);
     });
 
-    // 4. สร้างปุ่มเปลี่ยนหน้า (Pagination)
+    // 4. สร้างปุ่มเปลี่ยนหน้า
     if (totalPages > 1) {
         renderPaginationControls(container, totalPages, page, type, data);
     }
 }
 
-// ฟังก์ชันสร้างปุ่มกดเปลี่ยนหน้า (ดีไซน์ใหม่ เข้ากับธีม)
+// ฟังก์ชันสร้างปุ่มกดเปลี่ยนหน้า (✅ เพิ่ม Scroll to Top)
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
     nav.className = "col-span-full flex justify-center items-center gap-2 mt-8 animate-fade-in";
@@ -139,7 +138,19 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
             ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:-translate-y-0.5'}`;
         
         if (!isDisabled && !isActive) {
-            btn.onclick = () => renderPagedData(container.id, currentFilteredData, type, targetPage);
+            btn.onclick = () => {
+                // โหลดหน้าใหม่
+                renderPagedData(container.id, currentFilteredData, type, targetPage);
+                
+                // ✅ เด้งขึ้นไปที่หัวข้อ Section นั้นๆ
+                const section = container.closest('section');
+                if (section) {
+                    const headerOffset = 100; 
+                    const elementPosition = section.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                }
+            };
         }
         return btn;
     };
@@ -150,10 +161,7 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
             nav.appendChild(createBtn(i, i, i === currentPage));
         } else if (i === currentPage - 2 || i === currentPage + 2) {
-            const dots = document.createElement('span');
-            dots.className = "text-gray-400 px-2 font-medium";
-            dots.innerText = "...";
-            nav.appendChild(dots);
+            nav.appendChild(document.createTextNode("..."));
         }
     }
 
@@ -201,8 +209,7 @@ export function renderStudentAchievements(data) {
     renderPagedData('student-achievements-container', allStudentData, 'student', 1); 
 }
 
-// ... (ฟังก์ชันอื่นๆ renderHomeNews, renderNews, renderSchoolInfo, renderPersonGrid, renderHistoryTable, renderInnovations, renderDocuments, renderStudentChart คงเดิม) ...
-
+// ข่าวหน้าแรก (4 รายการ)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -221,6 +228,7 @@ export function renderHomeNews(newsList) {
     });
 }
 
+// ข่าวทั้งหมด
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     if (!container) return;
@@ -237,6 +245,7 @@ export function renderNews(newsList) {
     });
 }
 
+// ข้อมูลโรงเรียน
 export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
@@ -254,6 +263,7 @@ export function renderSchoolInfo(dataList) {
     const socialContainer = document.getElementById('social-links-container'); if(socialContainer) { let html = ''; if(info.facebook) html += `<a href="${info.facebook}" target="_blank" class="text-slate-400 hover:text-blue-500 transition text-xl"><i class="fa-brands fa-facebook"></i></a>`; if(info.youtube) html += `<a href="${info.youtube}" target="_blank" class="text-slate-400 hover:text-red-500 transition text-xl"><i class="fa-brands fa-youtube"></i></a>`; socialContainer.innerHTML = html; }
 }
 
+// บุคลากร (ประธานกลาง)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -268,6 +278,7 @@ export function renderPersonGrid(data, containerId) {
     container.innerHTML = html;
 }
 
+// ตารางประวัติ
 export function renderHistoryTable(tbodyId, data) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -283,6 +294,7 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
+// ผลงานโรงเรียน (ยังไม่มี 6 รายการ ใช้แบบเดิม)
 export function renderSchoolAchievements(data) { 
     const container = document.getElementById('school-achievements-container');
     if (!container) return;
