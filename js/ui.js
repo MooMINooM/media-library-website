@@ -1,6 +1,25 @@
 // js/ui.js
 
-// 1. ✅ แสดงข่าวหน้าแรก (แก้ให้เหลือ 4 รายการ)
+// 0. ฟังก์ชันค้นหา (Search Logic) สำหรับหน้าผลงาน
+window.filterAchievements = function(inputId, containerId) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const container = document.getElementById(containerId);
+    // ดึงการ์ดทั้งหมดที่มี class 'achievement-card'
+    const cards = container.getElementsByClassName('achievement-card');
+
+    for (let i = 0; i < cards.length; i++) {
+        const textContent = cards[i].textContent || cards[i].innerText;
+        // ถ้ามีคำที่พิมพ์ค้นหา ให้โชว์ ถ้าไม่มีให้ซ่อน
+        if (textContent.toLowerCase().indexOf(filter) > -1) {
+            cards[i].style.display = ""; // แสดง
+        } else {
+            cards[i].style.display = "none"; // ซ่อน
+        }
+    }
+}
+
+// 1. แสดงข่าวหน้าแรก (จำกัด 4 รายการ เพื่อความสวยงามคู่กับเมนูด่วน)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -11,11 +30,9 @@ export function renderHomeNews(newsList) {
         return;
     }
     
-    // เรียงจาก ใหม่ -> เก่า
+    // เรียงจาก ใหม่ -> เก่า (ID มากไปน้อย)
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
-    
-    // ✅ ตัดให้เหลือแค่ 4 อันล่าสุด (เพื่อให้ความสูงพอดีกับเมนูด่วน)
-    const limitNews = sortedNews.slice(0, 4);
+    const limitNews = sortedNews.slice(0, 4); // ตัดเหลือ 4 อัน
 
     limitNews.forEach(news => {
         const dateStr = news.date ? new Date(news.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
@@ -43,7 +60,7 @@ export function renderHomeNews(newsList) {
     });
 }
 
-// 2. แสดงข่าวทั้งหมด (หน้าข่าวสารรวม)
+// 2. แสดงข่าวทั้งหมด
 export function renderNews(newsList) {
     const container = document.getElementById('news-container');
     if (!container) return;
@@ -52,7 +69,6 @@ export function renderNews(newsList) {
         container.innerHTML = '<div class="text-center p-10 bg-gray-50 rounded-xl text-gray-500">ไม่พบข่าวสาร</div>';
         return;
     }
-    // เรียงใหม่ไปเก่า
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
 
     sortedNews.forEach(news => {
@@ -85,9 +101,11 @@ export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
+    // Hero Motto
     const mottoEl = document.getElementById('hero-motto');
     if(mottoEl && info.motto) mottoEl.innerText = info.motto;
 
+    // School Age
     if (info.founding_date) {
         const founded = new Date(info.founding_date);
         const now = new Date();
@@ -96,6 +114,7 @@ export function renderSchoolInfo(dataList) {
         if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
+    // Identity
     if(info.identity) {
         const idBadge = document.getElementById('school-identity');
         if(idBadge) {
@@ -104,6 +123,7 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
+    // VTR
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -119,6 +139,7 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
+    // Colors
     const colorBox = document.getElementById('school-color-box');
     if(colorBox) {
         const c1 = info.color_code || '#ddd';
@@ -127,6 +148,7 @@ export function renderSchoolInfo(dataList) {
         colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
     }
 
+    // Music
     const audio = document.getElementById('school-song');
     if (info.song_url && audio) {
         audio.src = info.song_url;
@@ -134,6 +156,7 @@ export function renderSchoolInfo(dataList) {
         if(controls) controls.classList.remove('hidden');
     }
 
+    // History Content
     const histContent = document.getElementById('school-history-content');
     if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติในระบบ';
     
@@ -143,22 +166,27 @@ export function renderSchoolInfo(dataList) {
     const identityContent = document.getElementById('school-identity-content');
     if(identityContent) identityContent.innerText = info.identity || '-';
 
-    const fbBtn = document.getElementById('footer-fb');
-    const ytBtn = document.getElementById('footer-yt');
-    if (info.facebook && fbBtn) { fbBtn.href = info.facebook; fbBtn.classList.remove('hidden'); }
-    if (info.youtube && ytBtn) { ytBtn.href = info.youtube; ytBtn.classList.remove('hidden'); }
-    
+    // Footer Socials
     const footerName = document.getElementById('footer-school-name');
     if(footerName && info.school_name) footerName.innerText = info.school_name;
+    
+    const socialContainer = document.getElementById('social-links-container');
+    if(socialContainer) {
+        let html = '';
+        if(info.facebook) html += `<a href="${info.facebook}" target="_blank" class="text-slate-400 hover:text-blue-500 transition text-xl"><i class="fa-brands fa-facebook"></i></a>`;
+        if(info.youtube) html += `<a href="${info.youtube}" target="_blank" class="text-slate-400 hover:text-red-500 transition text-xl"><i class="fa-brands fa-youtube"></i></a>`;
+        socialContainer.innerHTML = html;
+    }
 }
 
-// 4. แสดงตารางบุคคล (ประธานอยู่กลาง)
+// 4. แสดง Grid บุคลากร (คนแรกเดี่ยว, ที่เหลือ Grid 4)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
 
+    // เรียง ID น้อย -> มาก (ID 1 มาก่อน)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
     const leader = sortedData[0]; 
     const others = sortedData.slice(1);
@@ -174,7 +202,11 @@ export function renderPersonGrid(data, containerId) {
     `;
 
     let html = '';
-    if (leader) html += `<div class="flex justify-center mb-8"><div class="w-full max-w-xs">${createCard(leader)}</div></div>`;
+    // ผอ./ประธาน
+    if (leader) {
+        html += `<div class="flex justify-center mb-8"><div class="w-full max-w-xs">${createCard(leader)}</div></div>`;
+    }
+    // คนอื่นๆ
     if (others.length > 0) {
         html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
         others.forEach(p => html += createCard(p));
@@ -205,28 +237,51 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
-// 6. ผลงาน
+// 6. ผลงาน (Achievements) - แบบละเอียดครบ 8 ข้อ
 function renderAchievements(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
-    if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีข้อมูลผลงาน</div>'; return; }
     
+    if (!data || data.length === 0) { 
+        container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีข้อมูลผลงาน</div>'; 
+        return; 
+    }
+    
+    // เรียง ใหม่ -> เก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
+
     sortedData.forEach(item => {
-        const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { month: 'short', year: 'numeric' }) : '';
-        const subtitle = type === 'teacher' ? (item.level || '') : (item.students || item.date || '');
+        const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        const name = type === 'teacher' ? item.name : item.students;
+        
+        // เพิ่ม class 'achievement-card' เพื่อใช้ค้นหา
         const div = document.createElement('div');
-        div.className = "bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100 flex flex-col";
+        div.className = "achievement-card bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden border border-gray-100 flex flex-col h-full";
         div.innerHTML = `
-            <div class="h-48 bg-gray-100 relative overflow-hidden group">
-                 ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">` : `<div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-trophy text-4xl"></i></div>`}
-                 ${dateStr ? `<div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-bold shadow-sm">${dateStr}</div>` : ''}
+            <div class="h-56 bg-gray-100 relative overflow-hidden group border-b cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
+                 ${item.image 
+                    ? `<img src="${item.image}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">` 
+                    : `<div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-certificate text-5xl"></i></div>`
+                 }
+                 ${item.level ? `<div class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">${item.level}</div>` : ''}
             </div>
-            <div class="p-4 flex-grow flex flex-col">
-                <h4 class="font-bold text-gray-800 mb-1 line-clamp-2">${item.title || item.project || item.name}</h4>
-                <p class="text-sm text-gray-500 mb-2">${subtitle}</p>
-                <div class="mt-auto pt-2 border-t border-gray-50 text-xs text-blue-600 font-semibold">${type === 'teacher' ? item.name : (type === 'student' ? (item.subject || 'วิชาการ') : 'โรงเรียน')}</div>
+            <div class="p-5 flex-grow flex flex-col gap-2">
+                <div>
+                    <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">${item.program || 'รายการทั่วไป'}</span>
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight mt-1 hover:text-blue-600 cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">${item.title || '-'}</h4>
+                </div>
+                
+                <div class="text-sm text-gray-600 space-y-1 mt-2">
+                    <p class="flex items-start gap-2"><i class="fa-solid fa-user text-blue-500 mt-1"></i> <span class="font-medium">${name}</span></p>
+                    <p class="flex items-start gap-2"><i class="fa-solid fa-book text-yellow-500 mt-1"></i> <span>${item.subject || '-'}</span></p>
+                    ${item.organization ? `<p class="flex items-start gap-2"><i class="fa-solid fa-building text-gray-400 mt-1"></i> <span class="text-xs">${item.organization}</span></p>` : ''}
+                </div>
+
+                <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400">
+                    <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
+                    ${item.image ? `<a href="${item.image}" target="_blank" class="text-blue-600 hover:underline">ดูเกียรติบัตร</a>` : ''}
+                </div>
             </div>
         `;
         container.appendChild(div);
