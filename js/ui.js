@@ -1,25 +1,34 @@
 // js/ui.js
 
-// 0. ฟังก์ชันค้นหา (Search Logic) สำหรับหน้าผลงาน
-window.filterAchievements = function(inputId, containerId) {
+// 0. ✅ ฟังก์ชันค้นหาและกรอง (Search + Filter)
+window.filterAchievements = function(inputId, selectId, containerId) {
     const input = document.getElementById(inputId);
-    const filter = input.value.toLowerCase();
+    const select = document.getElementById(selectId);
+    
+    const searchText = input.value.toLowerCase();
+    const filterLevel = select.value; // ค่าจาก Dropdown (all, ระดับชาติ, etc.)
+    
     const container = document.getElementById(containerId);
-    // ดึงการ์ดทั้งหมดที่มี class 'achievement-card'
     const cards = container.getElementsByClassName('achievement-card');
 
     for (let i = 0; i < cards.length; i++) {
         const textContent = cards[i].textContent || cards[i].innerText;
-        // ถ้ามีคำที่พิมพ์ค้นหา ให้โชว์ ถ้าไม่มีให้ซ่อน
-        if (textContent.toLowerCase().indexOf(filter) > -1) {
-            cards[i].style.display = ""; // แสดง
+        // ดึงค่าระดับจาก attribute ที่เราฝังไว้
+        const cardLevel = cards[i].getAttribute('data-level') || "";
+
+        const matchText = textContent.toLowerCase().indexOf(searchText) > -1;
+        const matchLevel = (filterLevel === "all") || (cardLevel === filterLevel);
+
+        // ต้องตรงทั้งคำค้นหา และ ระดับที่เลือก
+        if (matchText && matchLevel) {
+            cards[i].style.display = "";
         } else {
-            cards[i].style.display = "none"; // ซ่อน
+            cards[i].style.display = "none";
         }
     }
 }
 
-// 1. แสดงข่าวหน้าแรก (จำกัด 4 รายการ เพื่อความสวยงามคู่กับเมนูด่วน)
+// 1. แสดงข่าวหน้าแรก (จำกัด 4 รายการ)
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -30,7 +39,7 @@ export function renderHomeNews(newsList) {
         return;
     }
     
-    // เรียงจาก ใหม่ -> เก่า (ID มากไปน้อย)
+    // เรียงจาก ใหม่ -> เก่า
     const sortedNews = [...newsList].sort((a, b) => b.id - a.id);
     const limitNews = sortedNews.slice(0, 4); // ตัดเหลือ 4 อัน
 
@@ -101,11 +110,9 @@ export function renderSchoolInfo(dataList) {
     if (!dataList || dataList.length === 0) return;
     const info = dataList[0]; 
 
-    // Hero Motto
     const mottoEl = document.getElementById('hero-motto');
     if(mottoEl && info.motto) mottoEl.innerText = info.motto;
 
-    // School Age
     if (info.founding_date) {
         const founded = new Date(info.founding_date);
         const now = new Date();
@@ -114,7 +121,6 @@ export function renderSchoolInfo(dataList) {
         if(ageBadge) ageBadge.innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
-    // Identity
     if(info.identity) {
         const idBadge = document.getElementById('school-identity');
         if(idBadge) {
@@ -123,7 +129,6 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
-    // VTR
     const vtrContainer = document.getElementById('vtr-container');
     const vtrIframe = document.getElementById('vtr-iframe');
     if (info.vtr_url && vtrContainer && vtrIframe) {
@@ -139,7 +144,6 @@ export function renderSchoolInfo(dataList) {
         }
     }
 
-    // Colors
     const colorBox = document.getElementById('school-color-box');
     if(colorBox) {
         const c1 = info.color_code || '#ddd';
@@ -148,7 +152,6 @@ export function renderSchoolInfo(dataList) {
         colorBox.style.border = '1px solid rgba(0,0,0,0.1)';
     }
 
-    // Music
     const audio = document.getElementById('school-song');
     if (info.song_url && audio) {
         audio.src = info.song_url;
@@ -156,7 +159,6 @@ export function renderSchoolInfo(dataList) {
         if(controls) controls.classList.remove('hidden');
     }
 
-    // History Content
     const histContent = document.getElementById('school-history-content');
     if(histContent) histContent.innerText = info.history || 'ยังไม่มีข้อมูลประวัติในระบบ';
     
@@ -166,7 +168,6 @@ export function renderSchoolInfo(dataList) {
     const identityContent = document.getElementById('school-identity-content');
     if(identityContent) identityContent.innerText = info.identity || '-';
 
-    // Footer Socials
     const footerName = document.getElementById('footer-school-name');
     if(footerName && info.school_name) footerName.innerText = info.school_name;
     
@@ -179,14 +180,13 @@ export function renderSchoolInfo(dataList) {
     }
 }
 
-// 4. แสดง Grid บุคลากร (คนแรกเดี่ยว, ที่เหลือ Grid 4)
+// 4. แสดง Grid บุคลากร (คนแรกเดี่ยว)
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     if (!data || data.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 col-span-full">กำลังปรับปรุงข้อมูล</p>'; return; }
 
-    // เรียง ID น้อย -> มาก (ID 1 มาก่อน)
     const sortedData = [...data].sort((a, b) => a.id - b.id);
     const leader = sortedData[0]; 
     const others = sortedData.slice(1);
@@ -202,11 +202,9 @@ export function renderPersonGrid(data, containerId) {
     `;
 
     let html = '';
-    // ผอ./ประธาน
     if (leader) {
         html += `<div class="flex justify-center mb-8"><div class="w-full max-w-xs">${createCard(leader)}</div></div>`;
     }
-    // คนอื่นๆ
     if (others.length > 0) {
         html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">';
         others.forEach(p => html += createCard(p));
@@ -237,7 +235,7 @@ export function renderHistoryTable(tbodyId, data) {
     });
 }
 
-// 6. ผลงาน (Achievements) - แบบละเอียดครบ 8 ข้อ
+// 6. ผลงาน (Achievements) ✅ อัปเดตใหม่: โชว์รายการแข่ง + ฝัง data-level
 function renderAchievements(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -248,15 +246,15 @@ function renderAchievements(containerId, data, type) {
         return; 
     }
     
-    // เรียง ใหม่ -> เก่า
     const sortedData = [...data].sort((a, b) => b.id - a.id);
 
     sortedData.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
         const name = type === 'teacher' ? item.name : item.students;
         
-        // เพิ่ม class 'achievement-card' เพื่อใช้ค้นหา
         const div = document.createElement('div');
+        // ✅ ฝัง data-level ไว้สำหรับการกรอง
+        div.setAttribute('data-level', item.level || ''); 
         div.className = "achievement-card bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden border border-gray-100 flex flex-col h-full";
         div.innerHTML = `
             <div class="h-56 bg-gray-100 relative overflow-hidden group border-b cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
@@ -268,7 +266,9 @@ function renderAchievements(containerId, data, type) {
             </div>
             <div class="p-5 flex-grow flex flex-col gap-2">
                 <div>
+                    ${item.competition ? `<span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded mr-1">${item.competition}</span>` : ''}
                     <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">${item.program || 'รายการทั่วไป'}</span>
+                    
                     <h4 class="font-bold text-gray-800 text-lg leading-tight mt-1 hover:text-blue-600 cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">${item.title || '-'}</h4>
                 </div>
                 
