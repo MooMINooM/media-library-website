@@ -36,7 +36,7 @@
     <div id="modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center"><div class="bg-white p-6 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto"><div class="flex justify-between mb-4"><h2 id="modal-title" class="font-bold text-xl">จัดการ</h2><button onclick="closeModal()">x</button></div><form id="data-form" class="space-y-4"><input type="hidden" name="id" id="field-id"><div id="form-fields"></div></form><div class="mt-6 flex gap-2"><button onclick="submitForm()" class="bg-blue-600 text-white px-4 py-2 rounded flex-1">บันทึก</button><button onclick="closeModal()" class="bg-gray-200 px-4 py-2 rounded">ยกเลิก</button></div></div></div>
 
     <script>
-        const SUPABASE_URL = 'ใส่_SUPABASE_URL_ที่นี่'; const SUPABASE_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
+        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         const SCHEMAS = {
