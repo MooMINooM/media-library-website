@@ -1,5 +1,5 @@
 // js/script.js
-import * as UI from './ui.js';
+import * as UI from 'js/ui.js';
 
 // ⚠️⚠️⚠️ ใส่ URL และ KEY ของอาจารย์ที่นี่ ⚠️⚠️⚠️
 const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
