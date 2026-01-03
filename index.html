@@ -44,7 +44,7 @@
                     </div>
                 </a>
 
-                <nav id="main-nav" class="hidden lg:flex items-center gap-2">
+                <nav id="main-nav" class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm xl:text-base">
                     <a href="#" data-page="home" class="nav-link hover:bg-blue-50">หน้าแรก</a>
 
                     <div class="relative dropdown group h-full flex items-center">
@@ -53,31 +53,51 @@
                             <a href="#" data-page="history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ประวัติความเป็นมา</a>
                             <a href="#" data-page="school-board" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">คณะกรรมการสถานศึกษา</a>
                             <a href="#" data-page="student-council" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">สภานักเรียน</a>
-                        </div>
-                    </div>
-
-                    <div class="relative dropdown group h-full flex items-center">
-                        <button class="nav-link dropdown-toggle">บุคลากร <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
-                        <div class="dropdown-menu">
+                            <div class="border-t my-1"></div>
                             <a href="#" data-page="personnel-list" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">บุคลากรปัจจุบัน</a>
                             <a href="#" data-page="director-history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ทำเนียบผู้บริหาร</a>
-                            <a href="#" data-page="personnel-history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ทำเนียบบุคลากร</a>
                         </div>
                     </div>
 
-                    <a href="#" data-page="students" class="nav-link hover:bg-blue-50">นักเรียน</a>
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle">วิชาการ&สถิติ <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
+                        <div class="dropdown-menu">
+                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold text-blue-600">
+                                <i class="fa-solid fa-chart-line mr-1"></i> ผลสัมฤทธิ์ (O-NET)
+                            </a>
+                            <a href="#" data-page="students" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">สารสนเทศนักเรียน</a>
+                        </div>
+                    </div>
+
+                    <a href="#" data-page="innovations" class="nav-link hover:bg-blue-50 text-blue-700 font-bold">
+                        <i class="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> นวัตกรรม
+                    </a>
 
                     <div class="relative dropdown group h-full flex items-center">
-                        <button class="nav-link dropdown-toggle">ผลงาน <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
+                        <button class="nav-link dropdown-toggle">ผลงาน/ข่าว <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
                         <div class="dropdown-menu w-48">
+                            <a href="#" data-page="news" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ข่าวประชาสัมพันธ์</a>
+                            <div class="border-t my-1"></div>
                             <a href="#" data-page="teacher-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานครู</a>
                             <a href="#" data-page="student-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานนักเรียน</a>
                             <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ผลงานสถานศึกษา</a>
                         </div>
                     </div>
 
-                    <a href="#" data-page="news" class="nav-link hover:bg-blue-50">ข่าวสาร</a>
-                    
+                    <div class="relative dropdown group h-full flex items-center">
+                        <button class="nav-link dropdown-toggle text-green-700 font-bold hover:bg-green-50">
+                            <i class="fa-solid fa-desktop mr-1"></i> ระบบสารสนเทศ
+                        </button>
+                        <div class="dropdown-menu w-56 right-0 left-auto">
+                            <a href="https://your-checkin-system.com" target="_blank" class="block px-4 py-2 hover:bg-green-50 text-green-700 font-bold">
+                                <i class="fa-solid fa-user-check mr-2"></i> เช็คชื่อห้องคอมฯ
+                            </a>
+                            <span class="block px-4 py-2 text-gray-400 text-xs cursor-default border-t mt-1">
+                                <i class="fa-solid fa-lock mr-1"></i> ระบบอื่นๆ (เร็วๆ นี้)
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="relative dropdown group h-full flex items-center">
                         <button class="nav-link dropdown-toggle">เอกสาร <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
                         <div class="dropdown-menu w-48 right-0 left-auto">
@@ -85,11 +105,9 @@
                             <a href="#" data-page="documents-forms" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">แบบฟอร์ม</a>
                         </div>
                     </div>
-                    
-                    <a href="#" data-page="innovations" class="nav-link hover:bg-blue-50">นวัตกรรม</a>
 
-                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 rounded-full shadow-md transition transform hover:scale-105 flex items-center justify-center text-sm" title="เข้าสู่ระบบผู้ดูแล">
-                        <i class="fa-solid fa-lock"></i>
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="ml-2 bg-slate-800 hover:bg-blue-700 text-white w-8 h-8 rounded-full shadow-md transition transform hover:scale-105 flex items-center justify-center text-xs" title="ผู้ดูแลระบบ">
+                        <i class="fa-solid fa-gear"></i>
                     </button>
                 </nav>
 
@@ -98,10 +116,14 @@
                 </button>
             </div>
             
-            <div id="mobile-menu" class="hidden lg:hidden bg-gray-50 border-t p-4 space-y-2">
+            <div id="mobile-menu" class="hidden lg:hidden bg-gray-50 border-t p-4 space-y-2 text-sm">
                 <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
                 <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
-                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-3 px-4 text-blue-600 font-bold bg-blue-50 rounded-lg mt-2">เข้าสู่ระบบผู้ดูแล</button>
+                <a href="#" data-page="innovations" class="block py-2 px-4 rounded hover:bg-white text-blue-700 font-bold">คลังนวัตกรรม</a>
+                <a href="https://your-checkin-system.com" target="_blank" class="block py-2 px-4 rounded bg-green-100 text-green-800 font-bold mt-2">
+                    <i class="fa-solid fa-desktop mr-2"></i> ระบบเช็คชื่อห้องคอมฯ
+                </a>
+                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-3 px-4 text-slate-700 font-bold bg-slate-200 rounded-lg mt-2">เข้าสู่ระบบผู้ดูแล</button>
             </div>
         </div>
     </header>
