@@ -3,431 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบหลังบ้าน - โรงเรียนบ้านภูพระโนนผักหวาน</title>
+    <title>ระบบจัดการข้อมูลโรงเรียน</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style> 
-        body { font-family: 'Sarabun', sans-serif; } 
-        .menu-item { @apply flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition text-gray-600 hover:bg-blue-50 hover:text-blue-600; }
-        .menu-item.active { @apply bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:text-white; }
-        .input-box { @apply w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white; }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+        .menu-item.active { @apply bg-blue-600 text-white shadow-md; }
+        /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-gray-100 h-screen flex overflow-hidden">
+<body class="flex h-screen overflow-hidden text-gray-800">
 
-    <aside class="w-64 bg-white shadow-xl flex-shrink-0 flex flex-col z-20">
-        <div class="p-6 border-b">
-            <h1 class="font-bold text-xl text-blue-800">Admin Panel</h1>
-            <p class="text-xs text-gray-500">จัดการข้อมูลเว็บไซต์</p>
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20 hidden md:flex shadow-lg">
+        <div class="p-6 border-b flex items-center gap-3 bg-blue-50">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                <i class="fa-solid fa-school"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-gray-800 text-lg">Admin Panel</h1>
+                <p class="text-xs text-gray-500">จัดการข้อมูลโรงเรียน</p>
+            </div>
         </div>
+        
         <nav class="flex-1 overflow-y-auto p-4 space-y-1">
-            <div onclick="showSection('news')" class="menu-item active" id="menu-news"><i class="fa-regular fa-newspaper w-5"></i> ข่าวประชาสัมพันธ์</div>
-            
-            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">ผลงาน</div>
-            <div onclick="showSection('teacher')" class="menu-item" id="menu-teacher"><i class="fa-solid fa-chalkboard-user w-5"></i> ผลงานครู</div>
-            <div onclick="showSection('student')" class="menu-item" id="menu-student"><i class="fa-solid fa-user-graduate w-5"></i> ผลงานนักเรียน</div>
-            <div onclick="showSection('school')" class="menu-item" id="menu-school"><i class="fa-solid fa-school w-5"></i> ผลงานโรงเรียน (ทั่วไป)</div>
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2">ทั่วไป</p>
+            <button onclick="loadSection('school_info')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-gear w-5 text-center"></i> ข้อมูลโรงเรียน
+            </button>
+            <button onclick="loadSection('news')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-newspaper w-5 text-center"></i> ข่าวสาร
+            </button>
 
-            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">วิชาการ & สถิติ</div>
-            <div onclick="showSection('academic')" class="menu-item" id="menu-academic"><i class="fa-solid fa-chart-line w-5"></i> ผลสัมฤทธิ์ (O-NET/NT/RT)</div>
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">วิชาการ & สถิติ</p>
+            <button onclick="loadSection('student_data')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> จำนวนนักเรียน
+            </button>
+            <button onclick="loadAcademic('onet')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition" id="menu-academic">
+                <i class="fa-solid fa-chart-line w-5 text-center"></i> ผลสัมฤทธิ์ (O-NET/NT)
+            </button>
 
-            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">อื่นๆ</div>
-            <div onclick="showSection('document')" class="menu-item" id="menu-document"><i class="fa-solid fa-folder-open w-5"></i> เอกสาร & ฟอร์ม</div>
-            <div onclick="showSection('innovation')" class="menu-item" id="menu-innovation"><i class="fa-solid fa-lightbulb w-5"></i> นวัตกรรม</div>
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">บุคลากร</p>
+            <button onclick="loadSection('personnel')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-user-tie w-5 text-center"></i> บุคลากรครู
+            </button>
+            <button onclick="loadSection('school_board')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-users-rectangle w-5 text-center"></i> คณะกรรมการฯ
+            </button>
+            <button onclick="loadSection('student_council')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-user-graduate w-5 text-center"></i> สภานักเรียน
+            </button>
+            <button onclick="loadSection('director_history')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-user-clock w-5 text-center"></i> ทำเนียบผู้บริหาร
+            </button>
+
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">ผลงาน & อื่นๆ</p>
+            <button onclick="loadSection('teacher_awards')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-medal w-5 text-center"></i> ผลงานครู
+            </button>
+            <button onclick="loadSection('student_awards')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-trophy w-5 text-center"></i> ผลงานนักเรียน
+            </button>
+            <button onclick="loadSection('school_awards')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-award w-5 text-center"></i> ผลงานโรงเรียน
+            </button>
+            <button onclick="loadSection('innovations')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-lightbulb w-5 text-center"></i> นวัตกรรม
+            </button>
+            <button onclick="loadSection('documents')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-folder-open w-5 text-center"></i> เอกสาร/แบบฟอร์ม
+            </button>
         </nav>
+        
         <div class="p-4 border-t">
-            <button onclick="logout()" class="w-full text-red-600 hover:bg-red-50 py-2 rounded-lg transition"><i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ</button>
+            <button onclick="logout()" class="w-full bg-red-50 text-red-600 py-2.5 rounded-lg hover:bg-red-100 font-bold transition flex justify-center items-center gap-2">
+                <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
+            </button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-8">
-        
-        <div id="section-news" class="content-section">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการข่าวสาร</h2>
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-2"><label>หัวข้อข่าว</label><input type="text" id="news-title" class="input-box"></div>
-                    <div><label>ลิงก์ (ถ้ามี)</label><input type="text" id="news-link" class="input-box" placeholder="https://..."></div>
-                    <div><label>รูปภาพ</label><input type="file" id="news-file" class="input-box"></div>
-                </div>
-                <button onclick="saveGeneric('news', ['title', 'link'], 'news-file')" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกข่าว</button>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left text-sm" id="table-news"></table>
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="bg-white shadow-sm p-4 md:hidden flex justify-between items-center z-10">
+            <span class="font-bold text-gray-800">Admin Panel</span>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-8" id="main-area">
+            <div class="h-full flex flex-col items-center justify-center text-gray-400">
+                <i class="fa-solid fa-school-circle-check text-6xl mb-4 text-blue-200"></i>
+                <p class="text-lg">ยินดีต้อนรับสู่ระบบจัดการ</p>
+                <p class="text-sm">เลือกเมนูทางซ้ายเพื่อเริ่มแก้ไขข้อมูล</p>
             </div>
         </div>
-
-        <div id="section-achievement" class="content-section hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800" id="ach-title">จัดการผลงาน</h2>
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-2"><label>ชื่อรางวัล / ผลงาน</label><input type="text" id="ach-title-input" class="input-box"></div>
-                    <div>
-                        <label>รายการแข่ง (Competition)</label>
-                        <input type="text" id="ach-comp" class="input-box" placeholder="เช่น ศิลปหัตถกรรม ครั้งที่ 71">
-                        <p class="text-xs text-gray-400">ใช้สำหรับสร้างโฟลเดอร์หน้าเว็บ</p>
-                    </div>
-                    <div>
-                        <label>กลุ่มสาระ</label>
-                        <select id="ach-subject" class="input-box">
-                            <option value="อื่นๆ">อื่นๆ</option>
-                            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
-                            <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
-                            <option value="ภาษาไทย">ภาษาไทย</option>
-                            <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
-                            <option value="สังคมศึกษา">สังคมศึกษา</option>
-                            <option value="การงานอาชีพ">การงานอาชีพ</option>
-                            <option value="ศิลปะ">ศิลปะ</option>
-                            <option value="สุขะ - พละ">สุขะ - พละ</option>
-                            <option value="ปฐมวัย">ปฐมวัย</option>
-                        </select>
-                    </div>
-                    <div class="col-span-2"><label>ชื่อเจ้าของผลงาน</label><input type="text" id="ach-name" class="input-box"></div>
-                    <div><label>รูปภาพ</label><input type="file" id="ach-file" class="input-box"></div>
-                </div>
-                <button onclick="saveAchievement()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกผลงาน</button>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left text-sm" id="table-achievement"></table>
-            </div>
-        </div>
-
-        <div id="section-academic" class="content-section hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                จัดการผลสัมฤทธิ์ทางการเรียน
-                <select id="academic-type" onchange="loadAcademicData()" class="text-base border-2 border-blue-500 text-blue-700 rounded-lg px-3 py-1 focus:outline-none bg-blue-50">
-                    <option value="onet">O-NET</option>
-                    <option value="nt">NT</option>
-                    <option value="rt">RT</option>
-                </select>
-            </h2>
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6 border-l-4 border-blue-500">
-                <h3 class="font-bold text-gray-700 mb-4" id="academic-form-header">เพิ่มข้อมูล O-NET</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label>ชื่อเอกสาร</label>
-                        <input type="text" id="acad-title" class="input-box" placeholder="เช่น คะแนนสอบ ปี 2566">
-                    </div>
-                    <div>
-                        <label>ปีการศึกษา (Tag)</label>
-                        <input type="text" id="acad-tag" class="input-box" placeholder="เช่น 2566 (สำคัญ! ใช้ทำโฟลเดอร์)">
-                    </div>
-                    <div class="col-span-2">
-                        <label>ไฟล์เอกสาร (PDF หรือ รูปภาพ)</label>
-                        <input type="file" id="acad-file" class="input-box">
-                    </div>
-                </div>
-                <button onclick="saveAcademic()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 w-full md:w-auto">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูล
-                </button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 border-b">
-                        <tr><th class="p-3">วันที่</th><th class="p-3">ชื่อเอกสาร</th><th class="p-3">ปี (Tag)</th><th class="p-3">ไฟล์</th><th class="p-3">ลบ</th></tr>
-                    </thead>
-                    <tbody id="table-academic"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="section-document" class="content-section hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการเอกสาร</h2>
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-2"><label>ชื่อเอกสาร</label><input type="text" id="doc-title" class="input-box"></div>
-                    <div>
-                        <label>ประเภท</label>
-                        <select id="doc-category" class="input-box">
-                            <option value="วิชาการ">วิชาการ</option>
-                            <option value="บุคคล">บุคคล</option>
-                            <option value="งบประมาณ">งบประมาณ</option>
-                            <option value="บริหารทั่วไป">บริหารทั่วไป</option>
-                        </select>
-                    </div>
-                    <div><label>ไฟล์ (PDF/Word)</label><input type="file" id="doc-file" class="input-box"></div>
-                </div>
-                <button onclick="saveGeneric('documents', ['title', 'category'], 'doc-file')" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกเอกสาร</button>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left text-sm" id="table-documents"></table>
-            </div>
-        </div>
-
-        <div id="section-innovation" class="content-section hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการนวัตกรรม</h2>
-            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="col-span-2"><label>ชื่อนวัตกรรม</label><input type="text" id="inno-title" class="input-box"></div>
-                    <div><label>เจ้าของผลงาน</label><input type="text" id="inno-creator" class="input-box"></div>
-                    <div><label>กลุ่มสาระ</label><input type="text" id="inno-subject" class="input-box"></div>
-                    <div><label>รูปปก</label><input type="file" id="inno-cover" class="input-box"></div>
-                    <div><label>ไฟล์ผลงาน (PDF/Link)</label><input type="text" id="inno-link" class="input-box" placeholder="Link หรือ URL"></div>
-                </div>
-                <button onclick="saveInnovation()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกนวัตกรรม</button>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="w-full text-left text-sm" id="table-innovations"></table>
-            </div>
-        </div>
-
     </main>
 
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
+                <h2 id="modal-title" class="text-lg font-bold text-gray-800">จัดการข้อมูล</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <form id="data-form" class="space-y-4">
+                    <input type="hidden" name="id" id="field-id">
+                    <div id="form-fields"></div>
+                </form>
+            </div>
+            <div class="p-5 border-t bg-gray-50 rounded-b-xl flex gap-3">
+                <button type="button" onclick="submitForm()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-bold shadow">บันทึกข้อมูล</button>
+                <button type="button" onclick="closeModal()" class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-bold">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // ⚠️⚠️⚠️ ตั้งค่า Supabase ⚠️⚠️⚠️
-        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
-        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
-        const supabase = window.supabase.createClient(PROJECT_URL, ANON_KEY);
+        // ⚠️⚠️⚠️ ใส่ URL และ KEY ของ Supabase ตรงนี้ ⚠️⚠️⚠️
+        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        
+        let supabaseAdmin;
+        try { supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error(e); }
 
-        // State
-        let currentAchType = 'teacher'; 
+        // --- SCHEMAS (โครงสร้างข้อมูลแต่ละตาราง) ---
+        const SCHEMAS = {
+            school_info: { title: "ข้อมูลพื้นฐานโรงเรียน", fields: [
+                { key: "school_name", label: "ชื่อโรงเรียน", type: "text" },
+                { key: "founding_date", label: "วันที่ก่อตั้ง", type: "date" },
+                { key: "color_code_1", label: "สีประจำโรงเรียน 1", type: "color" },
+                { key: "color_code_2", label: "สีประจำโรงเรียน 2", type: "color" },
+                { key: "motto", label: "คำขวัญ", type: "text" },
+                { key: "identity", label: "อัตลักษณ์", type: "text" },
+                { key: "mission", label: "พันธกิจ", type: "textarea", rows: 3 },
+                { key: "history", label: "ประวัติ", type: "textarea", rows: 5 },
+                { key: "song_url", label: "ลิงก์เพลงมาร์ช", type: "url" },
+                { key: "vtr_url", label: "ลิงก์ VTR", type: "url" },
+                { key: "facebook", label: "Facebook", type: "url" },
+                { key: "youtube", label: "Youtube", type: "url" }
+            ]},
+            news: { title: "ข่าวสาร", fields: [
+                { key: "title", label: "หัวข้อข่าว", type: "text", required: true },
+                { key: "date", label: "วันที่", type: "date", required: true },
+                { key: "image", label: "รูปภาพ (URL)", type: "url" },
+                { key: "link", label: "ลิงก์อ่านต่อ", type: "url" }
+            ]},
+            student_data: { title: "จำนวนนักเรียน", fields: [
+                { key: "grade", label: "ระดับชั้น", type: "text", required: true },
+                { key: "male", label: "ชาย", type: "number", required: true },
+                { key: "female", label: "หญิง", type: "number", required: true }
+            ]},
+            // ✅ เพิ่ม 3 ตารางสำหรับผลสัมฤทธิ์
+            onet: { title: "ผลสัมฤทธิ์ O-NET", fields: [
+                { key: "title", label: "ชื่อรายการ (เช่น คะแนนปี 66)", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา (เช่น 2566)", type: "text", required: true },
+                { key: "file_url", label: "ลิงก์ไฟล์ (PDF/รูป)", type: "url", required: true },
+                { key: "date", label: "วันที่ลงข้อมูล", type: "date" }
+            ]},
+            nt: { title: "ผลสัมฤทธิ์ NT", fields: [
+                { key: "title", label: "ชื่อรายการ", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา", type: "text", required: true },
+                { key: "file_url", label: "ลิงก์ไฟล์", type: "url", required: true },
+                { key: "date", label: "วันที่ลงข้อมูล", type: "date" }
+            ]},
+            rt: { title: "ผลสัมฤทธิ์ RT", fields: [
+                { key: "title", label: "ชื่อรายการ", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา", type: "text", required: true },
+                { key: "file_url", label: "ลิงก์ไฟล์", type: "url", required: true },
+                { key: "date", label: "วันที่ลงข้อมูล", type: "date" }
+            ]},
+            // ... (ตารางอื่นๆ เหมือนเดิม)
+            personnel: { title: "บุคลากรครู", fields: [{ key: "name", label: "ชื่อ", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            school_board: { title: "คณะกรรมการ", fields: [{ key: "name", label: "ชื่อ", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            student_council: { title: "สภานักเรียน", fields: [{ key: "name", label: "ชื่อ", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            director_history: { title: "ทำเนียบผู้บริหาร", fields: [{ key: "name", label: "ชื่อ", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "start_date", label: "เริ่ม", type: "text" }, { key: "end_date", label: "สิ้นสุด", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            teacher_awards: { title: "ผลงานครู", fields: [{ key: "name", label: "ชื่อครู", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "subject", label: "กลุ่มสาระ", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            student_awards: { title: "ผลงานนักเรียน", fields: [{ key: "students", label: "ชื่อนักเรียน", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "subject", label: "กลุ่มสาระ", type: "text" }, { key: "image", label: "รูป", type: "url" }] },
+            school_awards: { title: "ผลงานโรงเรียน", fields: [{ key: "title", label: "รางวัล", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "รูป", type: "url" }] },
+            innovations: { title: "นวัตกรรม", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "creator", label: "ผู้จัดทำ", type: "text" }, { key: "subject", label: "วิชา", type: "text" }, { key: "fileUrl", label: "ไฟล์", type: "url" }, { key: "coverImageUrl", label: "ปก", type: "url" }] },
+            documents: { title: "เอกสาร/แบบฟอร์ม", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "ไฟล์", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] }
+        };
 
-        // 1. Check Login
+        let currentSection = '';
+        let currentData = [];
+
+        // --- FUNCTIONS ---
+
         async function checkAuth() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseAdmin.auth.getSession();
             if (!session) window.location.href = 'index.html';
-            else showSection('news'); // เริ่มต้นที่หน้าข่าว
         }
-
-        // 2. Navigation
-        window.showSection = function(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-
-            // Show selected
-            let targetId = sectionId;
-            if(['teacher', 'student', 'school'].includes(sectionId)) targetId = 'achievement'; // รวม 3 อันนี้ใช้หน้า achievement เดียวกัน
-
-            document.getElementById(`section-${targetId}`).classList.remove('hidden');
-            document.getElementById(`menu-${sectionId}`).classList.add('active');
-
-            // Load Data based on section
-            if(sectionId === 'news') loadGenericTable('news', 'table-news');
-            else if(sectionId === 'document') loadGenericTable('documents', 'table-documents');
-            else if(sectionId === 'innovation') loadGenericTable('innovations', 'table-innovations');
-            else if(sectionId === 'academic') loadAcademicData(); // โหลดข้อมูลวิชาการ
-            else {
-                // Achievement Types
-                currentAchType = sectionId; // teacher, student, school
-                document.getElementById('ach-title').innerText = `จัดการผลงาน${sectionId === 'teacher' ? 'ครู' : sectionId === 'student' ? 'นักเรียน' : 'โรงเรียน'}`;
-                loadAchievementTable();
-            }
-        }
-
-        // --------------------------------------------------------
-        // 🏫 ACADEMIC LOGIC (O-NET / NT / RT) - ส่วนที่เพิ่มมาใหม่
-        // --------------------------------------------------------
-        
-        async function loadAcademicData() {
-            const type = document.getElementById('academic-type').value; // onet, nt, rt
-            document.getElementById('academic-form-header').innerText = `เพิ่มข้อมูล ${type.toUpperCase()}`;
-            
-            const tbody = document.getElementById('table-academic');
-            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">กำลังโหลด...</td></tr>';
-
-            const { data, error } = await supabase.from(type).select('*').order('id', { ascending: false });
-            if(error) { console.error(error); return; }
-
-            tbody.innerHTML = '';
-            if(data.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีข้อมูล</td></tr>';
-
-            data.forEach(item => {
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">${new Date(item.date).toLocaleDateString('th-TH')}</td>
-                        <td class="p-3 font-bold">${item.title}</td>
-                        <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 rounded text-xs">${item.tag}</span></td>
-                        <td class="p-3"><a href="${item.file_url}" target="_blank" class="text-blue-600 hover:underline">ดูไฟล์</a></td>
-                        <td class="p-3"><button onclick="deleteItem('${type}', ${item.id}, loadAcademicData)" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `;
-            });
-        }
-
-        window.saveAcademic = async function() {
-            const type = document.getElementById('academic-type').value;
-            const title = document.getElementById('acad-title').value;
-            const tag = document.getElementById('acad-tag').value;
-            const file = document.getElementById('acad-file').files[0];
-
-            if(!title || !tag || !file) { Swal.fire('แจ้งเตือน', 'กรุณากรอกให้ครบ', 'warning'); return; }
-
-            Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
-            
-            // Upload
-            const fileName = `academic/${type}/${Date.now()}_${file.name}`;
-            const { error: uploadError } = await supabase.storage.from('uploads').upload(fileName, file); // ใช้ Bucket 'uploads' เหมือนกัน
-            if(uploadError) { Swal.fire('Error', uploadError.message, 'error'); return; }
-            
-            const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);
-
-            // Insert
-            const { error } = await supabase.from(type).insert([{
-                title: title,
-                tag: tag,
-                file_url: publicUrl,
-                date: new Date()
-            }]);
-
-            if(error) Swal.fire('Error', error.message, 'error');
-            else {
-                Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
-                document.getElementById('acad-title').value = '';
-                document.getElementById('acad-tag').value = '';
-                document.getElementById('acad-file').value = '';
-                loadAcademicData();
-            }
-        }
-
-        // --------------------------------------------------------
-        // 🏆 ACHIEVEMENT LOGIC (Teacher/Student/School)
-        // --------------------------------------------------------
-        async function loadAchievementTable() {
-            const table = `${currentAchType}_achievements`;
-            const tbody = document.getElementById('table-achievement');
-            tbody.innerHTML = '<tr><td class="p-4 text-center">กำลังโหลด...</td></tr>';
-            
-            const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
-            tbody.innerHTML = '';
-            
-            data.forEach((item, index) => {
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">${index+1}</td>
-                        <td class="p-3"><img src="${item.image}" class="w-10 h-10 object-cover rounded"></td>
-                        <td class="p-3 font-bold">${item.title || item.name}</td>
-                        <td class="p-3 text-xs text-gray-500">${item.competition || '-'}</td>
-                        <td class="p-3"><button onclick="deleteItem('${table}', ${item.id}, loadAchievementTable)" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>`;
-            });
-        }
-
-        window.saveAchievement = async function() {
-            const table = `${currentAchType}_achievements`;
-            const title = document.getElementById('ach-title-input').value;
-            const comp = document.getElementById('ach-comp').value;
-            const subj = document.getElementById('ach-subject').value;
-            const name = document.getElementById('ach-name').value;
-            const file = document.getElementById('ach-file').files[0];
-
-            if(!title || !file) { Swal.fire('ขาดข้อมูล', 'ชื่อรางวัลและรูปภาพจำเป็นต้องมี', 'warning'); return; }
-
-            Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
-            
-            // Upload
-            const fileName = `achievements/${Date.now()}_${file.name}`;
-            const { error: upErr } = await supabase.storage.from('uploads').upload(fileName, file);
-            if(upErr) { Swal.fire('Error', upErr.message, 'error'); return; }
-            const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);
-
-            // Insert
-            const payload = { 
-                title: title, 
-                competition: comp, 
-                subject: subj, 
-                image: publicUrl, 
-                date: new Date() 
-            };
-            if(currentAchType === 'teacher') payload.name = name;
-            else if(currentAchType === 'student') payload.students = name;
-            // school ไม่ต้องมี name
-
-            const { error } = await supabase.from(table).insert([payload]);
-            if(error) Swal.fire('Error', error.message, 'error');
-            else {
-                Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
-                // Clear Form (Simplified)
-                document.getElementById('ach-title-input').value = '';
-                document.getElementById('ach-file').value = '';
-                loadAchievementTable();
-            }
-        }
-
-        // --------------------------------------------------------
-        // 📰 GENERIC LOGIC (News / Docs / Innovation)
-        // --------------------------------------------------------
-        async function loadGenericTable(table, tableId) {
-            const tbody = document.getElementById(tableId);
-            tbody.innerHTML = '<tr><td class="p-4 text-center">กำลังโหลด...</td></tr>';
-            const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
-            tbody.innerHTML = '';
-            
-            data.forEach((item, index) => {
-                let imgHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded">` : (item.fileUrl ? '<i class="fa-solid fa-file text-blue-500"></i>' : '-');
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">${index+1}</td>
-                        <td class="p-3">${imgHtml}</td>
-                        <td class="p-3 font-bold">${item.title}</td>
-                        <td class="p-3"><button onclick="deleteItem('${table}', ${item.id}, () => loadGenericTable('${table}', '${tableId}'))" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>`;
-            });
-        }
-
-        window.saveGeneric = async function(table, fields, fileInputId) {
-            // โค้ดส่วนนี้เขียนแบบย่อๆ เพื่อให้พอดีหน้าจอ
-            // จริงๆ ควรดึงค่าตาม fields ที่ส่งมา
-            const file = document.getElementById(fileInputId).files[0];
-            let publicUrl = '';
-            
-            if(file) {
-                Swal.fire({ title: 'กำลังอัปโหลด...', didOpen: () => Swal.showLoading() });
-                const fileName = `${table}/${Date.now()}_${file.name}`;
-                await supabase.storage.from('uploads').upload(fileName, file);
-                publicUrl = supabase.storage.from('uploads').getPublicUrl(fileName).data.publicUrl;
-            }
-
-            let payload = { date: new Date() };
-            if(table === 'news') {
-                payload.title = document.getElementById('news-title').value;
-                payload.link = document.getElementById('news-link').value;
-                payload.image = publicUrl;
-            } else if (table === 'documents') {
-                payload.title = document.getElementById('doc-title').value;
-                payload.category = document.getElementById('doc-category').value;
-                payload.fileUrl = publicUrl;
-                payload.uploadDate = new Date();
-            } else if (table === 'innovations') {
-                payload.title = document.getElementById('inno-title').value;
-                payload.creator = document.getElementById('inno-creator').value;
-                payload.subject = document.getElementById('inno-subject').value;
-                payload.fileUrl = document.getElementById('inno-link').value;
-                payload.coverImageUrl = document.getElementById('inno-cover').files[0] ? (await uploadFile(document.getElementById('inno-cover').files[0])) : '';
-                // *หมายเหตุ: Innovation อาจต้องเขียนแยกถ้าจะอัป 2 ไฟล์
-            }
-
-            await supabase.from(table).insert([payload]);
-            Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
-            loadGenericTable(table, `table-${table}`);
-        }
-        
-        async function uploadFile(file) {
-             const fileName = `misc/${Date.now()}_${file.name}`;
-             await supabase.storage.from('uploads').upload(fileName, file);
-             return supabase.storage.from('uploads').getPublicUrl(fileName).data.publicUrl;
-        }
-
-        // --------------------------------------------------------
-        // 🗑️ COMMON UTILS
-        // --------------------------------------------------------
-        window.deleteItem = async function(table, id, refreshCallback) {
-            const result = await Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบเลย' });
-            if (result.isConfirmed) {
-                await supabase.from(table).delete().eq('id', id);
-                refreshCallback();
-                Swal.fire('ลบแล้ว', '', 'success');
-            }
-        }
-
-        window.logout = async () => { await supabase.auth.signOut(); window.location.href = 'index.html'; }
-
         checkAuth();
+
+        async function logout() { await supabaseAdmin.auth.signOut(); window.location.href = 'index.html'; }
+
+        // ✅ ฟังก์ชันพิเศษ: สำหรับกดเมนู "ผลสัมฤทธิ์" แล้วให้โหลด O-NET เป็นค่าเริ่มต้น
+        function loadAcademic(type) {
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('menu-academic').classList.add('active');
+            loadSection(type); // โหลดตารางที่ส่งมา (เช่น onet)
+        }
+
+        async function loadSection(section) {
+            currentSection = section;
+            const schema = SCHEMAS[section];
+            const main = document.getElementById('main-area');
+            main.innerHTML = `<div class="h-full flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-500"></i></div>`;
+
+            // Highlight Menu (ถ้าไม่ใช่ academic เพราะ academic จัดการ active เองแล้ว)
+            if(!['onet','nt','rt'].includes(section)) {
+                document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+                const activeMenu = document.querySelector(`button[onclick="loadSection('${section}')"]`);
+                if(activeMenu) activeMenu.classList.add('active');
+            }
+
+            // Fetch Data
+            let query = supabaseAdmin.from(section).select('*');
+            query = (section === 'student_data') ? query.order('id', { ascending: true }) : query.order('id', { ascending: false });
+            const { data, error } = await query;
+
+            if (error) { console.error(error); main.innerHTML = `<div class="text-red-500 p-8">Error: ${error.message}</div>`; return; }
+            currentData = data;
+
+            // Render
+            if (section === 'school_info') {
+                renderSchoolInfoForm(data[0] || {});
+            } else {
+                renderListView(schema, section);
+            }
+        }
+
+        function renderListView(schema, sectionKey) {
+            const main = document.getElementById('main-area');
+            
+            // ✅ สร้าง Dropdown ถ้าเป็นหน้าผลสัมฤทธิ์
+            let headerControl = `<h2 class="text-2xl font-bold text-gray-800">${schema.title}</h2>`;
+            
+            if (['onet', 'nt', 'rt'].includes(sectionKey)) {
+                headerControl = `
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">ผลสัมฤทธิ์: </h2>
+                        <select onchange="loadSection(this.value)" class="border-2 border-blue-500 text-blue-700 rounded-lg px-3 py-1 font-bold bg-white focus:outline-none">
+                            <option value="onet" ${sectionKey==='onet'?'selected':''}>O-NET</option>
+                            <option value="nt" ${sectionKey==='nt'?'selected':''}>NT</option>
+                            <option value="rt" ${sectionKey==='rt'?'selected':''}>RT</option>
+                        </select>
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="flex justify-between items-center mb-6">
+                    ${headerControl}
+                    <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> เพิ่มข้อมูล
+                    </button>
+                </div>
+                <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                    <div class="divide-y divide-gray-100">`;
+
+            if (currentData.length === 0) html += `<div class="p-8 text-center text-gray-400">ยังไม่มีข้อมูล</div>`;
+            else {
+                currentData.forEach(item => {
+                    // หา Title กับ Subtitle มาแสดง
+                    let titleKey = schema.fields[0].key;
+                    let subKey = schema.fields[1] ? schema.fields[1].key : null;
+                    
+                    html += `
+                        <div class="p-4 flex justify-between items-center hover:bg-gray-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">${item.id}</div>
+                                <div>
+                                    <div class="font-bold text-gray-800">${item[titleKey] || '-'}</div>
+                                    ${subKey ? `<div class="text-sm text-gray-500">${item[subKey] || ''}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editItem('${item.id}')" class="w-8 h-8 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem('${item.id}')" class="w-8 h-8 rounded bg-red-50 text-red-600 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>`;
+                });
+            }
+            html += `</div></div>`;
+            main.innerHTML = html;
+        }
+
+        // ... (ส่วน Modal / Form / Save / Delete ยังเหมือนเดิมเป๊ะๆ ครับ เพื่อความกระชับผมขอละไว้ แต่ในไฟล์จริงต้องมีนะ) ...
+        // (ฟังก์ชัน renderSchoolInfoForm, openModal, closeModal, submitForm, deleteItem เหมือนโค้ดก่อนหน้าครับ)
+        
+        // ⚠️ เพื่อให้ใช้งานได้จริง อาจารย์ก๊อปปี้ฟังก์ชันด้านล่างนี้ไปแปะต่อท้าย renderListView ได้เลยครับ 👇👇👇
+
+        function renderSchoolInfoForm(data) {
+            const inputs = SCHEMAS['school_info'].fields.map(f => {
+                let val = data[f.key] || '';
+                if(f.type==='textarea') return `<div><label class="block text-sm font-bold mb-1">${f.label}</label><textarea name="${f.key}" class="w-full border p-2 rounded" rows="${f.rows}">${val}</textarea></div>`;
+                if(f.type==='color') return `<div><label class="block text-sm font-bold mb-1">${f.label}</label><input type="color" name="${f.key}" value="${val||'#000000'}" class="h-10 border rounded"></div>`;
+                return `<div><label class="block text-sm font-bold mb-1">${f.label}</label><input type="${f.type}" name="${f.key}" value="${val}" class="w-full border p-2 rounded"></div>`;
+            }).join('');
+            
+            document.getElementById('main-area').innerHTML = `
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow border">
+                    <h2 class="text-2xl font-bold mb-6">ข้อมูลโรงเรียน</h2>
+                    <form id="school-info-form" class="space-y-4">
+                        <input type="hidden" name="id" value="${data.id||''}">
+                        ${inputs}
+                        <button type="button" onclick="saveSchoolInfo()" class="mt-4 w-full bg-blue-600 text-white py-3 rounded font-bold">บันทึก</button>
+                    </form>
+                </div>`;
+        }
+
+        async function saveSchoolInfo() {
+            const form = document.getElementById('school-info-form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            const id = data.id; delete data.id;
+            
+            let error;
+            if(id) ({ error } = await supabaseAdmin.from('school_info').update(data).eq('id', id));
+            else ({ error } = await supabaseAdmin.from('school_info').insert([data]));
+            
+            if(error) Swal.fire('Error', error.message, 'error');
+            else Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
+        }
+
+        function openModal(isEdit=false, id=null) {
+            const schema = SCHEMAS[currentSection];
+            document.getElementById('modal-title').innerText = isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลใหม่';
+            document.getElementById('field-id').value = id || '';
+            let item = (isEdit && id) ? currentData.find(d => d.id == id) || {} : {};
+            
+            document.getElementById('form-fields').innerHTML = schema.fields.map(f => {
+                let val = item[f.key] || '';
+                if(f.type === 'select') return `<div><label class="block text-sm font-bold mb-1">${f.label}</label><select name="${f.key}" class="w-full border p-2 rounded">${f.options.map(o=>`<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select></div>`;
+                return `<div><label class="block text-sm font-bold mb-1">${f.label}</label><input type="${f.type}" name="${f.key}" value="${val}" class="w-full border p-2 rounded" ${f.required?'required':''}></div>`;
+            }).join('');
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        window.editItem = (id) => openModal(true, id);
+
+        async function submitForm() {
+            const form = document.getElementById('data-form');
+            if(!form.checkValidity()) { form.reportValidity(); return; }
+            const data = Object.fromEntries(new FormData(form).entries());
+            const id = data.id; delete data.id;
+            Object.keys(data).forEach(k => { if(data[k] === '') data[k] = null; }); // clean empty
+
+            let error;
+            if(id) ({ error } = await supabaseAdmin.from(currentSection).update(data).eq('id', id));
+            else ({ error } = await supabaseAdmin.from(currentSection).insert([data]));
+
+            if(error) Swal.fire('Error', error.message, 'error');
+            else { closeModal(); loadSection(currentSection); Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success'); }
+        }
+
+        async function deleteItem(id) {
+            if(!confirm('ยืนยันการลบ?')) return;
+            const { error } = await supabaseAdmin.from(currentSection).delete().eq('id', id);
+            if(!error) loadSection(currentSection);
+        }
     </script>
 </body>
 </html>
