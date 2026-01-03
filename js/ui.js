@@ -48,23 +48,26 @@ function renderAchievementSystem(containerId, data, type) {
 
     // เช็คว่ากำลังดู "หน้ารวมโฟลเดอร์" หรือ "หน้าใน"
     if (currentFolderFilter === null) {
-        // โหมด 1: แสดงโฟลเดอร์ (รายการแข่ง)
+        // โหมด 1: แสดงโฟลเดอร์ (รายการแข่ง - competition)
         renderFolders(containerId, data, type);
-        
-        // ซ่อนตัวกรอง (Filter/Search) ตอนดูหน้าโฟลเดอร์ (เพราะมันเยอะเกิน)
-        // (Optional: ถ้าอยากซ่อน input search จริงๆ ต้องไปแก้ HTML เพิ่ม แต่ปล่อยไว้ก็ได้)
     } else {
         // โหมด 2: แสดงรายการข้างใน (Pagination 6 อัน)
-        const filteredData = data.filter(item => (item.program || 'อื่นๆ') === currentFolderFilter);
+        // ✅ กรองตาม "รายการแข่ง" (item.competition)
+        const filteredData = data.filter(item => (item.competition || 'รายการอื่นๆ') === currentFolderFilter);
         
         // เพิ่มปุ่ม "ย้อนกลับ"
         const backBtnContainer = document.createElement('div');
         backBtnContainer.className = "col-span-full mb-4 animate-fade-in";
         backBtnContainer.innerHTML = `
-            <button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 hover:bg-blue-50 px-4 py-2 rounded-full">
-                <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปดูรายการทั้งหมด
-            </button>
-            <h3 class="text-xl font-bold text-gray-800 mt-4 border-l-4 border-blue-500 pl-3">${currentFolderFilter}</h3>
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition font-bold text-sm bg-gray-100 hover:bg-blue-50 px-4 py-2 rounded-full shadow-sm border border-gray-200">
+                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปหน้ารวม
+                </button>
+            </div>
+            <div class="mb-6 border-l-4 border-blue-500 pl-4 bg-blue-50 py-3 pr-4 rounded-r-lg">
+                <h3 class="text-xl font-bold text-blue-800"><i class="fa-solid fa-trophy mr-2 text-yellow-500"></i>${currentFolderFilter}</h3>
+                <p class="text-xs text-blue-600 mt-1">แสดงผลงานทั้งหมดในรายการนี้</p>
+            </div>
         `;
         container.appendChild(backBtnContainer);
 
@@ -77,51 +80,62 @@ function renderAchievementSystem(containerId, data, type) {
 function renderFolders(containerId, data, type) {
     const container = document.getElementById(containerId);
     
-    // 1. Group ข้อมูลตามชื่อรายการ (program)
+    // 1. ✅ Group ข้อมูลตาม "รายการแข่ง" (competition)
     const groups = data.reduce((acc, item) => {
-        const key = item.program || 'รายการอื่นๆ';
+        const key = item.competition || 'รายการอื่นๆ'; // ใช้ competition เป็น Key หลัก
         if (!acc[key]) {
-            acc[key] = { count: 0, items: [], latestImage: null };
+            acc[key] = { count: 0, items: [], latestImage: null, dates: [] };
         }
         acc[key].count++;
         acc[key].items.push(item);
         // เก็บรูปแรกที่เจอมาทำปก
         if (!acc[key].latestImage && item.image) acc[key].latestImage = item.image;
+        if (item.date) acc[key].dates.push(new Date(item.date));
         return acc;
     }, {});
 
     // 2. สร้างการ์ดโฟลเดอร์
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
-    const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
-
-    Object.keys(groups).forEach(programName => {
-        const group = groups[programName];
-        const folderDiv = document.createElement('div');
+    
+    Object.keys(groups).forEach(competitionName => {
+        const group = groups[competitionName];
         
-        // ดีไซน์การ์ดโฟลเดอร์
-        folderDiv.className = `bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-lg hover:-translate-y-1 transition cursor-pointer flex flex-col h-full animate-fade-in group`;
-        folderDiv.onclick = () => selectFolder(containerId, type, programName);
+        // หาวันที่ล่าสุดของรายการนี้เพื่อแสดง
+        let dateLabel = 'ไม่ระบุวันที่';
+        if(group.dates.length > 0) {
+            const maxDate = new Date(Math.max.apply(null, group.dates));
+            dateLabel = maxDate.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+        }
+
+        const folderDiv = document.createElement('div');
+        folderDiv.className = `bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-lg hover:border-${themeColor}-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col h-full animate-fade-in group relative overflow-hidden`;
+        folderDiv.onclick = () => selectFolder(containerId, type, competitionName);
 
         folderDiv.innerHTML = `
-            <div class="flex items-start gap-4">
-                <div class="w-16 h-16 rounded-xl bg-${themeColor}-50 text-${themeColor}-500 flex items-center justify-center text-3xl flex-shrink-0 group-hover:scale-110 transition duration-300 overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-${themeColor}-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:scale-110"></div>
+            
+            <div class="relative z-10 flex items-start gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-3xl flex-shrink-0 group-hover:scale-105 transition duration-300 overflow-hidden relative">
                     ${group.latestImage 
-                        ? `<img src="${group.latestImage}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">` 
-                        : `<i class="fa-solid fa-folder-open"></i>`
+                        ? `<img src="${group.latestImage}" class="w-full h-full object-cover">` 
+                        : `<i class="fa-solid fa-folder-closed text-${themeColor}-200"></i>`
                     }
                 </div>
                 
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2 group-hover:text-${themeColor}-600 transition">${programName}</h4>
-                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md font-medium">
-                        ${group.count} ผลงาน
-                    </span>
+                <div class="flex-1 min-w-0 pt-1">
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-2 line-clamp-2 group-hover:text-${themeColor}-600 transition">${competitionName}</h4>
+                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                        <span class="bg-${themeColor}-50 text-${themeColor}-600 px-2 py-0.5 rounded-full font-bold border border-${themeColor}-100">
+                            ${group.count} รางวัล
+                        </span>
+                        <span><i class="fa-regular fa-calendar mr-1"></i>${dateLabel}</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
-                <span>คลิกเพื่อดูรายละเอียด</span>
-                <i class="fa-solid fa-chevron-right group-hover:translate-x-1 transition"></i>
+            <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400 group-hover:text-${themeColor}-500 transition">
+                <span>คลิกเพื่อเปิดดู</span>
+                <i class="fa-solid fa-arrow-right-long transform group-hover:translate-x-1 transition"></i>
             </div>
         `;
         container.appendChild(folderDiv);
@@ -132,13 +146,18 @@ function renderFolders(containerId, data, type) {
 // 3. System Control Functions (Global Scope)
 // -------------------------------------------------------------------------
 
-// เมื่อกดเลือกโฟลเดอร์
+// เมื่อกดเลือกโฟลเดอร์ (รายการแข่ง)
 window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
     const data = type === 'teacher' ? allTeacherData : allStudentData;
     renderAchievementSystem(containerId, data, type);
     // Scroll ขึ้นบนนิดหน่อย
-    window.scrollTo({ top: document.getElementById(containerId).offsetTop - 150, behavior: 'smooth' });
+    const el = document.getElementById(containerId);
+    if(el) {
+        const offset = 120; 
+        const topPos = el.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: topPos, behavior: 'smooth' });
+    }
 }
 
 // เมื่อกดย้อนกลับ
@@ -149,12 +168,10 @@ window.clearFolderFilter = function(containerId, type) {
 }
 
 // -------------------------------------------------------------------------
-// 4. Render Paged Data (หน้าใน: แสดงการ์ด 6 ใบ) - Logic เดิมแต่ปรับรับ Container Element
+// 4. Render Paged Data (หน้าใน: แสดงการ์ด 6 ใบ)
 // -------------------------------------------------------------------------
 
 function renderPagedData(container, pageItemsFullList, type, page = 1) {
-    // ล้างเฉพาะเนื้อหาการ์ด (เก็บปุ่ม Back ไว้) -> แต่ container ที่ส่งมาคือ div หลัก ดังนั้นเราต้องสร้าง div ย่อยห่อการ์ด
-    
     // สร้าง Wrapper สำหรับ Grid การ์ด (ถ้ายังไม่มี)
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
@@ -180,7 +197,7 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const pageItems = pageItemsFullList.slice(startIndex, endIndex);
 
-    // Loop วาดการ์ด
+    // Loop วาดการ์ด (Compact Design)
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
         const name = type === 'teacher' ? item.name : item.students;
@@ -202,10 +219,8 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                      ${getSubjectBadge(item.subject)}
                 </div>
                 <h4 class="text-sm font-bold text-slate-800 leading-tight cursor-pointer hover:text-${themeColor}-600 line-clamp-1 mb-1" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">${item.title || '-'}</h4>
-                <div class="flex flex-col gap-0.5 text-[10px] text-gray-500 border-l-2 border-gray-200 pl-2 mb-2">
-                    ${item.competition ? `<div class="font-semibold text-${themeColor}-600 truncate"><i class="fa-solid fa-trophy w-3 text-center"></i> ${item.competition}</div>` : ''}
-                    ${item.program ? `<div class="truncate"><i class="fa-solid fa-tag w-3 text-center"></i> ${item.program}</div>` : ''}
-                </div>
+                
+                ${item.program ? `<div class="flex flex-col gap-0.5 text-[10px] text-gray-500 border-l-2 border-gray-200 pl-2 mb-2"><div class="truncate"><i class="fa-solid fa-tag w-3 text-center"></i> ${item.program}</div></div>` : ''}
             </div>
             <div class="relative z-10 pt-2 border-t border-dashed border-gray-100 mt-auto">
                 <div class="flex justify-between items-end text-[10px]">
@@ -222,7 +237,7 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
     }
 }
 
-// Pagination Controls (ปรับให้รับ container element แทน ID)
+// Pagination Controls (ปรับ Scroll to top)
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
     nav.className = "pagination-controls col-span-full flex justify-center items-center gap-1.5 mt-4 pt-4 border-t border-gray-100";
@@ -233,7 +248,14 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
         btn.innerHTML = label;
         btn.className = `px-2 py-0.5 rounded text-xs font-bold transition ${isActive ? `bg-${themeColor}-600 text-white` : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
         if (!isDisabled && !isActive) {
-            btn.onclick = () => renderPagedData(container, currentFilteredData, type, targetPage);
+            btn.onclick = () => {
+                renderPagedData(container, currentFilteredData, type, targetPage);
+                // Scroll กลับไปที่หัวข้อ "รายการแข่ง" (ไม่ใช่บนสุดของเว็บ)
+                const headerOffset = 150;
+                const elementPosition = container.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+            };
         }
         return btn;
     };
@@ -251,10 +273,10 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
 }
 
 // -------------------------------------------------------------------------
-// 5. Export Functions (แก้ไขใหม่หมดให้เรียกผ่าน renderAchievementSystem)
+// 5. Export Functions (Search & Render Entry Points)
 // -------------------------------------------------------------------------
 
-// Search Function (ปรับให้ทำงานร่วมกับ Folder View)
+// Search Function (ค้นหาแล้วข้ามโหมดโฟลเดอร์ไปโชว์เลย)
 window.filterAchievements = function(inputId, selectId, containerId) {
     const input = document.getElementById(inputId);
     const select = document.getElementById(selectId);
@@ -266,9 +288,8 @@ window.filterAchievements = function(inputId, selectId, containerId) {
     const sourceData = isTeacher ? allTeacherData : allStudentData;
     const type = isTeacher ? 'teacher' : 'student';
 
-    // ถ้ามีการค้นหา ให้ "ข้ามโหมดโฟลเดอร์" แล้วโชว์ผลลัพธ์เลย (เพื่อความสะดวก)
     if (searchText || filterLevel !== 'all') {
-        currentFolderFilter = 'ผลการค้นหา'; // Trick ให้เข้าระบบหน้าใน
+        currentFolderFilter = 'ผลการค้นหา'; 
         const filteredData = sourceData.filter(item => {
             const textContent = `${item.title} ${item.program} ${item.competition} ${item.subject} ${item.name || item.students} ${item.organization}`.toLowerCase();
             const itemLevel = item.level || "";
@@ -277,9 +298,8 @@ window.filterAchievements = function(inputId, selectId, containerId) {
             return matchText && matchLevel;
         });
         
-        // Render แบบหน้าใน (พร้อมปุ่ม Back)
         const container = document.getElementById(containerId);
-        container.innerHTML = ''; // Clear Folders
+        container.innerHTML = ''; 
         
         const backBtnContainer = document.createElement('div');
         backBtnContainer.className = "col-span-full mb-4";
@@ -289,7 +309,6 @@ window.filterAchievements = function(inputId, selectId, containerId) {
         renderPagedData(container, filteredData, type, 1);
 
     } else {
-        // ถ้าไม่มีการค้นหา (ลบคำค้นออกหมด) ให้กลับไปหน้าโฟลเดอร์
         clearFolderFilter(containerId, type);
     }
 }
@@ -306,7 +325,7 @@ export function renderStudentAchievements(data) {
     renderAchievementSystem('student-achievements-container', allStudentData, 'student');
 }
 
-// ... (ฟังก์ชันอื่นๆ renderHomeNews, renderNews, renderSchoolInfo, renderPersonGrid, renderHistoryTable, renderInnovations, renderDocuments, renderStudentChart เหมือนเดิมจากคำตอบก่อนหน้า Copy มาใส่ต่อท้ายได้เลยครับ เพื่อความสั้นผมขอละไว้ในคำตอบนี้) ...
+// ... (ส่วน News, School Info, Person Grid, etc. เหมือนเดิมครับ ใช้ของเดิมต่อท้ายได้เลย) ...
 
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
