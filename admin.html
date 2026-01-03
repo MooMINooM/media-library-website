@@ -11,99 +11,69 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style> 
         body { font-family: 'Sarabun', sans-serif; } 
-        .menu-item { @apply flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition text-gray-600 hover:bg-blue-50 hover:text-blue-600; }
+        .menu-item { @apply flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition text-gray-600 hover:bg-blue-50 hover:text-blue-600; }
         .menu-item.active { @apply bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:text-white; }
+        .input-box { @apply w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white; }
     </style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden">
 
     <aside class="w-64 bg-white shadow-xl flex-shrink-0 flex flex-col z-20">
-        <div class="p-6 border-b flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold"><i class="fa-solid fa-cog"></i></div>
-            <h1 class="font-bold text-gray-800 text-lg">Admin Panel</h1>
+        <div class="p-6 border-b">
+            <h1 class="font-bold text-xl text-blue-800">Admin Panel</h1>
+            <p class="text-xs text-gray-500">จัดการข้อมูลเว็บไซต์</p>
         </div>
         <nav class="flex-1 overflow-y-auto p-4 space-y-1">
-            <div onclick="setPage('news', 'news')" class="menu-item active" id="menu-news"><i class="fa-regular fa-newspaper w-5"></i> ข่าวประชาสัมพันธ์</div>
-            <div class="pt-4 pb-2 text-xs font-bold text-gray-400 uppercase px-4">ผลงาน & กิจกรรม</div>
-            <div onclick="setPage('teacher_achievements', 'achievement')" class="menu-item" id="menu-teacher"><i class="fa-solid fa-chalkboard-user w-5"></i> ผลงานครู</div>
-            <div onclick="setPage('student_achievements', 'achievement')" class="menu-item" id="menu-student"><i class="fa-solid fa-user-graduate w-5"></i> ผลงานนักเรียน</div>
-            <div onclick="setPage('school_achievements', 'achievement')" class="menu-item" id="menu-school"><i class="fa-solid fa-school w-5"></i> ผลงานโรงเรียน</div>
+            <div onclick="showSection('news')" class="menu-item active" id="menu-news"><i class="fa-regular fa-newspaper w-5"></i> ข่าวประชาสัมพันธ์</div>
             
-            <div class="pt-4 pb-2 text-xs font-bold text-gray-400 uppercase px-4">วิชาการ & สถิติ (ใหม่)</div>
-            <div onclick="setPage('onet', 'academic')" class="menu-item" id="menu-onet"><i class="fa-solid fa-chart-line w-5 text-green-500"></i> ผลสัมฤทธิ์ O-NET</div>
-            <div onclick="setPage('nt', 'academic')" class="menu-item" id="menu-nt"><i class="fa-solid fa-chart-simple w-5 text-blue-500"></i> ผลสัมฤทธิ์ NT</div>
-            <div onclick="setPage('rt', 'academic')" class="menu-item" id="menu-rt"><i class="fa-solid fa-book-open w-5 text-purple-500"></i> ผลสัมฤทธิ์ RT</div>
+            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">ผลงาน</div>
+            <div onclick="showSection('teacher')" class="menu-item" id="menu-teacher"><i class="fa-solid fa-chalkboard-user w-5"></i> ผลงานครู</div>
+            <div onclick="showSection('student')" class="menu-item" id="menu-student"><i class="fa-solid fa-user-graduate w-5"></i> ผลงานนักเรียน</div>
+            <div onclick="showSection('school')" class="menu-item" id="menu-school"><i class="fa-solid fa-school w-5"></i> ผลงานโรงเรียน (ทั่วไป)</div>
 
-            <div class="pt-4 pb-2 text-xs font-bold text-gray-400 uppercase px-4">อื่นๆ</div>
-            <div onclick="setPage('documents', 'document')" class="menu-item" id="menu-doc"><i class="fa-solid fa-folder-open w-5"></i> เอกสาร/แบบฟอร์ม</div>
-            <div onclick="setPage('innovations', 'innovation')" class="menu-item" id="menu-innov"><i class="fa-solid fa-lightbulb w-5"></i> นวัตกรรม</div>
+            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">วิชาการ & สถิติ</div>
+            <div onclick="showSection('academic')" class="menu-item" id="menu-academic"><i class="fa-solid fa-chart-line w-5"></i> ผลสัมฤทธิ์ (O-NET/NT/RT)</div>
+
+            <div class="pt-4 pb-1 text-xs font-bold text-gray-400 uppercase px-3">อื่นๆ</div>
+            <div onclick="showSection('document')" class="menu-item" id="menu-document"><i class="fa-solid fa-folder-open w-5"></i> เอกสาร & ฟอร์ม</div>
+            <div onclick="showSection('innovation')" class="menu-item" id="menu-innovation"><i class="fa-solid fa-lightbulb w-5"></i> นวัตกรรม</div>
         </nav>
         <div class="p-4 border-t">
-            <button onclick="logout()" class="w-full bg-red-50 text-red-600 py-2 rounded-lg hover:bg-red-100 font-bold transition"><i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ</button>
+            <button onclick="logout()" class="w-full text-red-600 hover:bg-red-50 py-2 rounded-lg transition"><i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ</button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-8 relative">
-        <div class="max-w-5xl mx-auto">
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800" id="page-title">จัดการข่าวสาร</h2>
-                    <p class="text-gray-500 text-sm mt-1" id="page-desc">เพิ่ม ลบ แก้ไข ข่าวประชาสัมพันธ์</p>
+    <main class="flex-1 overflow-y-auto p-8">
+        
+        <div id="section-news" class="content-section">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการข่าวสาร</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2"><label>หัวข้อข่าว</label><input type="text" id="news-title" class="input-box"></div>
+                    <div><label>ลิงก์ (ถ้ามี)</label><input type="text" id="news-link" class="input-box" placeholder="https://..."></div>
+                    <div><label>รูปภาพ</label><input type="file" id="news-file" class="input-box"></div>
                 </div>
-                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg font-bold transition transform hover:scale-105 flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> เพิ่มข้อมูลใหม่
-                </button>
+                <button onclick="saveGeneric('news', ['title', 'link'], 'news-file')" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกข่าว</button>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-gray-600 font-bold text-sm border-b">
-                            <tr>
-                                <th class="p-4 w-20">#</th>
-                                <th class="p-4">รูปภาพ/ไฟล์</th>
-                                <th class="p-4">หัวข้อ / ชื่อเรื่อง</th>
-                                <th class="p-4">รายละเอียดเพิ่มเติม</th>
-                                <th class="p-4 text-center">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body" class="divide-y divide-gray-100 text-sm text-gray-700">
-                            <tr><td colspan="5" class="p-8 text-center text-gray-400">กำลังโหลด...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left text-sm" id="table-news"></table>
             </div>
         </div>
-    </main>
 
-    <div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-8 relative animate-fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-times"></i></button>
-            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">เพิ่มข้อมูล</h3>
-            
-            <form id="data-form" onsubmit="saveData(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">หัวข้อ / ชื่อรางวัล / ชื่อเอกสาร <span class="text-red-500">*</span></label>
-                    <input type="text" id="inp-title" class="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" required>
-                </div>
-
-                <div id="field-academic" class="grid grid-cols-2 gap-4 hidden">
+        <div id="section-achievement" class="content-section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800" id="ach-title">จัดการผลงาน</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2"><label>ชื่อรางวัล / ผลงาน</label><input type="text" id="ach-title-input" class="input-box"></div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">ปีการศึกษา (Tag) <span class="text-red-500">*</span></label>
-                        <input type="text" id="inp-tag" class="w-full p-3 border rounded-xl" placeholder="เช่น 2566">
-                    </div>
-                </div>
-
-                <div id="field-achievement" class="grid grid-cols-2 gap-4 hidden">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">รายการแข่ง (Competition)</label>
-                        <input type="text" id="inp-competition" class="w-full p-3 border rounded-xl" placeholder="เช่น ศิลปหัตถกรรม ครั้งที่ 71">
-                        <p class="text-xs text-gray-400 mt-1">ใช้สำหรับสร้างโฟลเดอร์</p>
+                        <label>รายการแข่ง (Competition)</label>
+                        <input type="text" id="ach-comp" class="input-box" placeholder="เช่น ศิลปหัตถกรรม ครั้งที่ 71">
+                        <p class="text-xs text-gray-400">ใช้สำหรับสร้างโฟลเดอร์หน้าเว็บ</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">กลุ่มสาระ (Subject)</label>
-                        <select id="inp-subject" class="w-full p-3 border rounded-xl bg-white">
-                            <option value="">- เลือกกลุ่มสาระ -</option>
+                        <label>กลุ่มสาระ</label>
+                        <select id="ach-subject" class="input-box">
+                            <option value="อื่นๆ">อื่นๆ</option>
                             <option value="คณิตศาสตร์">คณิตศาสตร์</option>
                             <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
                             <option value="ภาษาไทย">ภาษาไทย</option>
@@ -113,246 +83,350 @@
                             <option value="ศิลปะ">ศิลปะ</option>
                             <option value="สุขะ - พละ">สุขะ - พละ</option>
                             <option value="ปฐมวัย">ปฐมวัย</option>
-                            <option value="กิจกรรมพัฒนาผู้เรียน">กิจกรรมพัฒนาผู้เรียน</option>
-                            <option value="อื่นๆ">อื่นๆ</option>
                         </select>
                     </div>
+                    <div class="col-span-2"><label>ชื่อเจ้าของผลงาน</label><input type="text" id="ach-name" class="input-box"></div>
+                    <div><label>รูปภาพ</label><input type="file" id="ach-file" class="input-box"></div>
+                </div>
+                <button onclick="saveAchievement()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกผลงาน</button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left text-sm" id="table-achievement"></table>
+            </div>
+        </div>
+
+        <div id="section-academic" class="content-section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                จัดการผลสัมฤทธิ์ทางการเรียน
+                <select id="academic-type" onchange="loadAcademicData()" class="text-base border-2 border-blue-500 text-blue-700 rounded-lg px-3 py-1 focus:outline-none bg-blue-50">
+                    <option value="onet">O-NET</option>
+                    <option value="nt">NT</option>
+                    <option value="rt">RT</option>
+                </select>
+            </h2>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6 border-l-4 border-blue-500">
+                <h3 class="font-bold text-gray-700 mb-4" id="academic-form-header">เพิ่มข้อมูล O-NET</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label>ชื่อเอกสาร</label>
+                        <input type="text" id="acad-title" class="input-box" placeholder="เช่น คะแนนสอบ ปี 2566">
+                    </div>
+                    <div>
+                        <label>ปีการศึกษา (Tag)</label>
+                        <input type="text" id="acad-tag" class="input-box" placeholder="เช่น 2566 (สำคัญ! ใช้ทำโฟลเดอร์)">
+                    </div>
                     <div class="col-span-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">ชื่อผู้รับรางวัล / หน่วยงาน</label>
-                        <input type="text" id="inp-name" class="w-full p-3 border rounded-xl">
+                        <label>ไฟล์เอกสาร (PDF หรือ รูปภาพ)</label>
+                        <input type="file" id="acad-file" class="input-box">
                     </div>
                 </div>
+                <button onclick="saveAcademic()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 w-full md:w-auto">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูล
+                </button>
+            </div>
 
-                <div id="field-document" class="grid grid-cols-2 gap-4 hidden">
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-3">วันที่</th><th class="p-3">ชื่อเอกสาร</th><th class="p-3">ปี (Tag)</th><th class="p-3">ไฟล์</th><th class="p-3">ลบ</th></tr>
+                    </thead>
+                    <tbody id="table-academic"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="section-document" class="content-section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการเอกสาร</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2"><label>ชื่อเอกสาร</label><input type="text" id="doc-title" class="input-box"></div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">หมวดหมู่ (Category)</label>
-                        <select id="inp-category" class="w-full p-3 border rounded-xl bg-white">
+                        <label>ประเภท</label>
+                        <select id="doc-category" class="input-box">
                             <option value="วิชาการ">วิชาการ</option>
                             <option value="บุคคล">บุคคล</option>
                             <option value="งบประมาณ">งบประมาณ</option>
                             <option value="บริหารทั่วไป">บริหารทั่วไป</option>
-                            <option value="กิจการนักเรียน">กิจการนักเรียน</option>
-                            <option value="อื่นๆ">อื่นๆ</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">ประเภทเอกสาร</label>
-                        <select id="inp-doc-type" class="w-full p-3 border rounded-xl bg-white">
-                            <option value="official">เอกสารราชการ</option>
-                            <option value="form">แบบฟอร์ม</option>
-                        </select>
-                    </div>
+                    <div><label>ไฟล์ (PDF/Word)</label><input type="file" id="doc-file" class="input-box"></div>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">อัปโหลดรูปภาพ / ไฟล์ PDF</label>
-                    <input type="file" id="inp-file" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
-                    <p class="text-xs text-gray-400 mt-1">รองรับ JPG, PNG, PDF (สำหรับเอกสาร)</p>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-lg transition">บันทึกข้อมูล</button>
-                </div>
-            </form>
+                <button onclick="saveGeneric('documents', ['title', 'category'], 'doc-file')" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกเอกสาร</button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left text-sm" id="table-documents"></table>
+            </div>
         </div>
-    </div>
+
+        <div id="section-innovation" class="content-section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">จัดการนวัตกรรม</h2>
+            <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="col-span-2"><label>ชื่อนวัตกรรม</label><input type="text" id="inno-title" class="input-box"></div>
+                    <div><label>เจ้าของผลงาน</label><input type="text" id="inno-creator" class="input-box"></div>
+                    <div><label>กลุ่มสาระ</label><input type="text" id="inno-subject" class="input-box"></div>
+                    <div><label>รูปปก</label><input type="file" id="inno-cover" class="input-box"></div>
+                    <div><label>ไฟล์ผลงาน (PDF/Link)</label><input type="text" id="inno-link" class="input-box" placeholder="Link หรือ URL"></div>
+                </div>
+                <button onclick="saveInnovation()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึกนวัตกรรม</button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <table class="w-full text-left text-sm" id="table-innovations"></table>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // ⚠️ SETUP SUPABASE KEY HERE ⚠️
+        // ⚠️⚠️⚠️ ตั้งค่า Supabase ⚠️⚠️⚠️
         const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
         const supabase = window.supabase.createClient(PROJECT_URL, ANON_KEY);
 
-        // State Variables
-        let currentTable = 'news'; // ตารางปัจจุบันที่เลือก
-        let currentMode = 'news';  // โหมดหน้าจอ (news, achievement, academic, document)
+        // State
+        let currentAchType = 'teacher'; 
 
-        // 1. Check Auth
+        // 1. Check Login
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) window.location.href = 'index.html';
-            else loadData();
+            else showSection('news'); // เริ่มต้นที่หน้าข่าว
         }
 
-        // 2. Set Page (Menu Click)
-        window.setPage = function(table, mode) {
-            currentTable = table;
-            currentMode = mode;
-            
-            // Highlight Menu
+        // 2. Navigation
+        window.showSection = function(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`menu-${table.includes('teacher') ? 'teacher' : table.includes('student') ? 'student' : table.includes('school') ? 'school' : table}`).classList.add('active');
 
-            // Update Title
-            const titleMap = {
-                'news': 'จัดการข่าวสาร',
-                'teacher_achievements': 'ผลงานครู',
-                'student_achievements': 'ผลงานนักเรียน',
-                'school_achievements': 'ผลงานโรงเรียน (ทั่วไป)',
-                'onet': 'ผลสัมฤทธิ์ O-NET',
-                'nt': 'ผลสัมฤทธิ์ NT',
-                'rt': 'ผลสัมฤทธิ์ RT',
-                'documents': 'เอกสารและแบบฟอร์ม',
-                'innovations': 'นวัตกรรม'
-            };
-            document.getElementById('page-title').innerText = titleMap[table] || 'จัดการข้อมูล';
-            
-            loadData();
+            // Show selected
+            let targetId = sectionId;
+            if(['teacher', 'student', 'school'].includes(sectionId)) targetId = 'achievement'; // รวม 3 อันนี้ใช้หน้า achievement เดียวกัน
+
+            document.getElementById(`section-${targetId}`).classList.remove('hidden');
+            document.getElementById(`menu-${sectionId}`).classList.add('active');
+
+            // Load Data based on section
+            if(sectionId === 'news') loadGenericTable('news', 'table-news');
+            else if(sectionId === 'document') loadGenericTable('documents', 'table-documents');
+            else if(sectionId === 'innovation') loadGenericTable('innovations', 'table-innovations');
+            else if(sectionId === 'academic') loadAcademicData(); // โหลดข้อมูลวิชาการ
+            else {
+                // Achievement Types
+                currentAchType = sectionId; // teacher, student, school
+                document.getElementById('ach-title').innerText = `จัดการผลงาน${sectionId === 'teacher' ? 'ครู' : sectionId === 'student' ? 'นักเรียน' : 'โรงเรียน'}`;
+                loadAchievementTable();
+            }
         }
 
-        // 3. Load Data
-        async function loadData() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">กำลังโหลด...</td></tr>';
+        // --------------------------------------------------------
+        // 🏫 ACADEMIC LOGIC (O-NET / NT / RT) - ส่วนที่เพิ่มมาใหม่
+        // --------------------------------------------------------
+        
+        async function loadAcademicData() {
+            const type = document.getElementById('academic-type').value; // onet, nt, rt
+            document.getElementById('academic-form-header').innerText = `เพิ่มข้อมูล ${type.toUpperCase()}`;
+            
+            const tbody = document.getElementById('table-academic');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">กำลังโหลด...</td></tr>';
 
-            const { data, error } = await supabase.from(currentTable).select('*').order('id', { ascending: false });
-            if (error) { alert(error.message); return; }
+            const { data, error } = await supabase.from(type).select('*').order('id', { ascending: false });
+            if(error) { console.error(error); return; }
 
             tbody.innerHTML = '';
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400">ยังไม่มีข้อมูล</td></tr>';
-                return;
-            }
+            if(data.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">ไม่มีข้อมูล</td></tr>';
 
-            data.forEach((item, index) => {
-                let detail = '-';
-                let imgShow = item.image || item.file_url || item.coverImageUrl;
-                
-                // Show detail based on type
-                if (currentMode === 'achievement') detail = `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">${item.competition || '-'}</span>`;
-                if (currentMode === 'academic') detail = `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">ปี ${item.tag || '-'}</span>`;
-                if (currentMode === 'document') detail = `<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">${item.category}</span>`;
-
-                // Icon for file
-                let thumb = `<div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><i class="fa-solid fa-image"></i></div>`;
-                if (imgShow) {
-                    if (imgShow.includes('.pdf')) thumb = `<div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500 font-bold text-xs">PDF</div>`;
-                    else thumb = `<img src="${imgShow}" class="w-12 h-12 object-cover rounded-lg border">`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
-                tr.innerHTML = `
-                    <td class="p-4 text-gray-400">${index + 1}</td>
-                    <td class="p-4">${thumb}</td>
-                    <td class="p-4 font-bold text-gray-700">${item.title || item.name}</td>
-                    <td class="p-4">${detail}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="deleteItem(${item.id})" class="text-red-500 hover:bg-red-100 w-8 h-8 rounded-full transition"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">${new Date(item.date).toLocaleDateString('th-TH')}</td>
+                        <td class="p-3 font-bold">${item.title}</td>
+                        <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 rounded text-xs">${item.tag}</span></td>
+                        <td class="p-3"><a href="${item.file_url}" target="_blank" class="text-blue-600 hover:underline">ดูไฟล์</a></td>
+                        <td class="p-3"><button onclick="deleteItem('${type}', ${item.id}, loadAcademicData)" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
         }
 
-        // 4. Modal & Form Logic
-        window.openModal = function() {
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('data-form').reset();
-            
-            // Show/Hide Fields
-            document.querySelectorAll('[id^="field-"]').forEach(el => el.classList.add('hidden'));
-            if(currentMode === 'achievement') document.getElementById('field-achievement').classList.remove('hidden');
-            if(currentMode === 'academic') document.getElementById('field-academic').classList.remove('hidden');
-            if(currentMode === 'document') document.getElementById('field-document').classList.remove('hidden');
-        }
-        window.closeModal = function() { document.getElementById('modal').classList.add('hidden'); }
+        window.saveAcademic = async function() {
+            const type = document.getElementById('academic-type').value;
+            const title = document.getElementById('acad-title').value;
+            const tag = document.getElementById('acad-tag').value;
+            const file = document.getElementById('acad-file').files[0];
 
-        // 5. Save Data (Upload + Insert)
-        window.saveData = async function(e) {
-            e.preventDefault();
-            
-            const fileInput = document.getElementById('inp-file');
-            const file = fileInput.files[0];
-            let uploadedUrl = '';
+            if(!title || !tag || !file) { Swal.fire('แจ้งเตือน', 'กรุณากรอกให้ครบ', 'warning'); return; }
 
             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
+            
+            // Upload
+            const fileName = `academic/${type}/${Date.now()}_${file.name}`;
+            const { error: uploadError } = await supabase.storage.from('uploads').upload(fileName, file); // ใช้ Bucket 'uploads' เหมือนกัน
+            if(uploadError) { Swal.fire('Error', uploadError.message, 'error'); return; }
+            
+            const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);
 
-            try {
-                // Upload File (If exists)
-                if (file) {
-                    const fileName = `${currentTable}/${Date.now()}_${file.name}`;
-                    // *ต้องสร้าง Bucket ชื่อ 'uploads' ใน Supabase ก่อนนะครับ*
-                    const { error: uploadError } = await supabase.storage.from('uploads').upload(fileName, file);
-                    if (uploadError) throw uploadError;
-                    
-                    const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);
-                    uploadedUrl = publicUrl;
-                }
+            // Insert
+            const { error } = await supabase.from(type).insert([{
+                title: title,
+                tag: tag,
+                file_url: publicUrl,
+                date: new Date()
+            }]);
 
-                // Prepare Data Object based on Table
-                let payload = {
-                    title: document.getElementById('inp-title').value,
-                    // Generic mapping
-                };
-
-                // Map specific fields
-                if (currentMode === 'news') {
-                    payload.image = uploadedUrl;
-                    payload.date = new Date();
-                } else if (currentMode === 'achievement') {
-                    payload.image = uploadedUrl;
-                    payload.competition = document.getElementById('inp-competition').value;
-                    payload.subject = document.getElementById('inp-subject').value;
-                    payload.name = document.getElementById('inp-name').value; // for teacher
-                    payload.students = document.getElementById('inp-name').value; // for student (using same input)
-                    payload.date = new Date();
-                } else if (currentMode === 'academic') { // O-NET / NT / RT
-                    payload.tag = document.getElementById('inp-tag').value; // Year
-                    payload.file_url = uploadedUrl;
-                    payload.date = new Date();
-                } else if (currentMode === 'document') {
-                    payload.category = document.getElementById('inp-category').value;
-                    payload.fileUrl = uploadedUrl;
-                    payload.uploadDate = new Date();
-                    // Handle type check if needed in separate field or logic
-                } else if (currentMode === 'innovation') {
-                    payload.coverImageUrl = uploadedUrl; // Inno uses coverImageUrl
-                    // Inno might need 2 files (cover + pdf), for simplicity using 1 for now
-                }
-
-                // Insert to DB
-                const { error: insertError } = await supabase.from(currentTable).insert([payload]);
-                if (insertError) throw insertError;
-
-                Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อย', 'success');
-                closeModal();
-                loadData();
-
-            } catch (err) {
-                console.error(err);
-                Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
+            if(error) Swal.fire('Error', error.message, 'error');
+            else {
+                Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
+                document.getElementById('acad-title').value = '';
+                document.getElementById('acad-tag').value = '';
+                document.getElementById('acad-file').value = '';
+                loadAcademicData();
             }
         }
 
-        // 6. Delete
-        window.deleteItem = async function(id) {
-            Swal.fire({
-                title: 'ยืนยันการลบ?',
-                text: "ข้อมูลจะหายไปถาวร",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'ลบเลย'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    const { error } = await supabase.from(currentTable).delete().eq('id', id);
-                    if (error) Swal.fire('ผิดพลาด', error.message, 'error');
-                    else {
-                        loadData();
-                        Swal.fire('ลบแล้ว', '', 'success');
-                    }
-                }
+        // --------------------------------------------------------
+        // 🏆 ACHIEVEMENT LOGIC (Teacher/Student/School)
+        // --------------------------------------------------------
+        async function loadAchievementTable() {
+            const table = `${currentAchType}_achievements`;
+            const tbody = document.getElementById('table-achievement');
+            tbody.innerHTML = '<tr><td class="p-4 text-center">กำลังโหลด...</td></tr>';
+            
+            const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">${index+1}</td>
+                        <td class="p-3"><img src="${item.image}" class="w-10 h-10 object-cover rounded"></td>
+                        <td class="p-3 font-bold">${item.title || item.name}</td>
+                        <td class="p-3 text-xs text-gray-500">${item.competition || '-'}</td>
+                        <td class="p-3"><button onclick="deleteItem('${table}', ${item.id}, loadAchievementTable)" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>`;
             });
         }
 
-        // 7. Logout
-        window.logout = async function() {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
+        window.saveAchievement = async function() {
+            const table = `${currentAchType}_achievements`;
+            const title = document.getElementById('ach-title-input').value;
+            const comp = document.getElementById('ach-comp').value;
+            const subj = document.getElementById('ach-subject').value;
+            const name = document.getElementById('ach-name').value;
+            const file = document.getElementById('ach-file').files[0];
+
+            if(!title || !file) { Swal.fire('ขาดข้อมูล', 'ชื่อรางวัลและรูปภาพจำเป็นต้องมี', 'warning'); return; }
+
+            Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
+            
+            // Upload
+            const fileName = `achievements/${Date.now()}_${file.name}`;
+            const { error: upErr } = await supabase.storage.from('uploads').upload(fileName, file);
+            if(upErr) { Swal.fire('Error', upErr.message, 'error'); return; }
+            const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(fileName);
+
+            // Insert
+            const payload = { 
+                title: title, 
+                competition: comp, 
+                subject: subj, 
+                image: publicUrl, 
+                date: new Date() 
+            };
+            if(currentAchType === 'teacher') payload.name = name;
+            else if(currentAchType === 'student') payload.students = name;
+            // school ไม่ต้องมี name
+
+            const { error } = await supabase.from(table).insert([payload]);
+            if(error) Swal.fire('Error', error.message, 'error');
+            else {
+                Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
+                // Clear Form (Simplified)
+                document.getElementById('ach-title-input').value = '';
+                document.getElementById('ach-file').value = '';
+                loadAchievementTable();
+            }
         }
 
-        // Start
+        // --------------------------------------------------------
+        // 📰 GENERIC LOGIC (News / Docs / Innovation)
+        // --------------------------------------------------------
+        async function loadGenericTable(table, tableId) {
+            const tbody = document.getElementById(tableId);
+            tbody.innerHTML = '<tr><td class="p-4 text-center">กำลังโหลด...</td></tr>';
+            const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                let imgHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded">` : (item.fileUrl ? '<i class="fa-solid fa-file text-blue-500"></i>' : '-');
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">${index+1}</td>
+                        <td class="p-3">${imgHtml}</td>
+                        <td class="p-3 font-bold">${item.title}</td>
+                        <td class="p-3"><button onclick="deleteItem('${table}', ${item.id}, () => loadGenericTable('${table}', '${tableId}'))" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>`;
+            });
+        }
+
+        window.saveGeneric = async function(table, fields, fileInputId) {
+            // โค้ดส่วนนี้เขียนแบบย่อๆ เพื่อให้พอดีหน้าจอ
+            // จริงๆ ควรดึงค่าตาม fields ที่ส่งมา
+            const file = document.getElementById(fileInputId).files[0];
+            let publicUrl = '';
+            
+            if(file) {
+                Swal.fire({ title: 'กำลังอัปโหลด...', didOpen: () => Swal.showLoading() });
+                const fileName = `${table}/${Date.now()}_${file.name}`;
+                await supabase.storage.from('uploads').upload(fileName, file);
+                publicUrl = supabase.storage.from('uploads').getPublicUrl(fileName).data.publicUrl;
+            }
+
+            let payload = { date: new Date() };
+            if(table === 'news') {
+                payload.title = document.getElementById('news-title').value;
+                payload.link = document.getElementById('news-link').value;
+                payload.image = publicUrl;
+            } else if (table === 'documents') {
+                payload.title = document.getElementById('doc-title').value;
+                payload.category = document.getElementById('doc-category').value;
+                payload.fileUrl = publicUrl;
+                payload.uploadDate = new Date();
+            } else if (table === 'innovations') {
+                payload.title = document.getElementById('inno-title').value;
+                payload.creator = document.getElementById('inno-creator').value;
+                payload.subject = document.getElementById('inno-subject').value;
+                payload.fileUrl = document.getElementById('inno-link').value;
+                payload.coverImageUrl = document.getElementById('inno-cover').files[0] ? (await uploadFile(document.getElementById('inno-cover').files[0])) : '';
+                // *หมายเหตุ: Innovation อาจต้องเขียนแยกถ้าจะอัป 2 ไฟล์
+            }
+
+            await supabase.from(table).insert([payload]);
+            Swal.fire('สำเร็จ', 'บันทึกเรียบร้อย', 'success');
+            loadGenericTable(table, `table-${table}`);
+        }
+        
+        async function uploadFile(file) {
+             const fileName = `misc/${Date.now()}_${file.name}`;
+             await supabase.storage.from('uploads').upload(fileName, file);
+             return supabase.storage.from('uploads').getPublicUrl(fileName).data.publicUrl;
+        }
+
+        // --------------------------------------------------------
+        // 🗑️ COMMON UTILS
+        // --------------------------------------------------------
+        window.deleteItem = async function(table, id, refreshCallback) {
+            const result = await Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบเลย' });
+            if (result.isConfirmed) {
+                await supabase.from(table).delete().eq('id', id);
+                refreshCallback();
+                Swal.fire('ลบแล้ว', '', 'success');
+            }
+        }
+
+        window.logout = async () => { await supabase.auth.signOut(); window.location.href = 'index.html'; }
+
         checkAuth();
     </script>
 </body>
