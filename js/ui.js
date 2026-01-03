@@ -3,7 +3,7 @@
 // --- Global Variables ---
 let allTeacherData = [];
 let allStudentData = [];
-let allSchoolData = []; // เพิ่มตัวแปรเก็บผลงานโรงเรียน
+let allSchoolData = []; 
 let allNewsData = [];
 let allOfficialDocs = [];
 let allFormDocs = [];
@@ -45,7 +45,8 @@ function getSubjectBadge(subject) {
 // 2. ACHIEVEMENT SYSTEM (Folder + Premium Cards)
 // =============================================================================
 
-function renderAchievementSystem(containerId, data, type) {
+// ✅ Export ฟังก์ชันนี้ เพื่อให้ script.js เรียกใช้ได้ (ตามที่อาจารย์ต้องการ)
+export function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
@@ -57,6 +58,8 @@ function renderAchievementSystem(containerId, data, type) {
         return;
     }
 
+    // ถ้ามีการกรอง Folder หรือไม่
+    // สำหรับหน้า academic (O-NET/NT/RT) เราบังคับให้แสดง Folder ปีการศึกษาเสมอ
     if (currentFolderFilter === null) {
         renderFolders(containerId, data, type);
     } else {
@@ -85,6 +88,8 @@ function renderAchievementSystem(containerId, data, type) {
 
 function renderFolders(containerId, data, type) {
     const container = document.getElementById(containerId);
+    
+    // จัดกลุ่มตามชื่อ Competition (ซึ่งเราใช้เป็นชื่อปี หรือชื่อรายการ)
     const groups = data.reduce((acc, item) => {
         const key = item.competition || 'รายการอื่นๆ';
         if (!acc[key]) { acc[key] = { count: 0, items: [], latestImage: null, dates: [] }; }
@@ -94,7 +99,6 @@ function renderFolders(containerId, data, type) {
         return acc;
     }, {});
 
-    // Theme สี (ครู=ฟ้า, อื่นๆ=ชมพู/ส้ม)
     const themeColor = type === 'teacher' ? 'blue' : (type === 'school' ? 'orange' : 'pink');
     
     const gridDiv = document.createElement('div');
@@ -162,18 +166,24 @@ function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
 
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
-        const name = type === 'teacher' ? item.name : (type === 'student' ? item.students : 'โรงเรียน'); // Handle school type
+        const name = type === 'teacher' ? item.name : (type === 'student' ? item.students : 'โรงเรียน');
         const themeColor = type === 'teacher' ? 'blue' : (type === 'school' ? 'orange' : 'pink');
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : (type === 'student' ? 'fa-user-graduate' : 'fa-school');
+
+        // กรณีเป็นไฟล์ (O-NET/NT/RT) ให้กดแล้วเปิดลิงก์
+        // กรณีเป็นผลงานทั่วไป ให้เปิดรูป
+        const clickAction = item.fileUrl ? `window.open('${item.fileUrl}', '_blank')` : `window.open('${item.image || '#'}', '_blank')`;
+        const btnText = item.fileUrl ? 'ดาวน์โหลด/ดูไฟล์' : 'ดูเกียรติบัตร';
+        const btnIcon = item.fileUrl ? 'fa-file-pdf' : 'fa-eye';
 
         const div = document.createElement('div');
         div.className = `achievement-card group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in w-full`;
         
         div.innerHTML = `
-            <div class="h-60 bg-gray-50 relative overflow-hidden cursor-pointer border-b border-gray-100" onclick="window.open('${item.image || '#'}', '_blank')">
+            <div class="h-60 bg-gray-50 relative overflow-hidden cursor-pointer border-b border-gray-100" onclick="${clickAction}">
                  ${item.image 
                     ? `<img src="${item.image}" class="w-full h-full object-cover object-top transition duration-700 group-hover:scale-105">` 
-                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs">ไม่มีรูปภาพ</span></div>`
+                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300"><i class="fa-solid fa-file-contract text-5xl mb-2 opacity-50"></i><span class="text-xs">เอกสาร</span></div>`
                  }
                  <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/5"></div>
                  <div class="absolute top-3 right-3">
@@ -187,19 +197,33 @@ function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
                         ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-yellow-500"></i> ${item.competition}</span>` : ''}
                         ${getSubjectBadge(item.subject)}
                     </div>
-                    <h4 class="font-bold text-gray-800 text-lg leading-snug mb-1 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">${item.title || '-'}</h4>
-                    <p class="text-xs text-gray-500 mb-4 flex items-center gap-1"><i class="fa-solid fa-tag text-gray-300"></i> ${item.program || '-'}</p>
+                    
+                    <h4 class="font-bold text-gray-800 text-lg leading-snug mb-1 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="${clickAction}" title="${item.title}">
+                        ${item.title || '-'}
+                    </h4>
+
+                    <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                        <i class="fa-solid fa-tag text-gray-300"></i> ${item.program || '-'}
+                    </p>
                 </div>
+                
                 <div class="mt-auto pt-3 border-t border-gray-50">
                     <div class="flex items-center gap-2 mb-2">
-                        <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs flex-shrink-0"><i class="fa-solid ${iconClass}"></i></div>
+                        <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs flex-shrink-0">
+                            <i class="fa-solid ${iconClass}"></i>
+                        </div>
                         <span class="text-sm font-bold text-gray-800 truncate flex-1">${name}</span>
                     </div>
+                    
                     <div class="flex items-center justify-between text-[10px] text-gray-400">
-                        <div class="flex items-center gap-1 truncate max-w-[50%]" title="${item.organization}"><i class="fa-solid fa-building"></i> ${item.organization || '-'}</div>
+                        <div class="flex items-center gap-1 truncate max-w-[50%]" title="${item.organization}">
+                            <i class="fa-solid fa-building"></i> ${item.organization || '-'}
+                        </div>
                         <div class="flex items-center gap-3 flex-shrink-0">
                             <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
-                            ${item.image ? `<a href="${item.image}" target="_blank" class="text-${themeColor}-600 hover:text-${themeColor}-700 hover:underline font-bold flex items-center gap-1 transition"><i class="fa-solid fa-eye"></i> ดู</a>` : ''}
+                            <a href="javascript:void(0)" onclick="${clickAction}" class="text-${themeColor}-600 hover:text-${themeColor}-700 hover:underline font-bold flex items-center gap-1 transition">
+                                <i class="fa-solid ${btnIcon}"></i> ${btnText}
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -248,35 +272,66 @@ function renderAchPagination(container, totalPages, currentPage, type, currentFi
 // System Actions
 window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
-    const data = type === 'teacher' ? allTeacherData : (type === 'student' ? allStudentData : allSchoolData);
+    
+    // ตรวจสอบว่ากำลังดูข้อมูลชุดไหน
+    let data = [];
+    if(type === 'teacher') data = allTeacherData;
+    else if(type === 'student') data = allStudentData;
+    else if(type === 'school') {
+        // ต้องกรองให้ถูกชุด (O-NET หรือ NT หรือ RT)
+        if(containerId.includes('onet')) {
+            data = allSchoolData.filter(item => item.title.includes('O-NET') || item.competition.includes('O-NET'));
+        } else if(containerId.includes('nt')) {
+            data = allSchoolData.filter(item => item.title.includes('NT') || item.competition.includes('NT'));
+        } else if(containerId.includes('rt')) {
+            data = allSchoolData.filter(item => item.title.includes('RT') || item.competition.includes('RT'));
+        } else {
+            // ผลงานโรงเรียนทั่วไป
+            data = allSchoolData.filter(item => !item.title.includes('O-NET') && !item.title.includes('NT') && !item.title.includes('RT'));
+        }
+    }
+
     renderAchievementSystem(containerId, data, type);
     const el = document.getElementById(containerId);
     if(el) { const offset = 120; window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - offset, behavior: 'smooth' }); }
 }
+
 window.clearFolderFilter = function(containerId, type) {
     currentFolderFilter = null;
-    const data = type === 'teacher' ? allTeacherData : (type === 'student' ? allStudentData : allSchoolData);
+    
+    let data = [];
+    if(type === 'teacher') data = allTeacherData;
+    else if(type === 'student') data = allStudentData;
+    else if(type === 'school') {
+        if(containerId.includes('onet')) data = allSchoolData.filter(item => item.title.includes('O-NET') || item.competition.includes('O-NET'));
+        else if(containerId.includes('nt')) data = allSchoolData.filter(item => item.title.includes('NT') || item.competition.includes('NT'));
+        else if(containerId.includes('rt')) data = allSchoolData.filter(item => item.title.includes('RT') || item.competition.includes('RT'));
+        else data = allSchoolData.filter(item => !item.title.includes('O-NET') && !item.title.includes('NT') && !item.title.includes('RT'));
+    }
+
     renderAchievementSystem(containerId, data, type);
 }
+
 window.filterAchievements = function(inputId, selectId, containerId) {
     const input = document.getElementById(inputId);
     const select = document.getElementById(selectId);
     const searchText = input.value.toLowerCase().trim();
     const filterLevel = select.value;
     
-    // Determine data source based on containerId
     let sourceData = [];
     let type = 'student';
+    
     if (containerId.includes('teacher')) { sourceData = allTeacherData; type = 'teacher'; }
     else if (containerId.includes('student')) { sourceData = allStudentData; type = 'student'; }
-    else if (containerId.includes('onet') || containerId.includes('nt') || containerId.includes('rt') || containerId.includes('school')) { 
+    else if (containerId.includes('school') || containerId.includes('onet') || containerId.includes('nt') || containerId.includes('rt')) { 
         sourceData = allSchoolData; 
-        type = 'school'; 
+        type = 'school';
         
-        // Filter specifically for ONET/NT/RT if needed inside the search
-        if(containerId.includes('onet')) sourceData = sourceData.filter(item => item.title.toUpperCase().includes('O-NET') || (item.competition && item.competition.toUpperCase().includes('O-NET')));
-        else if(containerId.includes('nt')) sourceData = sourceData.filter(item => item.title.toUpperCase().includes('NT') || (item.competition && item.competition.toUpperCase().includes('NT')));
-        else if(containerId.includes('rt')) sourceData = sourceData.filter(item => item.title.toUpperCase().includes('RT') || (item.competition && item.competition.toUpperCase().includes('RT')));
+        // Filter sub-sets
+        if(containerId.includes('onet')) sourceData = sourceData.filter(item => item.title.includes('O-NET') || item.competition.includes('O-NET'));
+        else if(containerId.includes('nt')) sourceData = sourceData.filter(item => item.title.includes('NT') || item.competition.includes('NT'));
+        else if(containerId.includes('rt')) sourceData = sourceData.filter(item => item.title.includes('RT') || item.competition.includes('RT'));
+        else sourceData = sourceData.filter(item => !item.title.includes('O-NET') && !item.title.includes('NT') && !item.title.includes('RT'));
     }
 
     if (searchText || filterLevel !== 'all') {
@@ -301,7 +356,7 @@ window.filterAchievements = function(inputId, selectId, containerId) {
 }
 
 // =============================================================================
-// 3. NEWS SYSTEM
+// 3. NEWS, DOCS & EXPORTS
 // =============================================================================
 
 window.filterNews = function(inputId, containerId) {
@@ -383,10 +438,6 @@ function renderNewsPagination(container, totalPages, currentPage, currentFiltere
     nav.appendChild(createBtn('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
     container.appendChild(nav);
 }
-
-// =============================================================================
-// 4. DOCUMENT SYSTEM
-// =============================================================================
 
 window.filterDocuments = function(inputId, containerId) {
     const input = document.getElementById(inputId);
@@ -538,9 +589,9 @@ window.clearDocFolder = function(containerId, type) {
     renderDocumentSystem(containerId, data, type);
 }
 
-// =============================================================================
-// 5. EXPORTED ENTRY POINTS
-// =============================================================================
+// --------------------------------------------------------
+// EXPORTS
+// --------------------------------------------------------
 
 export function renderTeacherAchievements(data) { if(!data) return; allTeacherData = [...data].sort((a, b) => b.id - a.id); renderAchievementSystem('teacher-achievements-container', allTeacherData, 'teacher'); }
 export function renderStudentAchievements(data) { if(!data) return; allStudentData = [...data].sort((a, b) => b.id - a.id); renderAchievementSystem('student-achievements-container', allStudentData, 'student'); }
@@ -551,32 +602,27 @@ export function renderDocuments(data, containerId) {
     else { allFormDocs = [...data].sort((a, b) => b.id - a.id); renderDocumentSystem(containerId, allFormDocs, 'form'); }
 }
 
-// 🆕 UPDATED: SCHOOL & ACADEMIC ACHIEVEMENTS (แยก O-NET/NT/RT)
+// ✅ ฟังก์ชันไฮไลท์: รวม O-NET/NT/RT และผลงานทั่วไปเข้าด้วยกัน แล้วแยก Render อัตโนมัติ
 export function renderSchoolAchievements(data) { 
     if (!data) return;
     allSchoolData = [...data].sort((a, b) => b.id - a.id);
     
-    // 1. แยกข้อมูลเข้าแต่ละถัง (Bucket)
-    const onetData = allSchoolData.filter(item => item.title.toUpperCase().includes('O-NET') || (item.competition && item.competition.toUpperCase().includes('O-NET')));
-    const ntData = allSchoolData.filter(item => item.title.toUpperCase().includes('NT') || (item.competition && item.competition.toUpperCase().includes('NT')));
-    const rtData = allSchoolData.filter(item => item.title.toUpperCase().includes('RT') || (item.competition && item.competition.toUpperCase().includes('RT')));
-    
-    // ข้อมูลทั่วไป (เอา O-NET/NT/RT ออกไป)
-    const generalData = allSchoolData.filter(item => 
-        !item.title.toUpperCase().includes('O-NET') && 
-        !item.title.toUpperCase().includes('NT') && 
-        !item.title.toUpperCase().includes('RT')
-    );
+    // 1. แยกข้อมูลตาม keyword
+    const onetData = allSchoolData.filter(item => item.title.includes('O-NET') || (item.competition && item.competition.includes('O-NET')));
+    const ntData = allSchoolData.filter(item => item.title.includes('NT') || (item.competition && item.competition.includes('NT')));
+    const rtData = allSchoolData.filter(item => item.title.includes('RT') || (item.competition && item.competition.includes('RT')));
+    const generalData = allSchoolData.filter(item => !item.title.includes('O-NET') && !item.title.includes('NT') && !item.title.includes('RT'));
 
-    // 2. Render ลงแต่ละหน้า
+    // 2. Render ไปยัง Container ต่างๆ (ถ้ามีในหน้า HTML)
+    // หน้าผลงานโรงเรียนทั่วไป
     renderAchievementSystem('school-achievements-container', generalData, 'school');
     
+    // หน้าวิชาการ
     if(document.getElementById('onet-container')) renderAchievementSystem('onet-container', onetData, 'school');
     if(document.getElementById('nt-container')) renderAchievementSystem('nt-container', ntData, 'school');
     if(document.getElementById('rt-container')) renderAchievementSystem('rt-container', rtData, 'school');
 }
 
-// ... Standard Exports ...
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return; container.innerHTML = '';
