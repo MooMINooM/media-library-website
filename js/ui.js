@@ -13,20 +13,20 @@ function getSubjectBadge(subject) {
     if (!subject) return '';
     const cleanSubject = subject.trim();
     const colorMap = {
-        'คณิตศาสตร์': 'bg-red-100 text-red-700 border-red-200', 'คณิต': 'bg-red-100 text-red-700 border-red-200',
-        'วิทยาศาสตร์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทย์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        'ภาษาไทย': 'bg-pink-100 text-pink-700 border-pink-200',
-        'ภาษาอังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200', 'อังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
-        'สังคมศึกษา': 'bg-teal-100 text-teal-700 border-teal-200', 'สังคม': 'bg-teal-100 text-teal-700 border-teal-200', 'สังคมศึกษา ศาสนา และวัฒนธรรม': 'bg-teal-100 text-teal-700 border-teal-200',
-        'การงานอาชีพ': 'bg-orange-100 text-orange-700 border-orange-200', 'การงาน': 'bg-orange-100 text-orange-700 border-orange-200',
-        'สุขะ - พละ': 'bg-green-100 text-green-700 border-green-200', 'สุขะ-พละ': 'bg-green-100 text-green-700 border-green-200', 'สุขศึกษาและพลศึกษา': 'bg-green-100 text-green-700 border-green-200',
-        'ศิลปะ - ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ-ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ ดนตรี นาฏศิลป์': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-100 text-purple-700 border-purple-200', 'ลูกเสือ': 'bg-purple-100 text-purple-700 border-purple-200', 'เนตรนารี': 'bg-purple-100 text-purple-700 border-purple-200', 'ยุวกาชาด': 'bg-purple-100 text-purple-700 border-purple-200',
-        'ปฐมวัย': 'bg-rose-100 text-rose-700 border-rose-200', 'อนุบาล': 'bg-rose-100 text-rose-700 border-rose-200',
-        'อื่นๆ': 'bg-gray-100 text-gray-700 border-gray-200'
+        'คณิตศาสตร์': 'bg-red-50 text-red-600 border-red-100', 'คณิต': 'bg-red-50 text-red-600 border-red-100',
+        'วิทยาศาสตร์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทย์': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        'ภาษาไทย': 'bg-pink-50 text-pink-600 border-pink-100',
+        'ภาษาอังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100', 'อังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100',
+        'สังคมศึกษา': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคม': 'bg-teal-50 text-teal-600 border-teal-100',
+        'การงานอาชีพ': 'bg-orange-50 text-orange-600 border-orange-100', 'การงาน': 'bg-orange-50 text-orange-600 border-orange-100',
+        'สุขะ - พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขะ-พละ': 'bg-green-50 text-green-600 border-green-100',
+        'ศิลปะ - ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100',
+        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-50 text-purple-600 border-purple-100', 'ลูกเสือ': 'bg-purple-50 text-purple-600 border-purple-100',
+        'ปฐมวัย': 'bg-rose-50 text-rose-600 border-rose-100', 'อนุบาล': 'bg-rose-50 text-rose-600 border-rose-100',
+        'อื่นๆ': 'bg-gray-50 text-gray-600 border-gray-200'
     };
     const styleClass = colorMap[cleanSubject] || colorMap['อื่นๆ'];
-    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-book-open"></i> ${cleanSubject}</span>`;
+    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
 }
 
 // 2. Logic สลับหน้า Folder / Items
@@ -34,10 +34,8 @@ function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // ✅ แก้บั๊ก Grid ซ้อน Grid: ล้าง class grid ของ container แม่ทิ้งไปเลย
-    container.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
-    container.classList.add('w-full', 'block'); // บังคับให้เป็น block เต็มจอแทน
-
+    // Reset Grid Class ที่อาจติดมาจาก HTML เดิม (เพื่อให้เต็มจอ)
+    container.className = "w-full"; 
     container.innerHTML = '';
 
     if (!data || data.length === 0) {
@@ -52,18 +50,18 @@ function renderAchievementSystem(containerId, data, type) {
         // โหมด 2: แสดงรายการข้างใน
         const filteredData = data.filter(item => (item.competition || 'รายการอื่นๆ') === currentFolderFilter);
         
-        // ส่วนหัวหน้าใน
+        // Header หน้าใน
         const backBtnContainer = document.createElement('div');
         backBtnContainer.className = "w-full mb-6 animate-fade-in";
         backBtnContainer.innerHTML = `
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm w-full">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                 <div>
                     <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <i class="fa-solid fa-trophy text-yellow-500"></i> ${currentFolderFilter}
                     </h3>
                     <p class="text-xs text-gray-500 mt-1 pl-7">พบข้อมูล ${filteredData.length} รายการ</p>
                 </div>
-                <button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center justify-center gap-2 text-blue-600 hover:text-white hover:bg-blue-600 transition font-bold text-sm bg-blue-50 px-5 py-2.5 rounded-full border border-blue-100 shadow-sm w-full md:w-auto">
+                <button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition font-bold text-sm bg-white px-5 py-2.5 rounded-full border border-gray-200 shadow-sm w-full md:w-auto">
                     <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
                 </button>
             </div>
@@ -89,7 +87,6 @@ function renderFolders(containerId, data, type) {
 
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     
-    // Grid 3 ช่อง สำหรับ Folder
     const gridDiv = document.createElement('div');
     gridDiv.className = "w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
 
@@ -132,12 +129,12 @@ function renderFolders(containerId, data, type) {
     container.appendChild(gridDiv);
 }
 
-// 4. Render Items (Premium Design - แก้ไขให้เต็มจอ)
+// 4. Render Items (✅ Premium Design + Tags ครบ + เต็มแถว)
 function renderPagedData(container, pageItemsFullList, type, page = 1) {
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
         gridWrapper = document.createElement('div');
-        // ✅ ใช้ w-full เพื่อบังคับให้เต็มแถว
+        // ใช้ w-full และ grid
         gridWrapper.className = "achievements-grid-wrapper w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
         container.appendChild(gridWrapper);
     } else {
@@ -163,6 +160,7 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
 
         const div = document.createElement('div');
+        // การ์ด Premium: พื้นขาว เงาเบาๆ ขอบมน
         div.className = `achievement-card group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in w-full`;
         
         div.innerHTML = `
@@ -171,18 +169,18 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                     ? `<img src="${item.image}" class="w-full h-full object-cover object-top transition duration-700 group-hover:scale-105">` 
                     : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs">ไม่มีรูปภาพ</span></div>`
                  }
-                 <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10"></div>
+                 <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/5"></div>
                  
                  <div class="absolute top-3 right-3">
-                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm border border-gray-200">${item.level}</span>` : ''}
+                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-600 text-[10px] font-bold px-2 py-1 rounded shadow-sm border border-gray-200">${item.level}</span>` : ''}
                  </div>
             </div>
 
             <div class="p-5 flex-grow flex flex-col justify-between relative">
                 <div>
                     <div class="flex flex-wrap gap-2 mb-3">
-                        ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-yellow-500"></i> ${item.competition}</span>` : ''}
                         ${getSubjectBadge(item.subject)}
+                        ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-[9px]"></i> ${item.competition}</span>` : ''}
                     </div>
                     
                     <h4 class="font-bold text-gray-800 text-lg leading-snug mb-1 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
@@ -190,7 +188,7 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                     </h4>
 
                     <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
-                        <i class="fa-solid fa-tag text-gray-300"></i> ${item.program || '-'}
+                        <i class="fa-solid fa-tag text-gray-300 text-[10px]"></i> ${item.program || '-'}
                     </p>
                 </div>
                 
@@ -203,12 +201,12 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                     </div>
                     
                     <div class="flex items-center justify-between text-[10px] text-gray-400">
-                        <div class="flex items-center gap-1 truncate max-w-[50%]">
+                        <div class="flex items-center gap-1 truncate max-w-[50%]" title="${item.organization}">
                             <i class="fa-solid fa-building"></i> ${item.organization || '-'}
                         </div>
                         <div class="flex items-center gap-3 flex-shrink-0">
                             <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
-                            ${item.image ? `<a href="${item.image}" target="_blank" class="text-${themeColor}-600 hover:underline font-bold flex items-center gap-1"><i class="fa-solid fa-eye"></i> ดูเกียรติบัตร</a>` : ''}
+                            ${item.image ? `<a href="${item.image}" target="_blank" class="text-${themeColor}-600 hover:text-${themeColor}-700 hover:underline font-bold flex items-center gap-1 transition"><i class="fa-solid fa-eye"></i> ดูเกียรติบัตร</a>` : ''}
                         </div>
                     </div>
                 </div>
@@ -228,7 +226,8 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
 
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
-    nav.className = "pagination-controls col-span-full flex justify-center items-center gap-1.5 mt-4 pt-4 border-t border-gray-100 w-full";
+    nav.className = "pagination-controls w-full flex justify-center items-center gap-1.5 mt-6 pt-4 border-t border-gray-100";
+    
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
         const btn = document.createElement('button');
@@ -256,6 +255,8 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
     nav.appendChild(createBtn('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
     container.appendChild(nav);
 }
+
+// ... (Export functions & Controls เหมือนเดิมครับ) ...
 
 window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
@@ -294,13 +295,10 @@ window.filterAchievements = function(inputId, selectId, containerId) {
             return matchText && matchLevel;
         });
         const container = document.getElementById(containerId);
-        // ✅ Clear grid class here too
-        container.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
-        container.classList.add('w-full', 'block');
-        
+        container.className = "w-full"; 
         container.innerHTML = ''; 
         const backBtnContainer = document.createElement('div');
-        backBtnContainer.className = "col-span-full mb-4 w-full"; 
+        backBtnContainer.className = "w-full mb-4"; 
         backBtnContainer.innerHTML = `<button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 px-4 py-2 rounded-full"><i class="fa-solid fa-times"></i> ล้างการค้นหา / กลับหน้าหลัก</button>`;
         container.appendChild(backBtnContainer);
         renderPagedData(container, filteredData, type, 1);
@@ -320,8 +318,6 @@ export function renderStudentAchievements(data) {
     allStudentData = [...data].sort((a, b) => b.id - a.id);
     renderAchievementSystem('student-achievements-container', allStudentData, 'student');
 }
-
-// ... (ส่วนอื่นๆ renderHomeNews, renderNews, etc. เหมือนเดิม copy มาต่อท้ายได้เลยครับ) ...
 
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
