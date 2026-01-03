@@ -213,7 +213,7 @@
     
     <script type="module" src="./script.js"></script>
     <script>
-        const PROJECT_URL = 'ใส่_SUPABASE_URL_ที่นี่'; const ANON_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
+        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
         let supabaseClient; try { supabaseClient = window.supabase.createClient(PROJECT_URL, ANON_KEY); } catch (e) {}
         async function handleLogin(e) { e.preventDefault(); const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value; const { error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) alert("ผิดพลาด: " + error.message); else { alert("ยินดีต้อนรับ!"); window.location.href = 'admin.html'; } }
         let isPlaying = false; function toggleMusic() { const audio = document.getElementById('school-song'); const icon = document.getElementById('music-icon'); if (isPlaying) { audio.pause(); icon.classList.replace('fa-pause', 'fa-play'); } else { audio.play(); icon.classList.replace('fa-play', 'fa-pause'); } isPlaying = !isPlaying; }
