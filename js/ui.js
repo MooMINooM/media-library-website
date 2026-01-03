@@ -14,14 +14,14 @@ function getSubjectBadge(subject) {
     const cleanSubject = subject.trim();
     const colorMap = {
         'คณิตศาสตร์': 'bg-red-50 text-red-600 border-red-100', 'คณิต': 'bg-red-50 text-red-600 border-red-100',
-        'วิทยาศาสตร์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทย์': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        'วิทยาศาสตร์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทย์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-50 text-yellow-700 border-yellow-200',
         'ภาษาไทย': 'bg-pink-50 text-pink-600 border-pink-100',
         'ภาษาอังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100', 'อังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100',
-        'สังคมศึกษา': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคม': 'bg-teal-50 text-teal-600 border-teal-100',
+        'สังคมศึกษา': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคม': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคมศึกษา ศาสนา และวัฒนธรรม': 'bg-teal-50 text-teal-600 border-teal-100',
         'การงานอาชีพ': 'bg-orange-50 text-orange-600 border-orange-100', 'การงาน': 'bg-orange-50 text-orange-600 border-orange-100',
-        'สุขะ - พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขะ-พละ': 'bg-green-50 text-green-600 border-green-100',
-        'ศิลปะ - ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100',
-        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-50 text-purple-600 border-purple-100', 'ลูกเสือ': 'bg-purple-50 text-purple-600 border-purple-100',
+        'สุขะ - พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขะ-พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขศึกษาและพลศึกษา': 'bg-green-50 text-green-600 border-green-100',
+        'ศิลปะ - ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ-ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ ดนตรี นาฏศิลป์': 'bg-indigo-50 text-indigo-600 border-indigo-100',
+        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-50 text-purple-600 border-purple-100', 'ลูกเสือ': 'bg-purple-50 text-purple-600 border-purple-100', 'เนตรนารี': 'bg-purple-50 text-purple-600 border-purple-100', 'ยุวกาชาด': 'bg-purple-50 text-purple-600 border-purple-100',
         'ปฐมวัย': 'bg-rose-50 text-rose-600 border-rose-100', 'อนุบาล': 'bg-rose-50 text-rose-600 border-rose-100',
         'อื่นๆ': 'bg-gray-50 text-gray-600 border-gray-200'
     };
@@ -34,7 +34,7 @@ function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Reset Grid Class ที่อาจติดมาจาก HTML เดิม (เพื่อให้เต็มจอ)
+    // Reset Grid Class ที่อาจติดมาจาก HTML เดิม
     container.className = "w-full"; 
     container.innerHTML = '';
 
@@ -129,12 +129,11 @@ function renderFolders(containerId, data, type) {
     container.appendChild(gridDiv);
 }
 
-// 4. Render Items (✅ Premium Design + Tags ครบ + เต็มแถว)
+// 4. Render Items (Premium Design: เพิ่มขนาดชื่อคน)
 function renderPagedData(container, pageItemsFullList, type, page = 1) {
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
         gridWrapper = document.createElement('div');
-        // ใช้ w-full และ grid
         gridWrapper.className = "achievements-grid-wrapper w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
         container.appendChild(gridWrapper);
     } else {
@@ -160,7 +159,6 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
 
         const div = document.createElement('div');
-        // การ์ด Premium: พื้นขาว เงาเบาๆ ขอบมน
         div.className = `achievement-card group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in w-full`;
         
         div.innerHTML = `
@@ -172,15 +170,15 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                  <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/5"></div>
                  
                  <div class="absolute top-3 right-3">
-                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-600 text-[10px] font-bold px-2 py-1 rounded shadow-sm border border-gray-200">${item.level}</span>` : ''}
+                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm border border-gray-200">${item.level}</span>` : ''}
                  </div>
             </div>
 
             <div class="p-5 flex-grow flex flex-col justify-between relative">
                 <div>
                     <div class="flex flex-wrap gap-2 mb-3">
+                        ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-yellow-500"></i> ${item.competition}</span>` : ''}
                         ${getSubjectBadge(item.subject)}
-                        ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-[9px]"></i> ${item.competition}</span>` : ''}
                     </div>
                     
                     <h4 class="font-bold text-gray-800 text-lg leading-snug mb-1 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
@@ -188,16 +186,16 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                     </h4>
 
                     <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
-                        <i class="fa-solid fa-tag text-gray-300 text-[10px]"></i> ${item.program || '-'}
+                        <i class="fa-solid fa-tag text-gray-300"></i> ${item.program || '-'}
                     </p>
                 </div>
                 
                 <div class="mt-auto pt-3 border-t border-gray-50">
                     <div class="flex items-center gap-2 mb-2">
-                        <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs flex-shrink-0">
+                        <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs flex-shrink-0">
                             <i class="fa-solid ${iconClass}"></i>
                         </div>
-                        <span class="text-xs font-bold text-gray-700 truncate flex-1">${name}</span>
+                        <span class="text-sm font-bold text-gray-800 truncate flex-1">${name}</span>
                     </div>
                     
                     <div class="flex items-center justify-between text-[10px] text-gray-400">
@@ -255,8 +253,6 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
     nav.appendChild(createBtn('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
     container.appendChild(nav);
 }
-
-// ... (Export functions & Controls เหมือนเดิมครับ) ...
 
 window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
@@ -318,6 +314,8 @@ export function renderStudentAchievements(data) {
     allStudentData = [...data].sort((a, b) => b.id - a.id);
     renderAchievementSystem('student-achievements-container', allStudentData, 'student');
 }
+
+// ... (ส่วนอื่นๆ renderHomeNews, renderNews, etc. เหมือนเดิมครับ) ...
 
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
