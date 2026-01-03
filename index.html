@@ -96,13 +96,8 @@
                         <button class="nav-link dropdown-toggle text-green-700 font-bold hover:bg-green-50">
                             <i class="fa-solid fa-desktop mr-1"></i> ระบบสารสนเทศ
                         </button>
-                        <div class="dropdown-menu w-56 right-0 left-auto">
-                            <a href="https://your-checkin-system.com" target="_blank" class="block px-4 py-2 hover:bg-green-50 text-green-700 font-bold">
-                                <i class="fa-solid fa-user-check mr-2"></i> เช็คชื่อห้องคอมฯ
-                            </a>
-                            <span class="block px-4 py-2 text-gray-400 text-xs cursor-default border-t mt-1">
-                                <i class="fa-solid fa-lock mr-1"></i> ระบบอื่นๆ (เร็วๆ นี้)
-                            </span>
+                        <div id="eservice-dropdown-container" class="dropdown-menu w-56 right-0 left-auto shadow-lg border-green-100">
+                            <p class="text-center text-gray-400 py-2 text-xs">กำลังโหลด...</p>
                         </div>
                     </div>
 
@@ -128,10 +123,7 @@
                 <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
                 <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
                 <a href="#" data-page="innovations" class="block py-2 px-4 rounded hover:bg-white text-blue-700 font-bold">คลังนวัตกรรม</a>
-                <a href="#" data-page="academic-onet" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ผลสัมฤทธิ์ O-NET/NT/RT</a>
-                <a href="https://your-checkin-system.com" target="_blank" class="block py-2 px-4 rounded bg-green-100 text-green-800 font-bold mt-2">
-                    <i class="fa-solid fa-desktop mr-2"></i> ระบบเช็คชื่อห้องคอมฯ
-                </a>
+                <a href="#" data-page="school-achievements" class="block py-2 px-4 rounded bg-gray-50 text-gray-700">ผลงานสถานศึกษา</a>
                 <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-3 px-4 text-slate-700 font-bold bg-slate-200 rounded-lg mt-2">เข้าสู่ระบบผู้ดูแล</button>
             </div>
         </div>
