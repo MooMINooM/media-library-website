@@ -10,150 +10,177 @@ let supabase;
 try {
     supabase = window.supabase.createClient(PROJECT_URL, ANON_KEY);
 } catch (e) {
-    console.error("Supabase Init Failed:", e);
+    console.error("Supabase Init Failed. Check your URL/Key.", e);
 }
 
+// เริ่มทำงานเมื่อเว็บโหลดเสร็จ
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("App Started...");
-    setupNavigation();
+    console.log("System Loading...");
+    setupNavigation(); 
     if(supabase) fetchAndRenderAll();
 });
 
-// ✅ ฟังก์ชันจัดการเมนู (Navigation)
+// =========================================
+// 1. ระบบเปลี่ยนหน้า (Navigation)
+// =========================================
 function setupNavigation() {
     const links = document.querySelectorAll('[data-page], [data-page-link]');
     
     links.forEach(link => {
         link.addEventListener('click', (e) => {
-            if(link.getAttribute('target') === '_blank') return; // ปล่อยลิงก์ภายนอก
+            // ถ้าเป็นลิงก์ภายนอก (เช่น ระบบเช็คชื่อ) ให้ปล่อยผ่าน
+            if(link.getAttribute('target') === '_blank') return;
 
             e.preventDefault();
             const pageId = link.getAttribute('data-page') || link.getAttribute('data-page-link');
             
-            // 1. ซ่อนทุกหน้า
-            document.querySelectorAll('.page-content').forEach(section => {
-                section.classList.add('hidden');
-                section.classList.remove('animate-fade-in');
+            // ซ่อนทุกหน้า
+            document.querySelectorAll('.page-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-fade-in');
             });
 
-            // 2. โชว์หน้าเป้าหมาย
+            // โชว์หน้าเป้าหมาย
             const target = document.getElementById(`page-${pageId}`);
             if (target) {
                 target.classList.remove('hidden');
                 target.classList.add('animate-fade-in');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
+                // ปรับเมนู Active
                 document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
                 if(link.classList.contains('nav-link')) link.classList.add('active');
             }
 
-            // 3. ปิดเมนูมือถือ
+            // ปิดเมนูมือถือ
             const mobileMenu = document.getElementById('mobile-menu');
             if(mobileMenu) mobileMenu.classList.add('hidden');
         });
     });
 }
 
-// ✅ ฟังก์ชันดึงข้อมูลทั้งหมด
+// =========================================
+// 2. ดึงข้อมูลและแสดงผล (Data Fetching)
+// =========================================
 async function fetchAndRenderAll() {
-    // 1. ข้อมูลโรงเรียน
+    
+    // 2.1 ข้อมูลโรงเรียน
     try {
-        const { data: info } = await supabase.from('school_info').select('*');
-        if(info) UI.renderSchoolInfo(info);
-    } catch (e) { console.error("Error School Info:", e); }
+        const { data } = await supabase.from('school_info').select('*');
+        if(data) UI.renderSchoolInfo(data);
+    } catch (e) { console.warn("Load School Info Failed", e); }
 
-    // 2. ข่าวสาร
+    // 2.2 ข่าวสาร
     try {
-        const { data: news } = await supabase.from('news').select('*');
-        if(news) {
-            UI.renderHomeNews(news);
-            UI.renderNews(news);
+        const { data } = await supabase.from('news').select('*');
+        if(data) {
+            UI.renderHomeNews(data);
+            UI.renderNews(data);
         }
-    } catch (e) { console.error("Error News:", e); }
+    } catch (e) { console.warn("Load News Failed", e); }
 
-    // 3. ผลงาน (ครู/นักเรียน/โรงเรียน + วิชาการ)
+    // 2.3 ผลงานครู & นักเรียน
     try {
         const { data: teachers } = await supabase.from('teacher_achievements').select('*');
         if(teachers) UI.renderTeacherAchievements(teachers);
 
         const { data: students } = await supabase.from('student_achievements').select('*');
         if(students) UI.renderStudentAchievements(students);
+    } catch (e) { console.warn("Load Achievements Failed", e); }
 
-        // ดึงข้อมูล 4 ส่วนมารวมกันเพื่อส่งให้ UI จัดการ
+    // 2.4 ✅ ไฮไลท์: รวมพลัง O-NET / NT / RT และผลงานโรงเรียน
+    try {
+        // ดึงข้อมูลดิบจาก 4 ตาราง
         const { data: school } = await supabase.from('school_achievements').select('*');
         const { data: onet } = await supabase.from('onet').select('*');
         const { data: nt } = await supabase.from('nt').select('*');
         const { data: rt } = await supabase.from('rt').select('*');
-        
-        let allAcademic = [];
-        // รวมผลงานโรงเรียนทั่วไป
-        if(school) allAcademic = [...allAcademic, ...school];
-        
-        // แปลง O-NET/NT/RT ให้ format ตรงกันกับที่ UI คาดหวัง
-        // (Mapping: title -> title, tag -> competition เพื่อให้สร้าง Folder ปี)
-        const formatAcad = (arr, prefix) => arr ? arr.map(i => ({
-            ...i, 
-            title: `${prefix} ${i.title}`, // เพิ่ม Prefix ให้ชัดเจน
-            competition: `${prefix} ปี ${i.tag}`, // ใช้ Tag ปีการศึกษา เป็นชื่อ Folder
-            image: i.file_url, // ใช้ไฟล์เป็นรูป (ถ้าเป็นรูป) หรือลิงก์
-            fileUrl: i.file_url // เก็บลิงก์ไว้เปิด
-        })) : [];
 
-        allAcademic = [
-            ...allAcademic, 
-            ...formatAcad(onet, 'O-NET'), 
-            ...formatAcad(nt, 'NT'), 
-            ...formatAcad(rt, 'RT')
+        let combinedData = [];
+
+        // ใส่ผลงานโรงเรียนปกติ
+        if(school) combinedData = [...combinedData, ...school];
+
+        // 🛠️ ตัวแปลงร่าง (Mapper): แปลงข้อมูลตารางแยก ให้เข้าฟอร์มมาตรฐาน
+        // ใส่คำว่า "O-NET" / "NT" / "RT" ลงใน Title เพื่อให้ UI.js รู้ว่าจะเอาไปลงกล่องไหน
+        const mapAcademic = (items, type) => {
+            if(!items) return [];
+            return items.map(item => ({
+                id: `acad-${type}-${item.id}`, // สร้าง ID ปลอมกันซ้ำ
+                title: `${type} : ${item.title}`, // เพิ่ม Prefix เช่น "O-NET : คะแนนปี 66"
+                competition: `ปีการศึกษา ${item.tag}`, // เอาปีมาเป็นชื่อโฟลเดอร์
+                fileUrl: item.file_url, // ลิงก์ไฟล์
+                image: null, // ไม่มีรูปปก ใช้ icon แทน
+                date: item.date,
+                category: type // แปะป้ายไว้เผื่อใช้
+            }));
+        };
+
+        // รวมร่าง
+        combinedData = [
+            ...combinedData,
+            ...mapAcademic(onet, 'O-NET'),
+            ...mapAcademic(nt, 'NT'),
+            ...mapAcademic(rt, 'RT')
         ];
 
-        // ส่งให้ UI render (UI จะแยก Folder ตามชื่อ Competition ให้เอง)
-        UI.renderSchoolAchievements(allAcademic);
+        // ส่งให้ UI ไปคัดแยกเอง (UI ฉลาดพอจะแยกตาม Title/Category)
+        UI.renderSchoolAchievements(combinedData);
 
-    } catch (e) { console.error("Error Achievements:", e); }
+    } catch (e) { console.warn("Load Academic Failed", e); }
 
-    // 4. เอกสาร & นวัตกรรม
+    // 2.5 เอกสาร & นวัตกรรม
     try {
         const { data: docs } = await supabase.from('documents').select('*');
         if(docs) {
+            // UI.renderDocuments จะแยก official/form ให้เองถ้าเราเรียกถูก container
             UI.renderDocuments(docs, 'documents-official-container'); 
-            UI.renderDocuments(docs, 'documents-forms-container'); 
+            UI.renderDocuments(docs, 'documents-forms-container');
         }
         const { data: innov } = await supabase.from('innovations').select('*');
         if(innov) UI.renderInnovations(innov);
-    } catch (e) { console.error("Error Docs:", e); }
+    } catch (e) { console.warn("Load Docs Failed", e); }
 
-    // 5. บุคลากร & นักเรียน
+    // 2.6 บุคลากร
     try {
         const { data: personnel } = await supabase.from('personnel').select('*');
-        const { data: director } = await supabase.from('director_history').select('*');
-        const { data: p_history } = await supabase.from('personnel_history').select('*');
-        
         if(personnel) UI.renderPersonGrid(personnel, 'personnel-list-container');
-        if(director) UI.renderHistoryTable('director-history-table-body', director);
-        if(p_history) UI.renderHistoryTable('personnel-history-table-body', p_history);
 
-        const { data: stats } = await supabase.from('student_data').select('*'); 
+        const { data: dirHistory } = await supabase.from('director_history').select('*');
+        if(dirHistory) UI.renderHistoryTable('director-history-table-body', dirHistory);
+
+        const { data: perHistory } = await supabase.from('personnel_history').select('*');
+        if(perHistory) UI.renderHistoryTable('personnel-history-table-body', perHistory);
+    } catch (e) { console.warn("Load Personnel Failed", e); }
+
+    // 2.7 สถิตินักเรียน
+    try {
+        // เช็คชื่อตารางใน Admin ดีๆ ว่าใช้ 'student_data' หรือ 'student_stats'
+        const { data: stats } = await supabase.from('student_data').select('*');
         if(stats) UI.renderStudentChart(stats);
+    } catch (e) { console.warn("Load Stats Failed", e); }
 
-    } catch (e) { console.error("Error Personnel:", e); }
-
-    // 6. ✅ ระบบสารสนเทศ (E-Service Dynamic Menu)
+    // 2.8 ✅ ระบบสารสนเทศ (Dynamic E-Service)
     try {
         const { data: services } = await supabase.from('eservices').select('*').order('id', { ascending: true });
         const container = document.getElementById('eservice-dropdown-container');
         
-        if (services && services.length > 0) {
-            container.innerHTML = ''; 
-            services.forEach(item => {
-                const a = document.createElement('a');
-                a.href = item.url;
-                a.target = "_blank";
-                a.className = "block px-4 py-2 hover:bg-green-50 text-green-700 font-bold border-b border-gray-100 last:border-0 transition";
-                a.innerHTML = `<i class="fa-solid fa-link mr-2 text-green-500"></i> ${item.title}`; 
-                container.appendChild(a);
-            });
-        } else {
-            container.innerHTML = '<span class="block px-4 py-2 text-gray-400 text-xs cursor-default text-center">ยังไม่มีระบบ</span>';
+        if(container) {
+            container.innerHTML = ''; // ล้าง Loading...
+            
+            if (services && services.length > 0) {
+                services.forEach(item => {
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.target = "_blank";
+                    a.className = "block px-4 py-2 hover:bg-green-50 text-green-700 font-bold border-b border-gray-100 last:border-0 transition";
+                    // แสดงชื่อระบบ (ไม่มี icon ตามที่ขอ)
+                    a.innerText = item.title;
+                    container.appendChild(a);
+                });
+            } else {
+                container.innerHTML = '<span class="block px-4 py-2 text-gray-400 text-xs text-center cursor-default">ยังไม่มีระบบ</span>';
+            }
         }
-    } catch (e) { console.error("Error E-Service:", e); }
+    } catch (e) { console.warn("Load E-Service Failed", e); }
 }
