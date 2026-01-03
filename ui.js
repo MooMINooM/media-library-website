@@ -1,4 +1,4 @@
-// ui.js (เพิ่มส่วน School Info)
+// ui.js (Full)
 export function renderSchoolInfo(info) {
     if(!info) return;
     
@@ -9,7 +9,7 @@ export function renderSchoolInfo(info) {
         document.getElementById('header-logo').classList.remove('hidden');
     }
 
-    // 1. Basic Info
+    // 1. Basic Info Mapping
     const map = {
         'info-name-th': info.school_name,
         'info-name-en': info.school_name_en,
@@ -31,11 +31,15 @@ export function renderSchoolInfo(info) {
         if(document.getElementById(id)) document.getElementById(id).innerText = val || '-';
     }
 
-    // Colors & Media
+    // Colors & Badge
+    if(info.founding_date && document.getElementById('school-age-badge')) {
+        document.getElementById('school-age-badge').innerText = `ก่อตั้งมาแล้ว ${new Date().getFullYear() - new Date(info.founding_date).getFullYear()} ปี`;
+    }
     if(document.getElementById('school-color-box')) {
         document.getElementById('school-color-box').style.background = `linear-gradient(to right, ${info.color_code_1||'#ddd'} 50%, ${info.color_code_2||'#ddd'} 50%)`;
     }
     
+    // Media (Uniform, VTR, Song)
     if(document.getElementById('student-uniform-img')) {
         if(info.uniform_url) {
             document.getElementById('student-uniform-img').src = info.uniform_url;
@@ -126,7 +130,6 @@ function renderPagedAchievements(container, data, type, page) {
     let grid = container.querySelector('.achievements-grid');
     if (!grid) { grid = document.createElement('div'); grid.className = "achievements-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"; container.appendChild(grid); } else { grid.innerHTML = ''; }
     
-    // Simple render without pagination logic for brevity, assuming small data or handled elsewhere
     data.forEach(item => {
         const click = item.fileUrl ? `window.open('${item.fileUrl}', '_blank')` : `window.open('${item.image}', '_blank')`;
         const div = document.createElement('div');
@@ -201,7 +204,6 @@ window.clearFolderFilter = (cid, type) => {
     renderAchievementSystem(cid, data, type);
 };
 
-// Filter Functions
 window.filterNews = (id) => {};
 window.filterDocuments = (id, cid) => {};
 window.filterAchievements = (id, selId, cid) => {};
