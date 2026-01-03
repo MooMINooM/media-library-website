@@ -3,16 +3,17 @@
 // ตัวแปรเก็บข้อมูลดิบ
 let allTeacherData = [];
 let allStudentData = [];
-const ITEMS_PER_PAGE = 6; 
+const ITEMS_PER_PAGE = 6; // ใช้ 6 รายการต่อหน้า (แบบมีรูปสวยงาม)
 
 // ตัวแปรเก็บสถานะว่าดูโฟลเดอร์ไหนอยู่
 let currentFolderFilter = null; 
 
-// 1. Helper: สีกลุ่มสาระ
+// -------------------------------------------------------------------------
+// 1. Helper: เลือกสีตามกลุ่มสาระ (เหมือนเดิม)
+// -------------------------------------------------------------------------
 function getSubjectBadge(subject) {
     if (!subject) return '';
     const cleanSubject = subject.trim();
-    // (ใช้ Color Map เดิม)
     const colorMap = {
         'คณิตศาสตร์': 'bg-red-100 text-red-700 border-red-200', 'คณิต': 'bg-red-100 text-red-700 border-red-200',
         'วิทยาศาสตร์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทย์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -30,7 +31,10 @@ function getSubjectBadge(subject) {
     return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-book-open"></i> ${cleanSubject}</span>`;
 }
 
+// -------------------------------------------------------------------------
 // 2. Logic สลับหน้า Folder / Items
+// -------------------------------------------------------------------------
+
 function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -42,10 +46,13 @@ function renderAchievementSystem(containerId, data, type) {
     }
 
     if (currentFolderFilter === null) {
+        // โหมด 1: แสดงโฟลเดอร์ (รายการแข่ง)
         renderFolders(containerId, data, type);
     } else {
+        // โหมด 2: แสดงรายการข้างใน (ใช้ดีไซน์ Premium)
         const filteredData = data.filter(item => (item.competition || 'รายการอื่นๆ') === currentFolderFilter);
         
+        // ส่วนหัวหน้าใน (ปุ่มย้อนกลับ + ชื่อรายการ)
         const backBtnContainer = document.createElement('div');
         backBtnContainer.className = "col-span-full mb-6 animate-fade-in";
         backBtnContainer.innerHTML = `
@@ -63,23 +70,33 @@ function renderAchievementSystem(containerId, data, type) {
         `;
         container.appendChild(backBtnContainer);
 
+        // เรียกฟังก์ชันวาดการ์ดแบบ Premium
         renderPagedData(container, filteredData, type, 1);
     }
 }
 
-// 3. Render Folders (หน้ารวม)
+// -------------------------------------------------------------------------
+// 3. Render Folders (หน้ารวมกล่อง)
+// -------------------------------------------------------------------------
+
 function renderFolders(containerId, data, type) {
     const container = document.getElementById(containerId);
+    
+    // Group ตามรายการแข่ง (competition)
     const groups = data.reduce((acc, item) => {
         const key = item.competition || 'รายการอื่นๆ';
-        if (!acc[key]) { acc[key] = { count: 0, items: [], latestImage: null, dates: [] }; }
-        acc[key].count++; acc[key].items.push(item);
+        if (!acc[key]) {
+            acc[key] = { count: 0, items: [], latestImage: null, dates: [] };
+        }
+        acc[key].count++;
+        acc[key].items.push(item);
         if (!acc[key].latestImage && item.image) acc[key].latestImage = item.image;
         if (item.date) acc[key].dates.push(new Date(item.date));
         return acc;
     }, {});
 
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
+    
     const gridDiv = document.createElement('div');
     gridDiv.className = "col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
 
@@ -100,7 +117,7 @@ function renderFolders(containerId, data, type) {
             <div class="relative z-10 flex items-start gap-4">
                 <div class="w-16 h-16 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-3xl flex-shrink-0 group-hover:scale-105 transition duration-300 overflow-hidden relative">
                     ${group.latestImage 
-                        ? `<img src="${group.latestImage}" class="w-full h-full object-cover object-top">` // ✅ ใช้ object-top เพื่อโชว์หัวเกียรติบัตร
+                        ? `<img src="${group.latestImage}" class="w-full h-full object-cover object-top">` 
                         : `<i class="fa-solid fa-folder-closed text-${themeColor}-200"></i>`
                     }
                 </div>
@@ -122,7 +139,10 @@ function renderFolders(containerId, data, type) {
     container.appendChild(gridDiv);
 }
 
-// 4. Render Items (✅ แก้ไขดีไซน์: ให้เหมือนรูปต้นแบบที่อาจารย์ชอบ)
+// -------------------------------------------------------------------------
+// 4. Render Items (✅ PREMIUM DESIGN ตามที่ขอ)
+// -------------------------------------------------------------------------
+
 function renderPagedData(container, pageItemsFullList, type, page = 1) {
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
@@ -145,35 +165,38 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const pageItems = pageItemsFullList.slice(startIndex, endIndex);
 
-    // Loop วาดการ์ด
+    // Loop วาดการ์ด (Premium Look: มีรูป, Tag เหลือง, ปุ่มสวย, เงา)
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
         const name = type === 'teacher' ? item.name : item.students;
         const themeColor = type === 'teacher' ? 'blue' : 'pink';
-        const borderColor = type === 'teacher' ? 'border-blue-500' : 'border-pink-500';
+        const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
 
         const div = document.createElement('div');
-        div.className = `achievement-card group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in`;
+        // ใช้ group และ hover effect
+        div.className = `achievement-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in`;
         
         div.innerHTML = `
-            <div class="h-56 bg-gray-50 relative overflow-hidden cursor-pointer border-b border-gray-100" onclick="window.open('${item.image || '#'}', '_blank')">
+            <div class="h-48 bg-gray-100 relative overflow-hidden cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
                  ${item.image 
-                    ? `<img src="${item.image}" class="w-full h-full object-cover object-top transition duration-700 group-hover:scale-105">` 
-                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs">ไม่มีรูปภาพ</span></div>`
+                    ? `<img src="${item.image}" class="w-full h-full object-cover object-top transition duration-700 group-hover:scale-110 group-hover:rotate-1">` // ✅ object-top เพื่อโชว์หัว
+                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs font-medium">ไม่มีรูปภาพ</span></div>`
                  }
+                 <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10"></div>
+                 
                  <div class="absolute top-3 right-3">
-                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-700 text-[10px] font-bold px-2 py-1 rounded shadow-sm border border-gray-200">${item.level}</span>` : ''}
+                    ${item.level ? `<span class="bg-white/95 backdrop-blur text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm border border-gray-200">${item.level}</span>` : ''}
                  </div>
             </div>
 
             <div class="p-5 flex-grow flex flex-col justify-between relative">
                 <div>
-                    <div class="flex flex-wrap gap-2 mb-3">
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        ${item.competition ? `<span class="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-yellow-500"></i> ${item.competition}</span>` : ''}
                         ${getSubjectBadge(item.subject)}
-                        ${item.competition ? `<span class="bg-blue-50 text-blue-700 border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-blue-500"></i> ${item.competition}</span>` : ''}
                     </div>
                     
-                    <h4 class="font-bold text-gray-800 text-lg leading-snug mb-1 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
                         ${item.title || '-'}
                     </h4>
 
@@ -182,22 +205,33 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                     </p>
                 </div>
                 
-                <div class="mt-auto pt-3 border-t border-gray-50">
-                    <div class="flex items-center gap-2 mb-2">
-                        <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <span class="text-xs font-bold text-gray-700 truncate flex-1">${name}</span>
+                <div>
+                    <hr class="border-gray-100 my-3 group-hover:border-${themeColor}-100 transition">
+
+                    <div class="space-y-1.5 mb-4">
+                        <p class="text-sm font-semibold text-gray-700 flex items-center gap-2 truncate">
+                            <i class="fa-solid ${iconClass} text-${themeColor}-500 w-4 text-center"></i> 
+                            <span>${name}</span>
+                        </p>
+                        ${item.organization ? `
+                            <p class="text-xs text-gray-500 flex items-center gap-2 truncate">
+                                <i class="fa-solid fa-building-columns text-gray-400 w-4 text-center"></i>
+                                <span>${item.organization}</span>
+                            </p>` : ''
+                        }
                     </div>
-                    
-                    <div class="flex items-center justify-between text-[10px] text-gray-400">
-                        <div class="flex items-center gap-1">
-                            <i class="fa-solid fa-building"></i> ${item.organization || '-'}
+
+                    <div class="flex justify-between items-center mt-auto pt-1">
+                        <div class="text-[11px] text-gray-400 flex items-center gap-1.5 font-medium">
+                            <i class="fa-regular fa-calendar"></i>
+                            ${dateStr}
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
-                            ${item.image ? `<a href="${item.image}" target="_blank" class="text-${themeColor}-600 hover:underline font-bold">ดูเกียรติบัตร <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ''}
-                        </div>
+                        
+                        ${item.image ? `
+                            <a href="${item.image}" target="_blank" class="flex items-center gap-1.5 text-[11px] bg-${themeColor}-50 text-${themeColor}-600 px-3 py-1.5 rounded-full hover:bg-${themeColor}-100 transition font-bold shadow-sm">
+                                <i class="fa-solid fa-expand"></i> ดูเกียรติบัตร
+                            </a>` : ''
+                        }
                     </div>
                 </div>
             </div>
@@ -210,11 +244,14 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
     }
 }
 
-// ... (Pagination Controls, Filter, Export Functions etc. ใช้เหมือนโค้ดชุดก่อนหน้าได้เลยครับ ไม่มีการเปลี่ยนแปลง Logic) ...
+// -------------------------------------------------------------------------
+// 5. System Controls (Pagination, Folder Navigation)
+// -------------------------------------------------------------------------
 
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
     nav.className = "pagination-controls col-span-full flex justify-center items-center gap-1.5 mt-4 pt-4 border-t border-gray-100";
+    
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
         const btn = document.createElement('button');
@@ -223,6 +260,7 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
         if (!isDisabled && !isActive) {
             btn.onclick = () => {
                 renderPagedData(container, currentFilteredData, type, targetPage);
+                // Scroll กลับไปที่หัวข้อ
                 const headerOffset = 150;
                 const elementPosition = container.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -231,6 +269,7 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
         }
         return btn;
     };
+
     nav.appendChild(createBtn('<i class="fa-solid fa-chevron-left"></i>', currentPage - 1, false, currentPage === 1));
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -247,6 +286,8 @@ window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
     const data = type === 'teacher' ? allTeacherData : allStudentData;
     renderAchievementSystem(containerId, data, type);
+    
+    // Scroll
     const el = document.getElementById(containerId);
     if(el) {
         const offset = 120; 
@@ -279,6 +320,7 @@ window.filterAchievements = function(inputId, selectId, containerId) {
             const matchLevel = (filterLevel === "all") || (itemLevel === filterLevel);
             return matchText && matchLevel;
         });
+        
         const container = document.getElementById(containerId);
         container.innerHTML = ''; 
         const backBtnContainer = document.createElement('div');
@@ -302,6 +344,8 @@ export function renderStudentAchievements(data) {
     allStudentData = [...data].sort((a, b) => b.id - a.id);
     renderAchievementSystem('student-achievements-container', allStudentData, 'student');
 }
+
+// ... (ส่วนอื่นๆ renderHomeNews, renderNews, etc. เหมือนเดิมครับ ใช้ของเดิมต่อท้ายได้เลย) ...
 
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
