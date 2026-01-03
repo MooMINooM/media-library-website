@@ -6,31 +6,72 @@ let allStudentData = [];
 const ITEMS_PER_PAGE = 6; 
 
 // -------------------------------------------------------------------------
-// 1. Helper Function: เลือกสีตามกลุ่มสาระ
+// 1. Helper Function: เลือกสีตามกลุ่มสาระ (ฉลาดขึ้น รองรับการพิมพ์ผิด)
 // -------------------------------------------------------------------------
 function getSubjectBadge(subject) {
     if (!subject) return '';
     
-    // กำหนดสีให้แต่ละวิชา (Tailwind Classes)
+    // 1. ตัดช่องว่างหน้าหลังออกก่อน
+    const cleanSubject = subject.trim();
+
+    // 2. กำหนดสี (เพิ่ม Key ดักไว้หลายๆ แบบ)
     const colorMap = {
+        // คณิตศาสตร์
         'คณิตศาสตร์': 'bg-red-100 text-red-700 border-red-200',
+        'คณิต': 'bg-red-100 text-red-700 border-red-200',
+        
+        // วิทยาศาสตร์
         'วิทยาศาสตร์': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        'วิทย์': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+
+        // ภาษาไทย
         'ภาษาไทย': 'bg-pink-100 text-pink-700 border-pink-200',
+        
+        // ภาษาอังกฤษ
         'ภาษาอังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
+        'อังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
+        
+        // สังคม
         'สังคมศึกษา': 'bg-teal-100 text-teal-700 border-teal-200',
+        'สังคม': 'bg-teal-100 text-teal-700 border-teal-200',
+        'สังคมศึกษา ศาสนา และวัฒนธรรม': 'bg-teal-100 text-teal-700 border-teal-200',
+
+        // การงาน
         'การงานอาชีพ': 'bg-orange-100 text-orange-700 border-orange-200',
+        'การงาน': 'bg-orange-100 text-orange-700 border-orange-200',
+
+        // สุขะ - พละ (ดักทั้งแบบเว้นวรรค และไม่เว้นวรรค)
         'สุขะ - พละ': 'bg-green-100 text-green-700 border-green-200',
+        'สุขะ-พละ': 'bg-green-100 text-green-700 border-green-200',
+        'สุขศึกษาและพลศึกษา': 'bg-green-100 text-green-700 border-green-200',
+
+        // ศิลปะ - ดนตรี (ดักทั้งแบบเว้นวรรค และไม่เว้นวรรค)
         'ศิลปะ - ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        'ศิลปะ-ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        'ศิลปะ': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        'ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        'ศิลปะ ดนตรี นาฏศิลป์': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+
+        // กิจกรรมพัฒนาผู้เรียน
         'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-100 text-purple-700 border-purple-200',
+        'ลูกเสือ': 'bg-purple-100 text-purple-700 border-purple-200',
+        'เนตรนารี': 'bg-purple-100 text-purple-700 border-purple-200',
+        'ยุวกาชาด': 'bg-purple-100 text-purple-700 border-purple-200',
+
+        // ปฐมวัย
         'ปฐมวัย': 'bg-rose-100 text-rose-700 border-rose-200',
+        'อนุบาล': 'bg-rose-100 text-rose-700 border-rose-200',
+
+        // อื่นๆ
         'อื่นๆ': 'bg-gray-100 text-gray-700 border-gray-200'
     };
 
-    // ถ้าไม่ตรงกับ list ให้ใช้สีเทา (อื่นๆ)
-    const styleClass = colorMap[subject] || colorMap['อื่นๆ'];
+    // 3. ตรวจสอบว่ามีคีย์ไหม ถ้าไม่มีให้ใช้ 'อื่นๆ'
+    const styleClass = colorMap[cleanSubject] || colorMap['อื่นๆ'];
 
-    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1">
-                <i class="fa-solid fa-book-open"></i> ${subject}
+    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1 whitespace-nowrap">
+                <i class="fa-solid fa-book-open"></i> ${cleanSubject}
             </span>`;
 }
 
@@ -112,11 +153,6 @@ function renderPagedData(containerId, data, type, page = 1) {
 
     if (totalPages > 1) renderPaginationControls(container, totalPages, page, type, data);
 }
-
-// ... (ฟังก์ชันอื่น renderPaginationControls, filterAchievements, renderHomeNews, etc. เหมือนเดิมจากคำตอบก่อนหน้า) ...
-
-// เพื่อความสะดวก อาจารย์สามารถใช้ renderPaginationControls และฟังก์ชันอื่นๆ จากโค้ดชุดเดิมได้เลยครับ 
-// เพราะแก้แค่ renderPagedData กับเพิ่ม getSubjectBadge ครับ
 
 // -------------------------------------------------------------------------
 // ส่วนท้าย: ใส่ Code Pagination Controls และอื่นๆ ให้ครบเพื่อให้ Copy ไปใช้ได้เลย
