@@ -33,6 +33,11 @@ function getSubjectBadge(subject) {
 function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    
+    // ✅ แก้บั๊ก Grid ซ้อน Grid: ล้าง class grid ของ container แม่ทิ้งไปเลย
+    container.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
+    container.classList.add('w-full', 'block'); // บังคับให้เป็น block เต็มจอแทน
+
     container.innerHTML = '';
 
     if (!data || data.length === 0) {
@@ -49,7 +54,7 @@ function renderAchievementSystem(containerId, data, type) {
         
         // ส่วนหัวหน้าใน
         const backBtnContainer = document.createElement('div');
-        backBtnContainer.className = "col-span-full mb-6 animate-fade-in w-full"; // ✅ w-full
+        backBtnContainer.className = "w-full mb-6 animate-fade-in";
         backBtnContainer.innerHTML = `
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm w-full">
                 <div>
@@ -84,9 +89,9 @@ function renderFolders(containerId, data, type) {
 
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     
-    // ✅ เพิ่ม w-full ให้ Grid
+    // Grid 3 ช่อง สำหรับ Folder
     const gridDiv = document.createElement('div');
-    gridDiv.className = "col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full";
+    gridDiv.className = "w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
 
     Object.keys(groups).forEach(competitionName => {
         const group = groups[competitionName];
@@ -127,13 +132,13 @@ function renderFolders(containerId, data, type) {
     container.appendChild(gridDiv);
 }
 
-// 4. Render Items (✅ แก้ไขให้เต็มแถว และสัดส่วนสวยงาม)
+// 4. Render Items (Premium Design - แก้ไขให้เต็มจอ)
 function renderPagedData(container, pageItemsFullList, type, page = 1) {
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
         gridWrapper = document.createElement('div');
-        // ✅ เพิ่ม w-full เพื่อบังคับให้เต็มความกว้าง
-        gridWrapper.className = "achievements-grid-wrapper grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full";
+        // ✅ ใช้ w-full เพื่อบังคับให้เต็มแถว
+        gridWrapper.className = "achievements-grid-wrapper w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
         container.appendChild(gridWrapper);
     } else {
         gridWrapper.innerHTML = ''; 
@@ -158,12 +163,10 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
 
         const div = document.createElement('div');
-        // ✅ ตัด border-l ออก เพื่อให้เหมือนรูปต้นแบบมากขึ้น
-        // ✅ ใช้ h-full เพื่อให้การ์ดสูงเท่ากันในแถว
         div.className = `achievement-card group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in w-full`;
         
         div.innerHTML = `
-            <div class="h-60 bg-gray-100 relative overflow-hidden cursor-pointer border-b border-gray-100" onclick="window.open('${item.image || '#'}', '_blank')">
+            <div class="h-60 bg-gray-50 relative overflow-hidden cursor-pointer border-b border-gray-100" onclick="window.open('${item.image || '#'}', '_blank')">
                  ${item.image 
                     ? `<img src="${item.image}" class="w-full h-full object-cover object-top transition duration-700 group-hover:scale-105">` 
                     : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs">ไม่มีรูปภาพ</span></div>`
@@ -194,7 +197,8 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
                 <div class="mt-auto pt-3 border-t border-gray-50">
                     <div class="flex items-center gap-2 mb-2">
                         <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs flex-shrink-0">
-                            <i class="fa-solid ${iconClass}"></i> </div>
+                            <i class="fa-solid ${iconClass}"></i>
+                        </div>
                         <span class="text-xs font-bold text-gray-700 truncate flex-1">${name}</span>
                     </div>
                     
@@ -224,7 +228,6 @@ function renderPagedData(container, pageItemsFullList, type, page = 1) {
 
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
-    // ✅ เพิ่ม w-full
     nav.className = "pagination-controls col-span-full flex justify-center items-center gap-1.5 mt-4 pt-4 border-t border-gray-100 w-full";
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
@@ -291,9 +294,13 @@ window.filterAchievements = function(inputId, selectId, containerId) {
             return matchText && matchLevel;
         });
         const container = document.getElementById(containerId);
+        // ✅ Clear grid class here too
+        container.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
+        container.classList.add('w-full', 'block');
+        
         container.innerHTML = ''; 
         const backBtnContainer = document.createElement('div');
-        backBtnContainer.className = "col-span-full mb-4 w-full"; // ✅ w-full
+        backBtnContainer.className = "col-span-full mb-4 w-full"; 
         backBtnContainer.innerHTML = `<button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 px-4 py-2 rounded-full"><i class="fa-solid fa-times"></i> ล้างการค้นหา / กลับหน้าหลัก</button>`;
         container.appendChild(backBtnContainer);
         renderPagedData(container, filteredData, type, 1);
