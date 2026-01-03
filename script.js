@@ -26,7 +26,7 @@ function setupNavigation() {
 async function fetchAndRenderAll() {
     try {
         const { data: info } = await supabase.from('school_info').select('*');
-        if(info) UI.renderSchoolInfo(info);
+        if(info) UI.renderSchoolInfo(info[0]);
     } catch (e) {}
 
     try {
