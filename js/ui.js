@@ -5,81 +5,38 @@ let allTeacherData = [];
 let allStudentData = [];
 const ITEMS_PER_PAGE = 6; 
 
+// ตัวแปรเก็บสถานะว่าดูโฟลเดอร์ไหนอยู่ (null = ดูหน้ารวม)
+let currentFolderFilter = null; 
+
 // -------------------------------------------------------------------------
-// 1. Helper Function: เลือกสีตามกลุ่มสาระ (ฉลาดขึ้น รองรับการพิมพ์ผิด)
+// 1. Helper Function: เลือกสีตามกลุ่มสาระ (เหมือนเดิม)
 // -------------------------------------------------------------------------
 function getSubjectBadge(subject) {
     if (!subject) return '';
-    
-    // 1. ตัดช่องว่างหน้าหลังออกก่อน
     const cleanSubject = subject.trim();
-
-    // 2. กำหนดสี (เพิ่ม Key ดักไว้หลายๆ แบบ)
     const colorMap = {
-        // คณิตศาสตร์
-        'คณิตศาสตร์': 'bg-red-100 text-red-700 border-red-200',
-        'คณิต': 'bg-red-100 text-red-700 border-red-200',
-        
-        // วิทยาศาสตร์
-        'วิทยาศาสตร์': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        'วิทย์': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-
-        // ภาษาไทย
+        'คณิตศาสตร์': 'bg-red-100 text-red-700 border-red-200', 'คณิต': 'bg-red-100 text-red-700 border-red-200',
+        'วิทยาศาสตร์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทย์': 'bg-yellow-100 text-yellow-800 border-yellow-200', 'วิทยาศาสตร์และเทคโนโลยี': 'bg-yellow-100 text-yellow-800 border-yellow-200',
         'ภาษาไทย': 'bg-pink-100 text-pink-700 border-pink-200',
-        
-        // ภาษาอังกฤษ
-        'ภาษาอังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
-        'อังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
-        
-        // สังคม
-        'สังคมศึกษา': 'bg-teal-100 text-teal-700 border-teal-200',
-        'สังคม': 'bg-teal-100 text-teal-700 border-teal-200',
-        'สังคมศึกษา ศาสนา และวัฒนธรรม': 'bg-teal-100 text-teal-700 border-teal-200',
-
-        // การงาน
-        'การงานอาชีพ': 'bg-orange-100 text-orange-700 border-orange-200',
-        'การงาน': 'bg-orange-100 text-orange-700 border-orange-200',
-
-        // สุขะ - พละ (ดักทั้งแบบเว้นวรรค และไม่เว้นวรรค)
-        'สุขะ - พละ': 'bg-green-100 text-green-700 border-green-200',
-        'สุขะ-พละ': 'bg-green-100 text-green-700 border-green-200',
-        'สุขศึกษาและพลศึกษา': 'bg-green-100 text-green-700 border-green-200',
-
-        // ศิลปะ - ดนตรี (ดักทั้งแบบเว้นวรรค และไม่เว้นวรรค)
-        'ศิลปะ - ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-        'ศิลปะ-ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-        'ศิลปะ': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-        'ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-        'ศิลปะ ดนตรี นาฏศิลป์': 'bg-indigo-100 text-indigo-700 border-indigo-200',
-
-        // กิจกรรมพัฒนาผู้เรียน
-        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-100 text-purple-700 border-purple-200',
-        'ลูกเสือ': 'bg-purple-100 text-purple-700 border-purple-200',
-        'เนตรนารี': 'bg-purple-100 text-purple-700 border-purple-200',
-        'ยุวกาชาด': 'bg-purple-100 text-purple-700 border-purple-200',
-
-        // ปฐมวัย
-        'ปฐมวัย': 'bg-rose-100 text-rose-700 border-rose-200',
-        'อนุบาล': 'bg-rose-100 text-rose-700 border-rose-200',
-
-        // อื่นๆ
+        'ภาษาอังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200', 'อังกฤษ': 'bg-sky-100 text-sky-700 border-sky-200',
+        'สังคมศึกษา': 'bg-teal-100 text-teal-700 border-teal-200', 'สังคม': 'bg-teal-100 text-teal-700 border-teal-200', 'สังคมศึกษา ศาสนา และวัฒนธรรม': 'bg-teal-100 text-teal-700 border-teal-200',
+        'การงานอาชีพ': 'bg-orange-100 text-orange-700 border-orange-200', 'การงาน': 'bg-orange-100 text-orange-700 border-orange-200',
+        'สุขะ - พละ': 'bg-green-100 text-green-700 border-green-200', 'สุขะ-พละ': 'bg-green-100 text-green-700 border-green-200', 'สุขศึกษาและพลศึกษา': 'bg-green-100 text-green-700 border-green-200',
+        'ศิลปะ - ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ-ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ดนตรี': 'bg-indigo-100 text-indigo-700 border-indigo-200', 'ศิลปะ ดนตรี นาฏศิลป์': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-100 text-purple-700 border-purple-200', 'ลูกเสือ': 'bg-purple-100 text-purple-700 border-purple-200', 'เนตรนารี': 'bg-purple-100 text-purple-700 border-purple-200', 'ยุวกาชาด': 'bg-purple-100 text-purple-700 border-purple-200',
+        'ปฐมวัย': 'bg-rose-100 text-rose-700 border-rose-200', 'อนุบาล': 'bg-rose-100 text-rose-700 border-rose-200',
         'อื่นๆ': 'bg-gray-100 text-gray-700 border-gray-200'
     };
-
-    // 3. ตรวจสอบว่ามีคีย์ไหม ถ้าไม่มีให้ใช้ 'อื่นๆ'
     const styleClass = colorMap[cleanSubject] || colorMap['อื่นๆ'];
-
-    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1 whitespace-nowrap">
-                <i class="fa-solid fa-book-open"></i> ${cleanSubject}
-            </span>`;
+    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-book-open"></i> ${cleanSubject}</span>`;
 }
 
 // -------------------------------------------------------------------------
-// 2. Render Function (Updated)
+// 2. Logic จัดการ Folder View vs Item View
 // -------------------------------------------------------------------------
 
-function renderPagedData(containerId, data, type, page = 1) {
+// ฟังก์ชันหลักที่ถูกเรียก (Entry Point)
+function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
@@ -89,7 +46,131 @@ function renderPagedData(containerId, data, type, page = 1) {
         return;
     }
 
-    const totalItems = data.length;
+    // เช็คว่ากำลังดู "หน้ารวมโฟลเดอร์" หรือ "หน้าใน"
+    if (currentFolderFilter === null) {
+        // โหมด 1: แสดงโฟลเดอร์ (รายการแข่ง)
+        renderFolders(containerId, data, type);
+        
+        // ซ่อนตัวกรอง (Filter/Search) ตอนดูหน้าโฟลเดอร์ (เพราะมันเยอะเกิน)
+        // (Optional: ถ้าอยากซ่อน input search จริงๆ ต้องไปแก้ HTML เพิ่ม แต่ปล่อยไว้ก็ได้)
+    } else {
+        // โหมด 2: แสดงรายการข้างใน (Pagination 6 อัน)
+        const filteredData = data.filter(item => (item.program || 'อื่นๆ') === currentFolderFilter);
+        
+        // เพิ่มปุ่ม "ย้อนกลับ"
+        const backBtnContainer = document.createElement('div');
+        backBtnContainer.className = "col-span-full mb-4 animate-fade-in";
+        backBtnContainer.innerHTML = `
+            <button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 hover:bg-blue-50 px-4 py-2 rounded-full">
+                <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปดูรายการทั้งหมด
+            </button>
+            <h3 class="text-xl font-bold text-gray-800 mt-4 border-l-4 border-blue-500 pl-3">${currentFolderFilter}</h3>
+        `;
+        container.appendChild(backBtnContainer);
+
+        // เรียกฟังก์ชันเดิมมาวาดการ์ด
+        renderPagedData(container, filteredData, type, 1);
+    }
+}
+
+// ฟังก์ชันวาด "โฟลเดอร์" (Folder Cards)
+function renderFolders(containerId, data, type) {
+    const container = document.getElementById(containerId);
+    
+    // 1. Group ข้อมูลตามชื่อรายการ (program)
+    const groups = data.reduce((acc, item) => {
+        const key = item.program || 'รายการอื่นๆ';
+        if (!acc[key]) {
+            acc[key] = { count: 0, items: [], latestImage: null };
+        }
+        acc[key].count++;
+        acc[key].items.push(item);
+        // เก็บรูปแรกที่เจอมาทำปก
+        if (!acc[key].latestImage && item.image) acc[key].latestImage = item.image;
+        return acc;
+    }, {});
+
+    // 2. สร้างการ์ดโฟลเดอร์
+    const themeColor = type === 'teacher' ? 'blue' : 'pink';
+    const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
+
+    Object.keys(groups).forEach(programName => {
+        const group = groups[programName];
+        const folderDiv = document.createElement('div');
+        
+        // ดีไซน์การ์ดโฟลเดอร์
+        folderDiv.className = `bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-lg hover:-translate-y-1 transition cursor-pointer flex flex-col h-full animate-fade-in group`;
+        folderDiv.onclick = () => selectFolder(containerId, type, programName);
+
+        folderDiv.innerHTML = `
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 rounded-xl bg-${themeColor}-50 text-${themeColor}-500 flex items-center justify-center text-3xl flex-shrink-0 group-hover:scale-110 transition duration-300 overflow-hidden relative">
+                    ${group.latestImage 
+                        ? `<img src="${group.latestImage}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">` 
+                        : `<i class="fa-solid fa-folder-open"></i>`
+                    }
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2 group-hover:text-${themeColor}-600 transition">${programName}</h4>
+                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md font-medium">
+                        ${group.count} ผลงาน
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
+                <span>คลิกเพื่อดูรายละเอียด</span>
+                <i class="fa-solid fa-chevron-right group-hover:translate-x-1 transition"></i>
+            </div>
+        `;
+        container.appendChild(folderDiv);
+    });
+}
+
+// -------------------------------------------------------------------------
+// 3. System Control Functions (Global Scope)
+// -------------------------------------------------------------------------
+
+// เมื่อกดเลือกโฟลเดอร์
+window.selectFolder = function(containerId, type, programName) {
+    currentFolderFilter = programName;
+    const data = type === 'teacher' ? allTeacherData : allStudentData;
+    renderAchievementSystem(containerId, data, type);
+    // Scroll ขึ้นบนนิดหน่อย
+    window.scrollTo({ top: document.getElementById(containerId).offsetTop - 150, behavior: 'smooth' });
+}
+
+// เมื่อกดย้อนกลับ
+window.clearFolderFilter = function(containerId, type) {
+    currentFolderFilter = null;
+    const data = type === 'teacher' ? allTeacherData : allStudentData;
+    renderAchievementSystem(containerId, data, type);
+}
+
+// -------------------------------------------------------------------------
+// 4. Render Paged Data (หน้าใน: แสดงการ์ด 6 ใบ) - Logic เดิมแต่ปรับรับ Container Element
+// -------------------------------------------------------------------------
+
+function renderPagedData(container, pageItemsFullList, type, page = 1) {
+    // ล้างเฉพาะเนื้อหาการ์ด (เก็บปุ่ม Back ไว้) -> แต่ container ที่ส่งมาคือ div หลัก ดังนั้นเราต้องสร้าง div ย่อยห่อการ์ด
+    
+    // สร้าง Wrapper สำหรับ Grid การ์ด (ถ้ายังไม่มี)
+    let gridWrapper = container.querySelector('.achievements-grid-wrapper');
+    if (!gridWrapper) {
+        gridWrapper = document.createElement('div');
+        gridWrapper.className = "achievements-grid-wrapper grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+        container.appendChild(gridWrapper);
+    } else {
+        gridWrapper.innerHTML = ''; // Clear เก่า
+    }
+
+    // ล้าง Pagination เก่าออก
+    const oldPag = container.querySelector('.pagination-controls');
+    if(oldPag) oldPag.remove();
+
+    // Logic แบ่งหน้า
+    const totalItems = pageItemsFullList.length;
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
     
     if (page < 1) page = 1;
@@ -97,89 +178,66 @@ function renderPagedData(containerId, data, type, page = 1) {
 
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const pageItems = data.slice(startIndex, endIndex);
+    const pageItems = pageItemsFullList.slice(startIndex, endIndex);
 
+    // Loop วาดการ์ด
     pageItems.forEach(item => {
         const dateStr = item.date ? new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '-';
         const name = type === 'teacher' ? item.name : item.students;
         const themeColor = type === 'teacher' ? 'blue' : 'pink';
         const iconClass = type === 'teacher' ? 'fa-chalkboard-user' : 'fa-user-graduate';
+        const borderColor = type === 'teacher' ? 'border-blue-500' : 'border-pink-500';
 
         const div = document.createElement('div');
-        div.className = `achievement-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full animate-fade-in`;
+        div.className = `achievement-card group bg-white rounded-lg shadow-sm border border-gray-200 border-l-[3px] ${borderColor} hover:shadow-md transition relative flex flex-col justify-between p-3 h-full min-h-[130px] animate-fade-in`;
         
         div.innerHTML = `
-            <div class="h-48 bg-gray-100 relative overflow-hidden cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')">
-                 ${item.image 
-                    ? `<img src="${item.image}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-1">` 
-                    : `<div class="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50"><i class="fa-solid fa-certificate text-5xl mb-2 opacity-50"></i><span class="text-xs font-medium">ไม่มีรูปภาพ</span></div>`
-                 }
-                 <div class="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10"></div>
-                 
-                 <div class="absolute top-3 right-3 flex gap-2">
-                    ${item.level ? `<span class="bg-white/90 backdrop-blur-sm text-gray-700 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm border border-gray-100">${item.level}</span>` : ''}
-                 </div>
-            </div>
-
-            <div class="p-5 flex-grow flex flex-col justify-between relative">
-                <div>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        ${getSubjectBadge(item.subject)}
-                        ${item.competition ? `<span class="bg-blue-50 text-blue-700 border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-full border inline-flex items-center gap-1"><i class="fa-solid fa-trophy text-blue-500"></i> ${item.competition}</span>` : ''}
-                    </div>
-                    
-                    <h4 class="font-bold text-gray-800 text-lg leading-tight mb-1 line-clamp-2 group-hover:text-${themeColor}-600 transition-colors cursor-pointer" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">
-                        ${item.title || '-'}
-                    </h4>
-
-                    ${item.program ? `<div class="text-xs text-gray-500 flex items-center gap-1.5 mb-3"><i class="fa-solid fa-tag text-gray-400"></i><span class="line-clamp-1">${item.program}</span></div>` : ''}
+            <div class="absolute top-1 right-1 text-gray-50 text-4xl -z-0 pointer-events-none group-hover:text-gray-100 transition"><i class="fa-solid fa-award"></i></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-1">
+                    ${item.level ? `<span class="bg-gray-100 text-gray-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-gray-200">${item.level}</span>` : '<span></span>'}
+                    ${item.image ? `<a href="${item.image}" target="_blank" class="text-[10px] text-${themeColor}-600 hover:underline font-bold flex items-center gap-1"><i class="fa-solid fa-file-contract"></i> ดูเกียรติบัตร</a>` : ''}
                 </div>
-                
-                <div>
-                    <hr class="border-gray-100 my-3 group-hover:border-${themeColor}-100 transition">
-                    <div class="space-y-1.5 mb-4">
-                        <p class="text-sm font-semibold text-gray-700 flex items-center gap-2 truncate"><i class="fa-solid ${iconClass} text-${themeColor}-500 w-4 text-center"></i> <span>${name}</span></p>
-                        ${item.organization ? `<p class="text-xs text-gray-500 flex items-center gap-2 truncate"><i class="fa-solid fa-building-columns text-gray-400 w-4 text-center"></i><span>${item.organization}</span></p>` : ''}
-                    </div>
-                    <div class="flex justify-between items-center mt-auto pt-1">
-                        <div class="text-[11px] text-gray-400 flex items-center gap-1.5 font-medium"><i class="fa-regular fa-calendar"></i>${dateStr}</div>
-                        ${item.image ? `<a href="${item.image}" target="_blank" class="flex items-center gap-1.5 text-[11px] bg-${themeColor}-50 text-${themeColor}-600 px-3 py-1.5 rounded-full hover:bg-${themeColor}-100 transition font-bold shadow-sm"><i class="fa-solid fa-expand"></i> ดูเกียรติบัตร</a>` : ''}
-                    </div>
+                <div class="flex flex-wrap gap-1 mb-1">
+                     ${getSubjectBadge(item.subject)}
+                </div>
+                <h4 class="text-sm font-bold text-slate-800 leading-tight cursor-pointer hover:text-${themeColor}-600 line-clamp-1 mb-1" onclick="window.open('${item.image || '#'}', '_blank')" title="${item.title}">${item.title || '-'}</h4>
+                <div class="flex flex-col gap-0.5 text-[10px] text-gray-500 border-l-2 border-gray-200 pl-2 mb-2">
+                    ${item.competition ? `<div class="font-semibold text-${themeColor}-600 truncate"><i class="fa-solid fa-trophy w-3 text-center"></i> ${item.competition}</div>` : ''}
+                    ${item.program ? `<div class="truncate"><i class="fa-solid fa-tag w-3 text-center"></i> ${item.program}</div>` : ''}
+                </div>
+            </div>
+            <div class="relative z-10 pt-2 border-t border-dashed border-gray-100 mt-auto">
+                <div class="flex justify-between items-end text-[10px]">
+                    <div class="font-medium text-gray-700 truncate max-w-[70%]"><i class="fa-solid ${iconClass} text-${themeColor}-500 mr-1"></i>${name}</div>
+                    <div class="text-gray-400 text-[9px]">${dateStr}</div>
                 </div>
             </div>
         `;
-        container.appendChild(div);
+        gridWrapper.appendChild(div);
     });
 
-    if (totalPages > 1) renderPaginationControls(container, totalPages, page, type, data);
+    if (totalPages > 1) {
+        renderPaginationControls(container, totalPages, page, type, pageItemsFullList);
+    }
 }
 
-// -------------------------------------------------------------------------
-// ส่วนท้าย: ใส่ Code Pagination Controls และอื่นๆ ให้ครบเพื่อให้ Copy ไปใช้ได้เลย
-// -------------------------------------------------------------------------
-
+// Pagination Controls (ปรับให้รับ container element แทน ID)
 function renderPaginationControls(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
-    nav.className = "col-span-full flex justify-center items-center gap-2 mt-8 animate-fade-in";
+    nav.className = "pagination-controls col-span-full flex justify-center items-center gap-1.5 mt-4 pt-4 border-t border-gray-100";
+    
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
         const btn = document.createElement('button');
         btn.innerHTML = label;
-        btn.className = `w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 shadow-sm ${isActive ? `bg-${themeColor}-600 text-white shadow-md scale-110` : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'} ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:-translate-y-0.5'}`;
+        btn.className = `px-2 py-0.5 rounded text-xs font-bold transition ${isActive ? `bg-${themeColor}-600 text-white` : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
         if (!isDisabled && !isActive) {
-            btn.onclick = () => {
-                renderPagedData(container.id, currentFilteredData, type, targetPage);
-                const section = container.closest('section');
-                if (section) {
-                    const headerOffset = 100;
-                    const elementPosition = section.getBoundingClientRect().top;
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-                }
-            };
+            btn.onclick = () => renderPagedData(container, currentFilteredData, type, targetPage);
         }
         return btn;
     };
+
     nav.appendChild(createBtn('<i class="fa-solid fa-chevron-left"></i>', currentPage - 1, false, currentPage === 1));
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -192,35 +250,63 @@ function renderPaginationControls(container, totalPages, currentPage, type, curr
     container.appendChild(nav);
 }
 
+// -------------------------------------------------------------------------
+// 5. Export Functions (แก้ไขใหม่หมดให้เรียกผ่าน renderAchievementSystem)
+// -------------------------------------------------------------------------
+
+// Search Function (ปรับให้ทำงานร่วมกับ Folder View)
 window.filterAchievements = function(inputId, selectId, containerId) {
     const input = document.getElementById(inputId);
     const select = document.getElementById(selectId);
+    
     const searchText = input.value.toLowerCase().trim();
     const filterLevel = select.value;
+    
     const isTeacher = containerId.includes('teacher');
     const sourceData = isTeacher ? allTeacherData : allStudentData;
     const type = isTeacher ? 'teacher' : 'student';
-    const filteredData = sourceData.filter(item => {
-        const textContent = `${item.title} ${item.program} ${item.competition} ${item.subject} ${item.name || item.students} ${item.organization}`.toLowerCase();
-        const itemLevel = item.level || "";
-        const matchText = !searchText || textContent.includes(searchText);
-        const matchLevel = (filterLevel === "all") || (itemLevel === filterLevel);
-        return matchText && matchLevel;
-    });
-    renderPagedData(containerId, filteredData, type, 1);
+
+    // ถ้ามีการค้นหา ให้ "ข้ามโหมดโฟลเดอร์" แล้วโชว์ผลลัพธ์เลย (เพื่อความสะดวก)
+    if (searchText || filterLevel !== 'all') {
+        currentFolderFilter = 'ผลการค้นหา'; // Trick ให้เข้าระบบหน้าใน
+        const filteredData = sourceData.filter(item => {
+            const textContent = `${item.title} ${item.program} ${item.competition} ${item.subject} ${item.name || item.students} ${item.organization}`.toLowerCase();
+            const itemLevel = item.level || "";
+            const matchText = !searchText || textContent.includes(searchText);
+            const matchLevel = (filterLevel === "all") || (itemLevel === filterLevel);
+            return matchText && matchLevel;
+        });
+        
+        // Render แบบหน้าใน (พร้อมปุ่ม Back)
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Clear Folders
+        
+        const backBtnContainer = document.createElement('div');
+        backBtnContainer.className = "col-span-full mb-4";
+        backBtnContainer.innerHTML = `<button onclick="clearFolderFilter('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 px-4 py-2 rounded-full"><i class="fa-solid fa-times"></i> ล้างการค้นหา / กลับหน้าหลัก</button>`;
+        container.appendChild(backBtnContainer);
+        
+        renderPagedData(container, filteredData, type, 1);
+
+    } else {
+        // ถ้าไม่มีการค้นหา (ลบคำค้นออกหมด) ให้กลับไปหน้าโฟลเดอร์
+        clearFolderFilter(containerId, type);
+    }
 }
 
 export function renderTeacherAchievements(data) { 
     if(!data) return;
     allTeacherData = [...data].sort((a, b) => b.id - a.id);
-    renderPagedData('teacher-achievements-container', allTeacherData, 'teacher', 1); 
+    renderAchievementSystem('teacher-achievements-container', allTeacherData, 'teacher');
 }
 
 export function renderStudentAchievements(data) { 
     if(!data) return;
     allStudentData = [...data].sort((a, b) => b.id - a.id);
-    renderPagedData('student-achievements-container', allStudentData, 'student', 1); 
+    renderAchievementSystem('student-achievements-container', allStudentData, 'student');
 }
+
+// ... (ฟังก์ชันอื่นๆ renderHomeNews, renderNews, renderSchoolInfo, renderPersonGrid, renderHistoryTable, renderInnovations, renderDocuments, renderStudentChart เหมือนเดิมจากคำตอบก่อนหน้า Copy มาใส่ต่อท้ายได้เลยครับ เพื่อความสั้นผมขอละไว้ในคำตอบนี้) ...
 
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
