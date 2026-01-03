@@ -1,130 +1,159 @@
-// script.js
-import * as UI from './js/ui.js';
+// js/script.js
+import * as UI from './ui.js';
 
-// ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
+// ⚠️⚠️⚠️ ใส่ URL และ KEY ของอาจารย์ที่นี่ ⚠️⚠️⚠️
 const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
 let supabase;
+
 try {
     supabase = window.supabase.createClient(PROJECT_URL, ANON_KEY);
 } catch (e) {
-    console.error("Supabase init error:", e);
+    console.error("Supabase Init Failed:", e);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    init();
+    console.log("App Started...");
     setupNavigation();
+    if(supabase) fetchAndRenderAll();
 });
 
-function init() {
-    showPage('home');
-    setupMobileMenu();
-    // โหลดข้อมูลพื้นฐานเสมอ
-    loadData('school_info', UI.renderSchoolInfo);
-}
-
+// ✅ ฟังก์ชันจัดการเมนู (Navigation)
 function setupNavigation() {
-    // 1. จัดการคลิกเมนูหลัก (Desktop)
-    document.querySelectorAll('#main-nav a[data-page], .dropdown-menu a[data-page]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pageId = link.getAttribute('data-page');
-            showPage(pageId);
-        });
-    });
-
-    // 2. จัดการคลิกจากปุ่มอื่นๆ (เช่น ปุ่ม "รู้จักเรา", "ดูทั้งหมด")
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-page-link]');
-        if (target) {
-            e.preventDefault();
-            showPage(target.getAttribute('data-page-link'));
-        }
-    });
-}
-
-function setupMobileMenu() {
-    // Mobile menu links
-    document.querySelectorAll('#mobile-menu a[data-page]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pageId = link.getAttribute('data-page');
-            showPage(pageId);
-            document.getElementById('mobile-menu').classList.add('hidden');
-        });
-    });
-}
-
-// ✅ ฟังก์ชันแสดงหน้า (เพิ่ม Scroll to Top)
-async function showPage(pageId) {
-    // 1. เด้งขึ้นบนสุดทันทีที่เปลี่ยนหน้า
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // 2. ปิด Dropdown ทั้งหมด
-    UI.closeAllDropdowns();
-
-    // 3. ซ่อนทุกหน้า
-    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    const links = document.querySelectorAll('[data-page], [data-page-link]');
     
-    // 4. แสดงหน้าเป้าหมาย
-    const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) {
-        targetPage.classList.remove('hidden');
-        
-        // 5. โหลดข้อมูลตามหน้า
-        switch(pageId) {
-            case 'home': 
-                await loadData('news', UI.renderHomeNews);
-                await loadData('school_info', UI.renderSchoolInfo);
-                break;
-            case 'history': await loadData('school_info', UI.renderSchoolInfo); break;
-            case 'school-board': await loadData('school_board', (d) => UI.renderPersonGrid(d, 'school-board-container')); break;
-            case 'student-council': await loadData('student_council', (d) => UI.renderPersonGrid(d, 'student-council-container')); break;
-            case 'personnel-list': await loadData('personnel', (d) => UI.renderPersonGrid(d, 'personnel-list-container')); break;
-            case 'director-history': await loadData('director_history', (d) => UI.renderHistoryTable('director-history-table-body', d)); break;
-            case 'personnel-history': await loadData('personnel_history', (d) => UI.renderHistoryTable('personnel-history-table-body', d)); break;
-            case 'students': await loadData('student_data', UI.renderStudentChart); break;
-            case 'teacher-achievements': await loadData('teacher_awards', UI.renderTeacherAchievements); break;
-            case 'student-achievements': await loadData('student_awards', UI.renderStudentAchievements); break;
-            case 'school-achievements': await loadData('school_awards', UI.renderSchoolAchievements); break;
-            case 'innovations': await loadData('innovations', UI.renderInnovations); break;
-            case 'documents-official': await loadData('documents', (d) => UI.renderDocuments(d, 'documents-official-container')); break;
-            case 'documents-forms': await loadData('forms', (d) => UI.renderDocuments(d, 'documents-forms-container')); break;
-            case 'news': await loadData('news', UI.renderNews); break;
-        }
-    }
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if(link.getAttribute('target') === '_blank') return; // ปล่อยลิงก์ภายนอก
+
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page') || link.getAttribute('data-page-link');
+            
+            // 1. ซ่อนทุกหน้า
+            document.querySelectorAll('.page-content').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('animate-fade-in');
+            });
+
+            // 2. โชว์หน้าเป้าหมาย
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('animate-fade-in');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                if(link.classList.contains('nav-link')) link.classList.add('active');
+            }
+
+            // 3. ปิดเมนูมือถือ
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenu) mobileMenu.classList.add('hidden');
+        });
+    });
 }
 
-async function loadData(tableName, callback) {
+// ✅ ฟังก์ชันดึงข้อมูลทั้งหมด
+async function fetchAndRenderAll() {
+    // 1. ข้อมูลโรงเรียน
     try {
-        const { data, error } = await supabase.from(tableName).select('*');
-        if (error) throw error;
-        callback(data);
-    } catch (err) {
-        console.error(`Error loading ${tableName}:`, err);
-        callback([]); // ส่ง array ว่างไปถ้า error
-    }
-}
+        const { data: info } = await supabase.from('school_info').select('*');
+        if(info) UI.renderSchoolInfo(info);
+    } catch (e) { console.error("Error School Info:", e); }
 
-// Music Player Logic
-window.toggleMusic = function() {
-    const audio = document.getElementById('school-song');
-    const icon = document.getElementById('music-icon');
-    const indicator = document.getElementById('music-indicator');
-    const controls = document.getElementById('music-player-controls');
-    
-    if (audio.paused) {
-        audio.play().then(() => {
-            icon.classList.replace('fa-play', 'fa-pause');
-            indicator.classList.remove('hidden');
-            controls.classList.remove('hidden');
-        }).catch(e => {
-            alert("กรุณาคลิกที่หน้าเว็บ 1 ครั้งเพื่อให้เสียงเล่นได้ (นโยบาย Browser)");
-        });
-    } else {
-        audio.pause();
-        icon.classList.replace('fa-pause', 'fa-play');
-        indicator.classList.add('hidden');
-    }
+    // 2. ข่าวสาร
+    try {
+        const { data: news } = await supabase.from('news').select('*');
+        if(news) {
+            UI.renderHomeNews(news);
+            UI.renderNews(news);
+        }
+    } catch (e) { console.error("Error News:", e); }
+
+    // 3. ผลงาน (ครู/นักเรียน/โรงเรียน + วิชาการ)
+    try {
+        const { data: teachers } = await supabase.from('teacher_achievements').select('*');
+        if(teachers) UI.renderTeacherAchievements(teachers);
+
+        const { data: students } = await supabase.from('student_achievements').select('*');
+        if(students) UI.renderStudentAchievements(students);
+
+        // ดึงข้อมูล 4 ส่วนมารวมกันเพื่อส่งให้ UI จัดการ
+        const { data: school } = await supabase.from('school_achievements').select('*');
+        const { data: onet } = await supabase.from('onet').select('*');
+        const { data: nt } = await supabase.from('nt').select('*');
+        const { data: rt } = await supabase.from('rt').select('*');
+        
+        let allAcademic = [];
+        // รวมผลงานโรงเรียนทั่วไป
+        if(school) allAcademic = [...allAcademic, ...school];
+        
+        // แปลง O-NET/NT/RT ให้ format ตรงกันกับที่ UI คาดหวัง
+        // (Mapping: title -> title, tag -> competition เพื่อให้สร้าง Folder ปี)
+        const formatAcad = (arr, prefix) => arr ? arr.map(i => ({
+            ...i, 
+            title: `${prefix} ${i.title}`, // เพิ่ม Prefix ให้ชัดเจน
+            competition: `${prefix} ปี ${i.tag}`, // ใช้ Tag ปีการศึกษา เป็นชื่อ Folder
+            image: i.file_url, // ใช้ไฟล์เป็นรูป (ถ้าเป็นรูป) หรือลิงก์
+            fileUrl: i.file_url // เก็บลิงก์ไว้เปิด
+        })) : [];
+
+        allAcademic = [
+            ...allAcademic, 
+            ...formatAcad(onet, 'O-NET'), 
+            ...formatAcad(nt, 'NT'), 
+            ...formatAcad(rt, 'RT')
+        ];
+
+        // ส่งให้ UI render (UI จะแยก Folder ตามชื่อ Competition ให้เอง)
+        UI.renderSchoolAchievements(allAcademic);
+
+    } catch (e) { console.error("Error Achievements:", e); }
+
+    // 4. เอกสาร & นวัตกรรม
+    try {
+        const { data: docs } = await supabase.from('documents').select('*');
+        if(docs) {
+            UI.renderDocuments(docs, 'documents-official-container'); 
+            UI.renderDocuments(docs, 'documents-forms-container'); 
+        }
+        const { data: innov } = await supabase.from('innovations').select('*');
+        if(innov) UI.renderInnovations(innov);
+    } catch (e) { console.error("Error Docs:", e); }
+
+    // 5. บุคลากร & นักเรียน
+    try {
+        const { data: personnel } = await supabase.from('personnel').select('*');
+        const { data: director } = await supabase.from('director_history').select('*');
+        const { data: p_history } = await supabase.from('personnel_history').select('*');
+        
+        if(personnel) UI.renderPersonGrid(personnel, 'personnel-list-container');
+        if(director) UI.renderHistoryTable('director-history-table-body', director);
+        if(p_history) UI.renderHistoryTable('personnel-history-table-body', p_history);
+
+        const { data: stats } = await supabase.from('student_data').select('*'); 
+        if(stats) UI.renderStudentChart(stats);
+
+    } catch (e) { console.error("Error Personnel:", e); }
+
+    // 6. ✅ ระบบสารสนเทศ (E-Service Dynamic Menu)
+    try {
+        const { data: services } = await supabase.from('eservices').select('*').order('id', { ascending: true });
+        const container = document.getElementById('eservice-dropdown-container');
+        
+        if (services && services.length > 0) {
+            container.innerHTML = ''; 
+            services.forEach(item => {
+                const a = document.createElement('a');
+                a.href = item.url;
+                a.target = "_blank";
+                a.className = "block px-4 py-2 hover:bg-green-50 text-green-700 font-bold border-b border-gray-100 last:border-0 transition";
+                a.innerHTML = `<i class="fa-solid fa-link mr-2 text-green-500"></i> ${item.title}`; 
+                container.appendChild(a);
+            });
+        } else {
+            container.innerHTML = '<span class="block px-4 py-2 text-gray-400 text-xs cursor-default text-center">ยังไม่มีระบบ</span>';
+        }
+    } catch (e) { console.error("Error E-Service:", e); }
 }
