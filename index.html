@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -27,9 +27,8 @@
         .dropdown:hover .dropdown-toggle { @apply text-blue-600 bg-blue-50; }
         
         @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
         .section-title { @apply text-2xl md:text-3xl font-bold text-slate-800 border-l-4 border-blue-600 pl-4 mb-6; }
-        .card-hover { @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -130,7 +129,6 @@
                  </div>
 
                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                     
                      <div class="lg:col-span-5 flex flex-col h-full">
                          <div class="flex items-center gap-2 mb-3 px-1">
                              <span class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-brands fa-youtube"></i></span>
@@ -187,10 +185,22 @@
             <section id="page-student-council" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">สภานักเรียน</h2><div id="student-council-container" class="mt-6"></div></div></section>
             <section id="page-personnel-list" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">บุคลากรปัจจุบัน</h2><div id="personnel-list-container" class="mt-6"></div></div></section>
             <section id="page-students" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ข้อมูลนักเรียน</h2><div id="student-summary-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6"></div><div class="h-[400px]"><canvas id="studentChart"></canvas></div></div></section>
-            <section id="page-news" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ข่าวประชาสัมพันธ์</h2><div id="news-container" class="mt-6 space-y-4"></div></div></section>
             <section id="page-director-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบผู้บริหาร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="director-history-table-body"></tbody></table></div></div></section>
             <section id="page-personnel-history" class="page-content hidden"><div class="bg-white p-8 rounded-2xl shadow"><h2 class="section-title">ทำเนียบบุคลากร</h2><div class="overflow-x-auto mt-4"><table class="w-full"><tbody id="personnel-history-table-body"></tbody></table></div></div></section>
             
+            <section id="page-news" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0">ข่าวประชาสัมพันธ์</h2>
+                        <div class="relative w-full md:w-72">
+                            <input type="text" onkeyup="filterNews('search-news', 'news-container')" id="search-news" placeholder="ค้นหาหัวข้อข่าว..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div id="news-container" class="mt-6 space-y-4"></div>
+                </div>
+            </section>
+
             <section id="page-teacher-achievements" class="page-content hidden">
                 <div class="bg-white rounded-2xl shadow p-8">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -212,7 +222,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="teacher-achievements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <div id="teacher-achievements-container" class="w-full"></div>
                 </div>
             </section>
 
@@ -237,7 +247,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="student-achievements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    <div id="student-achievements-container" class="w-full"></div>
                 </div>
             </section>
 
@@ -292,8 +302,8 @@
     <script type="module" src="script.js"></script>
     <script>
         // ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
-        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
-        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        const PROJECT_URL = 'ใส่_SUPABASE_URL_ที่นี่'; 
+        const ANON_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
 
         let supabaseClient;
         try { supabaseClient = window.supabase.createClient(PROJECT_URL, ANON_KEY); } catch (e) { console.error(e); }
