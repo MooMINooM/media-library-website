@@ -53,6 +53,9 @@
                             <a href="#" data-page="history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ประวัติความเป็นมา</a>
                             <a href="#" data-page="school-board" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">คณะกรรมการสถานศึกษา</a>
                             <a href="#" data-page="student-council" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">สภานักเรียน</a>
+                            <a href="#" data-page="students" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold text-blue-600">
+                                <i class="fa-solid fa-chart-pie mr-1"></i> สารสนเทศนักเรียน
+                            </a>
                             <div class="border-t my-1"></div>
                             <a href="#" data-page="personnel-list" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">บุคลากรปัจจุบัน</a>
                             <a href="#" data-page="director-history" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">ทำเนียบผู้บริหาร</a>
@@ -61,12 +64,15 @@
 
                     <div class="relative dropdown group h-full flex items-center">
                         <button class="nav-link dropdown-toggle">วิชาการ&สถิติ <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
-                        <div class="dropdown-menu w-64">
-                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold text-blue-600">
-                                <i class="fa-solid fa-chart-line mr-1"></i> ผลสัมฤทธิ์ (O-NET / NT / RT)
+                        <div class="dropdown-menu">
+                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                                <i class="fa-solid fa-file-contract mr-2 text-green-500"></i> ผลสัมฤทธิ์ O-NET
                             </a>
-                            <a href="#" data-page="students" class="block px-4 py-2 hover:bg-blue-50 text-gray-700">
-                                <i class="fa-solid fa-chart-pie mr-1"></i> สารสนเทศนักเรียน
+                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                                <i class="fa-solid fa-file-contract mr-2 text-blue-500"></i> ผลสัมฤทธิ์ NT
+                            </a>
+                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                                <i class="fa-solid fa-file-contract mr-2 text-purple-500"></i> ผลสัมฤทธิ์ RT
                             </a>
                         </div>
                     </div>
@@ -122,6 +128,7 @@
                 <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
                 <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
                 <a href="#" data-page="innovations" class="block py-2 px-4 rounded hover:bg-white text-blue-700 font-bold">คลังนวัตกรรม</a>
+                <a href="#" data-page="school-achievements" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ผลสัมฤทธิ์ O-NET/NT/RT</a>
                 <a href="https://your-checkin-system.com" target="_blank" class="block py-2 px-4 rounded bg-green-100 text-green-800 font-bold mt-2">
                     <i class="fa-solid fa-desktop mr-2"></i> ระบบเช็คชื่อห้องคอมฯ
                 </a>
@@ -350,8 +357,8 @@
     <script type="module" src="script.js"></script>
     <script>
         // ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
-        const PROJECT_URL = 'ใส่_SUPABASE_URL_ที่นี่'; 
-        const ANON_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
+        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
         let supabaseClient;
         try { supabaseClient = window.supabase.createClient(PROJECT_URL, ANON_KEY); } catch (e) { console.error(e); }
