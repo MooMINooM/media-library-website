@@ -65,13 +65,13 @@
                     <div class="relative dropdown group h-full flex items-center">
                         <button class="nav-link dropdown-toggle">วิชาการ&สถิติ <i class="fa-solid fa-chevron-down text-[10px] opacity-50 mt-0.5"></i></button>
                         <div class="dropdown-menu">
-                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                            <a href="#" data-page="academic-onet" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
                                 <i class="fa-solid fa-file-contract mr-2 text-green-500"></i> ผลสัมฤทธิ์ O-NET
                             </a>
-                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                            <a href="#" data-page="academic-nt" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
                                 <i class="fa-solid fa-file-contract mr-2 text-blue-500"></i> ผลสัมฤทธิ์ NT
                             </a>
-                            <a href="#" data-page="school-achievements" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
+                            <a href="#" data-page="academic-rt" class="block px-4 py-2 hover:bg-blue-50 text-gray-700 font-bold">
                                 <i class="fa-solid fa-file-contract mr-2 text-purple-500"></i> ผลสัมฤทธิ์ RT
                             </a>
                         </div>
@@ -128,7 +128,7 @@
                 <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
                 <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
                 <a href="#" data-page="innovations" class="block py-2 px-4 rounded hover:bg-white text-blue-700 font-bold">คลังนวัตกรรม</a>
-                <a href="#" data-page="school-achievements" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ผลสัมฤทธิ์ O-NET/NT/RT</a>
+                <a href="#" data-page="academic-onet" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ผลสัมฤทธิ์ O-NET/NT/RT</a>
                 <a href="https://your-checkin-system.com" target="_blank" class="block py-2 px-4 rounded bg-green-100 text-green-800 font-bold mt-2">
                     <i class="fa-solid fa-desktop mr-2"></i> ระบบเช็คชื่อห้องคอมฯ
                 </a>
@@ -285,6 +285,48 @@
             <section id="page-school-achievements" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">ผลงานสถานศึกษา</h2><div id="school-achievements-container" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6"></div></div></section>
             <section id="page-innovations" class="page-content hidden"><div class="bg-white rounded-2xl shadow p-8"><h2 class="section-title">คลังนวัตกรรม</h2><div id="innovations-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div></section>
             
+            <section id="page-academic-onet" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0 text-green-600 border-green-600">ผลสัมฤทธิ์ O-NET</h2>
+                        <div class="relative w-full md:w-64">
+                            <input type="text" onkeyup="filterAchievements('search-onet', 'filter-dummy-onet', 'onet-container')" id="search-onet" placeholder="ค้นหาปีการศึกษา..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-green-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                            <select id="filter-dummy-onet" class="hidden"><option value="all">all</option></select> 
+                        </div>
+                    </div>
+                    <div id="onet-container" class="w-full"></div>
+                </div>
+            </section>
+
+            <section id="page-academic-nt" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0 text-blue-600 border-blue-600">ผลสัมฤทธิ์ NT</h2>
+                        <div class="relative w-full md:w-64">
+                            <input type="text" onkeyup="filterAchievements('search-nt', 'filter-dummy-nt', 'nt-container')" id="search-nt" placeholder="ค้นหาปีการศึกษา..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                            <select id="filter-dummy-nt" class="hidden"><option value="all">all</option></select>
+                        </div>
+                    </div>
+                    <div id="nt-container" class="w-full"></div>
+                </div>
+            </section>
+
+            <section id="page-academic-rt" class="page-content hidden">
+                <div class="bg-white rounded-2xl shadow p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="section-title mb-0 text-purple-600 border-purple-600">ผลสัมฤทธิ์ RT</h2>
+                        <div class="relative w-full md:w-64">
+                            <input type="text" onkeyup="filterAchievements('search-rt', 'filter-dummy-rt', 'rt-container')" id="search-rt" placeholder="ค้นหาปีการศึกษา..." class="w-full pl-10 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-purple-500 outline-none text-sm bg-gray-50">
+                            <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                            <select id="filter-dummy-rt" class="hidden"><option value="all">all</option></select>
+                        </div>
+                    </div>
+                    <div id="rt-container" class="w-full"></div>
+                </div>
+            </section>
+
             <section id="page-documents-official" class="page-content hidden">
                 <div class="bg-white rounded-2xl shadow p-8">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -357,8 +399,8 @@
     <script type="module" src="script.js"></script>
     <script>
         // ⚠️⚠️⚠️ ใส่ URL / KEY ตรงนี้ครับ ⚠️⚠️⚠️
-        const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; 
-        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        const PROJECT_URL = 'ใส่_SUPABASE_URL_ที่นี่'; 
+        const ANON_KEY = 'ใส่_SUPABASE_ANON_KEY_ที่นี่';
 
         let supabaseClient;
         try { supabaseClient = window.supabase.createClient(PROJECT_URL, ANON_KEY); } catch (e) { console.error(e); }
