@@ -4,13 +4,17 @@
 let allTeacherData = [];
 let allStudentData = [];
 let allNewsData = [];
+let allOfficialDocs = [];
+let allFormDocs = [];
 
 // --- Config ---
 const ACH_ITEMS_PER_PAGE = 6;  // ผลงาน: 6 รายการ/หน้า
 const NEWS_ITEMS_PER_PAGE = 5; // ข่าว: 5 รายการ/หน้า
+const DOCS_ITEMS_PER_PAGE = 10; // เอกสาร: 10 รายการ/หน้า
 
 // --- State ---
-let currentFolderFilter = null; // เก็บสถานะว่ากำลังดูโฟลเดอร์ไหน
+let currentFolderFilter = null; 
+let currentDocFolder = null;
 
 // =============================================================================
 // 1. HELPER FUNCTIONS
@@ -40,12 +44,11 @@ function getSubjectBadge(subject) {
 // 2. ACHIEVEMENT SYSTEM (ผลงานครู/นักเรียน)
 // =============================================================================
 
-// Entry Point: ควบคุมการแสดงผล Folder vs Items
 function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // ✅ Clear Grid Class เพื่อให้ Layout เต็มจอ ไม่บีบ
+    // Clear Grid Class เก่า
     container.className = "w-full"; 
     container.innerHTML = '';
 
@@ -55,13 +58,10 @@ function renderAchievementSystem(containerId, data, type) {
     }
 
     if (currentFolderFilter === null) {
-        // โหมด 1: แสดงรายชื่อรายการแข่ง (Folders)
         renderFolders(containerId, data, type);
     } else {
-        // โหมด 2: แสดงเกียรติบัตรข้างใน (Items)
         const filteredData = data.filter(item => (item.competition || 'รายการอื่นๆ') === currentFolderFilter);
         
-        // Header หน้าใน (ปุ่มย้อนกลับ)
         const backBtnContainer = document.createElement('div');
         backBtnContainer.className = "w-full mb-6 animate-fade-in";
         backBtnContainer.innerHTML = `
@@ -83,11 +83,9 @@ function renderAchievementSystem(containerId, data, type) {
     }
 }
 
-// Logic: วาด Folders
 function renderFolders(containerId, data, type) {
     const container = document.getElementById(containerId);
     
-    // Group ข้อมูล
     const groups = data.reduce((acc, item) => {
         const key = item.competition || 'รายการอื่นๆ';
         if (!acc[key]) { acc[key] = { count: 0, items: [], latestImage: null, dates: [] }; }
@@ -99,7 +97,6 @@ function renderFolders(containerId, data, type) {
 
     const themeColor = type === 'teacher' ? 'blue' : 'pink';
     
-    // Grid 3 คอลัมน์สำหรับ Folder
     const gridDiv = document.createElement('div');
     gridDiv.className = "w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
 
@@ -142,7 +139,6 @@ function renderFolders(containerId, data, type) {
     container.appendChild(gridDiv);
 }
 
-// Logic: วาด Items (Premium Card Design)
 function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
     let gridWrapper = container.querySelector('.achievements-grid-wrapper');
     if (!gridWrapper) {
@@ -230,12 +226,11 @@ function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
     }
 }
 
-// Pagination Controls (Achievements)
 function renderAchPagination(container, totalPages, currentPage, type, currentFilteredData) {
     const nav = document.createElement('div');
     nav.className = "pagination-controls w-full flex justify-center items-center gap-1.5 mt-6 pt-4 border-t border-gray-100";
-    const themeColor = type === 'teacher' ? 'blue' : 'pink';
     
+    const themeColor = type === 'teacher' ? 'blue' : 'pink';
     const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
         const btn = document.createElement('button');
         btn.innerHTML = label;
@@ -263,7 +258,6 @@ function renderAchPagination(container, totalPages, currentPage, type, currentFi
     container.appendChild(nav);
 }
 
-// System Actions
 window.selectFolder = function(containerId, type, programName) {
     currentFolderFilter = programName;
     const data = type === 'teacher' ? allTeacherData : allStudentData;
@@ -317,7 +311,6 @@ window.filterAchievements = function(inputId, selectId, containerId) {
 // 3. NEWS SYSTEM (ข่าวประชาสัมพันธ์)
 // =============================================================================
 
-// Search News
 window.filterNews = function(inputId, containerId) {
     const input = document.getElementById(inputId);
     const searchText = input.value.toLowerCase().trim();
@@ -327,7 +320,6 @@ window.filterNews = function(inputId, containerId) {
     renderPagedNews(containerId, filteredNews, 1);
 }
 
-// Render News Pagination
 function renderPagedNews(containerId, data, page = 1) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -419,7 +411,197 @@ function renderNewsPagination(container, totalPages, currentPage, currentFiltere
 }
 
 // =============================================================================
-// 4. EXPORTED FUNCTIONS
+// 4. DOCUMENT SYSTEM (เอกสาร: โฟลเดอร์ + ค้นหา + แบ่งหน้า)
+// =============================================================================
+
+window.filterDocuments = function(inputId, containerId) {
+    const input = document.getElementById(inputId);
+    const searchText = input.value.toLowerCase().trim();
+    
+    const isOfficial = containerId.includes('official');
+    const sourceData = isOfficial ? allOfficialDocs : allFormDocs;
+    const type = isOfficial ? 'official' : 'form';
+
+    if (searchText) {
+        currentDocFolder = 'ผลการค้นหา';
+        const filteredData = sourceData.filter(item => {
+            const textContent = `${item.title} ${item.category}`.toLowerCase();
+            return textContent.includes(searchText);
+        });
+        
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        const backBtn = document.createElement('div');
+        backBtn.className = "col-span-full mb-4 w-full";
+        backBtn.innerHTML = `<button onclick="clearDocFolder('${containerId}', '${type}')" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition font-bold text-sm bg-gray-100 px-4 py-2 rounded-full"><i class="fa-solid fa-times"></i> ล้างการค้นหา</button>`;
+        container.appendChild(backBtn);
+
+        renderPagedDocs(container, filteredData, type, 1);
+    } else {
+        clearDocFolder(containerId, type);
+    }
+}
+
+function renderDocumentSystem(containerId, data, type) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.className = "w-full"; 
+    container.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200"><i class="fa-solid fa-folder-open text-3xl mb-2 opacity-50"></i><p>ไม่พบเอกสาร</p></div>';
+        return;
+    }
+
+    if (currentDocFolder === null) {
+        renderDocFolders(container, data, type);
+    } else {
+        const filteredData = data.filter(item => (item.category || 'อื่นๆ') === currentDocFolder);
+        
+        const header = document.createElement('div');
+        header.className = "w-full mb-6 animate-fade-in";
+        header.innerHTML = `
+            <div class="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <h3 class="font-bold text-gray-700 flex items-center gap-2"><i class="fa-solid fa-folder-open text-yellow-500"></i> ${currentDocFolder}</h3>
+                <button onclick="clearDocFolder('${containerId}', '${type}')" class="text-sm text-blue-600 hover:underline font-bold"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+            </div>
+        `;
+        container.appendChild(header);
+
+        renderPagedDocs(container, filteredData, type, 1);
+    }
+}
+
+function renderDocFolders(container, data, type) {
+    const groups = data.reduce((acc, item) => {
+        const key = item.category || 'อื่นๆ';
+        if (!acc[key]) acc[key] = 0;
+        acc[key]++;
+        return acc;
+    }, {});
+
+    const grid = document.createElement('div');
+    grid.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full";
+
+    Object.keys(groups).forEach(cat => {
+        const count = groups[cat];
+        const div = document.createElement('div');
+        div.className = "bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition cursor-pointer flex flex-col items-center text-center gap-3 group animate-fade-in";
+        div.onclick = () => selectDocFolder(container.id, type, cat);
+        div.innerHTML = `
+            <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300">
+                <i class="fa-solid fa-folder"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-gray-700 text-sm group-hover:text-blue-600 transition">${cat}</h4>
+                <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full mt-1 inline-block">${count} ไฟล์</span>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+    container.appendChild(grid);
+}
+
+function renderPagedDocs(container, data, type, page = 1) {
+    const wrapper = document.createElement('div');
+    wrapper.className = "flex flex-col gap-3 w-full animate-fade-in";
+    
+    const totalItems = data.length;
+    const totalPages = Math.ceil(totalItems / DOCS_ITEMS_PER_PAGE);
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+
+    const startIndex = (page - 1) * DOCS_ITEMS_PER_PAGE;
+    const endIndex = startIndex + DOCS_ITEMS_PER_PAGE;
+    const pageItems = data.slice(startIndex, endIndex);
+
+    pageItems.forEach(doc => {
+        const dateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString('th-TH') : '-';
+        let icon = 'fa-file-lines text-gray-400';
+        if (doc.title.toLowerCase().includes('pdf')) icon = 'fa-file-pdf text-red-500';
+        else if (doc.title.toLowerCase().includes('doc')) icon = 'fa-file-word text-blue-500';
+        else if (doc.title.toLowerCase().includes('xls')) icon = 'fa-file-excel text-green-500';
+
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md hover:border-blue-200 transition group cursor-pointer";
+        div.onclick = () => { if(doc.fileUrl) window.open(doc.fileUrl, '_blank'); };
+        
+        div.innerHTML = `
+            <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-xl group-hover:bg-white transition shadow-sm">
+                <i class="fa-solid ${icon}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-gray-700 text-sm group-hover:text-blue-600 transition truncate">${doc.title}</h4>
+                <div class="flex gap-3 text-xs text-gray-400 mt-0.5">
+                    <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
+                    <span class="bg-gray-100 px-1.5 rounded text-[10px]">${doc.category || 'ทั่วไป'}</span>
+                </div>
+            </div>
+            <div class="text-gray-300 group-hover:text-blue-500 transition px-2">
+                <i class="fa-solid fa-download"></i>
+            </div>
+        `;
+        wrapper.appendChild(div);
+    });
+
+    container.appendChild(wrapper);
+
+    if (totalPages > 1) {
+        renderDocPagination(container, totalPages, page, type, data);
+    }
+}
+
+function renderDocPagination(container, totalPages, currentPage, type, currentFilteredData) {
+    const nav = document.createElement('div');
+    nav.className = "col-span-full flex justify-center items-center gap-2 mt-4 pt-4 border-t border-gray-100";
+    
+    const createBtn = (label, targetPage, isActive = false, isDisabled = false) => {
+        const btn = document.createElement('button');
+        btn.innerHTML = label;
+        btn.className = `w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold transition ${isActive ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+        if (!isDisabled && !isActive) {
+            btn.onclick = () => {
+                const oldWrapper = container.querySelector('.flex.flex-col');
+                if(oldWrapper) oldWrapper.remove();
+                const oldNav = container.querySelector('.col-span-full');
+                if(oldNav) oldNav.remove();
+                
+                renderPagedDocs(container, currentFilteredData, type, targetPage);
+                const offset = 150;
+                const topPos = container.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top: topPos, behavior: "smooth" });
+            };
+        }
+        return btn;
+    };
+
+    nav.appendChild(createBtn('<i class="fa-solid fa-chevron-left"></i>', currentPage - 1, false, currentPage === 1));
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            nav.appendChild(createBtn(i, i, i === currentPage));
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            nav.appendChild(document.createTextNode("..."));
+        }
+    }
+    nav.appendChild(createBtn('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, false, currentPage === totalPages));
+    container.appendChild(nav);
+}
+
+window.selectDocFolder = function(containerId, type, catName) {
+    currentDocFolder = catName;
+    const data = type === 'official' ? allOfficialDocs : allFormDocs;
+    renderDocumentSystem(containerId, data, type);
+}
+
+window.clearDocFolder = function(containerId, type) {
+    currentDocFolder = null;
+    const data = type === 'official' ? allOfficialDocs : allFormDocs;
+    renderDocumentSystem(containerId, data, type);
+}
+
+// =============================================================================
+// 5. EXPORTED ENTRY POINTS
 // =============================================================================
 
 export function renderTeacherAchievements(data) { 
@@ -440,6 +622,18 @@ export function renderNews(newsList) {
     renderPagedNews('news-container', allNewsData, 1);
 }
 
+export function renderDocuments(data, containerId) {
+    if (!data) return;
+    if (containerId.includes('official')) {
+        allOfficialDocs = [...data].sort((a, b) => b.id - a.id);
+        renderDocumentSystem(containerId, allOfficialDocs, 'official');
+    } else {
+        allFormDocs = [...data].sort((a, b) => b.id - a.id);
+        renderDocumentSystem(containerId, allFormDocs, 'form');
+    }
+}
+
+// ... Standard Exports ...
 export function renderHomeNews(newsList) {
     const container = document.getElementById('home-news-container');
     if (!container) return;
@@ -529,23 +723,6 @@ export function renderInnovations(data) {
         const div = document.createElement('div');
         div.className = "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden";
         div.innerHTML = `<div class="aspect-[4/3] bg-gray-100 relative overflow-hidden">${item.coverImageUrl ? `<img src="${item.coverImageUrl}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">` : `<div class="w-full h-full flex items-center justify-center text-blue-200"><i class="fa-solid fa-lightbulb text-5xl"></i></div>`}<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">${item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-sm font-bold shadow-lg w-full text-center transform translate-y-4 group-hover:translate-y-0 transition duration-300">เปิดดูผลงาน</a>` : ''}</div></div><div class="p-5"><div class="flex items-center gap-2 mb-2"><span class="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-md">${item.subject || 'ทั่วไป'}</span><span class="text-xs text-gray-400 border border-gray-200 px-2 py-1 rounded-md">${item.class || '-'}</span></div><h3 class="font-bold text-gray-800 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition">${item.title}</h3><p class="text-sm text-gray-500 flex items-center gap-2"><i class="fa-solid fa-user-pen"></i> ${item.creator || 'คณะผู้จัดทำ'}</p></div>`;
-        container.appendChild(div);
-    });
-}
-
-export function renderDocuments(data, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = '';
-    if (!data || data.length === 0) { container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">ไม่พบเอกสาร</div>'; return; }
-    const sortedData = [...data].sort((a, b) => b.id - a.id);
-    sortedData.forEach(doc => {
-        const dateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString('th-TH') : '-';
-        const icon = doc.title.includes('PDF') ? 'fa-file-pdf text-red-500' : (doc.title.includes('Word') ? 'fa-file-word text-blue-500' : 'fa-file-lines text-gray-500');
-        const div = document.createElement('div');
-        div.className = "flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md transition group cursor-pointer";
-        div.onclick = () => { if(doc.fileUrl) window.open(doc.fileUrl, '_blank'); };
-        div.innerHTML = `<div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-2xl group-hover:bg-blue-50 transition"><i class="fa-solid ${icon}"></i></div><div class="flex-1"><h4 class="font-bold text-gray-700 group-hover:text-blue-600 transition">${doc.title}</h4><div class="flex gap-3 text-xs text-gray-400 mt-1"><span><i class="fa-regular fa-calendar"></i> ${dateStr}</span><span><i class="fa-solid fa-tag"></i> ${doc.category || 'ทั่วไป'}</span></div></div><div class="text-gray-300 group-hover:text-blue-500"><i class="fa-solid fa-download"></i></div>`;
         container.appendChild(div);
     });
 }
