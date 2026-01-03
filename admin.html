@@ -57,6 +57,7 @@
             <button onclick="loadSection('rt')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
                 <i class="fa-solid fa-book-open w-5 text-center text-purple-600"></i> ผลสัมฤทธิ์ RT
             </button>
+
             <p class="px-4 text-xs font-bold text-gray-400 uppercase mb-2 mt-4">บุคลากร</p>
             <button onclick="loadSection('personnel')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
                 <i class="fa-solid fa-user-tie w-5 text-center"></i> บุคลากรครู
@@ -92,6 +93,9 @@
             </button>
             <button onclick="loadSection('forms')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
                 <i class="fa-solid fa-file-lines w-5 text-center"></i> แบบฟอร์ม
+            </button>
+            <button onclick="loadSection('eservices')" class="menu-item w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 text-gray-700 flex items-center gap-3 transition">
+                <i class="fa-solid fa-link w-5 text-center text-orange-500"></i> ระบบสารสนเทศ (ลิงก์)
             </button>
         </nav>
         
@@ -154,26 +158,30 @@
         }
 
         const SCHEMAS = {
-            // ✅ เพิ่ม 3 SCHEMAS ใหม่สำหรับ O-NET / NT / RT
+            // ✅ เพิ่ม SCHEMA ใหม่ (ไม่มี icon)
+            eservices: { title: "ลิงก์ระบบสารสนเทศ", fields: [
+                { key: "title", label: "ชื่อระบบ (เช่น ระบบเช็คชื่อ)", type: "text", required: true },
+                { key: "url", label: "ลิงก์ปลายทาง (URL)", type: "url", required: true }
+            ]},
+            // --- SCHEMAS เดิม ---
             onet: { title: "ผลสัมฤทธิ์ O-NET", fields: [
-                { key: "title", label: "ชื่อเอกสาร (เช่น คะแนนสอบ ปี 2566)", type: "text", required: true },
-                { key: "tag", label: "ปีการศึกษา (สำคัญ! ใช้สร้างโฟลเดอร์)", type: "text", required: true },
-                { key: "file_url", label: "ไฟล์ผลคะแนน (URL)", type: "url", required: true },
-                { key: "date", label: "วันที่อัปโหลด", type: "date" }
+                { key: "title", label: "ชื่อเอกสาร", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา", type: "text", required: true },
+                { key: "file_url", label: "ไฟล์ (URL)", type: "url", required: true },
+                { key: "date", label: "วันที่", type: "date" }
             ]},
             nt: { title: "ผลสัมฤทธิ์ NT", fields: [
-                { key: "title", label: "ชื่อเอกสาร (เช่น คะแนนสอบ ปี 2566)", type: "text", required: true },
-                { key: "tag", label: "ปีการศึกษา (สำคัญ! ใช้สร้างโฟลเดอร์)", type: "text", required: true },
-                { key: "file_url", label: "ไฟล์ผลคะแนน (URL)", type: "url", required: true },
-                { key: "date", label: "วันที่อัปโหลด", type: "date" }
+                { key: "title", label: "ชื่อเอกสาร", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา", type: "text", required: true },
+                { key: "file_url", label: "ไฟล์ (URL)", type: "url", required: true },
+                { key: "date", label: "วันที่", type: "date" }
             ]},
             rt: { title: "ผลสัมฤทธิ์ RT", fields: [
-                { key: "title", label: "ชื่อเอกสาร (เช่น คะแนนสอบ ปี 2566)", type: "text", required: true },
-                { key: "tag", label: "ปีการศึกษา (สำคัญ! ใช้สร้างโฟลเดอร์)", type: "text", required: true },
-                { key: "file_url", label: "ไฟล์ผลคะแนน (URL)", type: "url", required: true },
-                { key: "date", label: "วันที่อัปโหลด", type: "date" }
+                { key: "title", label: "ชื่อเอกสาร", type: "text", required: true },
+                { key: "tag", label: "ปีการศึกษา", type: "text", required: true },
+                { key: "file_url", label: "ไฟล์ (URL)", type: "url", required: true },
+                { key: "date", label: "วันที่", type: "date" }
             ]},
-            // --- ของเดิมครบถ้วน ห้ามลบ ---
             school_info: { title: "ข้อมูลพื้นฐานโรงเรียน", fields: [
                 { key: "school_name", label: "ชื่อโรงเรียน", type: "text" },
                 { key: "founding_date", label: "วันที่ก่อตั้ง", type: "date" },
@@ -301,7 +309,6 @@
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
 
-            // School Info (Single Record)
             if (section === 'school_info') {
                 const { data, error } = await supabaseAdmin.from(section).select('*').limit(1).single();
                 if (error && error.code !== 'PGRST116') console.error(error);
@@ -309,7 +316,6 @@
                 return;
             }
 
-            // List View
             let query = supabaseAdmin.from(section).select('*');
             if (section === 'student_data') query = query.order('id', { ascending: true });
             else query = query.order('id', { ascending: false });
