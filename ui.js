@@ -1,4 +1,4 @@
-// js/ui.js - Lumina Bento Edition (Full Version)
+// js/ui.js - Lumina Bento Edition (Final Full Version)
 
 // --- Global Variables ---
 let allTeacherData = [];
@@ -58,7 +58,7 @@ export function renderSchoolInfo(info) {
         document.getElementById('school-age-badge').innerText = `${age}`;
     }
 
-    // 3. Page: School Basic Info (Hero Card & Codes)
+    // 3. Page: School Basic Info
     const basicFields = {
         'info-name-th': info.school_name,
         'info-name-en': info.school_name_en,
@@ -73,7 +73,7 @@ export function renderSchoolInfo(info) {
         if (el) el.innerText = value || '-';
     }
     
-    // Logo Logic for Hero Card (Handle Placeholder)
+    // Logo Logic for Hero Card
     if (document.getElementById('header-logo-basic')) {
         const logoBasic = document.getElementById('header-logo-basic');
         const logoPlaceholder = document.getElementById('logo-placeholder');
@@ -200,8 +200,7 @@ export function renderPersonGrid(data, containerId) {
                         : `<div class="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50"><i class="fa-solid fa-user text-5xl"></i></div>`
                     }
                 </div>
-                ${isLeader ? '<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">Leader</div>' : ''}
-            </div>
+                </div>
 
             <div class="relative z-10 w-full">
                 <h3 class="text-xl font-bold text-slate-800 mb-2 line-clamp-1 group-hover:text-blue-600 transition">${p.name}</h3>
@@ -213,6 +212,7 @@ export function renderPersonGrid(data, containerId) {
     };
 
     let html = '';
+    // ยังคงแสดงคนแรก (Leader) เด่นกว่า แต่ไม่มีป้ายชื่อ
     if (leader) {
         html += `<div class="flex justify-center mb-12 animate-fade-in"><div class="w-full max-w-sm transform hover:scale-105 transition duration-500">${createCard(leader, true)}</div></div>`;
     }
@@ -275,7 +275,7 @@ function renderHistoryList(container, data) {
     });
 }
 
-// 3.3 Student Data (Dashboard Bento)
+// 3.3 Student Data (Dashboard Bento & Paired Bar Chart)
 export function renderStudentChart(data) {
     const container = document.getElementById('student-summary-container');
     const chartCanvas = document.getElementById('studentChart');
@@ -289,6 +289,7 @@ export function renderStudentChart(data) {
     let totalMale = 0, totalFemale = 0;
     data.forEach(d => { totalMale += parseInt(d.male || 0); totalFemale += parseInt(d.female || 0); });
 
+    // Summary Cards
     if (container) {
         container.innerHTML = `
         <div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -316,6 +317,7 @@ export function renderStudentChart(data) {
         </div>`;
     }
 
+    // Chart (Paired Bar)
     if (chartCanvas && window.Chart) {
         const canvasContainer = chartCanvas.parentElement;
         canvasContainer.className = "bg-white rounded-[2.5rem] p-6 md:p-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden";
@@ -325,14 +327,41 @@ export function renderStudentChart(data) {
             data: {
                 labels: data.map(d => d.grade),
                 datasets: [
-                    { label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#0ea5e9', borderRadius: 6, barPercentage: 0.6 },
-                    { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 6, barPercentage: 0.6 }
+                    { 
+                        label: 'ชาย', 
+                        data: data.map(d => d.male), 
+                        backgroundColor: '#0ea5e9', // Sky 500
+                        borderRadius: 6, 
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8 // ให้แท่งอยู่ชิดกันเป็นคู่
+                    },
+                    { 
+                        label: 'หญิง', 
+                        data: data.map(d => d.female), 
+                        backgroundColor: '#ec4899', // Pink 500
+                        borderRadius: 6, 
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8
+                    }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#f1f5f9' }, beginAtZero: true } },
-                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Sarabun', sans-serif" } } }, tooltip: { backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, cornerRadius: 12 } }
+                scales: { 
+                    x: { 
+                        stacked: false, // ✅ ปรับเป็น false เพื่อให้เป็นแท่งคู่
+                        grid: { display: false } 
+                    }, 
+                    y: { 
+                        stacked: false, // ✅ ปรับเป็น false
+                        grid: { color: '#f1f5f9' }, 
+                        beginAtZero: true 
+                    } 
+                },
+                plugins: { 
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Sarabun', sans-serif" } } }, 
+                    tooltip: { backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, cornerRadius: 12 } 
+                }
             }
         });
     }
