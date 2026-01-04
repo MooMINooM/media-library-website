@@ -1,11 +1,10 @@
-// js/ui.js
+// js/ui.js - Lumina Bento Edition (Full Version)
 
 // --- Global Variables ---
 let allTeacherData = [];
 let allStudentData = [];
 let allSchoolData = [];
 let allNewsData = [];
-// ✅ เพิ่มตัวแปรเก็บข้อมูลเอกสารแยกประเภท
 let allOfficialDocs = [];
 let allFormDocs = [];
 
@@ -16,11 +15,7 @@ const DOCS_ITEMS_PER_PAGE = 10;
 
 // --- State ---
 let currentFolderFilter = null;
-// ✅ ตัวแปรเก็บสถานะโฟลเดอร์ของเอกสารแต่ละประเภท
-let currentDocFolder = {
-    official: null,
-    form: null
-};
+let currentDocFolder = { official: null, form: null };
 
 // =============================================================================
 // 1. HELPER FUNCTIONS
@@ -29,37 +24,41 @@ let currentDocFolder = {
 function getSubjectBadge(subject) {
     if (!subject) return '';
     const cleanSubject = subject.trim();
-    // (ใช้โค้ดสีเดิมของอาจารย์ได้เลยครับ)
     return `<span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
 }
 
 // =============================================================================
-// 2. SCHOOL INFO RENDERER (คงเดิมจากเวอร์ชันล่าสุด)
+// 2. SCHOOL INFO RENDERER (Lumina Logic)
 // =============================================================================
 
 export function renderSchoolInfo(info) {
     if (!info) return;
 
+    // 1. Title & Header
     if (info.school_name) document.title = info.school_name;
-
-    // Header
     if (document.getElementById('header-school-name')) document.getElementById('header-school-name').innerText = info.school_name || 'กำลังโหลด...';
     if (document.getElementById('header-affiliation')) document.getElementById('header-affiliation').innerText = info.affiliation || '-';
-    if (document.getElementById('header-logo') && info.logo_url) {
+    
+    // Header Logo (Main Navbar)
+    if (document.getElementById('header-logo')) {
         const logo = document.getElementById('header-logo');
-        logo.src = info.logo_url;
-        logo.classList.remove('hidden');
+        if (info.logo_url) {
+            logo.src = info.logo_url;
+            logo.classList.remove('hidden');
+        } else {
+            logo.classList.add('hidden');
+        }
     }
 
-    // Content
+    // 2. Home & Footer
     if (document.getElementById('hero-motto')) document.getElementById('hero-motto').innerText = info.motto || '-';
     if (document.getElementById('footer-school-name')) document.getElementById('footer-school-name').innerText = info.school_name || '';
     if (info.founding_date && document.getElementById('school-age-badge')) {
         const age = new Date().getFullYear() - new Date(info.founding_date).getFullYear();
-        document.getElementById('school-age-badge').innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
+        document.getElementById('school-age-badge').innerText = `${age}`;
     }
 
-    // Basic Info Page
+    // 3. Page: School Basic Info (Hero Card & Codes)
     const basicFields = {
         'info-name-th': info.school_name,
         'info-name-en': info.school_name_en,
@@ -73,8 +72,8 @@ export function renderSchoolInfo(info) {
         const el = document.getElementById(id);
         if (el) el.innerText = value || '-';
     }
-
-    // Logo ในหน้า Basic (✅ แก้ไข: เพิ่ม Logic Placeholder)
+    
+    // Logo Logic for Hero Card (Handle Placeholder)
     if (document.getElementById('header-logo-basic')) {
         const logoBasic = document.getElementById('header-logo-basic');
         const logoPlaceholder = document.getElementById('logo-placeholder');
@@ -88,8 +87,8 @@ export function renderSchoolInfo(info) {
             if(logoPlaceholder) logoPlaceholder.classList.remove('hidden');
         }
     }
-    
-    // About Page
+
+    // 4. Page: School About
     const aboutFields = {
         'school-history-content': info.history,
         'info-vision': info.vision,
@@ -99,11 +98,13 @@ export function renderSchoolInfo(info) {
         'school-identity-content': info.identity,
         'school-uniqueness-content': info.uniqueness
     };
+
     for (const [id, value] of Object.entries(aboutFields)) {
         const el = document.getElementById(id);
         if (el) el.innerText = value || '-';
     }
 
+    // Color & Uniform
     if (document.getElementById('school-color-box')) {
         const c1 = info.color_code_1 || '#ddd';
         const c2 = info.color_code_2 || c1 || '#ddd';
@@ -123,6 +124,7 @@ export function renderSchoolInfo(info) {
         }
     }
 
+    // Media
     if (info.song_url && document.getElementById('school-song')) {
         document.getElementById('school-song').src = info.song_url;
         document.getElementById('music-player-controls').classList.remove('hidden');
@@ -134,38 +136,215 @@ export function renderSchoolInfo(info) {
             if (info.vtr_url.includes('v=')) vid = info.vtr_url.split('v=')[1].split('&')[0];
             else if (info.vtr_url.includes('youtu.be/')) vid = info.vtr_url.split('youtu.be/')[1];
         } catch (e) {}
+
         if (vid) {
             document.getElementById('vtr-iframe').src = `https://www.youtube.com/embed/${vid}`;
             if(document.getElementById('vtr-placeholder')) document.getElementById('vtr-placeholder').classList.add('hidden');
         }
     }
+
+    // Google Maps Embed Logic
     if (document.getElementById('school-map-container')) {
         const mapContainer = document.getElementById('school-map-container');
-        if (info.map_embed) {
-            // ถ้ามีข้อมูลแผนที่ ให้แสดง iframe
+        if (info.map_embed && info.map_embed.trim() !== '') {
             mapContainer.innerHTML = info.map_embed;
-            // ปรับแต่ง iframe ให้เต็มกรอบอัตโนมัติ
             const iframe = mapContainer.querySelector('iframe');
             if(iframe) {
                 iframe.style.width = "100%";
                 iframe.style.height = "100%";
                 iframe.style.border = "0";
-                iframe.style.filter = "grayscale(20%)"; // ใส่ฟิลเตอร์เท่ๆ (ลบได้ถ้าไม่ชอบ)
+                iframe.style.filter = "grayscale(20%) contrast(1.1)";
             }
-        } else {
-            // ถ้าไม่มี ให้ใช้ Placeholder เดิม (ไม่ต้องทำอะไร เพราะ HTML มีอยู่แล้ว)
         }
     }
 }
 
 // =============================================================================
-// 3. ACHIEVEMENT SYSTEM
+// 3. PERSONNEL & STUDENTS (LUMINA BENTO STYLE)
+// =============================================================================
+
+// 3.1 Person Grid (Teachers, Board, Student Council)
+export function renderPersonGrid(data, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full flex flex-col items-center justify-center p-10 bg-white rounded-[2rem] border border-dashed border-slate-200 text-slate-400">
+                <i class="fa-solid fa-user-slash text-4xl mb-3 opacity-50"></i>
+                <p>กำลังปรับปรุงข้อมูล</p>
+            </div>`;
+        return;
+    }
+
+    const sorted = [...data].sort((a, b) => a.id - b.id);
+    const leader = sorted[0];
+    const others = sorted.slice(1);
+
+    const createCard = (p, isLeader = false) => {
+        const bgClass = isLeader 
+            ? 'bg-gradient-to-b from-white to-blue-50 border-blue-100 shadow-[0_20px_50px_-12px_rgba(59,130,246,0.2)]' 
+            : 'bg-white border-slate-100 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1';
+        
+        const imgBorder = isLeader ? 'border-blue-200 ring-4 ring-blue-50' : 'border-slate-100';
+
+        return `
+        <div class="relative group rounded-[2.5rem] p-6 ${bgClass} border overflow-hidden transition-all duration-500 flex flex-col items-center text-center h-full">
+            <div class="absolute top-0 right-0 w-32 h-32 ${isLeader ? 'bg-blue-200' : 'bg-slate-100'} rounded-full blur-[50px] opacity-40 -mr-10 -mt-10 group-hover:opacity-80 transition duration-700 pointer-events-none"></div>
+            
+            <div class="relative z-10 mb-6">
+                <div class="w-32 h-32 rounded-full overflow-hidden border-[6px] ${imgBorder} shadow-lg bg-white relative mx-auto group-hover:scale-105 transition duration-500">
+                    ${p.image 
+                        ? `<img src="${p.image}" class="w-full h-full object-cover">` 
+                        : `<div class="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50"><i class="fa-solid fa-user text-5xl"></i></div>`
+                    }
+                </div>
+                ${isLeader ? '<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">Leader</div>' : ''}
+            </div>
+
+            <div class="relative z-10 w-full">
+                <h3 class="text-xl font-bold text-slate-800 mb-2 line-clamp-1 group-hover:text-blue-600 transition">${p.name}</h3>
+                <div class="inline-block px-3 py-1 bg-white rounded-full border border-slate-200 shadow-sm">
+                    <p class="text-sm text-slate-500 font-medium line-clamp-1">${p.role}</p>
+                </div>
+            </div>
+        </div>`;
+    };
+
+    let html = '';
+    if (leader) {
+        html += `<div class="flex justify-center mb-12 animate-fade-in"><div class="w-full max-w-sm transform hover:scale-105 transition duration-500">${createCard(leader, true)}</div></div>`;
+    }
+    if (others.length > 0) {
+        html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 animate-fade-in delay-100">`;
+        others.forEach(p => html += createCard(p));
+        html += `</div>`;
+    }
+    container.innerHTML = html;
+}
+
+// 3.2 History List (Horizontal Bento)
+export function renderHistoryTable(tbodyId, data) {
+    const container = document.getElementById(tbodyId); 
+    if (!container) return;
+    
+    // Handle table replacement if using old HTML
+    const isTable = container.tagName === 'TBODY';
+    const targetContainer = isTable ? container.closest('table').parentElement : container;
+    
+    if (isTable) {
+        container.closest('table').style.display = 'none';
+        let listContainer = document.getElementById(tbodyId + '-list');
+        if(!listContainer) {
+            listContainer = document.createElement('div');
+            listContainer.id = tbodyId + '-list';
+            listContainer.className = "space-y-4";
+            targetContainer.appendChild(listContainer);
+        }
+        renderHistoryList(listContainer, data);
+    } else {
+        container.className = "space-y-4";
+        renderHistoryList(container, data);
+    }
+}
+
+function renderHistoryList(container, data) {
+    container.innerHTML = '';
+    
+    if (!data || data.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center bg-white rounded-[2rem] border border-dashed border-slate-200 text-slate-400"><i class="fa-solid fa-clock-rotate-left text-3xl mb-2"></i><p>ยังไม่มีข้อมูลประวัติ</p></div>`;
+        return;
+    }
+
+    [...data].sort((a, b) => b.id - a.id).forEach((item) => {
+        const div = document.createElement('div');
+        div.className = "group relative bg-white rounded-[1.5rem] p-4 pr-6 border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-500 flex items-center gap-6 overflow-hidden";
+        div.innerHTML = `
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-slate-200 to-slate-100 group-hover:from-blue-500 group-hover:to-indigo-500 transition-colors duration-500"></div>
+            <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex-shrink-0 shadow-inner group-hover:scale-105 transition duration-500">
+                ${item.image ? `<img class="h-full w-full object-cover" src="${item.image}">` : `<div class="h-full w-full flex items-center justify-center text-slate-300"><i class="fa-solid fa-user text-2xl"></i></div>`}
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div><h4 class="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition">${item.name}</h4><p class="text-sm text-slate-500 font-medium">${item.role || '-'}</p></div>
+                    <div class="flex-shrink-0"><span class="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold uppercase tracking-wider rounded-full border border-amber-100 shadow-sm group-hover:bg-amber-100 transition"><i class="fa-solid fa-calendar-check"></i><span>${item.year || 'ไม่ระบุปี'}</span></span></div>
+                </div>
+            </div>`;
+        container.appendChild(div);
+    });
+}
+
+// 3.3 Student Data (Dashboard Bento)
+export function renderStudentChart(data) {
+    const container = document.getElementById('student-summary-container');
+    const chartCanvas = document.getElementById('studentChart');
+
+    if (!data || data.length === 0) {
+        if (container) container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10 bg-white rounded-[2rem] border border-dashed">ยังไม่มีข้อมูลนักเรียน</div>';
+        return;
+    }
+
+    data.sort((a, b) => a.id - b.id);
+    let totalMale = 0, totalFemale = 0;
+    data.forEach(d => { totalMale += parseInt(d.male || 0); totalFemale += parseInt(d.female || 0); });
+
+    if (container) {
+        container.innerHTML = `
+        <div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-[2rem] p-6 shadow-lg border border-blue-50 relative overflow-hidden group hover:-translate-y-1 transition duration-500">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-60 -mr-6 -mt-6"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-2xl text-blue-600 shadow-sm group-hover:scale-110 transition duration-500"><i class="fa-solid fa-users"></i></div>
+                    <div><p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">นักเรียนทั้งหมด</p><h3 class="text-3xl font-black text-slate-800">${totalMale + totalFemale} <span class="text-sm font-light text-slate-400">คน</span></h3></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-[2rem] p-6 shadow-lg border border-sky-50 relative overflow-hidden group hover:-translate-y-1 transition duration-500">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-full blur-2xl opacity-60 -mr-6 -mt-6"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-2xl text-sky-500 shadow-sm group-hover:scale-110 transition duration-500"><i class="fa-solid fa-child"></i></div>
+                    <div><p class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-1">นักเรียนชาย</p><h3 class="text-3xl font-black text-slate-800">${totalMale} <span class="text-sm font-light text-slate-400">คน</span></h3></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-[2rem] p-6 shadow-lg border border-pink-50 relative overflow-hidden group hover:-translate-y-1 transition duration-500">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-pink-50 rounded-full blur-2xl opacity-60 -mr-6 -mt-6"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-pink-50 rounded-2xl flex items-center justify-center text-2xl text-pink-500 shadow-sm group-hover:scale-110 transition duration-500"><i class="fa-solid fa-child-dress"></i></div>
+                    <div><p class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-1">นักเรียนหญิง</p><h3 class="text-3xl font-black text-slate-800">${totalFemale} <span class="text-sm font-light text-slate-400">คน</span></h3></div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    if (chartCanvas && window.Chart) {
+        const canvasContainer = chartCanvas.parentElement;
+        canvasContainer.className = "bg-white rounded-[2.5rem] p-6 md:p-8 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden";
+        if (window.myStudentChart) window.myStudentChart.destroy();
+        window.myStudentChart = new Chart(chartCanvas, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.grade),
+                datasets: [
+                    { label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#0ea5e9', borderRadius: 6, barPercentage: 0.6 },
+                    { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 6, barPercentage: 0.6 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#f1f5f9' }, beginAtZero: true } },
+                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { family: "'Sarabun', sans-serif" } } }, tooltip: { backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, cornerRadius: 12 } }
+            }
+        });
+    }
+}
+
+// =============================================================================
+// 4. ACHIEVEMENT & DOCS SYSTEM (Standard)
 // =============================================================================
 
 export function renderAchievementSystem(containerId, data, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
     container.className = "w-full"; 
     container.innerHTML = '';
 
@@ -252,7 +431,7 @@ function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
 }
 
 // =============================================================================
-// 4. NEWS
+// 5. NEWS & DOCS
 // =============================================================================
 
 export function renderNews(data) {
@@ -282,36 +461,23 @@ export function renderNews(data) {
     });
 }
 
-// =============================================================================
-// 5. ✅ DOCUMENT SYSTEM (ระบบเอกสารแบบโฟลเดอร์) - แก้ไขใหม่
-// =============================================================================
-
-// ฟังก์ชันหลักที่ script.js จะเรียกใช้
-// type = 'official' (เอกสารราชการ) หรือ 'form' (แบบฟอร์ม)
 export function renderDocumentSystem(data, containerId, type = 'official') {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     
-    // บันทึกข้อมูลลงตัวแปร Global แยกประเภท เพื่อใช้ตอนกดโฟลเดอร์
-    if(type === 'official') {
-        allOfficialDocs = data;
-    } else {
-        allFormDocs = data;
-    }
+    if(type === 'official') allOfficialDocs = data; else allFormDocs = data;
 
     if (!data || data.length === 0) {
         container.innerHTML = '<div class="text-center p-10 text-gray-400 bg-gray-50 rounded-xl border border-dashed"><i class="fa-solid fa-folder-open text-3xl mb-2 opacity-50"></i><p>ไม่พบเอกสาร</p></div>';
         return;
     }
 
-    // ตรวจสอบสถานะว่ากำลังเข้าดูโฟลเดอร์ไหน (แยกตาม type)
     const currentFolder = currentDocFolder[type];
 
     if (currentFolder === null) {
-        // --- 1. หน้าแรก: แสดงรายการโฟลเดอร์ (Groups by Category) ---
         const groups = data.reduce((acc, item) => {
-            const key = item.category || 'ทั่วไป'; // ถ้าไม่มีหมวดหมู่ ให้รวมเป็น 'ทั่วไป'
+            const key = item.category || 'ทั่วไป';
             if (!acc[key]) acc[key] = 0;
             acc[key]++;
             return acc;
@@ -335,43 +501,30 @@ export function renderDocumentSystem(data, containerId, type = 'official') {
         container.innerHTML = html;
 
     } else {
-        // --- 2. หน้าในโฟลเดอร์: แสดงรายการไฟล์ ---
         const filteredDocs = data.filter(item => (item.category || 'ทั่วไป') === currentFolder);
-        
         container.innerHTML = `
             <div class="flex items-center justify-between mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200 animate-fade-in">
-                <h3 class="font-bold text-gray-700 flex items-center gap-2">
-                    <i class="fa-solid fa-folder-open text-yellow-500"></i> ${currentFolder}
-                </h3>
-                <button onclick="window.clearDocFolder('${containerId}', '${type}')" class="text-sm text-blue-600 font-bold hover:underline flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
-                </button>
+                <h3 class="font-bold text-gray-700 flex items-center gap-2"><i class="fa-solid fa-folder-open text-yellow-500"></i> ${currentFolder}</h3>
+                <button onclick="window.clearDocFolder('${containerId}', '${type}')" class="text-sm text-blue-600 font-bold hover:underline flex items-center gap-1"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
             </div>
             <div class="space-y-3 animate-fade-in">
                 ${filteredDocs.map(doc => {
                     const dateStr = doc.uploadDate ? new Date(doc.uploadDate).toLocaleDateString('th-TH') : '-';
-                    // ไอคอนตามประเภทไฟล์
                     let iconClass = 'fa-file-lines text-gray-400';
-                    if(doc.title.includes('.pdf')) iconClass = 'fa-file-pdf text-red-500';
-                    else if(doc.title.includes('.doc')) iconClass = 'fa-file-word text-blue-500';
-                    else if(doc.title.includes('.xls')) iconClass = 'fa-file-excel text-green-500';
+                    if(doc.title && doc.title.includes('.pdf')) iconClass = 'fa-file-pdf text-red-500';
+                    else if(doc.title && doc.title.includes('.doc')) iconClass = 'fa-file-word text-blue-500';
+                    else if(doc.title && doc.title.includes('.xls')) iconClass = 'fa-file-excel text-green-500';
 
                     return `
                     <div class="flex justify-between items-center p-4 bg-white border border-gray-100 rounded-xl hover:shadow-md transition group cursor-pointer" onclick="window.open('${doc.fileUrl}', '_blank')">
                         <div class="flex items-center gap-4 overflow-hidden">
-                            <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 text-xl group-hover:bg-white transition">
-                                <i class="fa-solid ${iconClass}"></i>
-                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 text-xl group-hover:bg-white transition"><i class="fa-solid ${iconClass}"></i></div>
                             <div class="min-w-0">
                                 <h4 class="font-bold text-gray-700 text-sm truncate group-hover:text-blue-600 transition">${doc.title}</h4>
-                                <div class="flex gap-3 text-xs text-gray-400 mt-0.5">
-                                    <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span>
-                                </div>
+                                <div class="flex gap-3 text-xs text-gray-400 mt-0.5"><span><i class="fa-regular fa-calendar"></i> ${dateStr}</span></div>
                             </div>
                         </div>
-                        <div class="text-gray-300 group-hover:text-blue-500 transition px-2">
-                            <i class="fa-solid fa-download"></i>
-                        </div>
+                        <div class="text-gray-300 group-hover:text-blue-500 transition px-2"><i class="fa-solid fa-download"></i></div>
                     </div>`;
                 }).join('')}
             </div>
@@ -380,13 +533,12 @@ export function renderDocumentSystem(data, containerId, type = 'official') {
 }
 
 // =============================================================================
-// 6. EXPORTS & HELPERS อื่นๆ (คงเดิม)
+// 6. EXPORTS & HELPERS
 // =============================================================================
 
 export function renderSchoolAchievements(data) { 
     if (!data) return;
     allSchoolData = [...data].sort((a, b) => b.id - a.id);
-    
     const onet = allSchoolData.filter(i => i.title.includes('O-NET') || (i.competition && i.competition.includes('O-NET')));
     const nt = allSchoolData.filter(i => i.title.includes('NT') || (i.competition && i.competition.includes('NT')));
     const rt = allSchoolData.filter(i => i.title.includes('RT') || (i.competition && i.competition.includes('RT')));
@@ -421,183 +573,20 @@ export function renderInnovations(data) {
     } 
 }
 
-export function renderPersonGrid(data, containerId) { 
-    const container = document.getElementById(containerId); 
-    if(!container) return; 
-    container.innerHTML = ''; 
-    
-    if(!data || data.length === 0) { 
-        container.innerHTML='<p class="text-center text-gray-500 col-span-full py-10">กำลังปรับปรุงข้อมูล</p>'; 
-        return; 
-    } 
-    
-    const sorted=[...data].sort((a,b)=>a.id-b.id); 
-    const leader=sorted[0]; 
-    const others=sorted.slice(1); 
-    
-    const createCard = (p) => `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-lg transition transform hover:-translate-y-1 h-full">
-            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 bg-gray-100">
-                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-4xl"></i></div>'}
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-1 line-clamp-1">${p.name}</h3>
-            <p class="text-blue-600 font-medium text-sm">${p.role}</p>
-        </div>`; 
-        
-    let html=''; 
-    if(leader) html+=`<div class="flex justify-center mb-10"><div class="w-full max-w-xs transform scale-110">${createCard(leader)}</div></div>`; 
-    if(others.length>0){ html+='<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">'; others.forEach(p=>html+=createCard(p)); html+='</div>'; } 
-    container.innerHTML=html; 
-}
-
-export function renderHistoryTable(tbodyId, data) { 
-    const tbody = document.getElementById(tbodyId); 
-    if (!tbody) return; 
-    tbody.innerHTML = ''; 
-    
-    if (!data || data.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-400">ไม่มีข้อมูล</td></tr>'; 
-        return; 
-    } 
-    
-    [...data].sort((a,b)=>b.id-a.id).forEach((item,index)=>{ 
-        const tr=document.createElement('tr'); 
-        tr.className='hover:bg-gray-50 transition border-b border-gray-100'; 
-        tr.innerHTML=`
-            <td class="px-6 py-4 text-sm text-gray-500">${index+1}</td>
-            <td class="px-6 py-4">
-                <div class="flex items-center">
-                    <div class="h-10 w-10 mr-4 bg-gray-200 rounded-full overflow-hidden shrink-0 border border-gray-200">
-                        ${item.image?`<img class="h-10 w-10 object-cover" src="${item.image}">`:'<div class="h-full w-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user"></i></div>'}
-                    </div>
-                    <div class="font-bold text-gray-800">${item.name}</div>
-                </div>
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-600">${item.role||'-'}</td>
-            <td class="px-6 py-4 text-sm text-blue-600 font-medium">${item.year||'-'}</td>
-        `; 
-        tbody.appendChild(tr); 
-    }); 
-}
-
-export function renderStudentChart(data) { 
-    const container = document.getElementById('student-summary-container'); 
-    const chartCanvas = document.getElementById('studentChart'); 
-    if (!data || data.length === 0) { 
-        if(container) container.innerHTML = '<p class="text-center text-gray-400 col-span-3 py-10">ยังไม่มีข้อมูลนักเรียน</p>'; 
-        return; 
-    } 
-    
-    data.sort((a, b) => a.id - b.id); 
-    let totalMale = 0, totalFemale = 0; 
-    data.forEach(d => { totalMale += parseInt(d.male || 0); totalFemale += parseInt(d.female || 0); }); 
-    
-    if (container) { 
-        container.innerHTML = `
-            <div class="bg-blue-50 p-4 rounded-xl text-center border border-blue-100"><h3 class="text-blue-800 font-bold text-lg">ทั้งหมด</h3><p class="text-3xl font-bold text-blue-600">${totalMale + totalFemale} <span class="text-sm">คน</span></p></div>
-            <div class="bg-green-50 p-4 rounded-xl text-center border border-green-100"><h3 class="text-green-800 font-bold text-lg">ชาย</h3><p class="text-3xl font-bold text-green-600">${totalMale} <span class="text-sm">คน</span></p></div>
-            <div class="bg-pink-50 p-4 rounded-xl text-center border border-pink-100"><h3 class="text-pink-800 font-bold text-lg">หญิง</h3><p class="text-3xl font-bold text-pink-600">${totalFemale} <span class="text-sm">คน</span></p></div>
-        `; 
-    } 
-    
-    if (chartCanvas && window.Chart) { 
-        if (window.myStudentChart) window.myStudentChart.destroy(); 
-        window.myStudentChart = new Chart(chartCanvas, { 
-            type: 'bar', 
-            data: { 
-                labels: data.map(d => d.grade), 
-                datasets: [ 
-                    { label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#3b82f6', borderRadius: 4 }, 
-                    { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 4 } 
-                ] 
-            }, 
-            options: { 
-                responsive: true, maintainAspectRatio: false, 
-                scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, 
-                plugins: { legend: { position: 'bottom' }, title: { display: false } } 
-            } 
-        }); 
-    } 
-}
-
 export function renderHomeNews(newsList) { 
     const c = document.getElementById('home-news-container'); 
-    if(c) { 
-        c.innerHTML = ''; 
-        if(!newsList || newsList.length === 0) { c.innerHTML = '<div class="text-center py-10 text-gray-300 text-sm">ยังไม่มีข่าว</div>'; return; }
+    if(c) { c.innerHTML = ''; if(!newsList || newsList.length === 0) { c.innerHTML = '<div class="text-center py-10 text-gray-300 text-sm">ยังไม่มีข่าว</div>'; return; }
         [...newsList].sort((a, b) => b.id - a.id).slice(0,4).forEach(n => {
-            c.innerHTML += `
-            <div class="p-3 border-b border-gray-50 flex gap-3 hover:bg-gray-50 cursor-pointer transition rounded-lg group" onclick="window.open('${n.link || '#'}', '_blank')">
-                <div class="w-16 h-12 bg-gray-200 rounded-md overflow-hidden shrink-0">
-                    ${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-110 transition">` : ''}
-                </div>
-                <div>
-                    <h4 class="text-sm font-bold text-gray-700 line-clamp-1 group-hover:text-blue-600">${n.title}</h4>
-                    <p class="text-xs text-gray-400 mt-1">${new Date(n.date).toLocaleDateString('th-TH')}</p>
-                </div>
-            </div>`; 
+            c.innerHTML += `<div class="p-3 border-b border-gray-50 flex gap-3 hover:bg-gray-50 cursor-pointer transition rounded-lg group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-16 h-12 bg-gray-200 rounded-md overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-110 transition">` : ''}</div><div><h4 class="text-sm font-bold text-gray-700 line-clamp-1 group-hover:text-blue-600">${n.title}</h4><p class="text-xs text-gray-400 mt-1">${new Date(n.date).toLocaleDateString('th-TH')}</p></div></div>`; 
         }); 
     } 
 }
 
-// Window Global Functions (เพื่อให้ HTML เรียกใช้งานได้)
-window.selectFolder = (cid, type, name) => {
-    currentFolderFilter = name;
-    let data = type==='teacher'?allTeacherData : (type==='student'?allStudentData : allSchoolData);
-    if(cid.includes('onet')) data = data.filter(d => d.title.includes('O-NET') || d.competition.includes('O-NET'));
-    else if(cid.includes('nt')) data = data.filter(d => d.title.includes('NT') || d.competition.includes('NT'));
-    else if(cid.includes('rt')) data = data.filter(d => d.title.includes('RT') || d.competition.includes('RT'));
-    renderAchievementSystem(cid, data, type);
-};
-
-window.clearFolderFilter = (cid, type) => {
-    currentFolderFilter = null;
-    let data = type==='teacher'?allTeacherData : (type==='student'?allStudentData : allSchoolData);
-    if(cid.includes('onet')) data = data.filter(d => d.title.includes('O-NET') || d.competition.includes('O-NET'));
-    else if(cid.includes('nt')) data = data.filter(d => d.title.includes('NT') || d.competition.includes('NT'));
-    else if(cid.includes('rt')) data = data.filter(d => d.title.includes('RT') || d.competition.includes('RT'));
-    renderAchievementSystem(cid, data, type);
-};
-
-// ✅ ฟังก์ชันจัดการ Folder ของเอกสาร (แก้ไขใหม่)
-window.selectDocFolder = (cid, type, catName) => {
-    currentDocFolder[type] = catName; // เก็บสถานะแยกตาม type
-    const data = type === 'official' ? allOfficialDocs : allFormDocs;
-    renderDocumentSystem(data, cid, type);
-};
-
-window.clearDocFolder = (cid, type) => {
-    currentDocFolder[type] = null; // รีเซ็ตสถานะแยกตาม type
-    const data = type === 'official' ? allOfficialDocs : allFormDocs;
-    renderDocumentSystem(data, cid, type);
-};
-
-window.filterNews = (id, cid) => { 
-    const input = document.getElementById(id);
-    const searchText = input.value.toLowerCase().trim();
-    const filtered = allNewsData.filter(item => !searchText || item.title.toLowerCase().includes(searchText));
-    renderPagedNews(cid, filtered, 1);
-};
-
-window.filterDocuments = (id, cid) => {
-    const input = document.getElementById(id);
-    const searchText = input.value.toLowerCase().trim();
-    const isOfficial = cid.includes('official');
-    const type = isOfficial ? 'official' : 'form';
-    const sourceData = isOfficial ? allOfficialDocs : allFormDocs;
-    
-    if (searchText) {
-        // ถ้ามีการค้นหา ให้แสดงผลลัพธ์เลย (ข้ามระบบโฟลเดอร์)
-        currentDocFolder[type] = 'ผลการค้นหา';
-        const filtered = sourceData.filter(item => item.title.toLowerCase().includes(searchText));
-        const container = document.getElementById(cid);
-        container.innerHTML = ''; // ล้างของเก่า
-        // บังคับ render แบบ List (โดยหลอก function ว่าอยู่ใน Folder ชื่อ 'ผลการค้นหา')
-        renderDocumentSystem(filtered, cid, type);
-    } else {
-        // ถ้าลบคำค้นหา ให้กลับไปหน้าแรก (เคลียร์โฟลเดอร์)
-        window.clearDocFolder(cid, type);
-    }
-};
-
-window.filterAchievements = (id, selId, cid) => { /* Reuse logic if needed */ };
+// Window Assignments for OnClick
+window.selectFolder = (cid, type, name) => { currentFolderFilter = name; let data = type==='teacher'?allTeacherData : (type==='student'?allStudentData : allSchoolData); if(cid.includes('onet')) data = data.filter(d => d.title.includes('O-NET') || d.competition.includes('O-NET')); else if(cid.includes('nt')) data = data.filter(d => d.title.includes('NT') || d.competition.includes('NT')); else if(cid.includes('rt')) data = data.filter(d => d.title.includes('RT') || d.competition.includes('RT')); renderAchievementSystem(cid, data, type); };
+window.clearFolderFilter = (cid, type) => { currentFolderFilter = null; let data = type==='teacher'?allTeacherData : (type==='student'?allStudentData : allSchoolData); if(cid.includes('onet')) data = data.filter(d => d.title.includes('O-NET') || d.competition.includes('O-NET')); else if(cid.includes('nt')) data = data.filter(d => d.title.includes('NT') || d.competition.includes('NT')); else if(cid.includes('rt')) data = data.filter(d => d.title.includes('RT') || d.competition.includes('RT')); renderAchievementSystem(cid, data, type); };
+window.selectDocFolder = (cid, type, catName) => { currentDocFolder[type] = catName; const data = type === 'official' ? allOfficialDocs : allFormDocs; renderDocumentSystem(data, cid, type); };
+window.clearDocFolder = (cid, type) => { currentDocFolder[type] = null; const data = type === 'official' ? allOfficialDocs : allFormDocs; renderDocumentSystem(data, cid, type); };
+window.filterNews = (id, cid) => { const input = document.getElementById(id); const searchText = input.value.toLowerCase().trim(); const filtered = allNewsData.filter(item => !searchText || item.title.toLowerCase().includes(searchText)); renderNews(filtered); };
+window.filterDocuments = (id, cid) => { const input = document.getElementById(id); const searchText = input.value.toLowerCase().trim(); const isOfficial = cid.includes('official'); const type = isOfficial ? 'official' : 'form'; const sourceData = isOfficial ? allOfficialDocs : allFormDocs; if (searchText) { currentDocFolder[type] = 'ผลการค้นหา'; const filtered = sourceData.filter(item => item.title.toLowerCase().includes(searchText)); const container = document.getElementById(cid); container.innerHTML = ''; renderDocumentSystem(filtered, cid, type); } else { window.clearDocFolder(cid, type); } };
+window.filterAchievements = (id, selId, cid) => {};
