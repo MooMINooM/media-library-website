@@ -81,7 +81,7 @@ export function renderSchoolInfo(info) {
         'school-mission-content': info.mission,
         'info-philosophy': info.philosophy,
         'info-motto': info.motto,
-        'school-identity-content': info.identity
+        'school-identity-content': info.identity,
         'school-uniqueness-content': info.uniqueness
     };
     for (const [id, value] of Object.entries(aboutFields)) {
