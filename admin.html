@@ -100,7 +100,6 @@
         try { supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error("Supabase Init Error:", e); }
         
         const SCHEMAS = {
-            // ✅ ปรับปรุง: แยกหมวดหมู่ อัตลักษณ์ & เอกลักษณ์ ออกมาให้ชัดเจน
             school_info: { title: "ข้อมูลโรงเรียน", fields: [
                 { type: "header", label: "--- 1. ข้อมูลพื้นฐาน ---" },
                 { key: "school_code_10", label: "รหัสโรงเรียน 10 หลัก", type: "text" },
@@ -111,18 +110,17 @@
                 { key: "affiliation", label: "สังกัด", type: "text" },
                 { key: "address", label: "ที่อยู่", type: "textarea", rows: 3 },
                 
-                { type: "header", label: "--- 2. เกี่ยวกับโรงเรียน (ประวัติ/วิสัยทัศน์) ---" },
+                { type: "header", label: "--- 2. เกี่ยวกับโรงเรียน ---" },
                 { key: "founding_date", label: "วันที่ก่อตั้ง (เพื่อคำนวณอายุ)", type: "date" },
                 { key: "history", label: "ประวัติของโรงเรียน", type: "textarea", rows: 5 },
                 { key: "philosophy", label: "ปรัชญา", type: "text" },
                 { key: "vision", label: "วิสัยทัศน์", type: "textarea", rows: 3 },
                 { key: "mission", label: "พันธกิจ", type: "textarea", rows: 3 },
                 
-                // ✅ แยกหัวข้อใหม่ตามที่ขอ
-                { type: "header", label: "--- 3. อัตลักษณ์ & เอกลักษณ์ & คำขวัญ ---" },
+                { type: "header", label: "--- 3. อัตลักษณ์ & เอกลักษณ์ ---" },
                 { key: "motto", label: "คำขวัญ", type: "text" },
-                { key: "identity", label: "อัตลักษณ์ (เช่น มารยาทงาม)", type: "text" },
-                { key: "uniqueness", label: "เอกลักษณ์ (เช่น ดนตรีเด่น)", type: "text" }, // เพิ่มช่องนี้
+                { key: "identity", label: "อัตลักษณ์", type: "text" },
+                { key: "uniqueness", label: "เอกลักษณ์", type: "text" },
                 
                 { type: "header", label: "--- 4. รูปภาพ & สี ---" },
                 { key: "logo_url", label: "ตราสัญลักษณ์ (URL รูป)", type: "url" },
@@ -130,12 +128,13 @@
                 { key: "color_code_1", label: "สีประจำโรงเรียน 1", type: "color" },
                 { key: "color_code_2", label: "สีประจำโรงเรียน 2", type: "color" },
                 
-                { type: "header", label: "--- 5. สื่อ & Social ---" },
+                { type: "header", label: "--- 5. สื่อ & Social & แผนที่ ---" },
                 { key: "vtr_url", label: "VTR (Youtube Link)", type: "url" },
                 { key: "song_url", label: "เพลงโรงเรียน (File URL)", type: "url" },
                 { key: "facebook", label: "Facebook URL", type: "url" },
                 { key: "youtube", label: "Youtube Channel URL", type: "url" },
-                { key: "map_embed", label: "Google Maps Embed Code (<iframe>...)", type: "textarea", rows: 4 }
+                // ✅ นี่ครับ! ช่องสำหรับใส่โค้ดแผนที่
+                { key: "map_embed", label: "Google Maps Embed Code (<iframe>...)", type: "textarea", rows: 4 } 
             ]},
 
             personnel: { title: "บุคลากรปัจจุบัน", fields: [{key:"name",label:"ชื่อ-สกุล",type:"text",required:true},{key:"role",label:"ตำแหน่ง",type:"text",required:true},{key:"image",label:"รูปภาพ (URL)",type:"url"}]},
