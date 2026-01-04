@@ -68,7 +68,7 @@ export function renderSchoolInfo(info) {
         'info-obec-code': info.obec_code_6,
         'info-affiliation': info.affiliation,
         'info-address': info.address
-        'school-uniqueness-content': info.uniqueness,
+        'info-uniqueness': info.uniqueness,
     };
     for (const [id, value] of Object.entries(basicFields)) {
         const el = document.getElementById(id);
