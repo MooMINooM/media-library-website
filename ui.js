@@ -3,18 +3,18 @@
 // --- Global Variables ---
 let allTeacherData = [];
 let allStudentData = [];
-let allSchoolData = [];
+let allSchoolData = []; 
 let allNewsData = [];
 let allOfficialDocs = [];
 let allFormDocs = [];
 
 // --- Config ---
-const ACH_ITEMS_PER_PAGE = 6;
-const NEWS_ITEMS_PER_PAGE = 5;
-const DOCS_ITEMS_PER_PAGE = 10;
+const ACH_ITEMS_PER_PAGE = 6;  
+const NEWS_ITEMS_PER_PAGE = 5; 
+const DOCS_ITEMS_PER_PAGE = 10; 
 
 // --- State ---
-let currentFolderFilter = null;
+let currentFolderFilter = null; 
 let currentDocFolder = null;
 
 // =============================================================================
@@ -24,49 +24,49 @@ let currentDocFolder = null;
 function getSubjectBadge(subject) {
     if (!subject) return '';
     const cleanSubject = subject.trim();
-    const colorMap = {
-        'คณิตศาสตร์': 'bg-red-50 text-red-600 border-red-100', 'คณิต': 'bg-red-50 text-red-600 border-red-100',
-        'วิทยาศาสตร์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทย์': 'bg-yellow-50 text-yellow-700 border-yellow-200',
-        'ภาษาไทย': 'bg-pink-50 text-pink-600 border-pink-100',
-        'ภาษาอังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100', 'อังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100',
-        'สังคมศึกษา': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคม': 'bg-teal-50 text-teal-600 border-teal-100',
-        'การงานอาชีพ': 'bg-orange-50 text-orange-600 border-orange-100', 'การงาน': 'bg-orange-50 text-orange-600 border-orange-100',
-        'สุขะ - พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขะ-พละ': 'bg-green-50 text-green-600 border-green-100',
-        'ศิลปะ - ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100',
-        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-50 text-purple-600 border-purple-100', 'ลูกเสือ': 'bg-purple-50 text-purple-600 border-purple-100',
-        'ปฐมวัย': 'bg-rose-50 text-rose-600 border-rose-100', 'อนุบาล': 'bg-rose-50 text-rose-600 border-rose-100',
-        'อื่นๆ': 'bg-gray-50 text-gray-600 border-gray-200'
-    };
-    const styleClass = colorMap[cleanSubject] || colorMap['อื่นๆ'];
-    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
+    // ใช้โค้ดสีเดิม
+    return `<span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
 }
 
 // =============================================================================
-// 2. SCHOOL INFO RENDERER (✅ ส่วนที่ปรับปรุงใหม่)
+// 2. SCHOOL INFO RENDERER (✅ ปรับปรุงใหม่: ดึงข้อมูลลง Header/Title)
 // =============================================================================
 
 export function renderSchoolInfo(info) {
     if (!info) return;
 
-    // --- A. ส่วน Header & Footer ---
-    if (document.getElementById('hero-motto')) document.getElementById('hero-motto').innerText = info.motto || '-';
-    if (document.getElementById('footer-school-name')) document.getElementById('footer-school-name').innerText = info.school_name || 'โรงเรียนบ้านภูพระโนนผักหวาน';
-    
-    // ตราสัญลักษณ์ (Logo)
+    // --- 1. อัปเดต Title ของ Browser tab ---
+    if (info.school_name) {
+        document.title = info.school_name;
+    }
+
+    // --- 2. อัปเดต Header (ส่วนหัวเว็บ) ---
+    // ชื่อโรงเรียน (ตัวใหญ่)
+    if (document.getElementById('header-school-name')) {
+        document.getElementById('header-school-name').innerText = info.school_name || 'กำลังโหลด...';
+    }
+    // สังกัด (ตัวเล็กใต้ชื่อ)
+    if (document.getElementById('header-affiliation')) {
+        document.getElementById('header-affiliation').innerText = info.affiliation || '-';
+    }
+    // โลโก้ซ้ายบน
     if (document.getElementById('header-logo') && info.logo_url) {
         const logo = document.getElementById('header-logo');
         logo.src = info.logo_url;
-        logo.classList.remove('hidden');
+        logo.classList.remove('hidden'); // โชว์รูปเมื่อโหลดเสร็จ
     }
 
+    // --- 3. ส่วนเนื้อหา (Home & Footer) ---
+    if (document.getElementById('hero-motto')) document.getElementById('hero-motto').innerText = info.motto || '-';
+    if (document.getElementById('footer-school-name')) document.getElementById('footer-school-name').innerText = info.school_name || '';
+    
     // อายุโรงเรียน
     if (info.founding_date && document.getElementById('school-age-badge')) {
         const age = new Date().getFullYear() - new Date(info.founding_date).getFullYear();
         document.getElementById('school-age-badge').innerText = `ก่อตั้งมาแล้ว ${age} ปี`;
     }
 
-    // --- B. ข้อมูลพื้นฐาน (Basic Info) ---
-    // ใช้ Object Mapping เพื่อความสั้นและง่ายในการแก้ไข
+    // --- 4. หน้าข้อมูลพื้นฐาน (Basic Info Page) ---
     const basicFields = {
         'info-name-th': info.school_name,
         'info-name-en': info.school_name_en,
@@ -82,7 +82,7 @@ export function renderSchoolInfo(info) {
         if (el) el.innerText = value || '-';
     }
 
-    // --- C. เกี่ยวกับโรงเรียน (About School) ---
+    // --- 5. หน้าเกี่ยวกับโรงเรียน (About Page) ---
     const aboutFields = {
         'school-history-content': info.history,
         'info-vision': info.vision,
@@ -97,14 +97,14 @@ export function renderSchoolInfo(info) {
         if (el) el.innerText = value || '-';
     }
 
-    // สีประจำโรงเรียน (ไล่สี 2 สี)
+    // สีประจำโรงเรียน
     if (document.getElementById('school-color-box')) {
         const c1 = info.color_code_1 || '#ddd';
         const c2 = info.color_code_2 || c1 || '#ddd';
         document.getElementById('school-color-box').style.background = `linear-gradient(to right, ${c1} 50%, ${c2} 50%)`;
     }
 
-    // รูปเครื่องแบบนักเรียน
+    // รูปเครื่องแบบ
     if (document.getElementById('student-uniform-img')) {
         const img = document.getElementById('student-uniform-img');
         const placeholder = document.getElementById('uniform-placeholder');
@@ -118,16 +118,13 @@ export function renderSchoolInfo(info) {
         }
     }
 
-    // --- D. สื่อ (Media) ---
-    // เพลงโรงเรียน
+    // --- 6. สื่อ (VTR & เพลง) ---
     if (info.song_url && document.getElementById('school-song')) {
         document.getElementById('school-song').src = info.song_url;
         document.getElementById('music-player-controls').classList.remove('hidden');
     }
 
-    // VTR
     if (info.vtr_url && document.getElementById('vtr-iframe')) {
-        // ดึง ID จาก Youtube URL (รองรับทั้งแบบเต็มและแบบย่อ)
         let vid = '';
         try {
             if (info.vtr_url.includes('v=')) vid = info.vtr_url.split('v=')[1].split('&')[0];
@@ -142,7 +139,7 @@ export function renderSchoolInfo(info) {
 }
 
 // =============================================================================
-// 3. ACHIEVEMENT SYSTEM (คงเดิม)
+// 3. ACHIEVEMENT SYSTEM
 // =============================================================================
 
 export function renderAchievementSystem(containerId, data, type) {
@@ -236,7 +233,7 @@ function renderPagedAchievements(container, pageItemsFullList, type, page = 1) {
 }
 
 // =============================================================================
-// 4. NEWS & DOCS (คงเดิม)
+// 4. NEWS & DOCS
 // =============================================================================
 
 export function renderNews(data) {
@@ -301,7 +298,6 @@ export function renderSchoolAchievements(data) {
     if (!data) return;
     allSchoolData = [...data].sort((a, b) => b.id - a.id);
     
-    // แยก O-NET / NT / RT / General
     const onet = allSchoolData.filter(i => i.title.includes('O-NET') || (i.competition && i.competition.includes('O-NET')));
     const nt = allSchoolData.filter(i => i.title.includes('NT') || (i.competition && i.competition.includes('NT')));
     const rt = allSchoolData.filter(i => i.title.includes('RT') || (i.competition && i.competition.includes('RT')));
@@ -375,7 +371,7 @@ export function renderHistoryTable(tbodyId, data) {
         return; 
     } 
     
-    [...data].sort((a,b)=>b.id-a.id).forEach((item,index)=>{ // เรียงจากใหม่ไปเก่า
+    [...data].sort((a,b)=>b.id-a.id).forEach((item,index)=>{ 
         const tr=document.createElement('tr'); 
         tr.className='hover:bg-gray-50 transition border-b border-gray-100'; 
         tr.innerHTML=`
@@ -427,8 +423,7 @@ export function renderStudentChart(data) {
                 ] 
             }, 
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
+                responsive: true, maintainAspectRatio: false, 
                 scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, 
                 plugins: { legend: { position: 'bottom' }, title: { display: false } } 
             } 
@@ -456,7 +451,7 @@ export function renderHomeNews(newsList) {
     } 
 }
 
-// Window Global Functions (เพื่อให้เรียกจาก HTML onclick ได้)
+// Window Global Functions
 window.selectFolder = (cid, type, name) => {
     currentFolderFilter = name;
     let data = type==='teacher'?allTeacherData : (type==='student'?allStudentData : allSchoolData);
