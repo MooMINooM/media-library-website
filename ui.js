@@ -24,8 +24,21 @@ let currentDocFolder = null;
 function getSubjectBadge(subject) {
     if (!subject) return '';
     const cleanSubject = subject.trim();
-    // (โค้ดสี Badge เดิม คงไว้ตามปกติ)
-    return `<span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
+    const colorMap = {
+        'คณิตศาสตร์': 'bg-red-50 text-red-600 border-red-100', 'คณิต': 'bg-red-50 text-red-600 border-red-100',
+        'วิทยาศาสตร์': 'bg-yellow-50 text-yellow-700 border-yellow-200', 'วิทย์': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+        'ภาษาไทย': 'bg-pink-50 text-pink-600 border-pink-100',
+        'ภาษาอังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100', 'อังกฤษ': 'bg-sky-50 text-sky-600 border-sky-100',
+        'สังคมศึกษา': 'bg-teal-50 text-teal-600 border-teal-100', 'สังคม': 'bg-teal-50 text-teal-600 border-teal-100',
+        'การงานอาชีพ': 'bg-orange-50 text-orange-600 border-orange-100', 'การงาน': 'bg-orange-50 text-orange-600 border-orange-100',
+        'สุขะ - พละ': 'bg-green-50 text-green-600 border-green-100', 'สุขะ-พละ': 'bg-green-50 text-green-600 border-green-100',
+        'ศิลปะ - ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ศิลปะ': 'bg-indigo-50 text-indigo-600 border-indigo-100', 'ดนตรี': 'bg-indigo-50 text-indigo-600 border-indigo-100',
+        'กิจกรรมพัฒนาผู้เรียน': 'bg-purple-50 text-purple-600 border-purple-100', 'ลูกเสือ': 'bg-purple-50 text-purple-600 border-purple-100',
+        'ปฐมวัย': 'bg-rose-50 text-rose-600 border-rose-100', 'อนุบาล': 'bg-rose-50 text-rose-600 border-rose-100',
+        'อื่นๆ': 'bg-gray-50 text-gray-600 border-gray-200'
+    };
+    const styleClass = colorMap[cleanSubject] || colorMap['อื่นๆ'];
+    return `<span class="${styleClass} text-[10px] font-bold px-2 py-0.5 rounded-md border inline-flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-tag text-[9px]"></i> ${cleanSubject}</span>`;
 }
 
 // =============================================================================
