@@ -275,38 +275,44 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <div class="group relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] p-10 text-white overflow-hidden shadow-xl hover:-translate-y-1 transition duration-500">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
+            <div class="group relative bg-white rounded-[2rem] p-10 shadow-xl border border-blue-100 hover:shadow-2xl hover:-translate-y-1 transition duration-500 overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-[60px] opacity-60 -mr-10 -mt-10 group-hover:scale-150 transition duration-700"></div>
+                
                 <div class="relative z-10 flex flex-col h-full">
-                    <div class="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl mb-6 text-blue-300 border border-white/10 shadow-inner">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-6 text-blue-600 shadow-sm border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition duration-300">
                         <i class="fa-solid fa-eye"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3 tracking-wide">วิสัยทัศน์ (Vision)</h3>
-                    <p id="info-vision" class="text-slate-300 font-light leading-relaxed flex-grow">-</p>
+                    
+                    <h3 class="text-2xl font-bold mb-4 tracking-wide text-gray-800 group-hover:text-blue-700 transition">วิสัยทัศน์ (Vision)</h3>
+                    <p id="info-vision" class="text-gray-600 font-light leading-relaxed text-lg flex-grow">-</p>
                 </div>
             </div>
 
-            <div class="group relative bg-gradient-to-br from-amber-50 to-orange-50 rounded-[2rem] p-10 text-amber-900 overflow-hidden shadow-xl hover:-translate-y-1 transition duration-500 border border-amber-100/50">
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-amber-400 rounded-full blur-[60px] opacity-10 group-hover:opacity-20 transition duration-700"></div>
+            <div class="group relative bg-white rounded-[2rem] p-10 shadow-xl border border-amber-100 hover:shadow-2xl hover:-translate-y-1 transition duration-500 overflow-hidden">
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-amber-50 rounded-full blur-[60px] opacity-60 -ml-10 -mb-10 group-hover:scale-150 transition duration-700"></div>
+                
                 <div class="relative z-10 flex flex-col h-full">
-                    <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl mb-6 text-amber-500 shadow-md">
+                    <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 text-amber-500 shadow-sm border border-amber-100 group-hover:bg-amber-500 group-hover:text-white transition duration-300">
                         <i class="fa-solid fa-lightbulb"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3 tracking-wide">ปรัชญา</h3>
-                    <p id="info-philosophy" class="text-amber-800 font-serif italic text-xl leading-relaxed flex-grow border-l-2 border-amber-300 pl-4">-</p>
+                    
+                    <h3 class="text-2xl font-bold mb-4 tracking-wide text-gray-800 group-hover:text-amber-600 transition">ปรัชญา</h3>
+                    <div class="relative pl-6 border-l-4 border-amber-200">
+                        <p id="info-philosophy" class="text-gray-600 font-light leading-relaxed text-lg italic">-</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 group relative bg-white rounded-[2rem] p-10 shadow-xl border border-gray-100 hover:shadow-2xl transition duration-500 overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 text-[10rem] text-green-50 opacity-50 rotate-12 z-0"><i class="fa-solid fa-list-check"></i></div>
+            <div class="lg:col-span-2 group relative bg-white rounded-[2rem] p-10 shadow-xl border border-green-100 hover:shadow-2xl transition duration-500 overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-[10rem] text-green-50 opacity-20 rotate-12 z-0 group-hover:scale-110 transition duration-700"><i class="fa-solid fa-list-check"></i></div>
                 <div class="relative z-10 flex flex-col md:flex-row gap-8 items-start">
-                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-3xl text-green-600 shadow-sm flex-shrink-0">
+                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-3xl text-green-600 shadow-sm border border-green-100 flex-shrink-0 group-hover:bg-green-600 group-hover:text-white transition duration-300">
                         <i class="fa-solid fa-flag"></i>
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3 group-hover:text-green-700 transition">
                             พันธกิจ (Mission) 
-                            <span class="h-px flex-1 bg-gray-200 ml-4"></span>
+                            <span class="h-px flex-1 bg-gray-100 ml-4"></span>
                         </h3>
                         <div id="school-mission-content" class="text-gray-600 text-lg leading-loose font-light text-justify">
                             -
@@ -332,10 +338,10 @@
                     <h4 id="info-motto" class="text-2xl md:text-3xl font-bold leading-snug drop-shadow-md">"- "</h4>
                 </div>
 
-                <div class="bg-white rounded-[2rem] p-6 shadow-md border border-gray-100 hover:shadow-xl transition duration-300 relative group overflow-hidden">
+                <div class="bg-white rounded-[2rem] p-6 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition duration-300 relative group overflow-hidden">
                     <div class="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-blue-100"></div>
                     <div class="relative z-10">
-                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition">
                             <i class="fa-solid fa-user-check"></i>
                         </div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">อัตลักษณ์</p>
@@ -343,10 +349,10 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-[2rem] p-6 shadow-md border border-gray-100 hover:shadow-xl transition duration-300 relative group overflow-hidden">
+                <div class="bg-white rounded-[2rem] p-6 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition duration-300 relative group overflow-hidden">
                     <div class="absolute top-0 right-0 w-20 h-20 bg-pink-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-pink-100"></div>
                     <div class="relative z-10">
-                        <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 mb-4">
+                        <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 mb-4 group-hover:scale-110 transition">
                             <i class="fa-solid fa-star"></i>
                         </div>
                         <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">เอกลักษณ์</p>
