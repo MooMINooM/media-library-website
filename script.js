@@ -13,39 +13,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if(supabase) fetchAndRenderAll();
 });
 
-// ✅ Navigation System (ระบบเปลี่ยนหน้า)
+// ✅ Navigation System
 function setupNavigation() {
     const links = document.querySelectorAll('[data-page], [data-page-link]');
-    
     links.forEach(link => {
         link.addEventListener('click', (e) => {
             if(link.getAttribute('target') === '_blank') return; 
-
             e.preventDefault();
             const pageId = link.getAttribute('data-page') || link.getAttribute('data-page-link');
-            
             document.querySelectorAll('.page-content').forEach(section => {
                 section.classList.add('hidden');
                 section.classList.remove('animate-fade-in');
             });
-
             const target = document.getElementById(`page-${pageId}`);
             if (target) {
                 target.classList.remove('hidden');
                 target.classList.add('animate-fade-in');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
                 document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
                 if(link.classList.contains('nav-link')) link.classList.add('active');
             }
-
             const mobileMenu = document.getElementById('mobile-menu');
             if(mobileMenu) mobileMenu.classList.add('hidden');
         });
     });
 }
 
-// ✅ Data Fetching System (ระบบดึงข้อมูล)
+// ✅ Data Fetching System
 async function fetchAndRenderAll() {
     
     // 1. ข้อมูลโรงเรียน
@@ -63,17 +57,14 @@ async function fetchAndRenderAll() {
         }
     } catch (e) { console.warn("Load News Failed", e); }
 
-    // 3. ผลงาน (แก้ไขชื่อตารางให้ตรงกับ Admin)
+    // 3. ผลงาน
     try {
-        // ✅ แก้ชื่อตารางเป็น teacher_awards
         const { data: teachers } = await supabase.from('teacher_awards').select('*');
         if(teachers) UI.renderTeacherAchievements(teachers);
 
-        // ✅ แก้ชื่อตารางเป็น student_awards
         const { data: students } = await supabase.from('student_awards').select('*');
         if(students) UI.renderStudentAchievements(students);
 
-        // ✅ แก้ชื่อตารางเป็น school_awards
         const { data: school } = await supabase.from('school_awards').select('*');
         const { data: onet } = await supabase.from('onet').select('*');
         const { data: nt } = await supabase.from('nt').select('*');
@@ -101,32 +92,36 @@ async function fetchAndRenderAll() {
 
     } catch (e) { console.warn("Load Achievements Failed", e); }
 
-    // 4. เอกสาร & นวัตกรรม
+    // 4. เอกสาร & นวัตกรรม (✅ แก้ไข: แยกตาราง documents และ forms)
     try {
+        // ดึงเอกสารราชการ
         const { data: docs } = await supabase.from('documents').select('*');
         if(docs) {
-            UI.renderDocuments(docs, 'documents-official-container'); 
-            UI.renderDocuments(docs, 'documents-forms-container'); 
+            // ใช้ renderDocumentSystem เพื่อรองรับระบบ Folder
+            UI.renderDocumentSystem(docs, 'documents-official-container', 'official');
         }
+
+        // ดึงแบบฟอร์ม (แก้ไขให้ดึงจากตาราง forms)
+        const { data: forms } = await supabase.from('forms').select('*');
+        if(forms) {
+            // ส่ง type = 'form'
+            UI.renderDocumentSystem(forms, 'documents-forms-container', 'form'); 
+        }
+
         const { data: innov } = await supabase.from('innovations').select('*');
         if(innov) UI.renderInnovations(innov);
     } catch (e) { console.warn("Load Docs Failed", e); }
 
-    // 5. บุคลากร & นักเรียน (เพิ่ม คณะกรรมการ + สภานักเรียน)
+    // 5. บุคลากร & นักเรียน
     try {
         const { data: personnel } = await supabase.from('personnel').select('*');
         const { data: p_history } = await supabase.from('personnel_history').select('*');
-        
-        // ✅ เพิ่มการดึงข้อมูล คณะกรรมการสถานศึกษา
         const { data: board } = await supabase.from('school_board').select('*');
-        
-        // ✅ เพิ่มการดึงข้อมูล สภานักเรียน
         const { data: council } = await supabase.from('student_council').select('*');
         
         if(personnel) UI.renderPersonGrid(personnel, 'personnel-list-container');
-        if(board) UI.renderPersonGrid(board, 'school-board-container');     // แสดงผลคณะกรรมการ
-        if(council) UI.renderPersonGrid(council, 'student-council-container'); // แสดงผลสภานักเรียน
-        
+        if(board) UI.renderPersonGrid(board, 'school-board-container');
+        if(council) UI.renderPersonGrid(council, 'student-council-container');
         if(p_history) UI.renderHistoryTable('personnel-history-table-body', p_history);
 
         const { data: stats } = await supabase.from('student_data').select('*'); 
@@ -138,7 +133,6 @@ async function fetchAndRenderAll() {
     try {
         const { data: services } = await supabase.from('eservices').select('*').order('id', { ascending: true });
         const container = document.getElementById('eservice-dropdown-container');
-        
         if (services && services.length > 0) {
             container.innerHTML = ''; 
             services.forEach(item => {
