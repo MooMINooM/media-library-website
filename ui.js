@@ -74,6 +74,21 @@ export function renderSchoolInfo(info) {
         if (el) el.innerText = value || '-';
     }
 
+    // Logo ในหน้า Basic (✅ แก้ไข: เพิ่ม Logic Placeholder)
+    if (document.getElementById('header-logo-basic')) {
+        const logoBasic = document.getElementById('header-logo-basic');
+        const logoPlaceholder = document.getElementById('logo-placeholder');
+        
+        if (info.logo_url) {
+            logoBasic.src = info.logo_url;
+            logoBasic.classList.remove('hidden');
+            if(logoPlaceholder) logoPlaceholder.classList.add('hidden');
+        } else {
+            logoBasic.classList.add('hidden');
+            if(logoPlaceholder) logoPlaceholder.classList.remove('hidden');
+        }
+    }
+    
     // About Page
     const aboutFields = {
         'school-history-content': info.history,
