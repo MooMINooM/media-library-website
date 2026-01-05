@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โรงเรียน...</title>
+    <title>โรงเรียนบ้...</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -123,7 +123,7 @@
                 <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">โรงเรียน</div>
                 <a href="#" data-page="school-basic" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-id-card text-blue-500 text-sm"></i> ข้อมูลพื้นฐาน</a>
                 <a href="#" data-page="school-about" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-school text-orange-500 text-sm"></i> เกี่ยวกับโรงเรียน</a>
-                <a href="#" data-page="personnel-list" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-user-tie text-purple-500 text-sm"></i> บุคลากร</a>
+                <a href="#" data-page="personnel-list" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-user-tie text-purple-500 text-sm"></i> บุคลากรปัจจุบัน</a>
                 <a href="#" data-page="students" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-child-reaching text-pink-500 text-sm"></i> ข้อมูลนักเรียน</a>
 
                 <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">ผลงาน/ข่าว</div>
@@ -145,9 +145,9 @@
                     <i class="fa-solid fa-lightbulb"></i> นวัตกรรม
                 </a>
 
-                <div class="pt-4 px-4 border-t border-slate-100">
-                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> เข้าสู่ระบบผู้ดูแล
+                <div class="pt-4 px-4 border-t border-slate-100 mt-4">
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+                        <i class="fa-solid fa-lock text-xs"></i> เข้าสู่ระบบผู้ดูแล
                     </button>
                 </div>
             </div>
@@ -442,11 +442,11 @@
                         <i class="fa-solid fa-lightbulb"></i>
                     </div>
                     <div class="flex-1 flex flex-col h-full">
-    <h3 class="text-2xl font-bold text-slate-800 mb-3 tracking-wide flex items-center gap-3">
-        ปรัชญา <span class="text-[10px] font-normal text-amber-500 uppercase tracking-widest border border-amber-100 px-2 py-0.5 rounded-full">Philosophy</span>
-    </h3>
-    <p id="info-philosophy" class="text-slate-600 text-lg font-light leading-loose flex-grow italic">"- "</p>
-</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3 tracking-wide flex items-center gap-3">
+                            ปรัชญา <span class="h-px w-12 bg-amber-200"></span>
+                        </h3>
+                        <p id="info-philosophy" class="text-slate-600 text-lg font-light leading-loose flex-grow italic">"- "</p>
+                    </div>
                 </div>
             </div>
 
