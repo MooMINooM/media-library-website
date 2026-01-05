@@ -103,6 +103,26 @@ export function renderSchoolInfo(dataList) {
         if (logoBasic) { logoBasic.src = info.logo_url; logoBasic.classList.remove('hidden'); if(logoPlaceholder) logoPlaceholder.classList.add('hidden'); }
     }
 
+    // --- ✅ เพิ่มคืนค่า: สีประจำโรงเรียน ---
+    if (document.getElementById('school-color-box')) {
+        const c1 = info.color_code_1 || '#3b82f6';
+        const c2 = info.color_code_2 || c1;
+        document.getElementById('school-color-box').style.background = `linear-gradient(135deg, ${c1} 50%, ${c2} 50%)`;
+    }
+
+    // --- ✅ เพิ่มคืนค่า: แผนที่โรงเรียน (Google Maps) ---
+    if (document.getElementById('school-map-container') && info.map_embed) {
+        const mapContainer = document.getElementById('school-map-container');
+        mapContainer.innerHTML = info.map_embed;
+        const ifr = mapContainer.querySelector('iframe');
+        if(ifr) { 
+            ifr.style.width = "100%"; 
+            ifr.style.height = "100%"; 
+            ifr.style.border = "0"; 
+            ifr.style.borderRadius = "2rem"; 
+        }
+    }
+
     // VTR Logic
     if (info.vtr_url && document.getElementById('vtr-iframe')) {
         let videoId = "";
