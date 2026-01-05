@@ -117,11 +117,39 @@
                 </button>
             </div>
             
-            <div id="mobile-menu" class="hidden lg:hidden bg-gray-50 border-t p-4 space-y-2 text-sm">
-                <a href="#" data-page="home" class="block py-2 px-4 rounded hover:bg-white text-gray-700">หน้าแรก</a>
-                <a href="#" data-page="news" class="block py-2 px-4 rounded hover:bg-white text-gray-700 border-t mt-2">ข่าวสาร</a>
-                <a href="#" data-page="school-basic" class="block py-2 px-4 rounded hover:bg-white text-gray-700">ข้อมูลโรงเรียน</a>
-                <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full text-left py-3 px-4 text-slate-700 font-bold bg-slate-200 rounded-lg mt-2">เข้าสู่ระบบผู้ดูแล</button>
+            <div id="mobile-menu" class="hidden lg:hidden bg-white border-t shadow-inner p-4 pb-10 space-y-1 text-base overflow-y-auto max-h-[80vh]">
+                <a href="#" data-page="home" class="block py-3 px-4 rounded-xl hover:bg-blue-50 text-slate-700 font-bold border-b border-slate-50">หน้าแรก</a>
+                
+                <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">โรงเรียน</div>
+                <a href="#" data-page="school-basic" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-id-card text-blue-500 text-sm"></i> ข้อมูลพื้นฐาน</a>
+                <a href="#" data-page="school-about" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-school text-orange-500 text-sm"></i> เกี่ยวกับโรงเรียน</a>
+                <a href="#" data-page="personnel-list" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-user-tie text-purple-500 text-sm"></i> บุคลากร</a>
+                <a href="#" data-page="students" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-child-reaching text-pink-500 text-sm"></i> ข้อมูลนักเรียน</a>
+
+                <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">ผลงาน/ข่าว</div>
+                <a href="#" data-page="news" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-newspaper text-blue-500 text-sm"></i> ข่าวประชาสัมพันธ์</a>
+                <a href="#" data-page="teacher-achievements" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-medal text-amber-500 text-sm"></i> ผลงานครู</a>
+                <a href="#" data-page="student-achievements" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-trophy text-yellow-500 text-sm"></i> ผลงานนักเรียน</a>
+                <a href="#" data-page="school-achievements" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-award text-indigo-500 text-sm"></i> ผลงานสถานศึกษา</a>
+
+                <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">ผลสัมฤทธิ์</div>
+                <a href="#" data-page="academic-onet" class="block py-2.5 px-4 text-green-600 pl-8 flex items-center gap-3 font-bold"><i class="fa-solid fa-chart-line text-sm"></i> O-NET</a>
+                <a href="#" data-page="academic-nt" class="block py-2.5 px-4 text-blue-600 pl-8 flex items-center gap-3 font-bold"><i class="fa-solid fa-chart-simple text-sm"></i> NT</a>
+                <a href="#" data-page="academic-rt" class="block py-2.5 px-4 text-purple-600 pl-8 flex items-center gap-3 font-bold"><i class="fa-solid fa-book-open text-sm"></i> RT</a>
+
+                <div class="py-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-lg mt-2">เอกสาร</div>
+                <a href="#" data-page="documents-official" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-file-pdf text-red-500 text-sm"></i> เอกสารราชการ</a>
+                <a href="#" data-page="documents-forms" class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3"><i class="fa-solid fa-file-lines text-blue-500 text-sm"></i> แบบฟอร์มต่าง ๆ</a>
+
+                <a href="#" data-page="innovations" class="block py-3 px-4 rounded-xl hover:bg-amber-50 text-amber-600 font-bold border-t border-slate-50 mt-2 flex items-center gap-3">
+                    <i class="fa-solid fa-lightbulb"></i> นวัตกรรม
+                </a>
+
+                <div class="pt-4 px-4 border-t border-slate-100">
+                    <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock"></i> เข้าสู่ระบบผู้ดูแล
+                    </button>
+                </div>
             </div>
         </div>
     </header>
