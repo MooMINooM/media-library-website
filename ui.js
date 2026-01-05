@@ -65,6 +65,11 @@ export function renderSchoolInfo(dataList) {
     const info = Array.isArray(dataList) ? dataList[0] : dataList;
     if (!info) return;
 
+    // ✅ บรรทัดนี้จะเปลี่ยนชื่อบนแท็บเว็บ (Browser Tab Title)
+    if (info.school_name) {
+        document.title = info.school_name; 
+    }
+        
     // --- ส่วนที่ใช้แสดงชื่อโรงเรียนใน Hero Banner ---
     const heroNameEl = document.getElementById('hero-school-name-short');
     if (heroNameEl) {
@@ -101,26 +106,6 @@ export function renderSchoolInfo(dataList) {
     if (info.logo_url) {
         if (logoHeader) { logoHeader.src = info.logo_url; logoHeader.classList.remove('hidden'); }
         if (logoBasic) { logoBasic.src = info.logo_url; logoBasic.classList.remove('hidden'); if(logoPlaceholder) logoPlaceholder.classList.add('hidden'); }
-    }
-
-    // --- ✅ เพิ่มคืนค่า: สีประจำโรงเรียน ---
-    if (document.getElementById('school-color-box')) {
-        const c1 = info.color_code_1 || '#3b82f6';
-        const c2 = info.color_code_2 || c1;
-        document.getElementById('school-color-box').style.background = `linear-gradient(135deg, ${c1} 50%, ${c2} 50%)`;
-    }
-
-    // --- ✅ เพิ่มคืนค่า: แผนที่โรงเรียน (Google Maps) ---
-    if (document.getElementById('school-map-container') && info.map_embed) {
-        const mapContainer = document.getElementById('school-map-container');
-        mapContainer.innerHTML = info.map_embed;
-        const ifr = mapContainer.querySelector('iframe');
-        if(ifr) { 
-            ifr.style.width = "100%"; 
-            ifr.style.height = "100%"; 
-            ifr.style.border = "0"; 
-            ifr.style.borderRadius = "2rem"; 
-        }
     }
 
     // VTR Logic
