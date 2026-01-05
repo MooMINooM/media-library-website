@@ -13,7 +13,7 @@ let allFormDocs = [];
 let allInnovationsData = []; 
 
 // --- Config ---
-const ACH_ITEMS_PER_PAGE = 8; 
+const ACH_ITEMS_PER_PAGE = 6; 
 const NEWS_ITEMS_PER_PAGE = 6;
 const DOCS_ITEMS_PER_PAGE = 10;
 const INNOV_ITEMS_PER_PAGE = 6;
