@@ -4,528 +4,652 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | ระบบจัดการข้อมูล</title>
+    <title>Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }</script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } }
+        }
+    </script>
     <style>
-        * {
-            font-family: 'Sarabun', sans-serif
+        body {
+            font-family: 'Sarabun', sans-serif;
         }
 
-        .side-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #94a3b8;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: all .15s;
-            text-align: left
+        /* Sidebar scrollbar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
         }
 
-        .side-btn:hover {
-            background: rgba(255, 255, 255, .08);
-            color: #e2e8f0
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        .side-btn.active {
-            background: #2563eb;
-            color: #fff;
-            font-weight: 700
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
         }
 
-        .side-btn i {
-            width: 18px;
-            text-align: center;
-            font-size: 13px
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .group-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: .15em;
-            padding: 20px 16px 6px
+        /* Menu group animation */
+        .menu-group-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            opacity: 0;
         }
 
-        .field-row {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 16px
+        .menu-group-items.open {
+            max-height: 500px;
+            opacity: 1;
         }
 
-        .field-row label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #374151
+        /* Active menu item */
+        .admin-menu-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+            color: #a5b4fc;
+            border-left: 3px solid #818cf8;
         }
 
-        .field-row input,
-        .field-row textarea,
-        .field-row select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #e5e7eb;
-            font-size: 14px;
-            outline: none;
-            transition: border .15s;
-            background: #fff;
-            font-family: 'Sarabun', sans-serif
+        /* Menu group header */
+        .menu-group-header {
+            transition: all 0.2s ease;
         }
 
-        .field-row input:focus,
-        .field-row textarea:focus,
-        .field-row select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1)
+        .menu-group-header:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .field-row textarea {
-            resize: vertical;
-            min-height: 80px
+        .menu-group-header .chevron {
+            transition: transform 0.3s ease;
         }
 
-        .btn-primary {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background .15s;
-            font-family: 'Sarabun', sans-serif
+        .menu-group-header.expanded .chevron {
+            transform: rotate(90deg);
         }
 
-        .btn-primary:hover {
-            background: #1d4ed8
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer
-        }
-
-        .btn-danger:hover {
-            background: #dc2626
-        }
-
-        .btn-edit {
-            background: #f1f5f9;
-            color: #2563eb;
-            border: 1px solid #e2e8f0;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer
-        }
-
-        .btn-edit:hover {
-            background: #dbeafe
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse
-        }
-
-        .data-table th {
-            background: #f8fafc;
-            padding: 10px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748b;
-            text-align: left;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            border-bottom: 2px solid #e2e8f0
-        }
-
-        .data-table td {
-            padding: 12px 16px;
-            font-size: 14px;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9
-        }
-
-        .data-table tr:hover td {
-            background: #f8fafc
-        }
-
-        .stat-box {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            padding: 24px;
-            text-align: center
-        }
-
-        .stat-box .num {
-            font-size: 32px;
-            font-weight: 800;
-            color: #1e293b
-        }
-
-        .stat-box .lbl {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
-            font-weight: 600
-        }
-
-        @keyframes fadeIn {
+        /* Fade in animation */
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(8px)
+                transform: translateY(15px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0)
+                transform: translateY(0);
             }
         }
 
-        .fade-in {
-            animation: fadeIn .3s ease forwards
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Modal backdrop */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
     </style>
 </head>
 
-<body class="flex h-screen bg-[#f1f5f9] overflow-hidden" style="font-family:'Sarabun',sans-serif">
+<body class="flex h-screen bg-slate-100/80 overflow-hidden font-sans">
 
-    <!-- SIDEBAR -->
-    <aside class="w-[240px] bg-[#0f172a] flex flex-col flex-shrink-0 overflow-hidden">
-        <div class="p-4 border-b border-white/10 flex items-center gap-3">
-            <div class="w-9 h-9 bg-blue-600 flex items-center justify-center text-white text-sm"><i
-                    class="fa-solid fa-school"></i></div>
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="w-[280px] bg-slate-900 flex flex-col z-20 shadow-2xl relative overflow-hidden flex-shrink-0">
+        <!-- Decorative gradient blob -->
+        <div class="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-[60px] pointer-events-none">
+        </div>
+        <div class="absolute bottom-0 left-0 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px] pointer-events-none">
+        </div>
+
+        <!-- Logo -->
+        <div class="p-5 flex items-center gap-3 relative z-10">
+            <div
+                class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-school"></i>
+            </div>
             <div>
-                <div class="text-white text-sm font-bold leading-tight">Admin Panel</div>
-                <div class="text-[10px] text-slate-500">จัดการข้อมูลโรงเรียน</div>
+                <h1 class="font-bold text-white text-base tracking-tight">Admin Panel</h1>
+                <p class="text-[10px] text-slate-500 font-medium tracking-wider uppercase">School Management</p>
             </div>
         </div>
-        <nav class="flex-1 overflow-y-auto py-2" id="sidebar-nav">
-            <button onclick="showDashboard()" class="side-btn active" id="nav-dashboard"><i
-                    class="fa-solid fa-gauge"></i> แดชบอร์ด</button>
 
-            <div class="group-label">ข้อมูลหลัก</div>
-            <button onclick="loadSection('school_info')" class="side-btn"><i class="fa-solid fa-gear"></i>
-                ตั้งค่าโรงเรียน</button>
-            <button onclick="loadSection('news')" class="side-btn"><i class="fa-solid fa-newspaper"></i>
-                ข่าวประชาสัมพันธ์</button>
+        <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mx-4"></div>
 
-            <div class="group-label">บุคลากร</div>
-            <button onclick="loadSection('personnel')" class="side-btn"><i class="fa-solid fa-user-tie"></i>
-                บุคลากรปัจจุบัน</button>
-            <button onclick="loadSection('personnel_history')" class="side-btn"><i
-                    class="fa-solid fa-clock-rotate-left"></i> ทำเนียบบุคลากร</button>
-            <button onclick="loadSection('school_board')" class="side-btn"><i class="fa-solid fa-users"></i>
-                กรรมการสถานศึกษา</button>
-            <button onclick="loadSection('student_council')" class="side-btn"><i class="fa-solid fa-user-graduate"></i>
-                สภานักเรียน</button>
-            <button onclick="loadSection('student_data')" class="side-btn"><i class="fa-solid fa-chart-pie"></i>
-                ข้อมูลนักเรียน</button>
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-4 space-y-1 relative z-10">
 
-            <div class="group-label">ผลงาน</div>
-            <button onclick="loadSection('teacher_awards')" class="side-btn"><i class="fa-solid fa-medal"></i>
-                ผลงานครู</button>
-            <button onclick="loadSection('student_awards')" class="side-btn"><i class="fa-solid fa-trophy"></i>
-                ผลงานนักเรียน</button>
-            <button onclick="loadSection('school_awards')" class="side-btn"><i class="fa-solid fa-award"></i>
-                ผลงานโรงเรียน</button>
-            <button onclick="loadSection('innovations')" class="side-btn"><i class="fa-solid fa-lightbulb"></i>
-                นวัตกรรม</button>
+            <!-- Group 1: ข้อมูลสถานศึกษา -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-school text-indigo-400 w-4 text-center"></i>
+                        <span>ข้อมูลสถานศึกษา</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('school_info')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-gear w-4 text-center text-xs"></i> ข้อมูลพื้นฐาน & เกี่ยวกับ ร.ร.
+                    </button>
+                </div>
+            </div>
 
-            <div class="group-label">วิชาการ & เอกสาร</div>
-            <button onclick="loadSection('onet')" class="side-btn"><i class="fa-solid fa-chart-line"></i> O-NET</button>
-            <button onclick="loadSection('nt')" class="side-btn"><i class="fa-solid fa-chart-simple"></i> NT</button>
-            <button onclick="loadSection('rt')" class="side-btn"><i class="fa-solid fa-book-open"></i> RT</button>
-            <button onclick="loadSection('documents')" class="side-btn"><i class="fa-solid fa-file-pdf"></i>
-                เอกสารราชการ</button>
-            <button onclick="loadSection('forms')" class="side-btn"><i class="fa-solid fa-file-lines"></i>
-                แบบฟอร์ม</button>
-            <button onclick="loadSection('eservices')" class="side-btn"><i class="fa-solid fa-link"></i>
-                ลิงก์ระบบ</button>
+            <!-- Group 2: บุคลากร & นักเรียน -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-users text-emerald-400 w-4 text-center"></i>
+                        <span>บุคลากร & นักเรียน</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('personnel')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-user-tie w-4 text-center text-xs"></i> บุคลากรปัจจุบัน
+                    </button>
+                    <button onclick="loadSection('personnel_history')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-clock-rotate-left w-4 text-center text-xs"></i> ทำเนียบบุคลากร
+                    </button>
+                    <button onclick="loadSection('student_data')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-pie w-4 text-center text-xs"></i> ข้อมูลนักเรียน
+                    </button>
+                    <button onclick="loadSection('school_board')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-users-rectangle w-4 text-center text-xs"></i> คณะกรรมการสถานศึกษา
+                    </button>
+                    <button onclick="loadSection('student_council')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-user-graduate w-4 text-center text-xs"></i> สภานักเรียน
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 3: ข่าวสาร & ผลงาน -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-newspaper text-amber-400 w-4 text-center"></i>
+                        <span>ข่าวสาร & ผลงาน</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('news')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-newspaper w-4 text-center text-xs"></i> ข่าวสาร
+                    </button>
+                    <button onclick="loadSection('teacher_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-medal w-4 text-center text-xs"></i> ผลงานครู
+                    </button>
+                    <button onclick="loadSection('student_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-trophy w-4 text-center text-xs"></i> ผลงานนักเรียน
+                    </button>
+                    <button onclick="loadSection('school_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-award w-4 text-center text-xs"></i> ผลงานโรงเรียน
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 4: วิชาการ -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-sky-400 w-4 text-center"></i>
+                        <span>วิชาการ</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items">
+                    <button onclick="loadSection('onet')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-line w-4 text-center text-xs text-emerald-400"></i> ผลสัมฤทธิ์ O-NET
+                    </button>
+                    <button onclick="loadSection('nt')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-simple w-4 text-center text-xs text-blue-400"></i> ผลสัมฤทธิ์ NT
+                    </button>
+                    <button onclick="loadSection('rt')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-book-open w-4 text-center text-xs text-violet-400"></i> ผลสัมฤทธิ์ RT
+                    </button>
+                    <button onclick="loadSection('innovations')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-lightbulb w-4 text-center text-xs text-amber-400"></i> นวัตกรรม
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 5: เอกสาร & ระบบ -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-folder-open text-rose-400 w-4 text-center"></i>
+                        <span>เอกสาร & ระบบ</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items">
+                    <button onclick="loadSection('eservices')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-link w-4 text-center text-xs text-orange-400"></i> ลิงก์ระบบสารสนเทศ
+                    </button>
+                    <button onclick="loadSection('documents')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-file-pdf w-4 text-center text-xs text-red-400"></i> เอกสารราชการ
+                    </button>
+                    <button onclick="loadSection('forms')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-file-lines w-4 text-center text-xs text-cyan-400"></i> แบบฟอร์ม
+                    </button>
+                </div>
+            </div>
+
         </nav>
-        <div class="border-t border-white/10 p-2">
-            <a href="index.html" class="side-btn text-slate-500"><i class="fa-solid fa-globe"></i> กลับหน้าเว็บ</a>
-            <button onclick="logout()" class="side-btn text-red-400 hover:!text-red-300"><i
-                    class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ</button>
+
+        <!-- Logout -->
+        <div class="p-3 relative z-10">
+            <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-3"></div>
+            <button onclick="logout()"
+                class="w-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 py-2.5 rounded-xl font-semibold transition-all flex justify-center items-center gap-2 text-sm border border-white/5 hover:border-red-500/30">
+                <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
+            </button>
         </div>
     </aside>
 
-    <!-- MAIN -->
+    <!-- ============ MAIN AREA ============ -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between flex-shrink-0">
-            <h2 id="page-title" class="text-base font-bold text-gray-800">แดชบอร์ด</h2>
-            <span class="text-xs text-gray-400" id="clock"></span>
+
+        <!-- Top Header Bar -->
+        <header
+            class="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 flex-shrink-0 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 text-sm text-slate-400">
+                    <i class="fa-solid fa-house text-xs"></i>
+                    <span>/</span>
+                    <span id="breadcrumb-text" class="text-slate-700 font-semibold">Dashboard</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-slate-500 font-medium">ระบบจัดการข้อมูล</p>
+                    <p class="text-[10px] text-slate-400" id="current-time"></p>
+                </div>
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
         </header>
-        <main class="flex-1 overflow-y-auto p-6" id="main-area"></main>
+
+        <!-- Content Area -->
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto bg-slate-50" id="main-area">
+            <div class="h-full flex items-center justify-center text-slate-400 flex-col animate-fade-in-up">
+                <div
+                    class="w-24 h-24 rounded-3xl bg-white shadow-xl shadow-indigo-500/5 flex items-center justify-center mb-6 border border-slate-100">
+                    <i class="fa-solid fa-school-circle-check text-5xl text-indigo-200"></i>
+                </div>
+                <p class="text-lg font-semibold text-slate-600 mb-1">ยินดีต้อนรับสู่ระบบจัดการ</p>
+                <p class="text-sm text-slate-400">เลือกเมนูทางซ้ายเพื่อเริ่มจัดการข้อมูล</p>
+            </div>
+        </main>
     </div>
 
-    <!-- MODAL -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4"
-        onclick="if(event.target===this)closeModal()">
-        <div class="bg-white w-full max-w-lg max-h-[90vh] flex flex-col fade-in shadow-xl">
-            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 flex-shrink-0">
-                <h3 id="modal-title" class="font-bold text-gray-800">จัดการข้อมูล</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 text-lg"><i
-                        class="fa-solid fa-xmark"></i></button>
+    <!-- ============ MODAL ============ -->
+    <div id="modal"
+        class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-md p-4"
+        style="animation: modalFadeIn 0.2s ease">
+        <div class="bg-white p-0 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl shadow-slate-900/20 border border-slate-200/50"
+            style="animation: modalSlideIn 0.3s cubic-bezier(0.4,0,0.2,1) forwards">
+            <!-- Modal Header -->
+            <div
+                class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
+                <h2 id="modal-title" class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                        <i class="fa-solid fa-pen-to-square text-indigo-500 text-sm"></i>
+                    </div>
+                    จัดการข้อมูล
+                </h2>
+                <button onclick="closeModal()"
+                    class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-times text-sm"></i>
+                </button>
             </div>
-            <div class="overflow-y-auto flex-1 p-6">
-                <form id="data-form"><input type="hidden" name="id" id="field-id">
+            <!-- Modal Body -->
+            <div class="px-6 py-5 overflow-y-auto max-h-[60vh]">
+                <form id="data-form" class="space-y-4">
+                    <input type="hidden" name="id" id="field-id">
                     <div id="form-fields"></div>
                 </form>
             </div>
-            <div class="px-6 py-4 border-t border-gray-100 flex gap-2 flex-shrink-0">
-                <button onclick="submitForm()" class="btn-primary flex-1">บันทึก</button>
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <button onclick="submitForm()"
+                    class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-5 py-2.5 rounded-xl flex-1 font-bold shadow-lg shadow-indigo-500/20 transition-all hover:shadow-xl hover:shadow-indigo-500/30 text-sm">
+                    <i class="fa-solid fa-check mr-1"></i> บันทึกข้อมูล
+                </button>
                 <button onclick="closeModal()"
-                    style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer">ยกเลิก</button>
+                    class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl font-semibold transition-all text-sm">
+                    ยกเลิก
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
-        let sb; try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) } catch (e) { }
+        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        let supabaseAdmin;
+        try { supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { console.error("Supabase Init Error:", e); }
 
-        // SCHEMAS - แต่ละ section กำหนด field ชัดเจน
-        const S = {
+        // ============ COLLAPSIBLE MENU ============
+        function toggleGroup(btn) {
+            const items = btn.nextElementSibling;
+            const isOpen = items.classList.contains('open');
+            btn.classList.toggle('expanded', !isOpen);
+            items.classList.toggle('open', !isOpen);
+        }
+
+        // ============ CLOCK ============
+        function updateClock() {
+            const el = document.getElementById('current-time');
+            if (el) {
+                const now = new Date();
+                el.textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' ' + now.toLocaleTimeString('th-TH');
+            }
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ============ SCHEMAS ============
+        const SCHEMAS = {
             school_info: {
-                t: "ตั้งค่าโรงเรียน", single: true, fields: [
-                    { type: "header", label: "ข้อมูลพื้นฐาน" },
-                    { key: "school_name", label: "ชื่อโรงเรียน (ไทย)", type: "text" },
-                    { key: "school_name_en", label: "ชื่อโรงเรียน (EN)", type: "text" },
-                    { key: "school_code_10", label: "รหัส 10 หลัก", type: "text" },
+                title: "ข้อมูลโรงเรียน", fields: [
+                    { type: "header", label: "--- 1. ข้อมูลพื้นฐาน ---" },
+                    { key: "school_code_10", label: "รหัสโรงเรียน 10 หลัก", type: "text" },
                     { key: "smis_code_8", label: "รหัส Smis 8 หลัก", type: "text" },
                     { key: "obec_code_6", label: "รหัส Obec 6 หลัก", type: "text" },
+                    { key: "school_name", label: "ชื่อสถานศึกษา (ไทย)", type: "text" },
+                    { key: "school_name_en", label: "ชื่อสถานศึกษา (อังกฤษ)", type: "text" },
                     { key: "affiliation", label: "สังกัด", type: "text" },
-                    { key: "address", label: "ที่อยู่", type: "textarea" },
-                    { type: "header", label: "เกี่ยวกับโรงเรียน" },
-                    { key: "founding_date", label: "วันที่ก่อตั้ง", type: "date" },
-                    { key: "history", label: "ประวัติ", type: "textarea" },
+                    { key: "address", label: "ที่อยู่", type: "textarea", rows: 3 },
+
+                    { type: "header", label: "--- 2. เกี่ยวกับโรงเรียน ---" },
+                    { key: "founding_date", label: "วันที่ก่อตั้ง (เพื่อคำนวณอายุ)", type: "date" },
+                    { key: "history", label: "ประวัติของโรงเรียน", type: "textarea", rows: 5 },
                     { key: "philosophy", label: "ปรัชญา", type: "text" },
-                    { key: "vision", label: "วิสัยทัศน์", type: "textarea" },
-                    { key: "mission", label: "พันธกิจ", type: "textarea" },
+                    { key: "vision", label: "วิสัยทัศน์", type: "textarea", rows: 3 },
+                    { key: "mission", label: "พันธกิจ", type: "textarea", rows: 3 },
+
+                    { type: "header", label: "--- 3. อัตลักษณ์ & เอกลักษณ์ ---" },
                     { key: "motto", label: "คำขวัญ", type: "text" },
                     { key: "identity", label: "อัตลักษณ์", type: "text" },
                     { key: "uniqueness", label: "เอกลักษณ์", type: "text" },
-                    { type: "header", label: "รูปภาพ & สื่อ" },
-                    { key: "logo_url", label: "URL ตราโรงเรียน", type: "url" },
-                    { key: "uniform_url", label: "URL รูปเครื่องแบบ", type: "url" },
-                    { key: "color_code_1", label: "สีประจำ 1", type: "color" },
-                    { key: "color_code_2", label: "สีประจำ 2", type: "color" },
-                    { key: "vtr_url", label: "VTR Youtube", type: "url" },
-                    { key: "song_url", label: "URL เพลงโรงเรียน", type: "url" },
+
+                    { type: "header", label: "--- 4. รูปภาพ & สี ---" },
+                    { key: "logo_url", label: "ตราสัญลักษณ์ (URL รูป)", type: "url" },
+                    { key: "uniform_url", label: "รูปเครื่องแบบนักเรียน (URL รูป)", type: "url" },
+                    { key: "color_code_1", label: "สีประจำโรงเรียน 1", type: "color" },
+                    { key: "color_code_2", label: "สีประจำโรงเรียน 2", type: "color" },
+
+                    { type: "header", label: "--- 5. สื่อ & Social & แผนที่ ---" },
+                    { key: "vtr_url", label: "VTR (Youtube Link)", type: "url" },
+                    { key: "song_url", label: "เพลงโรงเรียน (File URL)", type: "url" },
                     { key: "facebook", label: "Facebook URL", type: "url" },
-                    { key: "youtube", label: "Youtube URL", type: "url" },
-                    { key: "map_embed", label: "Google Maps (วาง iframe)", type: "textarea" },
-                    { type: "header", label: "ป๊อปอัพประกาศ" },
-                    { key: "popup_img", label: "URL รูปประกาศ", type: "url" },
-                    { key: "show_popup", label: "แสดงป๊อปอัพ", type: "select", options: ["เปิดใช้งาน", "ปิดการใช้งาน"] }
+                    { key: "youtube", label: "Youtube Channel URL", type: "url" },
+                    { key: "map_embed", label: "Google Maps Embed Code (วางโค้ด iframe ที่นี่)", type: "textarea", rows: 4 },
+
+                    { type: "header", label: "--- 6. ป๊อปอัพประกาศพิเศษ (Popup Announcement) ---" },
+                    { key: "popup_img", label: "URL รูปภาพประกาศ (แสดงเมื่อเข้าเว็บ)", type: "url" },
+                    { key: "show_popup", label: "สถานะการแสดงป๊อปอัพ", type: "select", options: ["เปิดใช้งาน", "ปิดการใช้งาน"] }
                 ]
             },
-            personnel: { t: "บุคลากรปัจจุบัน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text", req: 1 }, { key: "role", label: "ตำแหน่ง", type: "text", req: 1 }, { key: "image", label: "URL รูป", type: "url" }] },
-            personnel_history: { t: "ทำเนียบบุคลากร", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "year", label: "ปี/วาระ", type: "text" }, { key: "image", label: "URL รูป", type: "url" }] },
-            student_data: { t: "ข้อมูลนักเรียน", fields: [{ key: "grade", label: "ระดับชั้น", type: "text" }, { key: "male", label: "ชาย", type: "number" }, { key: "female", label: "หญิง", type: "number" }] },
-            school_board: { t: "กรรมการสถานศึกษา", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "URL รูป", type: "url" }] },
-            student_council: { t: "สภานักเรียน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "URL รูป", type: "url" }] },
-            news: { t: "ข่าวประชาสัมพันธ์", fields: [{ key: "title", label: "หัวข้อ", type: "text", req: 1 }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "URL รูป", type: "url" }, { key: "link", label: "ลิงก์อ่านต่อ", type: "url" }] },
-            teacher_awards: { t: "ผลงานครู", fields: [{ key: "name", label: "ชื่อครู", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "URL รูป", type: "url" }] },
-            student_awards: { t: "ผลงานนักเรียน", fields: [{ key: "students", label: "ชื่อนักเรียน", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "URL รูป", type: "url" }] },
-            school_awards: { t: "ผลงานโรงเรียน", fields: [{ key: "title", label: "ชื่อรางวัล", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "URL รูป", type: "url" }] },
-            innovations: { t: "นวัตกรรม", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "creator", label: "ผู้จัดทำ", type: "text" }, { key: "subject", label: "วิชา", type: "text" }, { key: "class", label: "ระดับชั้น", type: "text" }, { key: "fileUrl", label: "URL ไฟล์", type: "url" }, { key: "coverImageUrl", label: "URL รูปปก", type: "url" }] },
-            onet: { t: "O-NET", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "tag", label: "ปี", type: "text" }, { key: "file_url", label: "URL ไฟล์", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
-            nt: { t: "NT", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "tag", label: "ปี", type: "text" }, { key: "file_url", label: "URL ไฟล์", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
-            rt: { t: "RT", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "tag", label: "ปี", type: "text" }, { key: "file_url", label: "URL ไฟล์", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
-            documents: { t: "เอกสารราชการ", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "URL ไฟล์", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] },
-            forms: { t: "แบบฟอร์ม", fields: [{ key: "title", label: "ชื่อ", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "URL ไฟล์", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] },
-            eservices: { t: "ลิงก์ระบบ", fields: [{ key: "title", label: "ชื่อระบบ", type: "text", req: 1 }, { key: "url", label: "URL", type: "url", req: 1 }] }
+
+            personnel: { title: "บุคลากรปัจจุบัน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text", required: true }, { key: "role", label: "ตำแหน่ง", type: "text", required: true }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            personnel_history: { title: "ทำเนียบบุคลากร", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "year", label: "ปี/วาระ (เช่น 2560-2564)", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            student_data: { title: "ข้อมูลจำนวนนักเรียน", fields: [{ key: "grade", label: "ระดับชั้น", type: "text" }, { key: "male", label: "ชาย (คน)", type: "number" }, { key: "female", label: "หญิง (คน)", type: "number" }] },
+            school_board: { title: "คณะกรรมการสถานศึกษา", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            student_council: { title: "สภานักเรียน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            news: { title: "ข่าวประชาสัมพันธ์", fields: [{ key: "title", label: "หัวข้อข่าว", type: "text", required: true }, { key: "academic_year", label: "ปีการศึกษา (เช่น 2568)", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }, { key: "link", label: "ลิงก์อ่านต่อ", type: "url" }] },
+            eservices: { title: "ลิงก์ระบบสารสนเทศ", fields: [{ key: "title", label: "ชื่อระบบ", type: "text", required: true }, { key: "url", label: "URL ปลายทาง", type: "url", required: true }] },
+            onet: { title: "ผลสัมฤทธิ์ O-NET", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            nt: { title: "ผลสัมฤทธิ์ NT", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            rt: { title: "ผลสัมฤทธิ์ RT", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            teacher_awards: { title: "ผลงานครู", fields: [{ key: "name", label: "ชื่อครู", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "รูปภาพ/เกียรติบัตร", type: "url" }] },
+            student_awards: { title: "ผลงานนักเรียน", fields: [{ key: "students", label: "ชื่อนักเรียน", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "รูปภาพ/เกียรติบัตร", type: "url" }] },
+            school_awards: { title: "ผลงานโรงเรียน", fields: [{ key: "title", label: "ชื่อรางวัล", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "รูปภาพ", type: "url" }] },
+            innovations: { title: "นวัตกรรม", fields: [{ key: "title", label: "ชื่อนวัตกรรม", type: "text" }, { key: "creator", label: "ผู้จัดทำ", type: "text" }, { key: "subject", label: "วิชา", type: "text" }, { key: "class", label: "ระดับชั้น", type: "text" }, { key: "fileUrl", label: "ไฟล์ผลงาน (URL)", type: "url" }, { key: "coverImageUrl", label: "รูปปก (URL)", type: "url" }] },
+            documents: { title: "เอกสารราชการ", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "ไฟล์ (URL)", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] },
+            forms: { title: "แบบฟอร์ม", fields: [{ key: "title", label: "ชื่อแบบฟอร์ม", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "ไฟล์ (URL)", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] }
         };
 
-        let curSec, curData;
+        let currentSection, currentData;
+        async function checkAuth() { try { const { data: { session } } = await supabaseAdmin.auth.getSession(); if (!session) window.location.href = 'index.html'; } catch (e) { } } checkAuth();
+        async function logout() { await supabaseAdmin.auth.signOut(); window.location.href = 'index.html'; }
 
-        // Auth
-        (async () => { try { const { data: { session } } = await sb.auth.getSession(); if (!session) location.href = 'index.html' } catch (e) { } })();
-        async function logout() { const r = await Swal.fire({ title: 'ออกจากระบบ?', icon: 'question', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ออก', cancelButtonText: 'ยกเลิก' }); if (r.isConfirmed) { await sb.auth.signOut(); location.href = 'index.html' } }
-
-        // Clock
-        setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) }, 1000);
-
-        // Dashboard
-        async function showDashboard() {
-            setNav('nav-dashboard');
-            document.getElementById('page-title').textContent = 'แดชบอร์ด';
-            const m = document.getElementById('main-area');
-            m.innerHTML = '<div class="flex items-center justify-center h-32"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
-            const tables = ['news', 'personnel', 'documents', 'innovations', 'teacher_awards', 'student_awards'];
-            const counts = {};
-            await Promise.all(tables.map(async t => { try { const { count } = await sb.from(t).select('*', { count: 'exact', head: true }); counts[t] = count || 0 } catch (e) { counts[t] = 0 } }));
-            m.innerHTML = `<div class="fade-in">
-    <div class="bg-blue-600 text-white p-6 mb-6"><h2 class="text-xl font-bold">ยินดีต้อนรับ 👋</h2><p class="text-blue-200 text-sm mt-1">จัดการข้อมูลโรงเรียนจากที่นี่</p></div>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-      ${tables.map(t => `<div class="stat-box"><div class="num">${counts[t]}</div><div class="lbl">${S[t]?.t || t}</div></div>`).join('')}
-    </div>
-    <div class="bg-white border border-gray-200 p-6">
-      <h3 class="font-bold text-gray-700 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-1"></i> ดำเนินการด่วน</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <button onclick="loadSection('news')" class="p-4 border border-gray-200 text-center hover:bg-blue-50 transition"><i class="fa-solid fa-plus text-blue-600"></i><p class="text-xs font-bold mt-2">เพิ่มข่าว</p></button>
-        <button onclick="loadSection('personnel')" class="p-4 border border-gray-200 text-center hover:bg-blue-50 transition"><i class="fa-solid fa-user-plus text-purple-600"></i><p class="text-xs font-bold mt-2">เพิ่มบุคลากร</p></button>
-        <button onclick="loadSection('school_info')" class="p-4 border border-gray-200 text-center hover:bg-blue-50 transition"><i class="fa-solid fa-gear text-gray-600"></i><p class="text-xs font-bold mt-2">ตั้งค่า ร.ร.</p></button>
-        <a href="index.html" class="p-4 border border-gray-200 text-center hover:bg-blue-50 transition block"><i class="fa-solid fa-globe text-green-600"></i><p class="text-xs font-bold mt-2">ดูหน้าเว็บ</p></a>
-      </div>
-    </div>
-  </div>`;
-        }
-
-        function setNav(id) {
-            document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-            const el = id ? document.getElementById(id) : null;
-            if (el) el.classList.add('active');
-            else if (event?.currentTarget) event.currentTarget.classList.add('active');
-        }
-
-        // Load Section
         async function loadSection(sec) {
-            curSec = sec; const s = S[sec];
-            setNav(null);
-            document.getElementById('page-title').textContent = s.t;
-            const m = document.getElementById('main-area');
-            m.innerHTML = '<div class="flex items-center justify-center h-32"><i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+            currentSection = sec; const s = SCHEMAS[sec];
+            const main = document.getElementById('main-area');
+            main.innerHTML = `<div class="h-full flex items-center justify-center"><div class="flex flex-col items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-500"></i></div><p class="text-sm text-slate-400 font-medium">กำลังโหลดข้อมูล...</p></div></div>`;
 
-            if (s.single) {
-                const { data } = await sb.from(sec).select('*').limit(1).single();
-                renderSingleForm(data || {});
+            // Update breadcrumb
+            document.getElementById('breadcrumb-text').textContent = s.title;
+
+            // Update active menu
+            document.querySelectorAll('.admin-menu-item').forEach(el => el.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            if (sec === 'school_info') {
+                const { data } = await supabaseAdmin.from(sec).select('*').limit(1).single();
+                renderForm(data || {});
             } else {
-                const { data } = await sb.from(sec).select('*').order('id', { ascending: false });
-                curData = data || [];
-                renderList(s);
+                const { data } = await supabaseAdmin.from(sec).select('*').order('id', { ascending: false });
+                currentData = data; renderList(s);
             }
         }
 
-        // Form สำหรับ school_info (single record)
-        function renderSingleForm(data) {
-            const fields = S.school_info.fields;
-            let h = '<div class="fade-in">';
-            h += '<div class="bg-white border border-gray-200">';
-            h += '<div class="bg-blue-600 text-white px-6 py-4"><h2 class="font-bold text-lg"><i class="fa-solid fa-gear mr-2"></i>ตั้งค่าข้อมูลโรงเรียน</h2><p class="text-blue-200 text-sm">กรอกข้อมูลให้ครบทุกช่อง แล้วกดบันทึก</p></div>';
-            h += '<div class="p-6">';
-            h += `<input type="hidden" id="si-id" value="${data.id || ''}">`;
-            fields.forEach(f => {
-                if (f.type === 'header') { h += `<div class="mt-6 mb-3 first:mt-0 pb-2 border-b-2 border-blue-600"><span class="text-sm font-bold text-blue-700"><i class="fa-solid fa-circle-dot text-[8px] mr-1"></i>${f.label}</span></div>`; return; }
-                let val = data[f.key] || '';
-                if (f.key === 'show_popup') val = data[f.key] === true ? "เปิดใช้งาน" : "ปิดการใช้งาน";
+        function renderForm(data) {
+            const f = SCHEMAS['school_info'].fields.map(field => {
+                if (field.type === 'header') return `<div class="pt-6 pb-2 first:pt-0"><h3 class="font-bold text-indigo-600 text-sm tracking-wide flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>${field.label.replace(/---/g, '').trim()}</h3><div class="h-px bg-gradient-to-r from-indigo-100 to-transparent mt-2"></div></div>`;
+                let val = data[field.key] || '';
+
+                if (field.key === 'show_popup') {
+                    val = (data[field.key] === true) ? "เปิดใช้งาน" : "ปิดการใช้งาน";
+                }
+
                 let inp;
-                if (f.type === 'textarea') inp = `<textarea id="si-${f.key}" class="field-row" style="padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none;width:100%;min-height:80px;resize:vertical;font-family:'Sarabun',sans-serif">${val}</textarea>`;
-                else if (f.type === 'color') inp = `<div style="display:flex;align-items:center;gap:8px"><input type="color" id="si-${f.key}" value="${val || '#000000'}" style="height:40px;width:60px;border:1px solid #e5e7eb;cursor:pointer"><span style="font-size:12px;color:#94a3b8">${val || '#000000'}</span></div>`;
-                else if (f.type === 'select') inp = `<select id="si-${f.key}" style="padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none;width:100%">${f.options.map(o => `<option ${val === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
-                else inp = `<input type="${f.type}" id="si-${f.key}" value="${val}" style="padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none;width:100%">`;
-                let preview = '';
-                if (['logo_url', 'uniform_url', 'popup_img'].includes(f.key) && val) preview = `<img src="${val}" style="height:60px;margin-top:8px;border:1px solid #e5e7eb;object-fit:contain;background:#f8fafc" onerror="this.style.display='none'">`;
-                h += `<div class="field-row"><label>${f.label}</label>${inp}${preview}</div>`;
-            });
-            h += `<button type="button" onclick="saveSchoolInfo()" class="btn-primary w-full mt-4" style="width:100%;padding:14px"><i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูลโรงเรียน</button>`;
-            h += '</div></div></div>';
-            document.getElementById('main-area').innerHTML = h;
+                const inputClass = "w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300";
+
+                if (field.type === 'textarea') {
+                    inp = `<textarea id="si-${field.key}" class="${inputClass} resize-none" rows="${field.rows}">${val}</textarea>`;
+                } else if (field.type === 'color') {
+                    inp = `<div class="flex items-center gap-3"><input type="color" id="si-${field.key}" value="${val || '#000000'}" class="h-10 w-16 border border-slate-200 rounded-xl cursor-pointer"><span class="text-xs text-slate-400">เลือกสี</span></div>`;
+                } else if (field.type === 'select') {
+                    inp = `<select id="si-${field.key}" class="${inputClass}">
+                        ${field.options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>`;
+                } else {
+                    inp = `<input type="${field.type}" id="si-${field.key}" value="${val}" class="${inputClass}">`;
+                }
+
+                return `<div><label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">${field.label}</label>${inp}</div>`;
+            }).join('');
+
+            document.getElementById('main-area').innerHTML = `<div class="max-w-4xl mx-auto animate-fade-in-up">
+                <div class="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/30">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">ข้อมูลโรงเรียน</h2>
+                            <p class="text-xs text-slate-400">จัดการข้อมูลพื้นฐานของสถานศึกษา</p>
+                        </div>
+                    </div>
+                    <form id="school-info-form" class="space-y-4">
+                        <input type="hidden" id="si-id" value="${data.id || ''}">
+                        ${f}
+                        <div class="pt-6">
+                            <button type="button" onclick="saveSchoolInfo()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลโรงเรียน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>`;
         }
 
         async function saveSchoolInfo() {
-            const data = {}, id = document.getElementById('si-id').value;
-            S.school_info.fields.forEach(f => { if (!f.key) return; let v = document.getElementById(`si-${f.key}`).value; if (f.key === 'show_popup') data[f.key] = v === "เปิดใช้งาน"; else data[f.key] = v; });
-            const { error } = id ? await sb.from('school_info').update(data).eq('id', id) : await sb.from('school_info').insert([data]);
-            if (error) Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
-            else Swal.fire({ icon: 'success', title: 'บันทึกแล้ว!', timer: 1500, showConfirmButton: false });
+            const data = {}; const id = document.getElementById('si-id').value;
+            SCHEMAS['school_info'].fields.forEach(f => {
+                if (f.key) {
+                    let val = document.getElementById(`si-${f.key}`).value;
+                    if (f.key === 'show_popup') {
+                        data[f.key] = (val === "เปิดใช้งาน");
+                    } else {
+                        data[f.key] = val;
+                    }
+                }
+            });
+            const { error } = id ? await supabaseAdmin.from('school_info').update(data).eq('id', id) : await supabaseAdmin.from('school_info').insert([data]);
+            if (error) Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#6366f1' });
+            else Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'บันทึกเรียบร้อย', confirmButtonColor: '#6366f1' });
         }
 
-        // List view
         function renderList(s) {
-            const m = document.getElementById('main-area');
-            const fields = s.fields.filter(f => f.type !== 'header');
-            const pk = fields[0]?.key;
-            let h = `<div class="fade-in">
-    <div class="flex items-center justify-between mb-4 gap-4">
-      <div class="relative flex-1 max-w-sm"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i><input type="text" id="admin-search" oninput="filterList()" placeholder="ค้นหา..." style="width:100%;padding:10px 10px 10px 36px;border:1px solid #e2e8f0;font-size:14px;outline:none"></div>
-      <button onclick="openModal()" class="btn-primary"><i class="fa-solid fa-plus mr-1"></i> เพิ่มข้อมูล</button>
-    </div>
-    <div class="bg-white border border-gray-200 overflow-hidden">`;
-            if (!curData || !curData.length) {
-                h += '<div class="p-12 text-center text-gray-400"><i class="fa-solid fa-inbox text-3xl mb-3 block"></i>ยังไม่มีข้อมูล</div>';
+            const main = document.getElementById('main-area'); const key = s.fields[0].key;
+            let h = `<div class="animate-fade-in-up">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm shadow-lg shadow-indigo-500/30">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">${s.title}</h2>
+                            <p class="text-xs text-slate-400">${currentData ? currentData.length : 0} รายการ</p>
+                        </div>
+                    </div>
+                    <button onclick="openModal()" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 font-semibold flex items-center gap-2 text-sm transition-all hover:shadow-xl hover:shadow-indigo-500/30">
+                        <i class="fa-solid fa-plus"></i> เพิ่มข้อมูล
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="divide-y divide-slate-50">`;
+
+            if (!currentData || !currentData.length) {
+                h += `<div class="p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 text-2xl mx-auto mb-3"><i class="fa-solid fa-inbox"></i></div>
+                    <p class="text-slate-400 font-medium">ยังไม่มีข้อมูล</p>
+                    <p class="text-xs text-slate-300 mt-1">กดปุ่ม "เพิ่มข้อมูล" เพื่อเริ่มต้น</p>
+                </div>`;
             } else {
-                h += '<div class="overflow-x-auto"><table class="data-table"><thead><tr><th style="width:50px">#</th>';
-                fields.slice(0, 3).forEach(f => h += `<th>${f.label}</th>`);
-                h += '<th style="width:160px;text-align:right">จัดการ</th></tr></thead><tbody>';
-                curData.forEach((item, i) => {
-                    h += `<tr class="list-row" data-search="${Object.values(item).join(' ').toLowerCase()}">
-        <td class="text-gray-400">${i + 1}</td>`;
-                    fields.slice(0, 3).forEach(f => {
-                        let v = item[f.key] || '-';
-                        if ((f.key === 'image' || f.key === 'coverImageUrl') && item[f.key]) v = `<img src="${item[f.key]}" style="height:32px;width:32px;object-fit:cover;border:1px solid #e5e7eb" onerror="this.style.display='none'">`;
-                        h += `<td>${v}</td>`;
-                    });
-                    h += `<td style="text-align:right;white-space:nowrap"><button onclick="editItem('${item.id}')" class="btn-edit" style="margin-right:4px"><i class="fa-solid fa-pen text-[10px]"></i> แก้ไข</button><button onclick="deleteItem('${item.id}')" class="btn-danger"><i class="fa-solid fa-trash text-[10px]"></i> ลบ</button></td></tr>`;
+                currentData.forEach(i => {
+                    const imgUrl = i.image || i.imageUrl || i.coverImageUrl || null;
+                    const thumbHtml = imgUrl
+                        ? `<div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 flex-shrink-0"><img src="${imgUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400 text-xs\'><i class=\'fa-solid fa-image\'></i></div>'"></div>`
+                        : `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 flex items-center justify-center font-bold text-sm border border-indigo-100/50 flex-shrink-0">${i.id}</div>`;
+                    const subInfo = i.academic_year ? `<span class="text-xs text-slate-400 ml-2 bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-medium">ปี ${i.academic_year}</span>` : (i.date ? `<span class="text-xs text-slate-400 ml-2">${i.date}</span>` : '');
+                    h += `<div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50/80 transition-all group">
+                    <div class="flex items-center gap-4">
+                        ${thumbHtml}
+                        <div>
+                            <div class="font-semibold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">${i[key] || '-'}</div>
+                            ${subInfo}
+                        </div>
+                    </div>
+                    <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <button onclick="editItem('${i.id}')" class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-100 flex items-center justify-center transition-all text-xs">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteItem('${i.id}')" class="w-9 h-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-all text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
                 });
-                h += '</tbody></table></div>';
             }
-            h += '</div></div>';
-            m.innerHTML = h;
+            h += `</div></div></div>`; main.innerHTML = h;
         }
 
-        function filterList() {
-            const q = document.getElementById('admin-search').value.toLowerCase().trim();
-            document.querySelectorAll('.list-row').forEach(r => { r.style.display = (r.dataset.search || '').includes(q) ? '' : 'none' });
-        }
-
-        // Modal
         function openModal(isEdit = false, id = null) {
-            const s = S[curSec];
-            document.getElementById('modal-title').textContent = isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลใหม่';
+            const schema = SCHEMAS[currentSection];
+            document.getElementById('modal-title').innerHTML = `<div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-${isEdit ? 'pen-to-square' : 'plus-circle'} text-indigo-500 text-sm"></i></div> ${isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลใหม่'}`;
             document.getElementById('field-id').value = id || '';
-            const item = isEdit && id ? curData.find(d => d.id == id) || {} : {};
-            document.getElementById('form-fields').innerHTML = s.fields.filter(f => f.type !== 'header').map(f => {
-                let v = item[f.key] || '';
-                let inp;
-                if (f.type === 'textarea') inp = `<textarea name="${f.key}" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none;min-height:80px;resize:vertical;font-family:'Sarabun'" ${f.req ? 'required' : ''}>${v}</textarea>`;
-                else if (f.type === 'select') inp = `<select name="${f.key}" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none">${f.options.map(o => `<option ${v === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
-                else inp = `<input type="${f.type}" name="${f.key}" value="${v}" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;outline:none;font-family:'Sarabun'" ${f.req ? 'required' : ''}>`;
-                return `<div class="field-row"><label>${f.label}</label>${inp}</div>`;
+            let item = (isEdit && id) ? currentData.find(d => d.id == id) || {} : {};
+            const inputClass = "w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300";
+            document.getElementById('form-fields').innerHTML = schema.fields.map(f => {
+                if (f.type === 'header') return '';
+                let val = item[f.key] || '';
+                let inp = f.type === 'select' ? `<select name="${f.key}" class="${inputClass}">${f.options.map(o => `<option value="${o}" ${val === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : `<input type="${f.type}" name="${f.key}" value="${val}" class="${inputClass}" ${f.required ? 'required' : ''}>`;
+                return `<div class="mb-4"><label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">${f.label}</label>${inp}</div>`;
             }).join('');
             document.getElementById('modal').classList.remove('hidden');
         }
-        function closeModal() { document.getElementById('modal').classList.add('hidden') }
-        window.editItem = id => openModal(true, id);
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        window.editItem = (id) => openModal(true, id);
 
         async function submitForm() {
-            const form = document.getElementById('data-form');
-            if (!form.checkValidity()) { form.reportValidity(); return }
-            const d = Object.fromEntries(new FormData(form).entries()); const id = d.id; delete d.id;
-            Object.keys(d).forEach(k => { if (d[k] === '') d[k] = null });
-            const { error } = id ? await sb.from(curSec).update(d).eq('id', id) : await sb.from(curSec).insert([d]);
-            if (error) Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
-            else { closeModal(); loadSection(curSec); Swal.fire({ icon: 'success', title: 'บันทึกแล้ว!', timer: 1200, showConfirmButton: false }) }
+            const form = document.getElementById('data-form'); if (!form.checkValidity()) { form.reportValidity(); return; }
+            const formData = new FormData(form); const data = Object.fromEntries(formData.entries());
+            const id = data.id; delete data.id; Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
+            const { error } = id ? await supabaseAdmin.from(currentSection).update(data).eq('id', id) : await supabaseAdmin.from(currentSection).insert([data]);
+            if (error) Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#6366f1' });
+            else { closeModal(); loadSection(currentSection); Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'บันทึกข้อมูลเรียบร้อย', confirmButtonColor: '#6366f1' }); }
         }
-
         async function deleteItem(id) {
-            const r = await Swal.fire({ title: 'ยืนยันลบ?', text: 'จะลบข้อมูลนี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
-            if (r.isConfirmed) { await sb.from(curSec).delete().eq('id', id); loadSection(curSec); Swal.fire({ icon: 'success', title: 'ลบแล้ว!', timer: 1200, showConfirmButton: false }) }
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: 'ข้อมูลนี้จะถูกลบถาวร',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก'
+            });
+            if (!result.isConfirmed) return;
+            const { error } = await supabaseAdmin.from(currentSection).delete().eq('id', id);
+            if (!error) loadSection(currentSection);
         }
-
-        showDashboard();
     </script>
 </body>
 
