@@ -4,16 +4,16 @@
 let allTeacherData = [];
 let allStudentData = [];
 let allSchoolData = [];
-let onetData = []; 
-let ntData = [];   
-let rtData = [];   
+let onetData = [];
+let ntData = [];
+let rtData = [];
 let allNewsData = [];
 let allOfficialDocs = [];
 let allFormDocs = [];
-let allInnovationsData = []; 
+let allInnovationsData = [];
 
 // --- Config ---
-const ACH_ITEMS_PER_PAGE = 8; 
+const ACH_ITEMS_PER_PAGE = 8;
 const NEWS_ITEMS_PER_PAGE = 6;
 const DOCS_ITEMS_PER_PAGE = 10;
 const INNOV_ITEMS_PER_PAGE = 6;
@@ -40,7 +40,7 @@ function formatDateThai(dateString) {
 function renderPagination(containerId, totalItems, perPage, currentPage, callbackName) {
     const totalPages = Math.ceil(totalItems / perPage);
     const container = document.getElementById(containerId);
-    if (!container || totalPages <= 1) { if(container) container.innerHTML = ''; return; }
+    if (!container || totalPages <= 1) { if (container) container.innerHTML = ''; return; }
 
     let html = `<div class="flex justify-center items-center gap-2 mt-10 animate-fade-in py-4">`;
     html += `<button onclick="${callbackName}(${Math.max(1, currentPage - 1)}); window.scrollTo({top:0, behavior:'smooth'})" 
@@ -101,7 +101,7 @@ export function renderSchoolInfo(dataList) {
     // Social Links (Flexible Column Check)
     const fbEl = document.getElementById('footer-facebook');
     const ytEl = document.getElementById('footer-youtube');
-    const fbLink = info.facebook_url || info.facebook; 
+    const fbLink = info.facebook_url || info.facebook;
     if (fbLink && fbEl) { fbEl.href = fbLink; fbEl.classList.remove('hidden'); }
     const ytLink = info.youtube_url || info.youtube;
     if (ytLink && ytEl) { ytEl.href = ytLink; ytEl.classList.remove('hidden'); }
@@ -112,10 +112,10 @@ export function renderSchoolInfo(dataList) {
     const logoPlaceholder = document.getElementById('logo-placeholder');
     if (info.logo_url) {
         if (logoHeader) { logoHeader.src = info.logo_url; logoHeader.classList.remove('hidden'); }
-        if (logoBasic) { 
-            logoBasic.src = info.logo_url; 
-            logoBasic.classList.remove('hidden'); 
-            if(logoPlaceholder) logoPlaceholder.classList.add('hidden'); 
+        if (logoBasic) {
+            logoBasic.src = info.logo_url;
+            logoBasic.classList.remove('hidden');
+            if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
         }
     }
 
@@ -131,11 +131,11 @@ export function renderSchoolInfo(dataList) {
         const mapContainer = document.getElementById('school-map-container');
         mapContainer.innerHTML = info.map_embed;
         const ifr = mapContainer.querySelector('iframe');
-        if(ifr) { 
-            ifr.style.width = "100%"; 
-            ifr.style.height = "100%"; 
-            ifr.style.border = "0"; 
-            ifr.style.borderRadius = "2rem"; 
+        if (ifr) {
+            ifr.style.width = "100%";
+            ifr.style.height = "100%";
+            ifr.style.border = "0";
+            ifr.style.borderRadius = "2rem";
         }
     }
 
@@ -146,10 +146,10 @@ export function renderSchoolInfo(dataList) {
             if (info.vtr_url.includes('v=')) videoId = info.vtr_url.split('v=')[1].split('&')[0];
             else if (info.vtr_url.includes('youtu.be/')) videoId = info.vtr_url.split('youtu.be/')[1].split('?')[0];
             else if (info.vtr_url.includes('embed/')) videoId = info.vtr_url.split('embed/')[1].split('?')[0];
-        } catch (e) {}
+        } catch (e) { }
         if (videoId) {
             document.getElementById('vtr-iframe').src = `https://www.youtube.com/embed/${videoId}`;
-            if(document.getElementById('vtr-placeholder')) document.getElementById('vtr-placeholder').classList.add('hidden');
+            if (document.getElementById('vtr-placeholder')) document.getElementById('vtr-placeholder').classList.add('hidden');
         }
     }
 
@@ -186,7 +186,7 @@ export function renderAnnouncement(info) {
 // Function สำหรับปิด Announcement
 window.closeAnnouncement = () => {
     const modal = document.getElementById('announcement-modal');
-    if(modal) modal.classList.add('hidden');
+    if (modal) modal.classList.add('hidden');
 };
 
 // =============================================================================
@@ -207,8 +207,8 @@ export function renderAchievementSystem(containerId, data, type, page = 1) {
         const groups = data.reduce((acc, item) => {
             const key = item.competition || 'รายการอื่นๆ';
             if (!acc[key]) acc[key] = { count: 0, latestImage: item.image };
-            acc[key].count++; 
-            if(!acc[key].latestImage && item.image) acc[key].latestImage = item.image;
+            acc[key].count++;
+            if (!acc[key].latestImage && item.image) acc[key].latestImage = item.image;
             return acc;
         }, {});
 
@@ -283,7 +283,7 @@ export function renderAchievementSystem(containerId, data, type, page = 1) {
 
         const pagId = `${containerId}-pagination`;
         let pagDiv = document.getElementById(pagId);
-        if(!pagDiv) { pagDiv = document.createElement('div'); pagDiv.id = pagId; container.appendChild(pagDiv); }
+        if (!pagDiv) { pagDiv = document.createElement('div'); pagDiv.id = pagId; container.appendChild(pagDiv); }
         renderPagination(pagId, data.length, ACH_ITEMS_PER_PAGE, page, `window.pagedAch_${type}`);
     }
 }
@@ -292,8 +292,8 @@ export function renderAchievementSystem(containerId, data, type, page = 1) {
 // 4. WINDOW BRIDGES & SEARCH LOGIC
 // =============================================================================
 
-window.selectFolder = (cid, type, name) => { 
-    currentFolderFilter = name; 
+window.selectFolder = (cid, type, name) => {
+    currentFolderFilter = name;
     let data = [];
     if (type === 'teacher') data = allTeacherData.filter(i => (i.competition || 'รายการอื่นๆ') === name);
     else if (type === 'student') data = allStudentData.filter(i => (i.competition || 'รายการอื่นๆ') === name);
@@ -301,28 +301,93 @@ window.selectFolder = (cid, type, name) => {
     else if (type === 'onet') data = onetData.filter(i => (i.competition || 'รายการอื่นๆ') === name);
     else if (type === 'nt') data = ntData.filter(i => (i.competition || 'รายการอื่นๆ') === name);
     else if (type === 'rt') data = rtData.filter(i => (i.competition || 'รายการอื่นๆ') === name);
-    renderAchievementSystem(cid, data, type, 1); 
+    renderAchievementSystem(cid, data, type, 1);
 };
 
-window.clearFolderFilter = (cid, type) => { 
-    currentFolderFilter = null; 
+window.clearFolderFilter = (cid, type) => {
+    currentFolderFilter = null;
     let data = [];
     if (type === 'teacher') data = allTeacherData;
     else if (type === 'student') data = allStudentData;
-    else if (type === 'school') data = allSchoolData.filter(i => !['O-NET','NT','RT'].some(k => (i.title+i.competition).includes(k)));
+    else if (type === 'school') data = allSchoolData.filter(i => !['O-NET', 'NT', 'RT'].some(k => (i.title + i.competition).includes(k)));
     else if (type === 'onet') data = onetData;
     else if (type === 'nt') data = ntData;
     else if (type === 'rt') data = rtData;
-    renderAchievementSystem(cid, data, type, 1); 
+    renderAchievementSystem(cid, data, type, 1);
 };
 
-window.filterAchievements = (inputId, type, containerId) => {
+window.filterAchievements = (inputId, selectOrType, containerId) => {
     const val = document.getElementById(inputId).value.toLowerCase().trim();
-    let source = (type==='teacher') ? allTeacherData : (type==='student' ? allStudentData : allSchoolData);
-    if(type==='onet') source = onetData; if(type==='nt') source = ntData; if(type==='rt') source = rtData;
-    const f = source.filter(i => [i.title, i.students, i.name, i.competition, i.subject].join(' ').toLowerCase().includes(val));
-    currentFolderFilter = val ? `ผลการค้นหา: "${val}"` : null;
+    // Determine the type from containerId
+    let type;
+    if (containerId.includes('teacher')) type = 'teacher';
+    else if (containerId.includes('student')) type = 'student';
+    else if (containerId.includes('school')) type = 'school';
+    else if (containerId.includes('onet')) type = 'onet';
+    else if (containerId.includes('nt-')) type = 'nt';
+    else if (containerId.includes('rt')) type = 'rt';
+    else type = selectOrType; // fallback to old behavior
+
+    let source = (type === 'teacher') ? allTeacherData : (type === 'student' ? allStudentData : allSchoolData);
+    if (type === 'onet') source = onetData; if (type === 'nt') source = ntData; if (type === 'rt') source = rtData;
+
+    // Read the level select filter if it exists
+    const selectEl = document.getElementById(selectOrType);
+    const levelFilter = (selectEl && selectEl.tagName === 'SELECT') ? selectEl.value : 'all';
+
+    const f = source.filter(i => {
+        const textMatch = !val || [i.title, i.students, i.name, i.competition, i.subject, i.program].join(' ').toLowerCase().includes(val);
+        const levelMatch = !levelFilter || levelFilter === 'all' || [i.level, i.competition, i.program].join(' ').includes(levelFilter);
+        return textMatch && levelMatch;
+    });
+    currentFolderFilter = (val || (levelFilter && levelFilter !== 'all')) ? `ผลการค้นหา` : null;
     renderAchievementSystem(containerId, f, type, 1);
+};
+
+// ✅ News Filter
+window.filterNews = (inputId, containerId) => {
+    const val = document.getElementById(inputId).value.toLowerCase().trim();
+    const yearSelect = document.getElementById('filter-news-year');
+    const yearFilter = yearSelect ? yearSelect.value : '';
+    const filtered = allNewsData.filter(item => {
+        const textMatch = !val || item.title.toLowerCase().includes(val);
+        const yearMatch = !yearFilter || (item.academic_year && item.academic_year === yearFilter);
+        return textMatch && yearMatch;
+    });
+    renderNews(filtered, 1);
+};
+
+// ✅ Innovations Filter
+window.filterInnovations = (inputId) => {
+    const val = document.getElementById(inputId).value.toLowerCase().trim();
+    const subjectSelect = document.getElementById('filter-innovations-subject');
+    const subjectFilter = subjectSelect ? subjectSelect.value : '';
+    const filtered = allInnovationsData.filter(item => {
+        const textMatch = !val || `${item.title} ${item.creator} ${item.subject}`.toLowerCase().includes(val);
+        const subjectMatch = !subjectFilter || (item.subject && item.subject.includes(subjectFilter));
+        return textMatch && subjectMatch;
+    });
+    renderInnovations(filtered, 1);
+};
+
+// ✅ Documents Filter
+window.filterDocuments = (inputId, containerId) => {
+    const val = document.getElementById(inputId).value.toLowerCase().trim();
+    const isOfficial = containerId.includes('official');
+    const type = isOfficial ? 'official' : 'form';
+    const sourceData = isOfficial ? allOfficialDocs : allFormDocs;
+    if (val) {
+        const filtered = sourceData.filter(item => `${item.title} ${item.category}`.toLowerCase().includes(val));
+        currentDocFolder[type] = `ผลการค้นหา: "${val}"`;
+        // Re-render with filtered data in "open folder" mode
+        const container = document.getElementById(containerId); if (!container) return;
+        container.innerHTML = '';
+        const items = filtered.slice(0, DOCS_ITEMS_PER_PAGE);
+        container.innerHTML = `<div class="flex items-center justify-between bg-slate-50 p-4 rounded-[2rem] border border-slate-100 mb-6"><h3 class="font-bold text-lg text-slate-700 flex items-center gap-3 ml-2"><i class="fa-solid fa-search text-blue-500"></i> พบ ${filtered.length} รายการ</h3><button onclick="document.getElementById('${inputId}').value=''; window.clearDocFolder('${containerId}', '${type}')" class="text-[10px] font-black uppercase bg-white px-5 py-2.5 rounded-full border border-slate-200 transition-all hover:bg-slate-800 hover:text-white">ล้าง</button></div><div class="grid grid-cols-1 gap-3">${items.map(doc => `<div class="group bg-white p-4 rounded-[1.5rem] border border-slate-100 flex items-center justify-between hover:shadow-lg transition-all cursor-pointer" onclick="window.open('${doc.fileUrl}', '_blank')"><div class="flex items-center gap-5 overflow-hidden"><div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-xl text-slate-400 shrink-0"><i class="fa-solid fa-file-lines"></i></div><div class="min-w-0"><h4 class="font-bold text-sm text-slate-700 truncate">${doc.title}</h4><p class="text-[10px] font-bold text-slate-400 uppercase mt-1"><i class="fa-regular fa-clock"></i> ${formatDateThai(doc.uploadDate)}</p></div></div><div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-download text-xs"></i></div></div>`).join('')}</div>`;
+    } else {
+        currentDocFolder[type] = null;
+        renderDocumentSystem(sourceData, containerId, type, 1);
+    }
 };
 
 // Pagination Bridges
@@ -337,17 +402,17 @@ window.pagedAch_rt = (p) => renderAchievementSystem('rt-container', rtData, 'rt'
 // 5. OTHER RENDERERS
 // =============================================================================
 
-export function renderSchoolAchievements(data) { 
+export function renderSchoolAchievements(data) {
     if (!data) return;
-    allSchoolData = data; 
+    allSchoolData = data;
     onetData = allSchoolData.filter(i => (i.title + i.competition).includes('O-NET'));
     ntData = allSchoolData.filter(i => (i.title + i.competition).includes('NT'));
     rtData = allSchoolData.filter(i => (i.title + i.competition).includes('RT'));
-    const general = allSchoolData.filter(i => !['O-NET','NT','RT'].some(k => (i.title+i.competition).includes(k)));
-    renderAchievementSystem('school-achievements-container', general, 'school'); 
-    if(document.getElementById('onet-container')) renderAchievementSystem('onet-container', onetData, 'onet');
-    if(document.getElementById('nt-container')) renderAchievementSystem('nt-container', ntData, 'nt');
-    if(document.getElementById('rt-container')) renderAchievementSystem('rt-container', rtData, 'rt');
+    const general = allSchoolData.filter(i => !['O-NET', 'NT', 'RT'].some(k => (i.title + i.competition).includes(k)));
+    renderAchievementSystem('school-achievements-container', general, 'school');
+    if (document.getElementById('onet-container')) renderAchievementSystem('onet-container', onetData, 'onet');
+    if (document.getElementById('nt-container')) renderAchievementSystem('nt-container', ntData, 'nt');
+    if (document.getElementById('rt-container')) renderAchievementSystem('rt-container', rtData, 'rt');
 }
 
 export function renderTeacherAchievements(data) { allTeacherData = data; renderAchievementSystem('teacher-achievements-container', data, 'teacher'); }
@@ -359,13 +424,13 @@ export function renderNews(data, page = 1) {
     const container = document.getElementById('news-container');
     if (!container) return;
     container.innerHTML = '';
-    const items = data.slice((page-1)*NEWS_ITEMS_PER_PAGE, page*NEWS_ITEMS_PER_PAGE);
+    const items = data.slice((page - 1) * NEWS_ITEMS_PER_PAGE, page * NEWS_ITEMS_PER_PAGE);
     items.forEach(news => {
         const div = document.createElement('div');
         div.className = "bg-white/80 border border-slate-100 rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row gap-6 mb-6 group cursor-pointer";
-        div.onclick = () => { if(news.link) window.open(news.link, '_blank'); };
+        div.onclick = () => { if (news.link) window.open(news.link, '_blank'); };
         // ✅ เปลี่ยนมาใช้ formatDateThai
-        div.innerHTML = `<div class="w-full md:w-64 h-48 bg-slate-100 rounded-[1.5rem] overflow-hidden shrink-0 relative">${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-[1.5s]">` : ''}<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[9px] font-black text-slate-500 border border-white">News</div></div><div class="flex-1 flex flex-col justify-between py-1"><div class="space-y-3"><h4 class="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">${news.title}</h4><p class="text-slate-500 text-sm leading-relaxed">ข้อมูลประชาสัมพันธ์วันที่ ${formatDateThai(news.date)}</p></div><div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-50"><span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400"></i> ${formatDateThai(news.date)}</span><span class="text-blue-600 text-[10px] font-black group-hover:translate-x-2 transition-transform">Read More <i class="fa-solid fa-arrow-right"></i></span></div></div>`;
+        div.innerHTML = `<div class="w-full md:w-64 h-48 bg-slate-100 rounded-[1.5rem] overflow-hidden shrink-0 relative">${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-[1.5s]">` : ''}<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[9px] font-black text-slate-500 border border-white">News</div></div><div class="flex-1 flex flex-col justify-between py-1"><div class="space-y-3"><h4 class="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">${news.title}</h4><p class="text-slate-500 text-sm leading-relaxed flex items-center gap-2 flex-wrap">ข้อมูลประชาสัมพันธ์วันที่ ${formatDateThai(news.date)}${news.academic_year ? ` <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full border border-indigo-100">ปี ${news.academic_year}</span>` : ''}</p></div><div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-50"><span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400"></i> ${formatDateThai(news.date)}</span><span class="text-blue-600 text-[10px] font-black group-hover:translate-x-2 transition-transform">Read More <i class="fa-solid fa-arrow-right"></i></span></div></div>`;
         container.appendChild(div);
     });
     renderPagination('news-pagination', data.length, NEWS_ITEMS_PER_PAGE, page, "window.pagedNews");
@@ -377,7 +442,7 @@ export function renderInnovations(data, page = 1) {
     const container = document.getElementById('innovations-container');
     if (!container) return;
     container.innerHTML = '';
-    const items = data.slice((page-1)*INNOV_ITEMS_PER_PAGE, page*INNOV_ITEMS_PER_PAGE);
+    const items = data.slice((page - 1) * INNOV_ITEMS_PER_PAGE, page * INNOV_ITEMS_PER_PAGE);
     container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in";
     items.forEach(item => {
         const div = document.createElement('div');
@@ -392,7 +457,7 @@ window.pagedInnovations = (p) => renderInnovations(allInnovationsData, p);
 
 export function renderDocumentSystem(data, containerId, type = 'official', page = 1) {
     const container = document.getElementById(containerId); if (!container) return;
-    if(type === 'official') allOfficialDocs = data; else allFormDocs = data;
+    if (type === 'official') allOfficialDocs = data; else allFormDocs = data;
     const current = currentDocFolder[type]; container.innerHTML = '';
     if (current === null) {
         const groups = data.reduce((acc, item) => { const key = item.category || 'ทั่วไป'; if (!acc[key]) acc[key] = 0; acc[key]++; return acc; }, {});
@@ -401,7 +466,7 @@ export function renderDocumentSystem(data, containerId, type = 'official', page 
         container.appendChild(grid);
     } else {
         const filtered = data.filter(item => (item.category || 'ทั่วไป') === current);
-        const items = filtered.slice((page-1)*DOCS_ITEMS_PER_PAGE, page*DOCS_ITEMS_PER_PAGE);
+        const items = filtered.slice((page - 1) * DOCS_ITEMS_PER_PAGE, page * DOCS_ITEMS_PER_PAGE);
         // ✅ เปลี่ยนมาใช้ formatDateThai (uploadDate)
         container.innerHTML = `<div class="flex items-center justify-between bg-slate-50 p-4 rounded-[2rem] border border-slate-100 mb-6"><h3 class="font-bold text-lg text-slate-700 flex items-center gap-3 ml-2"><i class="fa-solid fa-folder-open text-amber-500"></i> ${current}</h3><button onclick="window.clearDocFolder('${containerId}', '${type}')" class="text-[10px] font-black uppercase bg-white px-5 py-2.5 rounded-full border border-slate-200 transition-all">ย้อนกลับ</button></div><div class="grid grid-cols-1 gap-3">${items.map(doc => `<div class="group bg-white p-4 rounded-[1.5rem] border border-slate-100 flex items-center justify-between hover:shadow-lg transition-all cursor-pointer" onclick="window.open('${doc.fileUrl}', '_blank')"><div class="flex items-center gap-5 overflow-hidden"><div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-xl text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-50 transition-colors shrink-0"><i class="fa-solid fa-file-lines"></i></div><div class="min-w-0"><h4 class="font-bold text-sm text-slate-700 truncate">${doc.title}</h4><p class="text-[10px] font-bold text-slate-400 uppercase mt-1"><i class="fa-regular fa-clock"></i> ${formatDateThai(doc.uploadDate)}</p></div></div><div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-download text-xs"></i></div></div>`).join('')}</div><div id="${containerId}-pagination"></div>`;
         renderPagination(`${containerId}-pagination`, filtered.length, DOCS_ITEMS_PER_PAGE, page, `window.pagedDoc_${type}`);
@@ -412,7 +477,7 @@ window.clearDocFolder = (cid, type) => { currentDocFolder[type] = null; const da
 
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId); if (!container) return; container.innerHTML = '';
-    const sorted = [...data].sort((a,b) => a.id - b.id);
+    const sorted = [...data].sort((a, b) => a.id - b.id);
     const createCard = (p, isL = false) => `<div class="relative group rounded-[2.5rem] p-8 ${isL ? 'bg-gradient-to-b from-white to-blue-50 border-blue-100 shadow-xl' : 'bg-white border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2'} border overflow-hidden transition-all duration-700 flex flex-col items-center text-center h-full"><div class="w-32 h-32 rounded-full overflow-hidden border-[6px] ${isL ? 'border-blue-100 ring-4 ring-blue-50' : 'border-white shadow-md'} bg-white mb-6 group-hover:scale-105 transition duration-700 relative z-10">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-5xl"><i class="fa-solid fa-user"></i></div>`}</div><div class="relative z-10 w-full"><h3 class="text-lg font-bold text-slate-800 mb-2">${p.name}</h3><div class="inline-block px-4 py-1 bg-slate-50 rounded-full border border-slate-100 shadow-sm"><p class="text-[10px] font-black text-slate-500 uppercase">${p.role}</p></div></div></div>`;
     if (sorted[0]) container.innerHTML += `<div class="flex justify-center mb-12 animate-fade-in"><div class="w-full max-w-sm">${createCard(sorted[0], true)}</div></div>`;
     if (sorted.slice(1).length > 0) { let g = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">`; sorted.slice(1).forEach(p => g += createCard(p)); g += `</div>`; container.innerHTML += g; }
@@ -422,20 +487,20 @@ export function renderHistoryTable(tbodyId, data) {
     const c = document.getElementById(tbodyId); if (!c) return;
     const isT = c.tagName === 'TBODY'; const target = isT ? c.closest('table').parentElement : c;
     if (isT) c.closest('table').style.display = 'none'; target.innerHTML = '';
-    [...data].sort((a,b) => b.id - a.id).forEach(i => { target.innerHTML += `<div class="group bg-white rounded-[2rem] p-4 border border-slate-100 shadow-sm hover:shadow-lg transition-all flex items-center gap-6 mb-4"><div class="w-20 h-20 rounded-2xl bg-slate-50 overflow-hidden shrink-0 group-hover:scale-105 transition border border-slate-100">${i.image ? `<img class="h-full w-full object-cover" src="${i.image}">` : ''}</div><div class="flex-1"><h4 class="font-bold text-lg text-slate-800">${i.name}</h4><p class="text-xs text-slate-500 font-bold uppercase mt-1">${i.role || '-'}</p></div><div class="px-4 py-1.5 bg-amber-50 text-amber-600 text-[10px] font-black uppercase rounded-full border border-amber-100 whitespace-nowrap">${i.year || '-'}</div></div>`; });
+    [...data].sort((a, b) => b.id - a.id).forEach(i => { target.innerHTML += `<div class="group bg-white rounded-[2rem] p-4 border border-slate-100 shadow-sm hover:shadow-lg transition-all flex items-center gap-6 mb-4"><div class="w-20 h-20 rounded-2xl bg-slate-50 overflow-hidden shrink-0 group-hover:scale-105 transition border border-slate-100">${i.image ? `<img class="h-full w-full object-cover" src="${i.image}">` : ''}</div><div class="flex-1"><h4 class="font-bold text-lg text-slate-800">${i.name}</h4><p class="text-xs text-slate-500 font-bold uppercase mt-1">${i.role || '-'}</p></div><div class="px-4 py-1.5 bg-amber-50 text-amber-600 text-[10px] font-black uppercase rounded-full border border-amber-100 whitespace-nowrap">${i.year || '-'}</div></div>`; });
 }
 
 export function renderStudentChart(data) {
     const c = document.getElementById('student-summary-container'); const canvas = document.getElementById('studentChart');
     if (!data || data.length === 0) return; let tM = 0, tF = 0; data.forEach(d => { tM += parseInt(d.male || 0); tF += parseInt(d.female || 0); });
-    if (c) c.innerHTML = `<div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"><div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-[2.5rem] p-6 shadow-xl text-white flex items-center gap-5"><div><p class="text-[10px] font-bold opacity-70 uppercase">ทั้งหมด</p><h3 class="text-3xl font-black">${tM+tF}</h3></div></div><div class="bg-white rounded-[2.5rem] p-6 shadow-lg border border-sky-100 flex items-center gap-5"><div><p class="text-[10px] font-bold text-sky-400 uppercase">ชาย</p><h3 class="text-3xl font-black text-slate-800">${tM}</h3></div></div><div class="bg-white rounded-[2.5rem] p-6 shadow-lg border border-pink-100 flex items-center gap-5"><div><p class="text-[10px] font-bold text-pink-400 uppercase">หญิง</p><h3 class="text-3xl font-black text-slate-800">${tF}</h3></div></div></div>`;
+    if (c) c.innerHTML = `<div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"><div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-[2.5rem] p-6 shadow-xl text-white flex items-center gap-5"><div><p class="text-[10px] font-bold opacity-70 uppercase">ทั้งหมด</p><h3 class="text-3xl font-black">${tM + tF}</h3></div></div><div class="bg-white rounded-[2.5rem] p-6 shadow-lg border border-sky-100 flex items-center gap-5"><div><p class="text-[10px] font-bold text-sky-400 uppercase">ชาย</p><h3 class="text-3xl font-black text-slate-800">${tM}</h3></div></div><div class="bg-white rounded-[2.5rem] p-6 shadow-lg border border-pink-100 flex items-center gap-5"><div><p class="text-[10px] font-bold text-pink-400 uppercase">หญิง</p><h3 class="text-3xl font-black text-slate-800">${tF}</h3></div></div></div>`;
     if (canvas && window.Chart) { if (window.myStudentChart) window.myStudentChart.destroy(); window.myStudentChart = new Chart(canvas, { type: 'bar', data: { labels: data.map(d => d.grade), datasets: [{ label: 'ชาย', data: data.map(d => d.male), backgroundColor: '#0ea5e9', borderRadius: 6 }, { label: 'หญิง', data: data.map(d => d.female), backgroundColor: '#ec4899', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } } }); }
 }
 
-export function renderHomeNews(newsList) { 
-    const c = document.getElementById('home-news-container'); if(!c) return; c.innerHTML = '';
+export function renderHomeNews(newsList) {
+    const c = document.getElementById('home-news-container'); if (!c) return; c.innerHTML = '';
     // ✅ เปลี่ยนมาใช้ formatDateThai ในหน้าแรกด้วย
-    [...newsList].sort((a, b) => b.id - a.id).slice(0,4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; }); 
+    [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
 }
 
 console.log("Lumina Final Super Full Version: Connected with Maps, Colors & Announcement System");
