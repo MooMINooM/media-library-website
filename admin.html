@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏫</text></svg>">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        /* Sidebar scrollbar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Menu group animation */
+        .menu-group-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            opacity: 0;
+        }
+
+        .menu-group-items.open {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* Active menu item */
+        .admin-menu-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+            color: #a5b4fc;
+            border-left: 3px solid #818cf8;
+        }
+
+        /* Menu group header */
+        .menu-group-header {
+            transition: all 0.2s ease;
+        }
+
+        .menu-group-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-group-header .chevron {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-group-header.expanded .chevron {
+            transform: rotate(90deg);
+        }
+
+        /* Fade in animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Upload image button */
+        .upload-img-btn {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 12px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1.5px dashed #cbd5e1;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .upload-img-btn:hover {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #6366f1;
+        }
+        .upload-img-btn.uploading {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #6366f1;
+            pointer-events: none;
+        }
+        .img-preview-thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1.5px solid #e2e8f0;
+            flex-shrink: 0;
+            display: none;
+        }
+        .img-field-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .img-field-wrap input {
+            flex: 1;
+            min-width: 0;
+        }
+        .gdrive-btn {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0 11px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .gdrive-btn:hover {
+            border-color: #4285f4;
+            background: #f0f5ff;
+            color: #4285f4;
+        }
+        .gdrive-converted {
+            animation: gdrive-flash 0.5s ease;
+        }
+        @keyframes gdrive-flash {
+            0%   { background: #d1fae5; }
+            100% { background: transparent; }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Modal backdrop */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="flex h-screen bg-slate-100/80 overflow-hidden font-sans">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="w-[280px] bg-slate-900 flex flex-col z-20 shadow-2xl relative overflow-hidden flex-shrink-0">
+        <!-- Decorative gradient blob -->
+        <div class="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-[60px] pointer-events-none">
+        </div>
+        <div class="absolute bottom-0 left-0 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px] pointer-events-none">
+        </div>
+
+        <!-- Logo -->
+        <div class="p-5 flex items-center gap-3 relative z-10">
+            <div
+                class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-school"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-white text-base tracking-tight">Admin Panel</h1>
+                <p class="text-[10px] text-slate-500 font-medium tracking-wider uppercase">School Management</p>
+            </div>
+        </div>
+
+        <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mx-4"></div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-4 space-y-1 relative z-10">
+
+            <!-- Group 1: ข้อมูลสถานศึกษา -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-school text-indigo-400 w-4 text-center"></i>
+                        <span>ข้อมูลสถานศึกษา</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('school_info')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-gear w-4 text-center text-xs"></i> ข้อมูลพื้นฐาน & เกี่ยวกับ ร.ร.
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 2: บุคลากร & นักเรียน -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-users text-emerald-400 w-4 text-center"></i>
+                        <span>บุคลากร & นักเรียน</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('personnel')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-user-tie w-4 text-center text-xs"></i> บุคลากรปัจจุบัน
+                    </button>
+                    <button onclick="loadSection('personnel_history')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-clock-rotate-left w-4 text-center text-xs"></i> ทำเนียบบุคลากร
+                    </button>
+                    <button onclick="loadSection('student_data')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-pie w-4 text-center text-xs"></i> ข้อมูลนักเรียน
+                    </button>
+                    <button onclick="loadSection('school_board')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-users-rectangle w-4 text-center text-xs"></i> คณะกรรมการสถานศึกษา
+                    </button>
+                    <button onclick="loadSection('student_council')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-user-graduate w-4 text-center text-xs"></i> สภานักเรียน
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 3: ข่าวสาร & ผลงาน -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-newspaper text-amber-400 w-4 text-center"></i>
+                        <span>ข่าวสาร & ผลงาน</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadSection('news')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-newspaper w-4 text-center text-xs"></i> ข่าวสาร
+                    </button>
+                    <button onclick="loadSection('teacher_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-medal w-4 text-center text-xs"></i> ผลงานครู
+                    </button>
+                    <button onclick="loadSection('student_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-trophy w-4 text-center text-xs"></i> ผลงานนักเรียน
+                    </button>
+                    <button onclick="loadSection('school_awards')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-award w-4 text-center text-xs"></i> ผลงานโรงเรียน
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 4: วิชาการ -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-sky-400 w-4 text-center"></i>
+                        <span>วิชาการ</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items">
+                    <button onclick="loadAcademicSection('onet')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-line w-4 text-center text-xs text-emerald-400"></i> ผลสัมฤทธิ์ O-NET
+                    </button>
+                    <button onclick="loadAcademicSection('nt')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chart-simple w-4 text-center text-xs text-blue-400"></i> ผลสัมฤทธิ์ NT
+                    </button>
+                    <button onclick="loadAcademicSection('rt')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-book-open w-4 text-center text-xs text-violet-400"></i> ผลสัมฤทธิ์ RT
+                    </button>
+                    <button onclick="loadSection('innovations')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-lightbulb w-4 text-center text-xs text-amber-400"></i> นวัตกรรม
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 5: เอกสาร & ระบบ -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-folder-open text-rose-400 w-4 text-center"></i>
+                        <span>เอกสาร & ระบบ</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items">
+                    <button onclick="loadSection('eservices')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-link w-4 text-center text-xs text-orange-400"></i> ลิงก์ระบบสารสนเทศ
+                    </button>
+                    <button onclick="loadSection('documents')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-file-pdf w-4 text-center text-xs text-red-400"></i> เอกสารราชการ
+                    </button>
+                    <button onclick="loadSection('forms')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-file-lines w-4 text-center text-xs text-cyan-400"></i> แบบฟอร์ม
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 6: ปฏิทิน & แกลลอรี่ -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-images text-pink-400 w-4 text-center"></i>
+                        <span>ปฏิทิน & แกลลอรี่</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items">
+                    <button onclick="loadSection('calendar_events')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-regular fa-calendar w-4 text-center text-xs text-indigo-400"></i> ปฏิทินกิจกรรม
+                    </button>
+                    <button onclick="loadSection('gallery_albums')"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-images w-4 text-center text-xs text-pink-400"></i> จัดการแกลลอรี่
+                    </button>
+                </div>
+            </div>
+
+        </nav>
+
+        <!-- Logout -->
+        <div class="p-3 relative z-10">
+            <div class="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-3"></div>
+            <button onclick="logout()"
+                class="w-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 py-2.5 rounded-xl font-semibold transition-all flex justify-center items-center gap-2 text-sm border border-white/5 hover:border-red-500/30">
+                <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
+            </button>
+        </div>
+    </aside>
+
+    <!-- ============ MAIN AREA ============ -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- Top Header Bar -->
+        <header
+            class="h-16 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 flex-shrink-0 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 text-sm text-slate-400">
+                    <i class="fa-solid fa-house text-xs"></i>
+                    <span>/</span>
+                    <span id="breadcrumb-text" class="text-slate-700 font-semibold">Dashboard</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-slate-500 font-medium">ระบบจัดการข้อมูล</p>
+                    <p class="text-[10px] text-slate-400" id="current-time"></p>
+                </div>
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto bg-slate-50" id="main-area">
+            <div class="h-full flex items-center justify-center text-slate-400 flex-col animate-fade-in-up">
+                <div
+                    class="w-24 h-24 rounded-3xl bg-white shadow-xl shadow-indigo-500/5 flex items-center justify-center mb-6 border border-slate-100">
+                    <i class="fa-solid fa-school-circle-check text-5xl text-indigo-200"></i>
+                </div>
+                <p class="text-lg font-semibold text-slate-600 mb-1">ยินดีต้อนรับสู่ระบบจัดการ</p>
+                <p class="text-sm text-slate-400">เลือกเมนูทางซ้ายเพื่อเริ่มจัดการข้อมูล</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============ MODAL ============ -->
+    <div id="modal"
+        class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-md p-4"
+        style="animation: modalFadeIn 0.2s ease">
+        <div class="bg-white p-0 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl shadow-slate-900/20 border border-slate-200/50"
+            style="animation: modalSlideIn 0.3s cubic-bezier(0.4,0,0.2,1) forwards">
+            <!-- Modal Header -->
+            <div
+                class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
+                <h2 id="modal-title" class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                        <i class="fa-solid fa-pen-to-square text-indigo-500 text-sm"></i>
+                    </div>
+                    จัดการข้อมูล
+                </h2>
+                <button onclick="closeModal()"
+                    class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="px-6 py-5 overflow-y-auto max-h-[60vh]">
+                <form id="data-form" class="space-y-4">
+                    <input type="hidden" name="id" id="field-id">
+                    <div id="form-fields"></div>
+                </form>
+            </div>
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <button onclick="submitForm()"
+                    class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-5 py-2.5 rounded-xl flex-1 font-bold shadow-lg shadow-indigo-500/20 transition-all hover:shadow-xl hover:shadow-indigo-500/30 text-sm">
+                    <i class="fa-solid fa-check mr-1"></i> บันทึกข้อมูล
+                </button>
+                <button onclick="closeModal()"
+                    class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl font-semibold transition-all text-sm">
+                    ยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co'; const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        let supabaseAdmin;
+        try { supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { console.error("Supabase Init Error:", e); }
+
+        // ============ COLLAPSIBLE MENU ============
+        function toggleGroup(btn) {
+            const items = btn.nextElementSibling;
+            const isOpen = items.classList.contains('open');
+            btn.classList.toggle('expanded', !isOpen);
+            items.classList.toggle('open', !isOpen);
+        }
+
+        // ============ CLOCK ============
+        function updateClock() {
+            const el = document.getElementById('current-time');
+            if (el) {
+                const now = new Date();
+                el.textContent = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' ' + now.toLocaleTimeString('th-TH');
+            }
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ============ SCHEMAS ============
+        const SCHEMAS = {
+            school_info: {
+                title: "ข้อมูลโรงเรียน", fields: [
+                    { type: "header", label: "--- 1. ข้อมูลพื้นฐาน ---" },
+                    { key: "school_code_10", label: "รหัสโรงเรียน 10 หลัก", type: "text" },
+                    { key: "smis_code_8", label: "รหัส Smis 8 หลัก", type: "text" },
+                    { key: "obec_code_6", label: "รหัส Obec 6 หลัก", type: "text" },
+                    { key: "school_name", label: "ชื่อสถานศึกษา (ไทย)", type: "text" },
+                    { key: "school_name_en", label: "ชื่อสถานศึกษา (อังกฤษ)", type: "text" },
+                    { key: "affiliation", label: "สังกัด", type: "text" },
+                    { key: "address", label: "ที่อยู่", type: "textarea", rows: 3 },
+
+                    { type: "header", label: "--- 2. เกี่ยวกับโรงเรียน ---" },
+                    { key: "founding_date", label: "วันที่ก่อตั้ง (เพื่อคำนวณอายุ)", type: "date" },
+                    { key: "history", label: "ประวัติของโรงเรียน", type: "textarea", rows: 5 },
+                    { key: "philosophy", label: "ปรัชญา", type: "text" },
+                    { key: "vision", label: "วิสัยทัศน์", type: "textarea", rows: 3 },
+                    { key: "mission", label: "พันธกิจ", type: "textarea", rows: 3 },
+
+                    { type: "header", label: "--- 3. อัตลักษณ์ & เอกลักษณ์ ---" },
+                    { key: "motto", label: "คำขวัญ", type: "text" },
+                    { key: "identity", label: "อัตลักษณ์", type: "text" },
+                    { key: "uniqueness", label: "เอกลักษณ์", type: "text" },
+
+                    { type: "header", label: "--- 4. รูปภาพ & สี ---" },
+                    { key: "logo_url", label: "ตราสัญลักษณ์ (URL รูป)", type: "url" },
+                    { key: "uniform_url", label: "รูปเครื่องแบบนักเรียน (URL รูป)", type: "url" },
+                    { key: "color_code_1", label: "สีประจำโรงเรียน 1", type: "color" },
+                    { key: "color_code_2", label: "สีประจำโรงเรียน 2", type: "color" },
+
+                    { type: "header", label: "--- 5. สื่อ & Social & แผนที่ ---" },
+                    { key: "vtr_url", label: "VTR (Youtube Link)", type: "url" },
+                    { key: "song_url", label: "เพลงโรงเรียน (File URL)", type: "url" },
+                    { key: "facebook", label: "Facebook URL", type: "url" },
+                    { key: "show_facebook_feed", label: "แสดง Facebook Feed ในหน้าแรก", type: "select", options: ["เปิดใช้งาน", "ปิดการใช้งาน"] },
+                    { key: "youtube", label: "Youtube Channel URL", type: "url" },
+                    { key: "map_embed", label: "Google Maps Embed Code (วางโค้ด iframe ที่นี่)", type: "textarea", rows: 4 },
+
+                    { type: "header", label: "--- 6. ป๊อปอัพประกาศพิเศษ (Popup Announcement) ---" },
+                    { key: "popup_img", label: "URL รูปภาพประกาศ (แสดงเมื่อเข้าเว็บ)", type: "url" },
+                    { key: "show_popup", label: "สถานะการแสดงป๊อปอัพ", type: "select", options: ["เปิดใช้งาน", "ปิดการใช้งาน"] },
+
+                    { type: "header", label: "--- 7. ข้อความวิ่งด้านบนเว็บ (Ticker) ---" },
+                    { key: "ticker_text", label: "ข้อความวิ่ง (คั่นแต่ละข้อความด้วย | เช่น ยินดีต้อนรับ | เปิดรับสมัคร ป.1 | )", type: "textarea", rows: 3 },
+
+                ]
+            },
+
+            personnel: { title: "บุคลากรปัจจุบัน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text", required: true }, { key: "role", label: "ตำแหน่ง", type: "text", required: true }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            personnel_history: { title: "ทำเนียบบุคลากร", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "year", label: "ปี/วาระ (เช่น 2560-2564)", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            student_data: { title: "ข้อมูลจำนวนนักเรียน", fields: [{ key: "grade", label: "ระดับชั้น", type: "text" }, { key: "male", label: "ชาย (คน)", type: "number" }, { key: "female", label: "หญิง (คน)", type: "number" }] },
+            school_board: { title: "คณะกรรมการสถานศึกษา", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            student_council: { title: "สภานักเรียน", fields: [{ key: "name", label: "ชื่อ-สกุล", type: "text" }, { key: "role", label: "ตำแหน่ง", type: "text" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }] },
+            news: { title: "ข่าวประชาสัมพันธ์", fields: [{ key: "title", label: "หัวข้อข่าว", type: "text", required: true }, { key: "academic_year", label: "ปีการศึกษา (เช่น 2568)", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "รูปภาพ (URL)", type: "url" }, { key: "link", label: "ลิงก์อ่านต่อ", type: "url" }] },
+            eservices: { title: "ลิงก์ระบบสารสนเทศ", fields: [{ key: "title", label: "ชื่อระบบ", type: "text", required: true }, { key: "url", label: "URL ปลายทาง", type: "url", required: true }] },
+            onet: { title: "ผลสัมฤทธิ์ O-NET", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            nt: { title: "ผลสัมฤทธิ์ NT", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            rt: { title: "ผลสัมฤทธิ์ RT", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "tag", label: "ปีการศึกษา", type: "text" }, { key: "file_url", label: "ไฟล์ (URL)", type: "url" }, { key: "date", label: "วันที่", type: "date" }] },
+            teacher_awards: { title: "ผลงานครู", fields: [{ key: "name", label: "ชื่อครู", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "รูปภาพ/เกียรติบัตร", type: "url" }] },
+            student_awards: { title: "ผลงานนักเรียน", fields: [{ key: "students", label: "ชื่อนักเรียน", type: "text" }, { key: "title", label: "รางวัล", type: "text" }, { key: "program", label: "รายการ", type: "text" }, { key: "competition", label: "รายการแข่ง", type: "text" }, { key: "image", label: "รูปภาพ/เกียรติบัตร", type: "url" }] },
+            school_awards: { title: "ผลงานโรงเรียน", fields: [{ key: "title", label: "ชื่อรางวัล", type: "text" }, { key: "date", label: "วันที่", type: "date" }, { key: "image", label: "รูปภาพ", type: "url" }] },
+            innovations: { title: "นวัตกรรม", fields: [{ key: "title", label: "ชื่อนวัตกรรม", type: "text" }, { key: "creator", label: "ผู้จัดทำ", type: "text" }, { key: "subject", label: "วิชา", type: "text" }, { key: "class", label: "ระดับชั้น", type: "text" }, { key: "fileUrl", label: "ไฟล์ผลงาน (URL)", type: "url" }, { key: "coverImageUrl", label: "รูปปก (URL)", type: "url" }] },
+            onet_settings: {
+                title: "รูปสรุปผล O-NET", singleRow: true, fields: [
+                    { key: "img_1", label: "รูปที่ 1 — ปีล่าสุด (URL)", type: "url" },
+                    { key: "img_2", label: "รูปที่ 2 (URL)", type: "url" },
+                    { key: "img_3", label: "รูปที่ 3 (URL)", type: "url" },
+                    { key: "img_4", label: "รูปที่ 4 — เปรียบเทียบย้อนหลัง (URL)", type: "url" }
+                ]
+            },
+            nt_settings: {
+                title: "รูปสรุปผล NT", singleRow: true, fields: [
+                    { key: "img_1", label: "รูปที่ 1 — ปีล่าสุด (URL)", type: "url" },
+                    { key: "img_2", label: "รูปที่ 2 (URL)", type: "url" },
+                    { key: "img_3", label: "รูปที่ 3 (URL)", type: "url" },
+                    { key: "img_4", label: "รูปที่ 4 — เปรียบเทียบย้อนหลัง (URL)", type: "url" }
+                ]
+            },
+            rt_settings: {
+                title: "รูปสรุปผล RT", singleRow: true, fields: [
+                    { key: "img_1", label: "รูปที่ 1 — ปีล่าสุด (URL)", type: "url" },
+                    { key: "img_2", label: "รูปที่ 2 (URL)", type: "url" },
+                    { key: "img_3", label: "รูปที่ 3 (URL)", type: "url" },
+                    { key: "img_4", label: "รูปที่ 4 — เปรียบเทียบย้อนหลัง (URL)", type: "url" }
+                ]
+            },
+            documents: { title: "เอกสารราชการ", fields: [{ key: "title", label: "ชื่อเอกสาร", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "ไฟล์ (URL)", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] },
+            forms: { title: "แบบฟอร์ม", fields: [{ key: "title", label: "ชื่อแบบฟอร์ม", type: "text" }, { key: "category", label: "หมวดหมู่", type: "text" }, { key: "fileUrl", label: "ไฟล์ (URL)", type: "url" }, { key: "uploadDate", label: "วันที่", type: "date" }] },
+            calendar_events: {
+                title: "ปฏิทินกิจกรรม", fields: [
+                    { key: "title", label: "ชื่อกิจกรรม", type: "text", required: true },
+                    { key: "type", label: "ประเภทกิจกรรม", type: "select", options: ["academic","activity","holiday","exam","other"] },
+                    { key: "start_date", label: "วันที่เริ่ม", type: "date", required: true },
+                    { key: "end_date", label: "วันที่สิ้นสุด (ถ้ามี)", type: "date" },
+                    { key: "description", label: "รายละเอียด", type: "text" },
+                    { key: "location", label: "สถานที่", type: "text" }
+                ]
+            },
+            gallery_albums: {
+                title: "แกลลอรี่อัลบั้ม", fields: [
+                    { key: "title", label: "ชื่ออัลบั้ม", type: "text", required: true },
+                    { key: "description", label: "คำอธิบาย", type: "text" },
+                    { key: "category", label: "หมวดหมู่", type: "select", options: ["academic","activity","sport","ceremony","other"] },
+                    { key: "album_url", label: "Link อัลบั้ม (Google Photos / Drive / อื่นๆ)", type: "url", required: true },
+                    { key: "cover_url", label: "URL รูปปกอัลบั้ม (ไม่บังคับ)", type: "url" },
+                    { key: "event_date", label: "วันที่จัดกิจกรรม", type: "date" },
+                    { key: "academic_year", label: "ปีการศึกษา (เช่น 2568)", type: "text" }
+                ]
+            }
+        };
+
+        let currentSection, currentData;
+        async function checkAuth() { try { const { data: { session } } = await supabaseAdmin.auth.getSession(); if (!session) window.location.href = 'index.html'; } catch (e) { } } checkAuth();
+        async function logout() { await supabaseAdmin.auth.signOut(); window.location.href = 'index.html'; }
+
+        async function loadSection(sec) {
+            currentSection = sec; const s = SCHEMAS[sec];
+            const main = document.getElementById('main-area');
+            main.innerHTML = `<div class="h-full flex items-center justify-center"><div class="flex flex-col items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-500"></i></div><p class="text-sm text-slate-400 font-medium">กำลังโหลดข้อมูล...</p></div></div>`;
+
+            // Update breadcrumb
+            document.getElementById('breadcrumb-text').textContent = s.title;
+
+            // Update active menu
+            document.querySelectorAll('.admin-menu-item').forEach(el => el.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            if (sec === 'school_info') {
+                const { data } = await supabaseAdmin.from(sec).select('*').limit(1).single();
+                renderForm(data || {});
+            } else {
+                const { data } = await supabaseAdmin.from(sec).select('*').order('id', { ascending: false });
+                currentData = data; renderList(s);
+            }
+        }
+
+        function renderForm(data) {
+            const f = SCHEMAS['school_info'].fields.map(field => {
+                if (field.type === 'header') return `<div class="pt-6 pb-2 first:pt-0"><h3 class="font-bold text-indigo-600 text-sm tracking-wide flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>${field.label.replace(/---/g, '').trim()}</h3><div class="h-px bg-gradient-to-r from-indigo-100 to-transparent mt-2"></div></div>`;
+                let val = data[field.key] || '';
+
+                if (field.key === 'show_popup') {
+                    val = (data[field.key] === true) ? "เปิดใช้งาน" : "ปิดการใช้งาน";
+                }
+                if (field.key === 'show_facebook_feed') {
+                    val = (data[field.key] === true || data[field.key] === 'เปิดใช้งาน') ? "เปิดใช้งาน" : "ปิดการใช้งาน";
+                }
+
+                let inp;
+                const inputClass = "w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300";
+
+                if (field.type === 'textarea') {
+                    inp = `<textarea id="si-${field.key}" class="${inputClass} resize-none" rows="${field.rows}">${val}</textarea>`;
+                } else if (field.type === 'color') {
+                    inp = `<div class="flex items-center gap-3"><input type="color" id="si-${field.key}" value="${val || '#000000'}" class="h-10 w-16 border border-slate-200 rounded-xl cursor-pointer"><span class="text-xs text-slate-400">เลือกสี</span></div>`;
+                } else if (field.type === 'select') {
+                    inp = `<select id="si-${field.key}" class="${inputClass}">
+                        ${field.options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>`;
+                } else {
+                    inp = `<input type="${field.type}" id="si-${field.key}" value="${val}" class="${inputClass}">`;
+                }
+
+                // URL fields ที่เป็นรูปภาพ → เพิ่มปุ่มอัปโหลด
+                if (field.type === 'url' && _isImageField(field.label)) {
+                    inp = _imgFieldHtml(inp, `si-${field.key}`, val);
+                }
+
+                return `<div><label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">${field.label}</label>${inp}</div>`;
+            }).join('');
+
+            document.getElementById('main-area').innerHTML = `<div class="max-w-4xl mx-auto animate-fade-in-up">
+                <div class="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-500/30">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">ข้อมูลโรงเรียน</h2>
+                            <p class="text-xs text-slate-400">จัดการข้อมูลพื้นฐานของสถานศึกษา</p>
+                        </div>
+                    </div>
+                    <form id="school-info-form" class="space-y-4">
+                        <input type="hidden" id="si-id" value="${data.id || ''}">
+                        ${f}
+                        <div class="pt-6">
+                            <button type="button" onclick="saveSchoolInfo()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 transition-all text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลโรงเรียน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>`;
+        }
+
+        async function saveSchoolInfo() {
+            const data = {}; const id = document.getElementById('si-id').value;
+            SCHEMAS['school_info'].fields.forEach(f => {
+                if (f.key) {
+                    let val = document.getElementById(`si-${f.key}`).value;
+                    if (f.key === 'show_popup') {
+                        data[f.key] = (val === "เปิดใช้งาน");
+                    } else if (f.key === 'show_facebook_feed') {
+                        data[f.key] = (val === "เปิดใช้งาน");
+                    } else {
+                        data[f.key] = val;
+                    }
+                }
+            });
+            const { error } = id ? await supabaseAdmin.from('school_info').update(data).eq('id', id) : await supabaseAdmin.from('school_info').insert([data]);
+            if (error) Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#6366f1' });
+            else Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'บันทึกเรียบร้อย', confirmButtonColor: '#6366f1' });
+        }
+
+        function renderList(s) {
+            const main = document.getElementById('main-area'); const key = s.fields[0].key;
+            let h = `<div class="animate-fade-in-up">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm shadow-lg shadow-indigo-500/30">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">${s.title}</h2>
+                            <p class="text-xs text-slate-400">${currentData ? currentData.length : 0} รายการ</p>
+                        </div>
+                    </div>
+                    <button onclick="openModal()" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 font-semibold flex items-center gap-2 text-sm transition-all hover:shadow-xl hover:shadow-indigo-500/30">
+                        <i class="fa-solid fa-plus"></i> เพิ่มข้อมูล
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="divide-y divide-slate-50">`;
+
+            if (!currentData || !currentData.length) {
+                h += `<div class="p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 text-2xl mx-auto mb-3"><i class="fa-solid fa-inbox"></i></div>
+                    <p class="text-slate-400 font-medium">ยังไม่มีข้อมูล</p>
+                    <p class="text-xs text-slate-300 mt-1">กดปุ่ม "เพิ่มข้อมูล" เพื่อเริ่มต้น</p>
+                </div>`;
+            } else {
+                currentData.forEach(i => {
+                    const imgUrl = i.image || i.imageUrl || i.coverImageUrl || i.cover_url || null;
+                    const thumbHtml = imgUrl
+                        ? `<div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 flex-shrink-0"><img src="${imgUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400 text-xs\'><i class=\'fa-solid fa-image\'></i></div>'"></div>`
+                        : `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 flex items-center justify-center font-bold text-sm border border-indigo-100/50 flex-shrink-0">${i.id}</div>`;
+                    const subInfo = i.academic_year ? `<span class="text-xs text-slate-400 ml-2 bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-medium">ปี ${i.academic_year}</span>` : (i.start_date ? `<span class="text-xs text-slate-400 ml-2">${i.start_date}</span>` : (i.date ? `<span class="text-xs text-slate-400 ml-2">${i.date}</span>` : ''));
+                    h += `<div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50/80 transition-all group">
+                    <div class="flex items-center gap-4">
+                        ${thumbHtml}
+                        <div>
+                            <div class="font-semibold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">${i[key] || '-'}</div>
+                            ${subInfo}
+                        </div>
+                    </div>
+                    <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <button onclick="editItem('${i.id}')" class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-100 flex items-center justify-center transition-all text-xs">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteItem('${i.id}')" class="w-9 h-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-all text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`;
+                });
+            }
+            h += `</div></div></div>`; main.innerHTML = h;
+            setTimeout(postRenderEnhance, 80);
+        }
+
+        function openModal(isEdit = false, id = null) {
+            const schema = SCHEMAS[currentSection];
+            document.getElementById('modal-title').innerHTML = `<div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-${isEdit ? 'pen-to-square' : 'plus-circle'} text-indigo-500 text-sm"></i></div> ${isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลใหม่'}`;
+            document.getElementById('field-id').value = id || '';
+            let item = (isEdit && id) ? currentData.find(d => d.id == id) || {} : {};
+            const inputClass = "w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300";
+            document.getElementById('form-fields').innerHTML = schema.fields.map(f => {
+                if (f.type === 'header') return '';
+                let val = item[f.key] || '';
+                let inp = f.type === 'select' ? `<select name="${f.key}" class="${inputClass}">${f.options.map(o => `<option value="${o}" ${val === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : `<input type="${f.type}" name="${f.key}" id="field-${f.key}" value="${val}" class="${inputClass}" ${f.required ? 'required' : ''}>`;
+                // URL fields ที่เป็นรูปภาพ → เพิ่มปุ่มอัปโหลด
+                if (f.type === 'url' && _isImageField(f.label)) {
+                    inp = _imgFieldHtml(inp, `field-${f.key}`, val);
+                }
+                return `<div class="mb-4"><label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">${f.label}</label>${inp}</div>`;
+            }).join('');
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        window.editItem = (id) => openModal(true, id);
+
+        async function submitForm() {
+            const form = document.getElementById('data-form'); if (!form.checkValidity()) { form.reportValidity(); return; }
+            const formData = new FormData(form); const data = Object.fromEntries(formData.entries());
+            const id = data.id; delete data.id; Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
+            const { error } = id ? await supabaseAdmin.from(currentSection).update(data).eq('id', id) : await supabaseAdmin.from(currentSection).insert([data]);
+            if (error) Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#6366f1' });
+            else { closeModal(); loadSection(currentSection); Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'บันทึกข้อมูลเรียบร้อย', confirmButtonColor: '#6366f1' }); }
+        }
+        async function deleteItem(id) {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: 'ข้อมูลนี้จะถูกลบถาวร',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก'
+            });
+            if (!result.isConfirmed) return;
+            const { error } = await supabaseAdmin.from(currentSection).delete().eq('id', id);
+            if (!error) loadSection(currentSection);
+        }
+
+        // ===== GALLERY UPLOAD SECTION =====
+        window.openGalleryUpload = async function(albumId, folderPath) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.onchange = async () => {
+                const files = Array.from(input.files);
+                if (!files.length) return;
+                let successCount = 0;
+                let lastError = null;
+                const total = files.length;
+                Swal.fire({
+                    title: 'กำลังอัปโหลด...',
+                    html: `<div class="text-sm text-slate-500">0 / ${total} ไฟล์</div>`,
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fixedFile = await _getFixedFile(file);
+                    const filePath = `${folderPath}/${fixedFile.name}`;
+                    const { error } = await supabaseAdmin.storage.from('gallery').upload(filePath, fixedFile, {
+                        upsert: true,
+                        contentType: fixedFile.type
+                    });
+                    if (!error) successCount++;
+                    else lastError = error;
+                    Swal.update({ html: `<div class="text-sm text-slate-500">${i+1} / ${total} ไฟล์</div>` });
+                }
+
+                if (successCount === total) {
+                    Swal.fire({ icon: 'success', title: `อัปโหลดสำเร็จ ${total} ไฟล์`, timer: 1500, showConfirmButton: false });
+                } else {
+                    // แสดง error จริงๆ พร้อมคำแนะนำ
+                    const errMsg = lastError?.message || 'ไม่ทราบสาเหตุ';
+                    const isNoPolicy = errMsg.includes('policy') || errMsg.includes('Unauthorized') || errMsg.includes('403') || errMsg.includes('row-level');
+                    const isBucketNotFound = errMsg.includes('Bucket not found') || errMsg.includes('404') || errMsg.includes('does not exist');
+                    let hint = '';
+                    if (isBucketNotFound) {
+                        hint = `<div class="mt-3 p-3 bg-amber-50 rounded-xl text-left text-xs text-amber-700 leading-relaxed">
+                            <b>วิธีแก้:</b> ไปที่ Supabase Dashboard → Storage<br>
+                            → กด <b>New Bucket</b> → ชื่อ <b>gallery</b> → เปิด Public ✓
+                        </div>`;
+                    } else if (isNoPolicy) {
+                        hint = `<div class="mt-3 p-3 bg-amber-50 rounded-xl text-left text-xs text-amber-700 leading-relaxed">
+                            <b>วิธีแก้:</b> ไปที่ Supabase → SQL Editor แล้วรัน:<br>
+                            <code class="block mt-1 bg-white p-1.5 rounded text-slate-600 font-mono">CREATE POLICY "admin_upload_gallery"<br>
+ON storage.objects FOR INSERT<br>
+WITH CHECK (bucket_id = 'gallery'<br>
+AND auth.role() = 'authenticated');</code>
+                        </div>`;
+                    } else {
+                        hint = `<div class="mt-3 p-3 bg-slate-50 rounded-xl text-left text-xs text-slate-600">${errMsg}</div>`;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: `อัปโหลดไม่สำเร็จ (${successCount}/${total})`,
+                        html: hint,
+                        confirmButtonColor: '#6366f1',
+                        confirmButtonText: 'รับทราบ'
+                    });
+                }
+            };
+            input.click();
+        };
+
+        window.viewGalleryPhotos = async function(folderPath, albumTitle) {
+            const { data: files, error } = await supabaseAdmin.storage.from('gallery').list(folderPath, { limit: 200 });
+            const main = document.getElementById('main-area');
+            if (error || !files) {
+                Swal.fire({ icon: 'error', title: 'ไม่สามารถโหลดรูปได้', text: 'ตรวจสอบว่าสร้าง Storage Bucket "gallery" แล้ว', confirmButtonColor: '#6366f1' });
+                return;
+            }
+            const imgFiles = files.filter(f => f.name && /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(f.name));
+            const { data: { publicUrl: base } } = supabaseAdmin.storage.from('gallery').getPublicUrl(`${folderPath}/placeholder`);
+            const baseUrl = base.replace('/placeholder','');
+            const grid = imgFiles.map(f => {
+                const url = `${baseUrl}/${f.name}`;
+                return `<div class="relative group rounded-2xl overflow-hidden aspect-square bg-slate-100">
+                    <img src="${url}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.remove()">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end justify-center pb-3 gap-2 opacity-0 group-hover:opacity-100">
+                        <button onclick="deleteGalleryPhoto('${folderPath}','${f.name}')" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-red-600 transition"><i class="fa-solid fa-trash text-[10px]"></i> ลบ</button>
+                    </div>
+                </div>`;
+            }).join('');
+            main.innerHTML = `<div class="animate-fade-in-up">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <button onclick="loadSection('gallery_albums')" class="w-9 h-9 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center shadow-sm transition"><i class="fa-solid fa-arrow-left text-sm"></i></button>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">${albumTitle}</h2>
+                            <p class="text-xs text-slate-400">${imgFiles.length} รูปภาพ · โฟลเดอร์: ${folderPath}</p>
+                        </div>
+                    </div>
+                    <button onclick="window.openGalleryUpload(null,'${folderPath}')" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-5 py-2.5 rounded-xl shadow-lg font-semibold flex items-center gap-2 text-sm transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> อัปโหลดรูปภาพ
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-xl p-6">
+                    ${imgFiles.length === 0
+                        ? `<div class="text-center py-16 text-slate-300"><i class="fa-solid fa-images text-5xl block mb-3"></i><p class="font-medium">ยังไม่มีรูปภาพ</p><p class="text-sm mt-1">กดปุ่ม "อัปโหลดรูปภาพ" เพื่อเพิ่มรูป</p></div>`
+                        : `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">${grid}</div>`}
+                </div>
+            </div>`;
+        };
+
+        window.deleteGalleryPhoto = async function(folderPath, fileName) {
+            const result = await Swal.fire({ title: 'ลบรูปนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
+            if (!result.isConfirmed) return;
+            const { error } = await supabaseAdmin.storage.from('gallery').remove([`${folderPath}/${fileName}`]);
+            if (error) { Swal.fire({ icon: 'error', title: 'ลบไม่สำเร็จ', text: error.message, confirmButtonColor: '#6366f1' }); }
+            else { Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', timer: 1000, showConfirmButton: false }); }
+        };
+
+        // ===== COMBINED ACADEMIC SECTION (รูป + เอกสาร) =====
+        const _acCfg = {
+            onet: { title:'ผลสัมฤทธิ์ O-NET', docTable:'onet', settingsTable:'onet_settings', icon:'fa-chart-line', color:'text-emerald-400', colorBg:'bg-emerald-50', colorText:'text-emerald-700', colorBorder:'border-emerald-200' },
+            nt:   { title:'ผลสัมฤทธิ์ NT',     docTable:'nt',   settingsTable:'nt_settings',   icon:'fa-chart-simple', color:'text-blue-400', colorBg:'bg-blue-50', colorText:'text-blue-700', colorBorder:'border-blue-200' },
+            rt:   { title:'ผลสัมฤทธิ์ RT',      docTable:'rt',   settingsTable:'rt_settings',   icon:'fa-book-open', color:'text-violet-400', colorBg:'bg-violet-50', colorText:'text-violet-700', colorBorder:'border-violet-200' }
+        };
+        let _acCurrentType = null;
+
+        async function loadAcademicSection(type) {
+            _acCurrentType = type;
+            currentSection = type;
+            const cfg = _acCfg[type];
+            const main = document.getElementById('main-area');
+            document.getElementById('breadcrumb-text').textContent = cfg.title;
+            document.querySelectorAll('.admin-menu-item').forEach(el => el.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            main.innerHTML = `<div class="h-full flex items-center justify-center"><div class="flex flex-col items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-500"></i></div><p class="text-sm text-slate-400">กำลังโหลด...</p></div></div>`;
+
+            // Fetch both settings and documents in parallel
+            const [settingsRes, docsRes] = await Promise.all([
+                supabaseAdmin.from(cfg.settingsTable).select('*').limit(1).maybeSingle(),
+                supabaseAdmin.from(cfg.docTable).select('*').order('id', { ascending: false })
+            ]);
+
+            const settings = settingsRes.data || {};
+            const docs = docsRes.data || [];
+            currentData = docs;
+
+            _renderAcademicPage(type, settings, docs);
+        }
+
+        function _renderAcademicPage(type, settings, docs) {
+            const cfg = _acCfg[type];
+            const main = document.getElementById('main-area');
+            const inputCls = 'w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300';
+
+            // Settings card HTML
+            const imgFields = [1,2,3,4].map(n => {
+                const curUrl = (settings[`img_${n}`]||'').trim();
+                const inputId = `acimg-${type}-${n}`;
+                const labelSuffix = n===1?' (ปีล่าสุด)':n===4?' (เปรียบเทียบย้อนหลัง)':'';
+                const inp = `<input type="url" id="${inputId}" value="${curUrl.replace(/"/g,'&quot;')}" placeholder="https://..." class="${inputCls} flex-1">`;
+                return `<div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">รูปที่ ${n}${labelSuffix}</label>
+                    ${_imgFieldHtml(inp, inputId, curUrl)}
+                </div>`;
+            }).join('');
+
+            // Docs list HTML
+            const docSchema = SCHEMAS[cfg.docTable];
+            const docKey = docSchema.fields[0].key;
+            const docItems = !docs.length
+                ? `<div class="p-12 text-center"><div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 text-2xl mx-auto mb-3"><i class="fa-solid fa-inbox"></i></div><p class="text-slate-400 font-medium">ยังไม่มีข้อมูล</p></div>`
+                : docs.map(i => {
+                    const sub = i.tag ? `<span class="text-xs bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-medium ml-2">ปี ${i.tag}</span>` : (i.date ? `<span class="text-xs text-slate-400 ml-2">${i.date}</span>` : '');
+                    return `<div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50/80 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 flex items-center justify-center font-bold text-sm border border-indigo-100/50 flex-shrink-0">${i.id}</div>
+                            <div><div class="font-semibold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">${i[docKey]||'-'}</div>${sub}</div>
+                        </div>
+                        <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editItem('${i.id}')" class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-100 flex items-center justify-center transition-all text-xs"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteItem('${i.id}')" class="w-9 h-9 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-all text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+
+            main.innerHTML = `<div class="space-y-6 animate-fade-in-up max-w-3xl mx-auto">
+
+                <!-- Settings Card -->
+                <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 ${cfg.colorBg}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-white/70 flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-images ${cfg.color} text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm ${cfg.colorText}">รูปสรุปผลและเปรียบเทียบย้อนหลัง</h3>
+                                <p class="text-xs ${cfg.colorText} opacity-60">ใส่ได้สูงสุด 4 รูป · รูปที่ไม่มี URL จะซ่อนอัตโนมัติ</p>
+                            </div>
+                        </div>
+                        <button onclick="_saveAcademicSettings('${type}')"
+                            class="bg-white ${cfg.colorText} ${cfg.colorBorder} border font-bold text-xs px-4 py-2 rounded-xl hover:shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกรูป
+                        </button>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="acimg-${type}-id" value="${settings.id||''}">
+                        ${imgFields}
+                    </div>
+                </div>
+
+                <!-- Document List Card -->
+                <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm shadow-lg shadow-indigo-500/30">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-800">รายการเอกสาร / ไฟล์</h3>
+                                <p class="text-xs text-slate-400">${docs.length} รายการ</p>
+                            </div>
+                        </div>
+                        <button onclick="openModal()" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/20 font-semibold flex items-center gap-2 text-xs transition-all">
+                            <i class="fa-solid fa-plus"></i> เพิ่มเอกสาร
+                        </button>
+                    </div>
+                    <div class="divide-y divide-slate-50">${docItems}</div>
+                </div>
+
+            </div>`;
+        }
+
+        async function _saveAcademicSettings(type) {
+            const id  = document.getElementById(`acimg-${type}-id`).value;
+            const cfg = _acCfg[type];
+            const data = {};
+            [1,2,3,4].forEach(n => {
+                const v = (document.getElementById(`acimg-${type}-${n}`)?.value||'').trim();
+                data[`img_${n}`] = v || null;
+            });
+            const { error } = id
+                ? await supabaseAdmin.from(cfg.settingsTable).update(data).eq('id', id)
+                : await supabaseAdmin.from(cfg.settingsTable).insert([data]);
+            if (error) Swal.fire({ icon:'error', title:'Error', text:error.message, confirmButtonColor:'#6366f1' });
+            else Swal.fire({ icon:'success', title:'บันทึกรูปเรียบร้อย', timer:1200, showConfirmButton:false });
+            // Reload to refresh previews
+            loadAcademicSection(type);
+        }
+        window._saveAcademicSettings = _saveAcademicSettings;
+
+                // ============================================================
+        // IMAGE UPLOAD TO SUPABASE STORAGE (bucket: "images")
+        // ============================================================
+
+        // ── Google Drive URL converter ──
+        function _gdriveToDirectUrl(url) {
+            if (!url) return url;
+            // รูปแบบ 1: /file/d/ID/view หรือ /file/d/ID/edit
+            const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+            // รูปแบบ 2: id=ID (query param)
+            const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+            // รูปแบบ 3: open?id=ID
+            const m3 = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
+            if (m3) return `https://drive.google.com/uc?export=view&id=${m3[1]}`;
+            return url; // ไม่ใช่ Drive URL → คืนค่าเดิม
+        }
+
+        function _isGdriveUrl(url) {
+            return url && url.includes('drive.google.com');
+        }
+
+        // กด "Google Drive" → popup อธิบาย + input ใส่ลิงก์
+        window.pasteGDrive = function(inputId) {
+            Swal.fire({
+                title: '<span style="font-size:16px;font-weight:600">วาง Link Google Drive</span>',
+                html: `<div style="text-align:left;font-size:13px;color:#64748b;line-height:1.7">
+                    <b style="color:#334155">ขั้นตอน:</b><br>
+                    1. เปิด Google Drive → คลิกขวารูป → แชร์<br>
+                    2. เปลี่ยนเป็น "ทุกคนที่มีลิงก์"<br>
+                    3. คัดลอก Link แล้ววางด้านล่าง
+                </div>
+                <input type="text" id="gdrive-input" placeholder="https://drive.google.com/file/d/..."
+                    style="width:100%;margin-top:12px;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;box-sizing:border-box"
+                    onfocus="this.style.borderColor='#6366f1'"
+                    onblur="this.style.borderColor='#e2e8f0'">`,
+                showCancelButton: true,
+                confirmButtonText: 'แปลง URL',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#6366f1',
+                preConfirm: () => {
+                    const raw = document.getElementById('gdrive-input').value.trim();
+                    if (!raw) { Swal.showValidationMessage('กรุณาวาง Link'); return false; }
+                    const converted = _gdriveToDirectUrl(raw);
+                    if (converted === raw && !raw.includes('uc?export=view')) {
+                        Swal.showValidationMessage('ไม่พบ Google Drive URL — ลองคัดลอก link ใหม่');
+                        return false;
+                    }
+                    return converted;
+                }
+            }).then(result => {
+                if (!result.isConfirmed) return;
+                const url = result.value;
+                // ใส่ URL ในช่อง input
+                const inp = document.getElementById(inputId)
+                    || document.querySelector(`[name="${inputId.split('-').slice(1).join('-')}"]`);
+                if (inp) {
+                    inp.value = url;
+                    inp.classList.add('gdrive-converted');
+                    setTimeout(() => inp.classList.remove('gdrive-converted'), 600);
+                    inp.dispatchEvent(new Event('input'));
+                }
+                // อัปเดต preview
+                const prevImg = document.getElementById(`prev-${inputId}`);
+                if (prevImg) { prevImg.src = url; prevImg.style.display = 'block'; }
+            });
+        };
+
+                // รูป label keywords ที่ควรมีปุ่มอัปโหลด
+        const _IMG_KEYWORDS = ['รูป','image','logo','cover','popup','uniform','photo','img'];
+        // link label keywords ที่ไม่ควรมีปุ่ม
+        const _LINK_KEYWORDS = ['facebook','youtube','vtr','youtube','google maps','embed','link','ลิงก์','เพลง','file url','ไฟล์'];
+
+        function _isImageField(label) {
+            const l = label.toLowerCase();
+            const hasImg  = _IMG_KEYWORDS.some(k => l.includes(k));
+            const hasLink = _LINK_KEYWORDS.some(k => l.includes(k));
+            return hasImg && !hasLink;
+        }
+
+        // สร้าง HTML wrapper สำหรับ url input + ปุ่ม + thumbnail
+        function _imgFieldHtml(inputHtml, inputId, currentUrl, extraCls = '') {
+            const thumb = currentUrl
+                ? `<img src="${currentUrl}" id="prev-${inputId}" class="img-preview-thumb" style="display:block" onerror="this.style.display='none'">`
+                : `<img id="prev-${inputId}" class="img-preview-thumb">`;
+            return `<div class="img-field-wrap ${extraCls}">
+                ${inputHtml}
+                <button type="button" class="gdrive-btn" title="วาง Link จาก Google Drive"
+                    onclick="pasteGDrive('${inputId}')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+                        <path d="M12 2L2 19h20L12 2z" fill="#4285F4" opacity=".2"/>
+                        <path d="M2 19l6.5-11.25L12 13l-3.5 6H2z" fill="#0F9D58"/>
+                        <path d="M22 19l-6.5-11.25L12 13l3.5 6H22z" fill="#FBBC05"/>
+                        <path d="M8.5 7.75L12 2l3.5 5.75H8.5z" fill="#4285F4"/>
+                        <path d="M8.5 13H15.5L12 19L8.5 13z" fill="#EA4335" opacity=".8"/>
+                    </svg>
+                    Drive
+                </button>
+                <button type="button" class="upload-img-btn" id="upbtn-${inputId}"
+                    onclick="uploadImg('${inputId}')">
+                    <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i> อัปโหลด
+                </button>
+                ${thumb}
+            </div>`;
+        }
+
+        // อัปโหลดรูปจริง → Supabase Storage bucket "images"
+        // ── ตรวจ MIME type จริงแล้วแปลงนามสกุลให้ถูกต้อง ──
+        // แก้ปัญหารูปจาก LINE / HEIC / ไม่มีนามสกุล
+        const _MIME_TO_EXT = {
+            'image/jpeg': 'jpg', 'image/jpg': 'jpg',
+            'image/png': 'png', 'image/gif': 'gif',
+            'image/webp': 'webp', 'image/heic': 'jpg',
+            'image/heif': 'jpg', 'image/bmp': 'jpg',
+            'image/tiff': 'jpg', 'image/avif': 'webp'
+        };
+
+        async function _getFixedFile(file) {
+            // ดึง extension จาก MIME type จริง
+            const mime = file.type || 'image/jpeg';
+            const ext  = _MIME_TO_EXT[mime] || 'jpg';
+
+            // ถ้า HEIC → แปลงเป็น JPEG ก่อนอัปโหลด (ผ่าน canvas)
+            if (mime === 'image/heic' || mime === 'image/heif') {
+                try {
+                    const bitmap = await createImageBitmap(file);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = bitmap.width; canvas.height = bitmap.height;
+                    canvas.getContext('2d').drawImage(bitmap, 0, 0);
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+                    return new File([blob], `img_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                } catch(e) { /* fallback */ }
+            }
+
+            // สร้างชื่อไฟล์ใหม่ที่ clean เสมอ
+            const safeName = `img_${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+            return new File([file], safeName, { type: mime === 'image/heic' ? 'image/jpeg' : mime });
+        }
+
+                window.uploadImg = async function(inputId) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.onchange = async () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const btn = document.getElementById(`upbtn-${inputId}`);
+                if (btn) { btn.classList.add('uploading'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> กำลังอัปโหลด...'; }
+
+                // แปลงไฟล์ให้มีนามสกุลถูกต้อง (รองรับรูปจาก LINE, HEIC ฯลฯ)
+                const fixedFile = await _getFixedFile(file);
+                const path = fixedFile.name;
+
+                const { data, error } = await supabaseAdmin.storage.from('images').upload(path, fixedFile, {
+                    upsert: true,
+                    contentType: fixedFile.type
+                });
+
+                if (btn) { btn.classList.remove('uploading'); btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up text-xs"></i> อัปโหลด'; }
+
+                if (error) {
+                    Swal.fire({ icon: 'error', title: 'อัปโหลดไม่สำเร็จ', html: `<div class="text-sm">${error.message}</div><div class="text-xs text-slate-400 mt-2">ตรวจสอบว่าสร้าง Storage Bucket ชื่อ <b>"images"</b> แล้วเปิด Public</div>`, confirmButtonColor: '#6366f1' });
+                    return;
+                }
+
+                // Get public URL
+                const { data: { publicUrl } } = supabaseAdmin.storage.from('images').getPublicUrl(path);
+
+                // Fill the input
+                const inp = document.getElementById(inputId) || document.querySelector(`[name="${inputId.split('-').slice(1).join('-')}"]`);
+                if (inp) { inp.value = publicUrl; inp.dispatchEvent(new Event('input')); }
+
+                // Show/update preview thumbnail
+                const prevImg = document.getElementById(`prev-${inputId}`);
+                if (prevImg) { prevImg.src = publicUrl; prevImg.style.display = 'block'; }
+
+                Swal.fire({ icon: 'success', title: 'อัปโหลดสำเร็จ!', text: 'URL ถูกใส่ในช่องอัตโนมัติแล้ว', timer: 1800, showConfirmButton: false });
+            };
+            fileInput.click();
+        };
+
+        // auto-preview + auto-convert Google Drive URL เมื่อวาง/พิมพ์
+        document.addEventListener('input', e => {
+            if (!e.target.id && !e.target.name) return;
+            const inputEl = e.target;
+            let url = inputEl.value.trim();
+
+            // Auto-convert Google Drive URL
+            if (_isGdriveUrl(url) && !url.includes('uc?export=view')) {
+                const converted = _gdriveToDirectUrl(url);
+                if (converted !== url) {
+                    inputEl.value = converted;
+                    inputEl.classList.add('gdrive-converted');
+                    setTimeout(() => inputEl.classList.remove('gdrive-converted'), 600);
+                    url = converted;
+                }
+            }
+
+            // Update preview thumbnail
+            const inputId = inputEl.id || `field-${inputEl.name}`;
+            const prevImg = document.getElementById(`prev-${inputId}`);
+            if (!prevImg) return;
+            if (url) { prevImg.src = url; prevImg.style.display = 'block'; }
+            else { prevImg.style.display = 'none'; }
+        });
+
+        // Also auto-convert on paste event (before input fires)
+        document.addEventListener('paste', e => {
+            const inputEl = e.target;
+            if (inputEl.tagName !== 'INPUT' && inputEl.tagName !== 'TEXTAREA') return;
+            setTimeout(() => {
+                const url = inputEl.value.trim();
+                if (_isGdriveUrl(url) && !url.includes('uc?export=view')) {
+                    const converted = _gdriveToDirectUrl(url);
+                    if (converted !== url) {
+                        inputEl.value = converted;
+                        inputEl.classList.add('gdrive-converted');
+                        setTimeout(() => inputEl.classList.remove('gdrive-converted'), 600);
+                        // Trigger preview update
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+            }, 10);
+        });
+
+                // Post-render enhancement hook (called after renderList finishes)
+        function postRenderEnhance() {
+            if (currentSection === 'gallery_albums' && currentData && currentData.length > 0) {
+                const rows = document.querySelectorAll('#main-area .divide-y > div');
+                rows.forEach((row, idx) => {
+                    if (!currentData[idx]) return;
+                    const album = currentData[idx];
+                    const btnGroup = row.querySelector('.flex.gap-2');
+                    if (btnGroup && album.album_url) {
+                        const viewBtn = document.createElement('button');
+                        viewBtn.onclick = (e) => { e.stopPropagation(); window.open(album.album_url, '_blank'); };
+                        viewBtn.className = 'w-9 h-9 rounded-xl bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition-all text-xs';
+                        viewBtn.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i>';
+                        viewBtn.title = 'เปิดอัลบั้ม';
+                        btnGroup.insertBefore(viewBtn, btnGroup.firstChild);
+                    }
+                });
+            }
+            if (currentSection === 'calendar_events' && currentData && currentData.length > 0) {
+                const typeLabel = { academic:'วิชาการ', activity:'กิจกรรม', holiday:'วันหยุด', exam:'สอบ', other:'อื่นๆ' };
+                const typeBg = { academic:'bg-blue-100 text-blue-700', activity:'bg-emerald-100 text-emerald-700', holiday:'bg-red-100 text-red-700', exam:'bg-amber-100 text-amber-700', other:'bg-slate-100 text-slate-600' };
+                document.querySelectorAll('#main-area .divide-y > div').forEach((row, idx) => {
+                    if (!currentData[idx]) return;
+                    const ev = currentData[idx];
+                    const nameEl = row.querySelector('.font-semibold');
+                    if (nameEl && ev.type) {
+                        const badge = document.createElement('span');
+                        badge.className = `text-[10px] font-bold px-2 py-0.5 rounded-lg ml-2 ${typeBg[ev.type] || typeBg.other}`;
+                        badge.textContent = typeLabel[ev.type] || ev.type;
+                        nameEl.appendChild(badge);
+                    }
+                    // Also show date
+                    const subEl = row.querySelector('.text-xs.text-slate-400');
+                    if (subEl && ev.start_date) {
+                        subEl.textContent = ev.start_date;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
