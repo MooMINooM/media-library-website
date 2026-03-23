@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเอกสาร ปพ. — โรงเรียนบ้านก้อจัดสรร</title>
+    <title>ระบบเอกสาร ปพ.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -153,7 +153,7 @@
         }
 
         #p5-submenu.open {
-            max-height: 260px;
+            max-height: 320px;
         }
 
         #p6-submenu {
@@ -352,7 +352,6 @@
             </div>
             <div id="sidebar-logo-text" class="leading-tight">
                 <p class="text-white font-bold text-sm leading-snug">ระบบเอกสาร ปพ.</p>
-                <p class="text-violet-300 text-[11px]">โรงเรียนบ้านก้อจัดสรร</p>
             </div>
         </div>
 
@@ -393,7 +392,7 @@
             <div id="p5-submenu">
                 <div class="nav-sub" data-sub="p5-cover" onclick="switchP5Sub('p5-cover',this)">
                     <span class="dot" style="background:#f59e0b;"></span>
-                    <span class="sidebar-label">พิมพ์ปก ปพ.5</span>
+                    <span class="sidebar-label">ระบบ ปพ.5</span>
                 </div>
                 <div class="nav-sub" data-sub="p5-score" onclick="switchP5Sub('p5-score',this)">
                     <span class="dot" style="background:#818cf8;"></span>
@@ -468,71 +467,131 @@
         <!-- ========================================
          PAGE: WELCOME
     ========================================= -->
-        <div id="page-welcome" class="page active p-6 md:p-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold text-slate-800">ยินดีต้อนรับ 👋</h1>
-                <p id="welcome-subtitle" class="text-slate-500 mt-1 text-sm">กรุณาเลือกระบบที่ต้องการใช้งาน</p>
+        <div id="page-welcome" class="page active relative bg-slate-50/30">
+            <!-- decorative background -->
+            <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                <div class="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-b from-indigo-50 to-transparent opacity-70 blur-3xl"></div>
+                <div class="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-t from-violet-50 to-transparent opacity-70 blur-3xl"></div>
             </div>
 
-            <!-- System cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
+            <div class="relative z-10 p-6 md:p-10 w-full min-h-[calc(100vh-70px)] flex flex-col items-center justify-center">
+                <div class="w-full max-w-5xl">
+                    <!-- Hero Banner -->
+                    <div class="mb-10 relative overflow-hidden rounded-[2.5rem] bg-[#1e1b4b] text-white shadow-2xl p-10 md:p-14 border border-indigo-500/20">
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/90 via-violet-800/90 to-fuchsia-900/90 z-0"></div>
+                        <div class="absolute top-0 right-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20 mix-blend-overlay z-0"></div>
+                        
+                        <div class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob z-0"></div>
+                        <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-fuchsia-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 z-0"></div>
 
-                <!-- ปพ.5 Card -->
-                <div onclick="switchPage('p5', document.querySelector('[data-page=p5]'))"
-                    class="bg-white rounded-2xl border-2 border-indigo-100 hover:border-indigo-400 hover:shadow-lg transition-all cursor-pointer group p-6">
-                    <div
-                        class="w-14 h-14 bg-indigo-100 group-hover:bg-indigo-200 rounded-2xl flex items-center justify-center mb-4 transition">
-                        <i class="fa-solid fa-book-open text-indigo-600 text-2xl"></i>
+                        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-6 text-indigo-100 text-xs font-medium uppercase tracking-wider">
+                                    <span class="relative flex h-2 w-2">
+                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    ระบบพร้อมใช้งาน
+                                </div>
+                                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-200">ยินดีต้อนรับ 👋</h1>
+                                <p id="welcome-subtitle" class="text-indigo-100/90 text-lg md:text-xl max-w-xl font-light leading-relaxed">เข้าสู่ระบบการจัดการเอกสารวิชาการ เลือกเมนูด้านล่างเพื่อเริ่มต้นการทำงาน</p>
+                            </div>
+                            <div class="hidden md:flex shrink-0 p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
+                                <i class="fa-solid fa-graduation-cap text-6xl text-indigo-200 drop-shadow-lg p-6"></i>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1">ปพ.5</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">บันทึกผลการเรียน กรอกคะแนน คำนวณเกรด
-                        และพิมพ์รายงานรายวิชา</p>
-                    <div class="mt-4 flex items-center gap-1 text-indigo-500 text-sm font-semibold">
-                        <span>เข้าใช้งาน</span>
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </div>
-                </div>
 
-                <!-- ปพ.6 Card -->
-                <div onclick="switchPage('p6', document.querySelector('[data-page=p6]'))"
-                    class="bg-white rounded-2xl border-2 border-violet-100 hover:border-violet-400 hover:shadow-lg transition-all cursor-pointer group p-6">
-                    <div
-                        class="w-14 h-14 bg-violet-100 group-hover:bg-violet-200 rounded-2xl flex items-center justify-center mb-4 transition">
-                        <i class="fa-solid fa-user-graduate text-violet-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1">ปพ.6</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">บันทึกพัฒนาการผู้เรียน คุณลักษณะ 8 ประการ
-                        และกิจกรรมพัฒนาผู้เรียน</p>
-                    <div class="mt-4 flex items-center gap-1 text-violet-500 text-sm font-semibold">
-                        <span>เข้าใช้งาน</span>
-                        <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </div>
-                </div>
-            </div>
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h2 class="text-xl font-bold text-slate-800 drop-shadow-sm">เลือกระบบงานที่ต้องการ</h2>
+                        </div>
 
-            <!-- Info section -->
-            <div class="mt-8 max-w-2xl bg-violet-50 border border-violet-100 rounded-2xl p-5">
-                <p class="text-xs font-bold text-violet-500 uppercase tracking-widest mb-3">ข้อมูลการใช้งาน</p>
-                <div class="grid grid-cols-2 gap-4 text-sm text-slate-600">
-                    <div>
-                        <p class="font-semibold text-slate-700 mb-1">ปพ.5 บันทึกผลการเรียน</p>
-                        <ul class="space-y-0.5 text-xs text-slate-500">
-                            <li>• เลือกวิชาและห้องเรียน</li>
-                            <li>• กรอกคะแนนแต่ละส่วน</li>
-                            <li>• ระบบคำนวณเกรดอัตโนมัติ</li>
-                            <li>• บันทึกและพิมพ์ได้ทันที</li>
-                        </ul>
+                        <!-- System cards -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                            <!-- ปพ.5 Card -->
+                            <div onclick="switchPage('p5', document.querySelector('[data-page=p5]'))"
+                                class="bg-white/80 backdrop-blur-xl rounded-[2rem] border border-white hover:border-indigo-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.15)] transition-all duration-500 cursor-pointer group p-8 flex flex-col justify-between h-full relative overflow-hidden transform hover:-translate-y-2">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-100 to-transparent rounded-bl-full opacity-50 transition-transform duration-500 group-hover:scale-110"></div>
+                                
+                                <div class="relative z-10">
+                                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-50 to-indigo-100 group-hover:from-indigo-500 group-hover:to-indigo-600 rounded-[1.5rem] flex items-center justify-center mb-6 transition-all duration-500 shadow-sm group-hover:shadow-indigo-300/50 transform group-hover:-rotate-3">
+                                        <i class="fa-solid fa-book-open text-indigo-600 group-hover:text-white text-3xl transition-colors duration-500"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-indigo-700 transition-colors">ระบบ ปพ.5</h3>
+                                    <p class="text-slate-500 text-base leading-relaxed mb-6">จัดการผลการเรียนรายวิชา บันทึกคะแนนเก็บ กลางภาค ปลายภาค พร้อมระบบคำนวณเกรดอัตโนมัติ และสั่งพิมพ์รายงานสรุปได้อย่างสมบูรณ์</p>
+                                </div>
+                                
+                                <div class="relative z-10 flex items-center justify-between mt-auto">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg">คะแนน</span>
+                                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg">คุณลักษณะ</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-indigo-600 font-bold bg-indigo-50 px-5 py-2.5 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                                        <span class="text-sm">เข้าใช้งาน</span>
+                                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ปพ.6 Card -->
+                            <div onclick="switchPage('p6', document.querySelector('[data-page=p6]'))"
+                                class="bg-white/80 backdrop-blur-xl rounded-[2rem] border border-white hover:border-violet-300 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(139,92,246,0.15)] transition-all duration-500 cursor-pointer group p-8 flex flex-col justify-between h-full relative overflow-hidden transform hover:-translate-y-2">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-violet-100 to-transparent rounded-bl-full opacity-50 transition-transform duration-500 group-hover:scale-110"></div>
+                                
+                                <div class="relative z-10">
+                                    <div class="w-20 h-20 bg-gradient-to-br from-violet-50 to-violet-100 group-hover:from-violet-500 group-hover:to-violet-600 rounded-[1.5rem] flex items-center justify-center mb-6 transition-all duration-500 shadow-sm group-hover:shadow-violet-300/50 transform group-hover:rotate-3">
+                                        <i class="fa-solid fa-users text-violet-600 group-hover:text-white text-3xl transition-colors duration-500"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-violet-700 transition-colors">ระบบ ปพ.6</h3>
+                                    <p class="text-slate-500 text-base leading-relaxed mb-6">สำหรับครูที่ปรึกษา (โฮมรูม) ประมวลผลการพัฒนาผู้เรียน บันทึกน้ำหนัก-ส่วนสูง และสังเคราะห์ข้อมูลจากทุกรายวิชาเพื่อสรุปผล</p>
+                                </div>
+
+                                <div class="relative z-10 flex items-center justify-between mt-auto">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg">โฮมรูม</span>
+                                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg">ความเห็นครู</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-violet-600 font-bold bg-violet-50 px-5 py-2.5 rounded-xl group-hover:bg-violet-600 group-hover:text-white transition-all duration-300">
+                                        <span class="text-sm">เข้าใช้งาน</span>
+                                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="font-semibold text-slate-700 mb-1">ปพ.6 พัฒนาการผู้เรียน</p>
-                        <ul class="space-y-0.5 text-xs text-slate-500">
-                            <li>• ประเมินคุณลักษณะ 8 ด้าน</li>
-                            <li>• บันทึกกิจกรรมพัฒนาผู้เรียน</li>
-                            <li>• ระดับ: ดีเยี่ยม / ดี / ผ่าน / ไม่ผ่าน</li>
-                            <li>• บันทึกและพิมพ์ได้ทันที</li>
-                        </ul>
+
+                    <!-- Guide & Tips Section (Collapsed to save height or looks integrated) -->
+                    <div class="bg-white/60 backdrop-blur-xl border border-white/80 shadow-md rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-200">
+                                    <i class="fa-solid fa-lightbulb text-white"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold text-slate-800">ไกด์การใช้งานเบื้องต้น</h2>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14">
+                                <div class="relative pl-6">
+                                    <div class="absolute left-0 top-1 bottom-1 w-1 bg-gradient-to-b from-indigo-400 to-indigo-100 rounded-full"></div>
+                                    <h4 class="font-bold text-slate-800 mb-2 text-sm text-indigo-700">ปพ.5 (สำหรับครูประจำวิชา)</h4>
+                                    <p class="text-slate-500 text-sm leading-relaxed mb-1">เริ่มจากการเลือกชั้นเรียนในเมนูหลัก บันทึกเวลาเรียน คุณลักษณะ และคะแนนตามลำดับ</p>
+                                    <p class="text-slate-500 text-sm leading-relaxed">เมื่อบันทึกข้อมูลครบถ้วน สามารถสั่งพิมพ์ PDF หรือ Export เป็น Excel ได้ทันที</p>
+                                </div>
+
+                                <div class="relative pl-6">
+                                    <div class="absolute left-0 top-1 bottom-1 w-1 bg-gradient-to-b from-violet-400 to-violet-100 rounded-full"></div>
+                                    <h4 class="font-bold text-slate-800 mb-2 text-sm text-violet-700">ปพ.6 (สำหรับครูประจำชั้น)</h4>
+                                    <p class="text-slate-500 text-sm leading-relaxed mb-1">ระบบจะดึงสรุปคุณลักษณะและเวลาเรียนจากทุกรายวิชาที่นักเรียนเรียนมาประมวลผลให้เอง</p>
+                                    <p class="text-slate-500 text-sm leading-relaxed">เพียงแค่บันทึกน้ำหนักส่วนสูง และความเห็นครูประจำชั้นในแต่ละภาคเรียน</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -558,14 +617,6 @@
                     <button onclick="p5ExportExcel()"
                         class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-xs text-emerald-700 font-semibold transition no-print">
                         <i class="fa-solid fa-file-excel"></i> Excel
-                    </button>
-                    <button onclick="p5OpenPrint('cover')"
-                        class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-xs text-amber-700 font-semibold transition no-print">
-                        <i class="fa-solid fa-book"></i> พิมพ์ปก
-                    </button>
-                    <button onclick="p5OpenPrint('score')"
-                        class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-xs text-indigo-700 font-semibold transition no-print">
-                        <i class="fa-solid fa-print"></i> พิมพ์คะแนน
                     </button>
                     <button id="p5-btn-save"
                         class="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow transition no-print">
@@ -653,12 +704,291 @@
                     <i class="fa-solid fa-book-open text-5xl mb-3 opacity-20"></i>
                     <p class="text-lg font-medium">เลือกวิชาและห้องเรียนเพื่อเริ่มบันทึกคะแนน</p>
                 </div>
+
+                <!-- Score Table -->
+                <div id="p5-print-header" class="hidden mb-2 text-xs text-slate-500 flex flex-wrap gap-3">
+                    <span id="p5-print-subject"></span>
+                    <span id="p5-print-class"></span>
+                    <span id="p5-print-year"></span>
+                </div>
+                <div id="p5-paste-hint" class="hidden text-xs text-slate-400 text-center mb-2 no-print">กด Ctrl+V
+                    วางข้อมูลจาก Excel ได้</div>
+                <div id="p5-table-wrap"
+                    class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+                    <table id="p5-table" class="w-full text-sm">
+                        <thead id="p5-thead"></thead>
+                        <tbody id="p5-tbody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- ========================================
-         PAGE: ปพ.6
-    ========================================= -->
+        <!-- ===== SECTION: พิมพ์เล่ม ปพ.5 ===== -->
+        <div id="p5-cover-section" class="hidden">
+            <div
+                class="bg-white border-b border-slate-100 px-4 md:px-6 py-3 flex items-center justify-between no-print sticky top-0 z-20">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book text-amber-500"></i> พิมพ์เล่ม ปพ.5
+                    </h2>
+                    <p id="p5-teacher-display-cover" class="text-slate-400 text-xs mt-0.5"></p>
+                </div>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4 no-print">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+                            <select id="cover-sel-year"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="2568">2568</option>
+                                <option value="2567">2567</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+                            <select id="cover-sel-term"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="1">ภาคเรียนที่ 1</option>
+                                <option value="2">ภาคเรียนที่ 2</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="cover-btn-load"
+                                class="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition">
+                                <i class="fa-solid fa-magnifying-glass"></i> โหลดรายวิชา
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="cover-empty" class="text-center py-16 text-slate-400">
+                    <i class="fa-solid fa-book text-5xl mb-3 opacity-20"></i>
+                    <p class="text-lg font-medium">กดโหลดเพื่อดูรายวิชา</p>
+                </div>
+                <div id="cover-cards" class="hidden">
+                    <div id="cover-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION: ลงเวลาเรียน ===== -->
+        <div id="p5-attend-section" class="hidden">
+            <div
+                class="bg-white border-b border-slate-100 px-4 md:px-6 py-3 flex items-center justify-between no-print sticky top-0 z-20">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-emerald-500"></i> ลงเวลาเรียน
+                    </h2>
+                    <p id="p5-teacher-display-att" class="text-slate-400 text-xs mt-0.5"></p>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button id="att-btn-save"
+                        class="hidden flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-floppy-disk"></i> บันทึก
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4 no-print">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+                            <select id="att-sel-year"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="2568">2568</option>
+                                <option value="2567">2567</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+                            <select id="att-sel-term"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="1">ภาคเรียนที่ 1 (พ.ค.–ต.ค.)</option>
+                                <option value="2">ภาคเรียนที่ 2 (พ.ย.–มี.ค.)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
+                            <select id="att-sel-subject"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชา —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+                            <select id="att-sel-class"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชาก่อน —</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="att-btn-load"
+                                class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition w-full justify-center">
+                                <i class="fa-solid fa-table"></i> โหลดตาราง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="att-holiday-info"
+                    class="hidden text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-xl px-4 py-2 mb-3 no-print">
+                </div>
+                <div id="att-empty" class="text-center py-16 text-slate-400">
+                    <i class="fa-solid fa-calendar text-5xl mb-3 opacity-20"></i>
+                    <p class="text-lg font-medium">เลือกวิชาและห้องเรียนเพื่อโหลดตาราง</p>
+                </div>
+                <div id="att-table-wrap"
+                    class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-xs" style="min-width:800px;">
+                        <thead id="att-thead"></thead>
+                        <tbody id="att-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION: คุณลักษณะ 8 ประการ ===== -->
+        <div id="p5-char-section" class="hidden">
+            <div
+                class="bg-white border-b border-slate-100 px-4 md:px-6 py-3 flex items-center justify-between no-print sticky top-0 z-20">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-star text-pink-500"></i> คุณลักษณะ 8 ประการ
+                    </h2>
+                    <p id="p5-teacher-display-char" class="text-slate-400 text-xs mt-0.5"></p>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button id="char-btn-save"
+                        class="hidden flex items-center gap-1.5 px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-floppy-disk"></i> บันทึก
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4 no-print">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+                            <select id="char-sel-year"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="2568">2568</option>
+                                <option value="2567">2567</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+                            <select id="char-sel-term"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="1">ภาคเรียนที่ 1</option>
+                                <option value="2">ภาคเรียนที่ 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
+                            <select id="char-sel-subject"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชา —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+                            <select id="char-sel-class"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชาก่อน —</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="char-btn-load"
+                                class="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition w-full justify-center">
+                                <i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="char-empty" class="text-center py-16 text-slate-400">
+                    <i class="fa-solid fa-star text-5xl mb-3 opacity-20"></i>
+                    <p class="text-lg font-medium">เลือกวิชาและห้องเรียนเพื่อโหลด</p>
+                </div>
+                <div id="char-table-wrap"
+                    class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-xs" id="char-table" style="min-width:900px;">
+                        <thead id="char-thead"></thead>
+                        <tbody id="char-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION: การอ่าน คิดวิเคราะห์ เขียน ===== -->
+        <div id="p5-read-section" class="hidden">
+            <div
+                class="bg-white border-b border-slate-100 px-4 md:px-6 py-3 flex items-center justify-between no-print sticky top-0 z-20">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-orange-500"></i> การอ่าน คิดวิเคราะห์ เขียน
+                    </h2>
+                    <p id="p5-teacher-display-read" class="text-slate-400 text-xs mt-0.5"></p>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button id="read-btn-save"
+                        class="hidden flex items-center gap-1.5 px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-semibold shadow transition">
+                        <i class="fa-solid fa-floppy-disk"></i> บันทึก
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-4 no-print">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+                            <select id="read-sel-year"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="2568">2568</option>
+                                <option value="2567">2567</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+                            <select id="read-sel-term"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="1">ภาคเรียนที่ 1</option>
+                                <option value="2">ภาคเรียนที่ 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
+                            <select id="read-sel-subject"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชา —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+                            <select id="read-sel-class"
+                                class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+                                <option value="">— เลือกวิชาก่อน —</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="read-btn-load"
+                                class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition w-full justify-center">
+                                <i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="read-empty" class="text-center py-16 text-slate-400">
+                    <i class="fa-solid fa-book-open text-5xl mb-3 opacity-20"></i>
+                    <p class="text-lg font-medium">เลือกห้องเรียนเพื่อโหลด</p>
+                </div>
+                <div id="read-table-wrap"
+                    class="hidden bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-xs" style="min-width:900px;">
+                        <thead id="read-thead"></thead>
+                        <tbody id="read-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         <div id="page-p6" class="page">
 
             <!-- Shared Header -->
@@ -763,17 +1093,17 @@
         if (!teacher) { window.location.href = 'index.html?openTeacherLogin=1'; throw new Error('no session'); }
 
         // ── Populate teacher info ────────────────────────────────────────
-        document.getElementById('sidebar-teacher-name').textContent = teacher.name;
-        document.getElementById('sidebar-teacher-pos').textContent = teacher.position || 'ครู';
-        document.getElementById('p5-teacher-display').textContent = teacher.name + (teacher.position ? ' · ' + teacher.position : '');
+        (function () { var _e = document.getElementById('sidebar-teacher-name'); if (_e) _e.textContent = teacher.name })();
+        (function () { var _e = document.getElementById('sidebar-teacher-pos'); if (_e) _e.textContent = teacher.position || 'ครู' })();
+        (function () { var _e = document.getElementById('p5-teacher-display'); if (_e) _e.textContent = teacher.name + (teacher.position ? ' · ' + teacher.position : '') })();
         ['p5-teacher-display-att', 'p5-teacher-display-char', 'p5-teacher-display-read'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.textContent = teacher.name + (teacher.position ? ' · ' + teacher.position : '');
         });
-        document.getElementById('p6-teacher-display').textContent = teacher.name + (teacher.position ? ' · ' + teacher.position : '');
-        document.getElementById('mobile-teacher-name').textContent = teacher.name;
-        document.getElementById('welcome-subtitle').textContent = `สวัสดีครับ/ค่ะ ${teacher.name} — กรุณาเลือกระบบที่ต้องการใช้งาน`;
-        document.getElementById('p6-print-teacher').textContent = `ครูที่บันทึก: ${teacher.name}`;
+        (function () { var _e = document.getElementById('p6-teacher-display'); if (_e) _e.textContent = teacher.name + (teacher.position ? ' · ' + teacher.position : '') })();
+        (function () { var _e = document.getElementById('mobile-teacher-name'); if (_e) _e.textContent = teacher.name })();
+        (function () { var _e = document.getElementById('welcome-subtitle'); if (_e) _e.textContent = `สวัสดีครับ/ค่ะ ${teacher.name} — กรุณาเลือกระบบที่ต้องการใช้งาน` })();
+        (function () { var _e = document.getElementById('p6-print-teacher'); if (_e) _e.textContent = `ครูที่บันทึก: ${teacher.name}` })();
 
         window.doLogout = function () {
             Swal.fire({
@@ -826,9 +1156,9 @@
                     sel.appendChild(o);
                 }
             });
-            document.getElementById('p5-sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
-            document.getElementById('p5-score-panel').classList.add('hidden');
-            document.getElementById('p5-level-badge').classList.add('hidden');
+            (function () { var _e = document.getElementById('p5-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
+            document.getElementById('p5-score-panel')?.classList.add('hidden');
+            document.getElementById('p5-level-badge')?.classList.add('hidden');
             document.getElementById('p5-sel-term').closest('div').classList.add('hidden');
         }
 
@@ -846,8 +1176,8 @@
                 o.textContent = a.classrooms.name;
                 sel.appendChild(o);
             });
-            document.getElementById('p5-score-panel').classList.add('hidden');
-            document.getElementById('p5-level-badge').classList.add('hidden');
+            document.getElementById('p5-score-panel')?.classList.add('hidden');
+            document.getElementById('p5-level-badge')?.classList.add('hidden');
         });
 
         document.getElementById('p5-sel-class')?.addEventListener('change', function () {
@@ -860,7 +1190,7 @@
             termDiv.classList.toggle('hidden', !isMiddle);
             p5ShowLevelBadge(p5CurrentLevel);
             p5RenderScorePanel();
-            document.getElementById('p5-score-panel').classList.remove('hidden');
+            document.getElementById('p5-score-panel')?.classList.remove('hidden');
         });
 
         function p5ShowLevelBadge(level) {
@@ -957,7 +1287,7 @@
             if (sumEl) { sumEl.textContent = sum; sumEl.style.color = sum === 100 ? '' : '#e24b4a'; }
             const warn = document.getElementById('p5-score-warn');
             if (warn) warn.classList.toggle('hidden', sum === 100);
-            document.getElementById('p5-max-total-display').textContent = 'รวม ' + sum + ' คะแนน';
+            (function () { var _e = document.getElementById('p5-max-total-display'); if (_e) _e.textContent = 'รวม ' + sum + ' คะแนน' })();
         };
 
         document.getElementById('p5-btn-load')?.addEventListener('click', async () => {
@@ -1013,16 +1343,16 @@
 
                 p5BuildTable(students, gradeMap1, gradeMap2, { tsId, classroomId, year, term });
 
-                document.getElementById('p5-empty').classList.add('hidden');
-                document.getElementById('p5-table-wrap').classList.remove('hidden');
+                document.getElementById('p5-empty')?.classList.add('hidden');
+                document.getElementById('p5-table-wrap')?.classList.remove('hidden');
                 const ab = document.getElementById('p5-action-bar');
                 ab.classList.remove('hidden'); ab.classList.add('flex');
-                document.getElementById('p5-progress-wrap').classList.remove('hidden');
-                document.getElementById('p5-paste-hint').classList.remove('hidden');
-                document.getElementById('p5-print-header').classList.remove('hidden');
-                document.getElementById('p5-print-subject').textContent = 'วิชา: ' + subjectTxt;
-                document.getElementById('p5-print-class').textContent = 'ห้อง: ' + classTxt;
-                document.getElementById('p5-print-year').textContent = 'ปีการศึกษา ' + year + (isMiddle ? ' ภาคเรียนที่ ' + term : '');
+                document.getElementById('p5-progress-wrap')?.classList.remove('hidden');
+                document.getElementById('p5-paste-hint')?.classList.remove('hidden');
+                document.getElementById('p5-print-header')?.classList.remove('hidden');
+                (function () { var _e = document.getElementById('p5-print-subject'); if (_e) _e.textContent = 'วิชา: ' + subjectTxt })();
+                (function () { var _e = document.getElementById('p5-print-class'); if (_e) _e.textContent = 'ห้อง: ' + classTxt })();
+                (function () { var _e = document.getElementById('p5-print-year'); if (_e) _e.textContent = 'ปีการศึกษา ' + year + (isMiddle ? ' ภาคเรียนที่ ' + term : '') })();
                 p5UpdateProgress();
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
@@ -1074,7 +1404,7 @@
 
             const table = document.getElementById('p5-table');
             table.style.minWidth = minW;
-            document.getElementById('p5-thead').innerHTML = headerHtml;
+            (function () { var _e = document.getElementById('p5-thead'); if (_e) _e.innerHTML = headerHtml })();
 
             const tbody = document.getElementById('p5-tbody');
             tbody.innerHTML = '';
@@ -1220,7 +1550,7 @@
             const pct = rows.length > 0 ? Math.round(filled / rows.length * 100) : 0;
             document.getElementById('p5-progress-bar').style.width = pct + '%';
             document.getElementById('p5-progress-bar').style.background = pct === 100 ? '#10b981' : '#6366f1';
-            document.getElementById('p5-progress-text').textContent = filled + ' / ' + rows.length + ' คน (' + pct + '%)';
+            (function () { var _e = document.getElementById('p5-progress-text'); if (_e) _e.textContent = filled + ' / ' + rows.length + ' คน (' + pct + '%)' })();
         }
 
         window.p5ExportExcel = function () {
@@ -1324,7 +1654,7 @@
             menu.classList.toggle('open', !isOpen);
             caret.classList.toggle('open', !isOpen);
             if (!isOpen) {
-                document.getElementById('nav-p6-parent').classList.add('active');
+                document.getElementById('nav-p6-parent')?.classList.add('active');
                 switchP6Sub(currentP6Sub, document.querySelector(`[data-p6sub="${currentP6Sub}"]`));
             }
         };
@@ -1401,8 +1731,8 @@
                 healthRecords[r.student_id][r.month] = r;
             });
             renderHealthTable();
-            document.getElementById('p6-health-wrap').classList.remove('hidden');
-            document.getElementById('p6-btn-save').classList.remove('hidden');
+            document.getElementById('p6-health-wrap')?.classList.remove('hidden');
+            document.getElementById('p6-btn-save')?.classList.remove('hidden');
         }
 
         function calcBMI(w, h) {
@@ -1559,9 +1889,9 @@
             commentRecords = {};
             (recs.data || []).forEach(r => { commentRecords[r.student_id] = r.comment || ''; });
             renderCommentSection();
-            document.getElementById('p6-comment-empty').classList.add('hidden');
-            document.getElementById('p6-comment-wrap').classList.remove('hidden');
-            document.getElementById('p6-btn-save').classList.remove('hidden');
+            document.getElementById('p6-comment-empty')?.classList.add('hidden');
+            document.getElementById('p6-comment-wrap')?.classList.remove('hidden');
+            document.getElementById('p6-btn-save')?.classList.remove('hidden');
         }
 
         function renderCommentSection() {
@@ -1607,7 +1937,7 @@
             caret.classList.toggle('open', !isOpen);
             if (!isOpen) {
                 // open and activate first sub
-                document.getElementById('nav-p5-parent').classList.add('active');
+                document.getElementById('nav-p5-parent')?.classList.add('active');
                 switchP5Sub(currentP5Sub, document.querySelector(`[data-sub="${currentP5Sub}"]`));
             }
         };
@@ -1642,7 +1972,7 @@
             if (sub === 'p5-read' && readSec) { readSec.classList.remove('hidden'); if (p5main) p5main.classList.add('hidden'); }
 
             // Update sub-title
-            const titles = { 'p5-cover': 'พิมพ์ปก ปพ.5', 'p5-score': 'กรอกคะแนน', 'p5-attend': 'ลงเวลาเรียน', 'p5-char': 'คุณลักษณะ 8 ประการ', 'p5-read': 'การอ่าน คิดวิเคราะห์ เขียน' };
+            const titles = { 'p5-cover': 'พิมพ์เล่ม ปพ.5', 'p5-score': 'กรอกคะแนน', 'p5-attend': 'ลงเวลาเรียน', 'p5-char': 'คุณลักษณะ 8 ประการ', 'p5-read': 'การอ่าน คิดวิเคราะห์ เขียน' };
             const titleEl = document.getElementById('p5-sub-title');
             if (titleEl) titleEl.textContent = titles[sub] || '';
 
@@ -1696,7 +2026,7 @@
                         sel.appendChild(o);
                     }
                 });
-                document.getElementById('att-sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+                (function () { var _e = document.getElementById('att-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
             } catch (e) { console.error(e); }
         }
 
@@ -1869,9 +2199,9 @@
                 }
 
                 attRenderTable();
-                document.getElementById('att-empty').classList.add('hidden');
-                document.getElementById('att-table-wrap').classList.remove('hidden');
-                document.getElementById('att-btn-save').classList.remove('hidden');
+                document.getElementById('att-empty')?.classList.add('hidden');
+                document.getElementById('att-table-wrap')?.classList.remove('hidden');
+                document.getElementById('att-btn-save')?.classList.remove('hidden');
                 document.querySelectorAll('.att-print-btn').forEach(b => b.classList.remove('hidden'));
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
@@ -2020,7 +2350,7 @@
                         sel.appendChild(o);
                     }
                 });
-                document.getElementById('char-sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+                (function () { var _e = document.getElementById('char-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
             } catch (e) { }
         }
 
@@ -2059,9 +2389,9 @@
                 charRecords = {};
                 (recs.data || []).forEach(r => { charRecords[r.student_id] = r; });
                 charRenderTable();
-                document.getElementById('char-empty').classList.add('hidden');
-                document.getElementById('char-table-wrap').classList.remove('hidden');
-                document.getElementById('char-btn-save').classList.remove('hidden');
+                document.getElementById('char-empty')?.classList.add('hidden');
+                document.getElementById('char-table-wrap')?.classList.remove('hidden');
+                document.getElementById('char-btn-save')?.classList.remove('hidden');
                 document.querySelectorAll('.char-print-btn').forEach(b => b.classList.remove('hidden'));
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
@@ -2273,7 +2603,7 @@
             }
 
             sessionStorage.setItem('p5_print_data', JSON.stringify(printData));
-            const pages = { score: 'p5-print.html', attend: 'p5-attend-print.html', char: 'p5-char-print.html', read: 'p5-read-print.html', cover: 'p5-cover-print.html' };
+            const pages = { score: 'p5-print.html', attend: 'p5-attend-print.html', char: 'p5-char-print.html', read: 'p5-read-print.html', cover: 'p5-book-print.html' };
             window.open(pages[mode] || 'p5-print.html', '_blank');
         };
 
@@ -2284,9 +2614,10 @@
             if (target) target.classList.add('active');
             document.querySelectorAll('.nav-item[data-page], .nav-sub, .nav-parent').forEach(el => el.classList.remove('active'));
             if (navEl) navEl.classList.add('active');
-            document.getElementById('mobile-page-title').textContent =
-                pageId === 'p5' ? 'ปพ.5 บันทึกผลการเรียน' :
-                    pageId === 'p6' ? 'ปพ.6 น้ำหนัก/ส่วนสูง' : 'ระบบเอกสาร ปพ.';
+            (function () {
+                var _e = document.getElementById('mobile-page-title'); if (_e) _e.textContent = pageId === 'p5' ? 'ปพ.5 บันทึกผลการเรียน' :
+                    pageId === 'p6' ? 'ปพ.6 น้ำหนัก/ส่วนสูง' : 'ระบบเอกสาร ปพ.'
+            })();
             const mainHdr = document.getElementById('p5-main-header');
             if (mainHdr) mainHdr.classList.toggle('hidden', pageId !== 'p5');
             if (pageId !== 'p5') {
@@ -2316,9 +2647,9 @@
 
         document.getElementById('cover-btn-load')?.addEventListener('click', coverLoadSubjects);
         document.getElementById('cover-sel-year')?.addEventListener('change', () => {
-            document.getElementById('cover-cards').classList.add('hidden');
-            document.getElementById('cover-empty').classList.remove('hidden');
-            document.getElementById('cover-btn-print-all').classList.add('hidden');
+            document.getElementById('cover-cards')?.classList.add('hidden');
+            document.getElementById('cover-empty')?.classList.remove('hidden');
+            document.getElementById('cover-btn-print-all')?.classList.add('hidden');
         });
 
         async function coverLoadSubjects() {
@@ -2329,18 +2660,17 @@
             try {
                 coverAssignments = await getTeacherAssignments(teacher.id, year);
                 if (!coverAssignments.length) {
-                    document.getElementById('cover-empty').innerHTML =
-                        '<i class="fa-solid fa-inbox text-4xl mb-3 opacity-20"></i><p class="text-lg">ไม่พบรายวิชาในปีการศึกษานี้</p>';
-                    document.getElementById('cover-empty').classList.remove('hidden');
-                    document.getElementById('cover-cards').classList.add('hidden');
+                    (function () { var _e = document.getElementById('cover-empty'); if (_e) _e.innerHTML = '<i class="fa-solid fa-inbox text-4xl mb-3 opacity-20"></i><p class="text-lg">ไม่พบรายวิชาในปีการศึกษานี้</p>' })();
+                    document.getElementById('cover-empty')?.classList.remove('hidden');
+                    document.getElementById('cover-cards')?.classList.add('hidden');
                     return;
                 }
                 const statusList = await Promise.all(coverAssignments.map(a => coverCheckStatus(a, year, term)));
                 coverRenderCards(coverAssignments, statusList, year, term);
-                document.getElementById('cover-empty').classList.add('hidden');
-                document.getElementById('cover-cards').classList.remove('hidden');
-                document.getElementById('cover-btn-print-all').classList.remove('hidden');
-                document.getElementById('p5-teacher-display-cover').textContent = teacher.name + ' — ปีการศึกษา ' + year;
+                document.getElementById('cover-empty')?.classList.add('hidden');
+                document.getElementById('cover-cards')?.classList.remove('hidden');
+                document.getElementById('cover-btn-print-all')?.classList.remove('hidden');
+                (function () { var _e = document.getElementById('p5-teacher-display-cover'); if (_e) _e.textContent = teacher.name + ' — ปีการศึกษา ' + year })();
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
             } finally {
@@ -2383,7 +2713,7 @@
         }
 
         function coverRenderCards(assignments, statusList, year, term) {
-            const container = document.getElementById('cover-cards');
+            const container = document.getElementById('cover-cards-grid');
             container.innerHTML = '';
             assignments.forEach((a, i) => {
                 const st = statusList[i];
@@ -2396,48 +2726,91 @@
                 const badgeText = isOk ? '✓ ข้อมูลครบถ้วน' : `⚠ ${st.issues.length} รายการต้องแก้ไข`;
                 const pct = isOk ? 100 : Math.max(10, 100 - st.issues.length * 22);
                 const issueHtml = st.issues.length ? `
-          <div style="margin-top:10px;border-top:1px solid #fde68a;padding-top:8px;">
-            ${st.issues.map(iss => `<div style="font-size:11.5px;color:#92400e;display:flex;gap:6px;align-items:center;margin-bottom:3px;">
-              <i class="fa-solid fa-triangle-exclamation" style="font-size:10px;color:#f59e0b;flex-shrink:0;"></i>
-              <span>${iss}</span></div>`).join('')}
+          <div style="margin-top:14px;padding-top:12px;border-top:1px dashed #fde68a;">
+            <div style="font-size:12px;color:#b45309;font-weight:600;margin-bottom:6px;">ข้อควรแก้ไข:</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              ${st.issues.map(iss => `<div style="font-size:11.5px;color:#92400e;display:flex;gap:6px;align-items:flex-start;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size:10px;color:#f59e0b;margin-top:3px;"></i>
+                <span>${iss}</span>
+              </div>`).join('')}
+            </div>
           </div>` : '';
                 const card = document.createElement('div');
-                card.style.cssText = `background:#fff;border-radius:14px;border:1.5px solid ${borderColor};padding:16px 18px;`;
+                card.style.cssText = `background:#fff;border-radius:14px;border:1.5px solid ${borderColor};padding:18px 22px;`;
                 card.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;">
             <div>
-              <div style="font-size:13px;font-weight:700;color:#1e293b;">${subj.code || ''} ${subj.name || ''}</div>
-              <div style="font-size:12px;color:#64748b;margin-top:2px;">${cls.name || ''} &nbsp;•&nbsp; ${st.studCount} คน &nbsp;•&nbsp; ปีการศึกษา ${year} ภาคเรียน ${term}</div>
+              <div style="font-size:14px;font-weight:700;color:#1e293b;line-height:1.3;">${subj.code || ''} ${subj.name || ''}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:6px;">${cls.name || ''} &nbsp;•&nbsp; ${st.studCount} คน &nbsp;•&nbsp; ปีการศึกษา ${year} ภาคเรียน ${term}</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
-              <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:${badgeBg};color:${badgeColor};font-weight:600;white-space:nowrap;">${badgeText}</span>
-              <button onclick="coverOpenOne(${a.id},'${year}',${term})" style="font-size:11.5px;padding:5px 14px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;color:#475569;font-family:'Sarabun',sans-serif;white-space:nowrap;">
-                <i class="fa-solid fa-print"></i> พิมพ์ปก
-              </button>
-            </div>
+            <span style="font-size:11.5px;padding:4px 10px;border-radius:20px;background:${badgeBg};color:${badgeColor};font-weight:600;white-space:nowrap;flex-shrink:0;">${badgeText}</span>
           </div>
-          <div style="margin-top:10px;background:#f1f5f9;border-radius:6px;height:7px;overflow:hidden;">
+          <div style="background:#f1f5f9;border-radius:6px;height:6px;overflow:hidden;margin-bottom:16px;">
             <div style="height:100%;border-radius:6px;background:${isOk ? '#10b981' : '#f59e0b'};width:${pct}%;"></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button onclick="coverOpenPrint(${a.id},'${year}',${term},'cover')" style="display:flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;cursor:pointer;font-weight:600;color:#0369a1;transition:all 0.2s;">
+              <i class="fa-solid fa-file-lines"></i> ปก
+            </button>
+            <button onclick="coverOpenPrint(${a.id},'${year}',${term},'score')" style="display:flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;cursor:pointer;font-weight:600;color:#4338ca;transition:all 0.2s;">
+              <i class="fa-solid fa-list-ol"></i> คะแนน
+            </button>
+            <button onclick="coverOpenPrint(${a.id},'${year}',${term},'attend')" style="display:flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;background:#ecfdf5;border:1px solid #86efac;border-radius:8px;cursor:pointer;font-weight:600;color:#047857;transition:all 0.2s;">
+              <i class="fa-solid fa-calendar-check"></i> เวลาเรียน
+            </button>
+            <button onclick="coverOpenPrint(${a.id},'${year}',${term},'char')" style="display:flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;background:#faf5ff;border:1px solid #d8b4fe;border-radius:8px;cursor:pointer;font-weight:600;color:#7e22ce;transition:all 0.2s;">
+              <i class="fa-solid fa-star"></i> คุณลักษณะ
+            </button>
+            <button onclick="coverOpenPrint(${a.id},'${year}',${term},'read')" style="display:flex;align-items:center;gap:5px;font-size:12px;padding:6px 14px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;cursor:pointer;font-weight:600;color:#c2410c;transition:all 0.2s;">
+              <i class="fa-solid fa-book-open"></i> การอ่านฯ
+            </button>
           </div>
           ${issueHtml}`;
                 container.appendChild(card);
             });
         }
 
-        window.coverOpenOne = function (tsId, year, term) {
+        // helper สร้าง printData จาก assignment
+        function makePrintData(tsId, year, term) {
             const assign = coverAssignments.find(a => a.id === tsId);
-            if (!assign) return;
-            const printData = {
-                mode: 'cover', tsId, classroomId: assign.classrooms?.id,
+            if (!assign) return null;
+            return {
+                tsId, classroomId: assign.classrooms?.id,
                 year, term: parseInt(term),
                 subjectTxt: (assign.subjects?.code || '') + ' ' + (assign.subjects?.name || ''),
                 classTxt: assign.classrooms?.name || '',
                 level: assign.classrooms?.level || '',
-                keepMax1: '', examMax1: '', keepMax2: '', examMax2: '', keepMaxM: '', midMaxM: '', finalMaxM: '',
+                keepMax1: '', examMax1: '', keepMax2: '', examMax2: '',
+                keepMaxM: '', midMaxM: '', finalMaxM: '',
             };
-            sessionStorage.setItem('p5_print_data', JSON.stringify(printData));
-            window.open('p5-cover-print.html', '_blank');
+        }
+
+        // พิมพ์เล่ม PDF (p5-book-print.html)
+        window.coverOpenBook = function (tsId, year, term) {
+            const pd = makePrintData(tsId, year, term);
+            if (!pd) return;
+            sessionStorage.setItem('p5_print_data', JSON.stringify(pd));
+            window.open('p5-book-print.html', '_blank');
         };
+
+        // พิมพ์แต่ละส่วน
+        window.coverOpenPrint = function (tsId, year, term, type) {
+            const pd = makePrintData(tsId, year, term);
+            if (!pd) return;
+            sessionStorage.setItem('p5_print_data', JSON.stringify(pd));
+            const pages = {
+                cover: 'p5-cover-print.html',
+                score: 'p5-print.html',
+                attend: 'p5-attend-print.html',
+                char: 'p5-char-print.html',
+                read: 'p5-read-print.html',
+                book: 'p5-book-print.html',
+            };
+            if (pages[type]) window.open(pages[type], '_blank');
+        };
+
+        // เก็บ backward compat
+        window.coverOpenOne = window.coverOpenBook;
 
         document.getElementById('cover-btn-print-all')?.addEventListener('click', () => {
             const year = document.getElementById('cover-sel-year').value;
@@ -2519,7 +2892,7 @@
                         sel.appendChild(o);
                     }
                 });
-                document.getElementById('read-sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+                (function () { var _e = document.getElementById('read-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
             } catch (e) { }
         }
 
@@ -2552,9 +2925,9 @@
                 readRecords = {};
                 (recs.data || []).forEach(r => { readRecords[r.student_id] = r; });
                 readRenderTable();
-                document.getElementById('read-empty').classList.add('hidden');
-                document.getElementById('read-table-wrap').classList.remove('hidden');
-                document.getElementById('read-btn-save').classList.remove('hidden');
+                document.getElementById('read-empty')?.classList.add('hidden');
+                document.getElementById('read-table-wrap')?.classList.remove('hidden');
+                document.getElementById('read-btn-save')?.classList.remove('hidden');
                 document.querySelectorAll('.read-print-btn').forEach(b => b.classList.remove('hidden'));
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
