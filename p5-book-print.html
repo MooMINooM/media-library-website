@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>พิมพ์เล่ม ปพ.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'TH Sarabun New', 'Sarabun', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .08);
+            padding: 36px 40px;
+            width: 480px;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'TH Sarabun New', 'Sarabun', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: left;
+            width: 100%;
+            transition: opacity .15s;
+        }
+
+        .btn:hover {
+            opacity: .85;
+        }
+
+        .btn .pg {
+            margin-left: auto;
+            font-size: 13px;
+            font-weight: 400;
+            opacity: .7;
+        }
+
+        .btn-score {
+            background: #eef2ff;
+            color: #3730a3;
+        }
+
+        .btn-att {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .btn-char {
+            background: #fdf4ff;
+            color: #7e22ce;
+        }
+
+        .btn-cover {
+            background: #f0f9ff;
+            color: #0c4a6e;
+        }
+
+        .btn-read {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 16px 0;
+        }
+
+        .close-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 14px;
+            font-family: 'TH Sarabun New', 'Sarabun', sans-serif;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .info {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>📚 พิมพ์เล่ม ปพ.5</h1>
+        <p class="sub" id="sub-title">กำลังโหลดข้อมูล...</p>
+        <div class="btn-row">
+            <button class="btn btn-cover" onclick="open('p5-cover-print.html')">
+                <span>🏫 พิมพ์ปก ปพ.5</span>
+                <span class="pg">ปก</span>
+            </button>
+            <button class="btn btn-score" onclick="open('p5-print.html')">
+                <span>📊 บันทึกคะแนน</span>
+                <span class="pg">หน้า 1</span>
+            </button>
+            <button class="btn btn-att" onclick="open('p5-attend-print.html')">
+                <span>📅 ลงเวลาเรียน (พ.ค.–มี.ค.)</span>
+                <span class="pg">หน้า 2–11</span>
+            </button>
+            <button class="btn btn-char" onclick="open('p5-char-print.html')">
+                <span>⭐ คุณลักษณะ 8 ประการ</span>
+                <span class="pg">หน้า 12</span>
+            </button>
+            <button class="btn btn-read" onclick="open('p5-read-print.html')">
+                <span>📖 การอ่าน คิดวิเคราะห์ เขียน</span>
+                <span class="pg">หน้า 13</span>
+            </button>
+        </div>
+        <div class="divider"></div>
+        <button class="close-btn" onclick="window.close()">✕ ปิด</button>
+        <p class="info">sessionStorage ถูกส่งต่อให้ทุกหน้าอัตโนมัติ</p>
+    </div>
+    <script>
+        try {
+            const pd = JSON.parse(sessionStorage.getItem('p5_print_data') || 'null');
+            if (pd) {
+                const sub = document.getElementById('sub-title');
+                const cls = pd.classTxt || '';
+                const subj = pd.subjectTxt || '';
+                const year = pd.year || '';
+                const term = pd.term || '';
+                sub.textContent = `${cls}  •  ${subj}  •  ปีการศึกษา ${year} ภาคเรียน ${term}`;
+            }
+        } catch (e) { }
+    </script>
+</body>
+
+</html>
