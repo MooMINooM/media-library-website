@@ -69,6 +69,9 @@
     .a4 {
       background: #fff;
       width: 277mm;
+      min-height: 190mm;
+      display: flex;
+      flex-direction: column;
       padding: 8mm 10mm;
       box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
       font-family: 'Sarabun', sans-serif;
@@ -238,6 +241,21 @@
       margin-top: 16px;
     }
 
+    .page-num-char {
+      text-align: right;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media print {
+      .page-num-char {
+        color: #666;
+      }
+    }
+
     #loading {
       text-align: center;
       padding: 60px;
@@ -293,14 +311,14 @@
     const db = window.supabase.createClient(URL_, KEY_);
 
     const GROUPS = [
-      { key: 'c1', label: '1.รักชาติ ศาสน์ กษัตริย์', cols: [{ k: 'c1_1', l: 'เป็นพลเมืองดี' }, { k: 'c1_2', l: 'เอกภาพชาติ' }, { k: 'c1_3', l: 'หลักกฎหมาย' }, { k: 'c1_4', l: 'เทิดทูนฯ' }] },
-      { key: 'c2', label: '2.ซื่อสัตย์สุจริต', cols: [{ k: 'c2_1', l: 'จิตใจตรง' }, { k: 'c2_2', l: 'ต่อตนเอง' }, { k: 'c2_3', l: 'กฎระเบียบ' }] },
-      { key: 'c3', label: '3.มีวินัย', cols: [{ k: 'c3_1', l: 'ปฏิบัติกฎระเบียบ' }] },
-      { key: 'c4', label: '4.ใฝ่เรียนรู้', cols: [{ k: 'c4_1', l: 'ตั้งใจเรียน' }, { k: 'c4_2', l: 'แสวงหาความรู้' }] },
-      { key: 'c5', label: '5.อยู่อย่างพอเพียง', cols: [{ k: 'c5_1', l: 'พอประมาณ' }, { k: 'c5_2', l: 'มีความสุข' }] },
-      { key: 'c6', label: '6.มุ่งมั่นในการทำงาน', cols: [{ k: 'c6_1', l: 'รับผิดชอบ' }, { k: 'c6_2', l: 'อดทน' }] },
-      { key: 'c7', label: '7.รักความเป็นไทย', cols: [{ k: 'c7_1', l: 'ภูมิใจไทย' }, { k: 'c7_2', l: 'ธรรมเนียม' }, { k: 'c7_3', l: 'ภูมิปัญญา' }, { k: 'c7_4', l: 'ภาษาไทย' }] },
-      { key: 'c8', label: '8.จิตสาธารณะ', cols: [{ k: 'c8_1', l: 'ช่วยเหลือ' }, { k: 'c8_2', l: 'ร่วมกิจกรรม' }] },
+      { key: 'c1_nation', label: '1.รักชาติ ศาสน์ กษัตริย์', cols: [{ k: 'c1_1', l: 'เป็นพลเมืองดี' }, { k: 'c1_2', l: 'เอกภาพชาติ' }, { k: 'c1_3', l: 'หลักกฎหมาย' }, { k: 'c1_4', l: 'เทิดทูนฯ' }] },
+      { key: 'c2_honest', label: '2.ซื่อสัตย์สุจริต', cols: [{ k: 'c2_1', l: 'จิตใจตรง' }, { k: 'c2_2', l: 'ต่อตนเอง' }, { k: 'c2_3', l: 'กฎระเบียบ' }] },
+      { key: 'c3_discipline', label: '3.มีวินัย', cols: [{ k: 'c3_1', l: 'ปฏิบัติกฎระเบียบ' }] },
+      { key: 'c4_study', label: '4.ใฝ่เรียนรู้', cols: [{ k: 'c4_1', l: 'ตั้งใจเรียน' }, { k: 'c4_2', l: 'แสวงหาความรู้' }] },
+      { key: 'c5_economy', label: '5.อยู่อย่างพอเพียง', cols: [{ k: 'c5_1', l: 'พอประมาณ' }, { k: 'c5_2', l: 'มีความสุข' }] },
+      { key: 'c6_work', label: '6.มุ่งมั่นในการทำงาน', cols: [{ k: 'c6_1', l: 'รับผิดชอบ' }, { k: 'c6_2', l: 'อดทน' }] },
+      { key: 'c7_thai', label: '7.รักความเป็นไทย', cols: [{ k: 'c7_1', l: 'ภูมิใจไทย' }, { k: 'c7_2', l: 'ธรรมเนียม' }, { k: 'c7_3', l: 'ภูมิปัญญา' }, { k: 'c7_4', l: 'ภาษาไทย' }] },
+      { key: 'c8_public', label: '8.จิตสาธารณะ', cols: [{ k: 'c8_1', l: 'ช่วยเหลือ' }, { k: 'c8_2', l: 'ร่วมกิจกรรม' }] },
     ];
     const VBG = { 3: '#dcfce7', 2: '#dbeafe', 1: '#fef9c3', 0: '#fee2e2' };
     const VCOL = { 3: '#166534', 2: '#1e40af', 1: '#854d0e', 0: '#991b1b' };
@@ -327,7 +345,7 @@
         return (a.student_no || '').localeCompare(b.student_no || '', undefined, { numeric: true });
       });
       const recMap = {}; (recR.data || []).forEach(r => { recMap[r.student_id] = r; });
-      document.getElementById('toolbar-info').textContent = (classTxt || cls.name || '') + ' ภาคเรียนที่ ' + term + ' — ปีการศึกษา ' + year;
+      document.getElementById('toolbar-info').textContent = (classTxt || cls.name || '') + ' — ปีการศึกษา ' + year + ' ภาคเรียนที่ ' + term;
 
       // ── header ──
       let h = '<div class="a4">';
@@ -338,7 +356,8 @@
   <div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
     <span><span style="font-weight:600;">รายวิชา</span> : ${esc(subjectTxt || '')}</span>
     <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(classTxt || cls.name || '')}</span>
-    <span><span style="font-weight:600;">ภาคเรียนที่</span> : ${term} &emsp; <span style="font-weight:600;">ปีการศึกษา</span> : ${year}</span>
+    <span><span style="font-weight:600;">จำนวนนักเรียน</span> : ${studs.length} คน</span>
+    <span><span style="font-weight:600;">ปีการศึกษา</span> : ${year} &emsp; <span style="font-weight:600;">ภาคเรียนที่</span> : ${term}</span>
   </div>`;
 
 
@@ -346,7 +365,7 @@
       h += '<table><thead>';
       let r1 = `<th class="th-fix" rowspan="2" style="width:22px;">ที่</th>`
         + `<th class="th-fix" rowspan="2" style="width:44px;">รหัส</th>`
-        + `<th class="th-fix" rowspan="2">ชื่อ-นามสกุล</th>`;
+        + `<th class="th-fix name-col" rowspan="2">ชื่อ-นามสกุล</th>`;
       let r2 = '';
       GROUPS.forEach(g => {
         r1 += `<th class="th-grp" colspan="${g.cols.length + 1}">${g.label}</th>`;
@@ -387,7 +406,8 @@
       });
 
       h += '</tbody></table>';
-      h += `<div class="sig-grid">
+      h += `<div style="margin-top:auto;">
+  <div class="sig-grid">
     <div><div>ลงชื่อ .....................................................</div>
     <div style="color:#555;">( ..................................................... )</div>
     <div style="font-weight:600;margin-top:3px;">ครูผู้สอน</div>
@@ -396,7 +416,9 @@
     <div style="color:#555;">( ..................................................... )</div>
     <div style="font-weight:600;margin-top:3px;">หัวหน้าวิชาการ</div>
     <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
-  </div></div>`;
+  </div>
+  <div class="page-num-char">หน้า 12</div>
+</div>`;
 
       document.getElementById('loading').style.display = 'none';
       document.getElementById('doc-root').innerHTML = h;
