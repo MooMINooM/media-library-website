@@ -198,6 +198,18 @@
                                 <div id="eservice-dropdown-container">
                                     <p class="text-center text-slate-300 py-2 text-xs italic">กำลังโหลดรายการ...</p>
                                 </div>
+                                <!-- ระบบเอกสารปพ -->
+                                <div class="h-px bg-slate-100 my-2"></div>
+                                <div class="px-3 py-1.5 text-[10px] font-black text-violet-500 uppercase tracking-widest mb-1">
+                                    <i class="fa-solid fa-graduation-cap mr-1"></i> เอกสารปพ.
+                                </div>
+                                <a href="#" id="nav-paw-system"
+                                    onclick="openTeacherLoginOrPaw(event)"
+                                    class="block px-3 py-2 hover:bg-violet-50 text-slate-600 rounded-lg transition-all flex items-center gap-2.5 text-sm">
+                                    <i class="fa-solid fa-id-card text-violet-500 w-4 text-xs"></i>
+                                    ระบบเอกสารปพ.
+                                    <span id="paw-login-badge" class="ml-auto text-[10px] bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded-full font-semibold hidden">ล็อกอินแล้ว</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -298,6 +310,19 @@
                 <a href="#" data-page="documents-forms"
                     class="block py-2.5 px-4 text-slate-600 pl-8 flex items-center gap-3 rounded-lg hover:bg-slate-50"><i
                         class="fa-solid fa-file-lines text-blue-500 text-sm w-5 text-center"></i> แบบฟอร์มต่าง ๆ</a>
+
+                <!-- ระบบเอกสารปพ (Mobile) -->
+                <div
+                    class="py-2 px-4 text-[10px] font-black text-violet-500 uppercase tracking-widest bg-violet-50/50 rounded-lg mt-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-graduation-cap"></i> เอกสารปพ.
+                </div>
+                <a href="#" id="mobile-nav-paw"
+                    onclick="openTeacherLoginOrPaw(event); document.getElementById('mobile-menu').classList.add('hidden')"
+                    class="block py-2.5 px-4 text-violet-700 pl-8 flex items-center gap-3 font-semibold rounded-lg hover:bg-violet-50">
+                    <i class="fa-solid fa-id-card text-violet-500 text-sm w-5 text-center"></i>
+                    ระบบเอกสารปพ.
+                    <span id="paw-login-badge-mobile" class="ml-auto text-[10px] bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded-full font-semibold hidden">ล็อกอินแล้ว</span>
+                </a>
 
                 <div class="pt-4 px-2 border-t border-slate-100 mt-4">
                     <button
@@ -1359,6 +1384,87 @@
         <button onclick="window.lightboxNav(1)" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center z-10 transition text-xl"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 
+    <!-- ===== TEACHER LOGIN MODAL ===== -->
+    <div id="teacher-login-modal"
+        class="fixed inset-0 bg-slate-900/70 hidden z-[101] flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden mx-4">
+            <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-8 pt-8 pb-6 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/10">
+                    <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">เข้าสู่ระบบครู</h2>
+                <p class="text-violet-200 text-xs mt-1">ระบบเอกสาร ปพ.5 / ปพ.6</p>
+            </div>
+            <button onclick="document.getElementById('teacher-login-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-all">
+                <i class="fa-solid fa-times text-sm"></i>
+            </button>
+            <div class="p-8 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">ชื่อผู้ใช้</label>
+                    <input type="text" id="teacher-username"
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all text-sm"
+                        placeholder="teacher01">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">รหัสผ่าน</label>
+                    <input type="password" id="teacher-password"
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 outline-none transition-all text-sm"
+                        placeholder="••••••••">
+                </div>
+                <p id="teacher-login-error" class="text-red-500 text-xs hidden"></p>
+                <button id="btn-teacher-login" onclick="handleTeacherLogin()"
+                    class="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PAW SYSTEM SELECT MODAL ===== -->
+    <div id="paw-select-modal"
+        class="fixed inset-0 bg-slate-900/70 hidden z-[101] flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative mx-4">
+            <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-6 pt-6 pb-4 text-center rounded-t-2xl">
+                <h2 class="text-lg font-bold text-white">ระบบเอกสารปพ.</h2>
+                <p id="paw-teacher-greeting" class="text-violet-200 text-xs mt-0.5"></p>
+            </div>
+            <button onclick="document.getElementById('paw-select-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center transition-all">
+                <i class="fa-solid fa-times text-sm"></i>
+            </button>
+            <div class="p-6 grid grid-cols-2 gap-4">
+                <a href="p5.html"
+                    class="flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-indigo-100 hover:border-indigo-400 hover:bg-indigo-50 transition-all group">
+                    <div class="w-14 h-14 bg-indigo-100 group-hover:bg-indigo-200 rounded-2xl flex items-center justify-center transition">
+                        <i class="fa-solid fa-book-open text-indigo-600 text-2xl"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-slate-700 text-sm">ปพ.5</p>
+                        <p class="text-xs text-slate-500 mt-0.5">บันทึกผลการเรียน</p>
+                    </div>
+                </a>
+                <a href="p6.html"
+                    class="flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-violet-100 hover:border-violet-400 hover:bg-violet-50 transition-all group">
+                    <div class="w-14 h-14 bg-violet-100 group-hover:bg-violet-200 rounded-2xl flex items-center justify-center transition">
+                        <i class="fa-solid fa-user-graduate text-violet-600 text-2xl"></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-slate-700 text-sm">ปพ.6</p>
+                        <p class="text-xs text-slate-500 mt-0.5">บันทึกพัฒนาการผู้เรียน</p>
+                    </div>
+                </a>
+            </div>
+            <div class="px-6 pb-4 flex justify-end">
+                <button onclick="teacherLogoutFromIndex()"
+                    class="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1 transition">
+                    <i class="fa-solid fa-right-from-bracket text-[10px]"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="login-modal"
         class="fixed inset-0 bg-slate-900/70 hidden z-[100] flex items-center justify-center backdrop-blur-md">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm relative animate-fade-in overflow-hidden mx-4">
@@ -1425,6 +1531,85 @@
             else { audio.play(); icon.classList.replace('fa-play', 'fa-pause'); }
             isPlaying = !isPlaying;
         }
+
+        // ===== TEACHER LOGIN (ปพ.5 / ปพ.6) =====
+        const PAW_SESSION_KEY = 'paw_teacher_session';
+
+        function getTeacherSession() {
+            try { return JSON.parse(sessionStorage.getItem(PAW_SESSION_KEY)); } catch { return null; }
+        }
+
+        function updatePawBadge() {
+            const t = getTeacherSession();
+            ['paw-login-badge', 'paw-login-badge-mobile'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', !t);
+            });
+        }
+
+        window.openTeacherLoginOrPaw = function(e) {
+            e.preventDefault();
+            const t = getTeacherSession();
+            if (t) {
+                window.location.href = 'paw.html';
+            } else {
+                document.getElementById('teacher-login-error').classList.add('hidden');
+                document.getElementById('teacher-username').value = '';
+                document.getElementById('teacher-password').value = '';
+                document.getElementById('teacher-login-modal').classList.remove('hidden');
+                setTimeout(function() { document.getElementById('teacher-username').focus(); }, 100);
+            }
+        };
+
+        window.handleTeacherLogin = async function() {
+            const username = document.getElementById('teacher-username').value.trim();
+            const password = document.getElementById('teacher-password').value;
+            const errEl = document.getElementById('teacher-login-error');
+            const btn = document.getElementById('btn-teacher-login');
+            if (!username || !password) {
+                errEl.textContent = 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+            btn.disabled = true;
+            errEl.classList.add('hidden');
+            try {
+                const { data, error } = await supabaseClient.rpc('authenticate_teacher', {
+                    p_username: username,
+                    p_password: password
+                });
+                if (error) throw error;
+                if (!data || data.length === 0) throw new Error('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+                const teacher = data[0];
+                sessionStorage.setItem(PAW_SESSION_KEY, JSON.stringify(teacher));
+                document.getElementById('teacher-login-modal').classList.add('hidden');
+                updatePawBadge();
+                window.location.href = 'paw.html';
+            } catch(err) {
+                errEl.textContent = err.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่';
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ';
+                btn.disabled = false;
+            }
+        };
+
+        window.teacherLogoutFromIndex = function() {
+            sessionStorage.removeItem(PAW_SESSION_KEY);
+            updatePawBadge();
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            ['teacher-username', 'teacher-password'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') window.handleTeacherLogin();
+                });
+            });
+            updatePawBadge();
+        });
+        // ===== END TEACHER LOGIN =====
 
         // ✅ ฟังก์ชันปิด Announcement Modal (เพิ่มเข้าไปเพื่อให้ทำงานได้)
         window.closeAnnouncement = () => {
