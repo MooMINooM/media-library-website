@@ -69,6 +69,9 @@
     .a4 {
       background: #fff;
       width: 277mm;
+      min-height: 190mm;
+      display: flex;
+      flex-direction: column;
       padding: 8mm 10mm;
       box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
       font-family: 'Sarabun', sans-serif;
@@ -288,6 +291,21 @@
       margin: 0 20px 3px;
     }
 
+    .page-num-att {
+      text-align: right;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media print {
+      .page-num-att {
+        color: #666;
+      }
+    }
+
     #loading {
       text-align: center;
       padding: 60px;
@@ -348,7 +366,9 @@
     const db = window.supabase.createClient(URL_, KEY_);
     const MF = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
     const DW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-    const ACAD = [4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2];
+    const ACAD_T1 = [4, 5, 6, 7, 8, 9];      // เทอม 1: พ.ค.–ต.ค.
+    const ACAD_T2 = [10, 11, 0, 1, 2];      // เทอม 2: พ.ย.–มี.ค.
+    const ACAD = [4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]; // ทั้งปี (fallback)
     const ATL = { P: 'ม', A: 'ข', L: 'ส', E: 'ล', S: 'ป' };
 
     function esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
@@ -389,7 +409,7 @@
       return arr;
     }
 
-    function buildPage(m, actYear, buddYear, days, studs, amap, headerHtml, isFirst) {
+    function buildPage(m, actYear, buddYear, days, studs, amap, headerHtml, isFirst, pageIdx) {
       const workDays = days.filter(d => !d.isOff);
       const mLabel = MF[m] + ' ' + (m <= 2 ? buddYear + 1 : buddYear);
       let h = '<div class="a4' + (isFirst ? '' : ' break') + '">';
@@ -480,7 +500,8 @@
 
 
 
-      h += `<div class="sig-grid">
+      h += `<div style="margin-top:auto;">
+  <div class="sig-grid">
     <div><div>ลงชื่อ .....................................................</div>
     <div style="color:#555;">( ..................................................... )</div>
     <div style="font-weight:600;margin-top:3px;">ครูผู้สอน</div>
@@ -489,7 +510,9 @@
     <div style="color:#555;">( ..................................................... )</div>
     <div style="font-weight:600;margin-top:3px;">หัวหน้าวิชาการ</div>
     <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
-  </div>`;
+  </div>
+  <div class="page-num-att">หน้า ${2 + pageIdx}</div>
+</div>`;
       h += '</div>';
       return h;
     }
@@ -500,6 +523,14 @@
       const { classroomId, year } = pd;
       console.log('printData received:', JSON.stringify(pd));
       const by = parseInt(year), cey = by - 543, ncy = cey + 1;
+
+      const term = pd.term || 1;
+      // กำหนดช่วงวันที่และเดือนตามเทอม
+      // เทอม 1: พ.ค.–ต.ค. (cey-05-01 ถึง cey-10-31)
+      // เทอม 2: พ.ย.–มี.ค. (cey-11-01 ถึง ncy-03-31)
+      const acadMonths = term === 1 ? ACAD_T1 : ACAD_T2;
+      const dateFrom = term === 1 ? cey + '-05-01' : cey + '-11-01';
+      const dateTo = term === 1 ? cey + '-10-31' : ncy + '-03-31';
 
       const [sR, cR, aR, stR, hs1, hs2] = await Promise.all([
         db.from('school_info').select('school_name,affiliation').limit(1).single(),
@@ -520,7 +551,7 @@
       const hours = pd.hours !== undefined && pd.hours !== '' ? pd.hours : (subj.hours_per_week || '');
 
       const { data: att } = await db.from('p5_attendance').select('*').eq('classroom_id', classroomId)
-        .gte('attend_date', cey + '-05-01').lte('attend_date', ncy + '-03-31');
+        .gte('attend_date', dateFrom).lte('attend_date', dateTo);
       const amap = {}; (att || []).forEach(r => { if (!amap[r.student_id]) amap[r.student_id] = {}; amap[r.student_id][r.attend_date] = r.status; });
 
       document.getElementById('toolbar-info').textContent = cls.name + ' — ปีการศึกษา ' + year;
@@ -536,6 +567,7 @@
   <div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
     <span><span style="font-weight:600;">รายวิชา</span> : ${esc(subjTxt)}</span>
     <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(cls.name || pd.classTxt || '')}</span>
+    <span><span style="font-weight:600;">ครูผู้สอน</span> : ${esc(teacherName)}</span>
     <span><span style="font-weight:600;">ปีการศึกษา</span> : ${year} &emsp; <span style="font-weight:600;">เดือน</span> : ${mLabel}</span>
   </div>`;
       }
@@ -548,11 +580,11 @@
 
       let html = '';
       let pageIdx = 0;
-      ACAD.forEach(m => {
+      acadMonths.forEach(m => {
         const ay = m <= 2 ? ncy : cey, hs_ = m <= 2 ? hs2 : hs1;
         const dayArr = getDays(ay, m, hs_);
         if (dayArr.filter(d => !d.isOff).length === 0) return;
-        html += buildPage(m, ay, by, dayArr, studs, amap, pageIdx === 0 ? makeHeaderHtml : Object.assign({ _subj: subjTxt, _cls: cls.name || pd.classTxt || '', _year: year }, {}), pageIdx === 0);
+        html += buildPage(m, ay, by, dayArr, studs, amap, pageIdx === 0 ? makeHeaderHtml : Object.assign({ _subj: subjTxt, _cls: cls.name || pd.classTxt || '', _year: year }, {}), pageIdx === 0, pageIdx);
         pageIdx++;
       });
 
