@@ -109,17 +109,20 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
+
         .upload-img-btn:hover {
             border-color: #6366f1;
             background: #eef2ff;
             color: #6366f1;
         }
+
         .upload-img-btn.uploading {
             border-color: #6366f1;
             background: #eef2ff;
             color: #6366f1;
             pointer-events: none;
         }
+
         .img-preview-thumb {
             width: 42px;
             height: 42px;
@@ -129,15 +132,18 @@
             flex-shrink: 0;
             display: none;
         }
+
         .img-field-wrap {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .img-field-wrap input {
             flex: 1;
             min-width: 0;
         }
+
         .gdrive-btn {
             flex-shrink: 0;
             display: inline-flex;
@@ -155,17 +161,25 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
+
         .gdrive-btn:hover {
             border-color: #4285f4;
             background: #f0f5ff;
             color: #4285f4;
         }
+
         .gdrive-converted {
             animation: gdrive-flash 0.5s ease;
         }
+
         @keyframes gdrive-flash {
-            0%   { background: #d1fae5; }
-            100% { background: transparent; }
+            0% {
+                background: #d1fae5;
+            }
+
+            100% {
+                background: transparent;
+            }
         }
 
         .animate-fade-in-up {
@@ -384,6 +398,40 @@
                 </div>
             </div>
 
+            <!-- Group: ระบบ ปพ. -->
+            <div class="menu-group">
+                <button onclick="toggleGroup(this)"
+                    class="menu-group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-indigo-400 w-4 text-center"></i>
+                        <span>ระบบ ปพ.</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right chevron text-[8px] opacity-50"></i>
+                </button>
+                <div class="menu-group-items open">
+                    <button onclick="loadP5BasicSection()" id="menu-p5basic"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-circle-info w-4 text-center text-xs text-cyan-400"></i> ข้อมูลพื้นฐาน ปพ.
+                    </button>
+                    <button onclick="loadAdvisorSection()" id="menu-advisors"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chalkboard-user w-4 text-center text-xs text-cyan-400"></i> ครูประจำชั้น
+                    </button>
+                    <button onclick="loadTeacherSection()" id="menu-teachers"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-chalkboard-teacher w-4 text-center text-xs text-indigo-400"></i> ครูผู้สอน
+                    </button>
+                    <button onclick="loadClassroomSection()" id="menu-classrooms"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-school w-4 text-center text-xs text-teal-400"></i> ห้องเรียน & วิชา
+                    </button>
+                    <button onclick="loadStudentSection()" id="menu-students"
+                        class="admin-menu-item w-full text-left pl-9 pr-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 flex items-center gap-3 transition-all text-sm">
+                        <i class="fa-solid fa-users w-4 text-center text-xs text-emerald-400"></i> นักเรียน
+                    </button>
+                </div>
+            </div>
+
         </nav>
 
         <!-- Logout -->
@@ -591,7 +639,7 @@
             calendar_events: {
                 title: "ปฏิทินกิจกรรม", fields: [
                     { key: "title", label: "ชื่อกิจกรรม", type: "text", required: true },
-                    { key: "type", label: "ประเภทกิจกรรม", type: "select", options: ["academic","activity","holiday","exam","other"] },
+                    { key: "type", label: "ประเภทกิจกรรม", type: "select", options: ["academic", "activity", "holiday", "exam", "other"] },
                     { key: "start_date", label: "วันที่เริ่ม", type: "date", required: true },
                     { key: "end_date", label: "วันที่สิ้นสุด (ถ้ามี)", type: "date" },
                     { key: "description", label: "รายละเอียด", type: "text" },
@@ -602,7 +650,7 @@
                 title: "แกลลอรี่อัลบั้ม", fields: [
                     { key: "title", label: "ชื่ออัลบั้ม", type: "text", required: true },
                     { key: "description", label: "คำอธิบาย", type: "text" },
-                    { key: "category", label: "หมวดหมู่", type: "select", options: ["academic","activity","sport","ceremony","other"] },
+                    { key: "category", label: "หมวดหมู่", type: "select", options: ["academic", "activity", "sport", "ceremony", "other"] },
                     { key: "album_url", label: "Link อัลบั้ม (Google Photos / Drive / อื่นๆ)", type: "url", required: true },
                     { key: "cover_url", label: "URL รูปปกอัลบั้ม (ไม่บังคับ)", type: "url" },
                     { key: "event_date", label: "วันที่จัดกิจกรรม", type: "date" },
@@ -816,7 +864,7 @@
         }
 
         // ===== GALLERY UPLOAD SECTION =====
-        window.openGalleryUpload = async function(albumId, folderPath) {
+        window.openGalleryUpload = async function (albumId, folderPath) {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -844,7 +892,7 @@
                     });
                     if (!error) successCount++;
                     else lastError = error;
-                    Swal.update({ html: `<div class="text-sm text-slate-500">${i+1} / ${total} ไฟล์</div>` });
+                    Swal.update({ html: `<div class="text-sm text-slate-500">${i + 1} / ${total} ไฟล์</div>` });
                 }
 
                 if (successCount === total) {
@@ -883,7 +931,7 @@ AND auth.role() = 'authenticated');</code>
             input.click();
         };
 
-        window.viewGalleryPhotos = async function(folderPath, albumTitle) {
+        window.viewGalleryPhotos = async function (folderPath, albumTitle) {
             const { data: files, error } = await supabaseAdmin.storage.from('gallery').list(folderPath, { limit: 200 });
             const main = document.getElementById('main-area');
             if (error || !files) {
@@ -892,7 +940,7 @@ AND auth.role() = 'authenticated');</code>
             }
             const imgFiles = files.filter(f => f.name && /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(f.name));
             const { data: { publicUrl: base } } = supabaseAdmin.storage.from('gallery').getPublicUrl(`${folderPath}/placeholder`);
-            const baseUrl = base.replace('/placeholder','');
+            const baseUrl = base.replace('/placeholder', '');
             const grid = imgFiles.map(f => {
                 const url = `${baseUrl}/${f.name}`;
                 return `<div class="relative group rounded-2xl overflow-hidden aspect-square bg-slate-100">
@@ -917,13 +965,13 @@ AND auth.role() = 'authenticated');</code>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-xl p-6">
                     ${imgFiles.length === 0
-                        ? `<div class="text-center py-16 text-slate-300"><i class="fa-solid fa-images text-5xl block mb-3"></i><p class="font-medium">ยังไม่มีรูปภาพ</p><p class="text-sm mt-1">กดปุ่ม "อัปโหลดรูปภาพ" เพื่อเพิ่มรูป</p></div>`
-                        : `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">${grid}</div>`}
+                    ? `<div class="text-center py-16 text-slate-300"><i class="fa-solid fa-images text-5xl block mb-3"></i><p class="font-medium">ยังไม่มีรูปภาพ</p><p class="text-sm mt-1">กดปุ่ม "อัปโหลดรูปภาพ" เพื่อเพิ่มรูป</p></div>`
+                    : `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">${grid}</div>`}
                 </div>
             </div>`;
         };
 
-        window.deleteGalleryPhoto = async function(folderPath, fileName) {
+        window.deleteGalleryPhoto = async function (folderPath, fileName) {
             const result = await Swal.fire({ title: 'ลบรูปนี้?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' });
             if (!result.isConfirmed) return;
             const { error } = await supabaseAdmin.storage.from('gallery').remove([`${folderPath}/${fileName}`]);
@@ -933,9 +981,9 @@ AND auth.role() = 'authenticated');</code>
 
         // ===== COMBINED ACADEMIC SECTION (รูป + เอกสาร) =====
         const _acCfg = {
-            onet: { title:'ผลสัมฤทธิ์ O-NET', docTable:'onet', settingsTable:'onet_settings', icon:'fa-chart-line', color:'text-emerald-400', colorBg:'bg-emerald-50', colorText:'text-emerald-700', colorBorder:'border-emerald-200' },
-            nt:   { title:'ผลสัมฤทธิ์ NT',     docTable:'nt',   settingsTable:'nt_settings',   icon:'fa-chart-simple', color:'text-blue-400', colorBg:'bg-blue-50', colorText:'text-blue-700', colorBorder:'border-blue-200' },
-            rt:   { title:'ผลสัมฤทธิ์ RT',      docTable:'rt',   settingsTable:'rt_settings',   icon:'fa-book-open', color:'text-violet-400', colorBg:'bg-violet-50', colorText:'text-violet-700', colorBorder:'border-violet-200' }
+            onet: { title: 'ผลสัมฤทธิ์ O-NET', docTable: 'onet', settingsTable: 'onet_settings', icon: 'fa-chart-line', color: 'text-emerald-400', colorBg: 'bg-emerald-50', colorText: 'text-emerald-700', colorBorder: 'border-emerald-200' },
+            nt: { title: 'ผลสัมฤทธิ์ NT', docTable: 'nt', settingsTable: 'nt_settings', icon: 'fa-chart-simple', color: 'text-blue-400', colorBg: 'bg-blue-50', colorText: 'text-blue-700', colorBorder: 'border-blue-200' },
+            rt: { title: 'ผลสัมฤทธิ์ RT', docTable: 'rt', settingsTable: 'rt_settings', icon: 'fa-book-open', color: 'text-violet-400', colorBg: 'bg-violet-50', colorText: 'text-violet-700', colorBorder: 'border-violet-200' }
         };
         let _acCurrentType = null;
 
@@ -969,11 +1017,11 @@ AND auth.role() = 'authenticated');</code>
             const inputCls = 'w-full border border-slate-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white text-sm hover:border-slate-300';
 
             // Settings card HTML
-            const imgFields = [1,2,3,4].map(n => {
-                const curUrl = (settings[`img_${n}`]||'').trim();
+            const imgFields = [1, 2, 3, 4].map(n => {
+                const curUrl = (settings[`img_${n}`] || '').trim();
                 const inputId = `acimg-${type}-${n}`;
-                const labelSuffix = n===1?' (ปีล่าสุด)':n===4?' (เปรียบเทียบย้อนหลัง)':'';
-                const inp = `<input type="url" id="${inputId}" value="${curUrl.replace(/"/g,'&quot;')}" placeholder="https://..." class="${inputCls} flex-1">`;
+                const labelSuffix = n === 1 ? ' (ปีล่าสุด)' : n === 4 ? ' (เปรียบเทียบย้อนหลัง)' : '';
+                const inp = `<input type="url" id="${inputId}" value="${curUrl.replace(/"/g, '&quot;')}" placeholder="https://..." class="${inputCls} flex-1">`;
                 return `<div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">รูปที่ ${n}${labelSuffix}</label>
                     ${_imgFieldHtml(inp, inputId, curUrl)}
@@ -990,7 +1038,7 @@ AND auth.role() = 'authenticated');</code>
                     return `<div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50/80 transition-all group">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-500 flex items-center justify-center font-bold text-sm border border-indigo-100/50 flex-shrink-0">${i.id}</div>
-                            <div><div class="font-semibold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">${i[docKey]||'-'}</div>${sub}</div>
+                            <div><div class="font-semibold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">${i[docKey] || '-'}</div>${sub}</div>
                         </div>
                         <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                             <button onclick="editItem('${i.id}')" class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-100 flex items-center justify-center transition-all text-xs"><i class="fa-solid fa-pen"></i></button>
@@ -1019,7 +1067,7 @@ AND auth.role() = 'authenticated');</code>
                         </button>
                     </div>
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" id="acimg-${type}-id" value="${settings.id||''}">
+                        <input type="hidden" id="acimg-${type}-id" value="${settings.id || ''}">
                         ${imgFields}
                     </div>
                 </div>
@@ -1047,24 +1095,24 @@ AND auth.role() = 'authenticated');</code>
         }
 
         async function _saveAcademicSettings(type) {
-            const id  = document.getElementById(`acimg-${type}-id`).value;
+            const id = document.getElementById(`acimg-${type}-id`).value;
             const cfg = _acCfg[type];
             const data = {};
-            [1,2,3,4].forEach(n => {
-                const v = (document.getElementById(`acimg-${type}-${n}`)?.value||'').trim();
+            [1, 2, 3, 4].forEach(n => {
+                const v = (document.getElementById(`acimg-${type}-${n}`)?.value || '').trim();
                 data[`img_${n}`] = v || null;
             });
             const { error } = id
                 ? await supabaseAdmin.from(cfg.settingsTable).update(data).eq('id', id)
                 : await supabaseAdmin.from(cfg.settingsTable).insert([data]);
-            if (error) Swal.fire({ icon:'error', title:'Error', text:error.message, confirmButtonColor:'#6366f1' });
-            else Swal.fire({ icon:'success', title:'บันทึกรูปเรียบร้อย', timer:1200, showConfirmButton:false });
+            if (error) Swal.fire({ icon: 'error', title: 'Error', text: error.message, confirmButtonColor: '#6366f1' });
+            else Swal.fire({ icon: 'success', title: 'บันทึกรูปเรียบร้อย', timer: 1200, showConfirmButton: false });
             // Reload to refresh previews
             loadAcademicSection(type);
         }
         window._saveAcademicSettings = _saveAcademicSettings;
 
-                // ============================================================
+        // ============================================================
         // IMAGE UPLOAD TO SUPABASE STORAGE (bucket: "images")
         // ============================================================
 
@@ -1088,7 +1136,7 @@ AND auth.role() = 'authenticated');</code>
         }
 
         // กด "Google Drive" → popup อธิบาย + input ใส่ลิงก์
-        window.pasteGDrive = function(inputId) {
+        window.pasteGDrive = function (inputId) {
             Swal.fire({
                 title: '<span style="font-size:16px;font-weight:600">วาง Link Google Drive</span>',
                 html: `<div style="text-align:left;font-size:13px;color:#64748b;line-height:1.7">
@@ -1133,14 +1181,14 @@ AND auth.role() = 'authenticated');</code>
             });
         };
 
-                // รูป label keywords ที่ควรมีปุ่มอัปโหลด
-        const _IMG_KEYWORDS = ['รูป','image','logo','cover','popup','uniform','photo','img'];
+        // รูป label keywords ที่ควรมีปุ่มอัปโหลด
+        const _IMG_KEYWORDS = ['รูป', 'image', 'logo', 'cover', 'popup', 'uniform', 'photo', 'img'];
         // link label keywords ที่ไม่ควรมีปุ่ม
-        const _LINK_KEYWORDS = ['facebook','youtube','vtr','youtube','google maps','embed','link','ลิงก์','เพลง','file url','ไฟล์'];
+        const _LINK_KEYWORDS = ['facebook', 'youtube', 'vtr', 'youtube', 'google maps', 'embed', 'link', 'ลิงก์', 'เพลง', 'file url', 'ไฟล์'];
 
         function _isImageField(label) {
             const l = label.toLowerCase();
-            const hasImg  = _IMG_KEYWORDS.some(k => l.includes(k));
+            const hasImg = _IMG_KEYWORDS.some(k => l.includes(k));
             const hasLink = _LINK_KEYWORDS.some(k => l.includes(k));
             return hasImg && !hasLink;
         }
@@ -1185,7 +1233,7 @@ AND auth.role() = 'authenticated');</code>
         async function _getFixedFile(file) {
             // ดึง extension จาก MIME type จริง
             const mime = file.type || 'image/jpeg';
-            const ext  = _MIME_TO_EXT[mime] || 'jpg';
+            const ext = _MIME_TO_EXT[mime] || 'jpg';
 
             // ถ้า HEIC → แปลงเป็น JPEG ก่อนอัปโหลด (ผ่าน canvas)
             if (mime === 'image/heic' || mime === 'image/heif') {
@@ -1196,15 +1244,15 @@ AND auth.role() = 'authenticated');</code>
                     canvas.getContext('2d').drawImage(bitmap, 0, 0);
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                     return new File([blob], `img_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                } catch(e) { /* fallback */ }
+                } catch (e) { /* fallback */ }
             }
 
             // สร้างชื่อไฟล์ใหม่ที่ clean เสมอ
-            const safeName = `img_${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+            const safeName = `img_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
             return new File([file], safeName, { type: mime === 'image/heic' ? 'image/jpeg' : mime });
         }
 
-                window.uploadImg = async function(inputId) {
+        window.uploadImg = async function (inputId) {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = 'image/*';
@@ -1291,7 +1339,7 @@ AND auth.role() = 'authenticated');</code>
             }, 10);
         });
 
-                // Post-render enhancement hook (called after renderList finishes)
+        // Post-render enhancement hook (called after renderList finishes)
         function postRenderEnhance() {
             if (currentSection === 'gallery_albums' && currentData && currentData.length > 0) {
                 const rows = document.querySelectorAll('#main-area .divide-y > div');
@@ -1310,8 +1358,8 @@ AND auth.role() = 'authenticated');</code>
                 });
             }
             if (currentSection === 'calendar_events' && currentData && currentData.length > 0) {
-                const typeLabel = { academic:'วิชาการ', activity:'กิจกรรม', holiday:'วันหยุด', exam:'สอบ', other:'อื่นๆ' };
-                const typeBg = { academic:'bg-blue-100 text-blue-700', activity:'bg-emerald-100 text-emerald-700', holiday:'bg-red-100 text-red-700', exam:'bg-amber-100 text-amber-700', other:'bg-slate-100 text-slate-600' };
+                const typeLabel = { academic: 'วิชาการ', activity: 'กิจกรรม', holiday: 'วันหยุด', exam: 'สอบ', other: 'อื่นๆ' };
+                const typeBg = { academic: 'bg-blue-100 text-blue-700', activity: 'bg-emerald-100 text-emerald-700', holiday: 'bg-red-100 text-red-700', exam: 'bg-amber-100 text-amber-700', other: 'bg-slate-100 text-slate-600' };
                 document.querySelectorAll('#main-area .divide-y > div').forEach((row, idx) => {
                     if (!currentData[idx]) return;
                     const ev = currentData[idx];
@@ -1330,6 +1378,1247 @@ AND auth.role() = 'authenticated');</code>
                 });
             }
         }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ระบบ ปพ. — จัดการครูผู้สอน
+        // ═══════════════════════════════════════════════════════════════════
+        const PAW_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+        const PAW_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        const pawDb = window.supabase ? window.supabase.createClient(PAW_URL, PAW_KEY) : null;
+
+        function setActivePawMenu(id) {
+            ['menu-teachers', 'menu-classrooms', 'menu-students', 'menu-p5basic', 'menu-advisors'].forEach(m => {
+                const el = document.getElementById(m);
+                if (el) el.classList.remove('active');
+            });
+            const t = document.getElementById(id);
+            if (t) t.classList.add('active');
+        }
+
+        // ── ข้อมูลพื้นฐาน ปพ. ────────────────────────────────────────────
+        async function loadP5BasicSection() {
+            setActivePawMenu('menu-p5basic');
+            document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › ข้อมูลพื้นฐาน ปพ.';
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">ข้อมูลพื้นฐาน ปพ.</h1>
+        <p class="text-slate-500 text-sm mt-1">ข้อมูลที่แสดงบนปกและหัวกระดาษ ปพ.5 ทุกฉบับ</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-5">
+        <h2 class="text-sm font-bold text-slate-600 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-school text-cyan-500"></i> ข้อมูลโรงเรียน
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อโรงเรียน</label>
+            <input id="p5b-school-name" type="text" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">อำเภอ/เขต</label>
+              <input id="p5b-district" type="text" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">จังหวัด</label>
+              <input id="p5b-province" type="text" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">สังกัด (ชื่อเต็ม)</label>
+            <input id="p5b-affiliation" type="text" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-5">
+        <h2 class="text-sm font-bold text-slate-600 mb-1 flex items-center gap-2">
+          <i class="fa-solid fa-signature text-cyan-500"></i> ผู้ลงนามในปก ปพ.5
+        </h2>
+        <p class="text-xs text-slate-400 mb-4">ชื่อ-นามสกุล ที่จะแสดงในช่องลงชื่อบนปก ปพ.5</p>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ฝ่ายวิชาการ</label>
+            <input id="p5b-vice-principal" type="text" placeholder="นาย/นาง/นางสาว ..."
+              class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ผู้อำนวยการโรงเรียน</label>
+            <input id="p5b-principal" type="text" placeholder="นาย/นาง/นางสาว ..."
+              class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+          </div>
+        </div>
+      </div>
+
+      <button id="p5b-save-btn" onclick="p5BasicSave()"
+        class="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow transition">
+        <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+      </button>
+    </div>`;
+
+            // โหลดข้อมูลปัจจุบัน
+            try {
+                const { data } = await supabaseAdmin.from('school_info')
+                    .select('school_name,district,province,affiliation,vice_principal,principal')
+                    .limit(1).single();
+                if (data) {
+                    document.getElementById('p5b-school-name').value = data.school_name || '';
+                    document.getElementById('p5b-district').value = data.district || '';
+                    document.getElementById('p5b-province').value = data.province || '';
+                    document.getElementById('p5b-affiliation').value = data.affiliation || '';
+                    document.getElementById('p5b-vice-principal').value = data.vice_principal || '';
+                    document.getElementById('p5b-principal').value = data.principal || '';
+                }
+            } catch (e) { console.warn('p5BasicLoad:', e.message); }
+        }
+
+        window.p5BasicSave = async function () {
+            const btn = document.getElementById('p5b-save-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            try {
+                const { data: cur } = await supabaseAdmin.from('school_info').select('id').limit(1).single();
+                const payload = {
+                    school_name: document.getElementById('p5b-school-name').value.trim(),
+                    district: document.getElementById('p5b-district').value.trim(),
+                    province: document.getElementById('p5b-province').value.trim(),
+                    affiliation: document.getElementById('p5b-affiliation').value.trim(),
+                    vice_principal: document.getElementById('p5b-vice-principal').value.trim(),
+                    principal: document.getElementById('p5b-principal').value.trim(),
+                };
+                if (cur?.id) {
+                    const { error } = await supabaseAdmin.from('school_info').update(payload).eq('id', cur.id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseAdmin.from('school_info').insert([payload]);
+                    if (error) throw error;
+                }
+                Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 2000, showConfirmButton: false });
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล'; btn.disabled = false;
+            }
+        };
+
+        // ── ครูประจำชั้น ──────────────────────────────────────────────────
+        async function loadAdvisorSection() {
+            setActivePawMenu('menu-advisors');
+            document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › ครูประจำชั้น';
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">ครูประจำชั้น</h1>
+        <p class="text-slate-500 text-sm mt-1">กำหนดครูประจำชั้นให้แต่ละห้องเรียน รองรับหลายคนต่อห้อง</p>
+      </div>
+
+      <!-- Filter -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-5">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+            <select id="adv-sel-year" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300"
+              onchange="advLoadClasses()">
+              <option value="2568">2568</option>
+              <option value="2567">2567</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+            <select id="adv-sel-class" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+              <option value="">— กำลังโหลด —</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="advLoadAdvisors()"
+              class="w-full flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+              <i class="fa-solid fa-magnifying-glass"></i> โหลด
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- รายชื่อครูประจำชั้น -->
+      <div id="adv-result" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hidden">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="adv-class-title" class="text-sm font-bold text-slate-700"></h2>
+        </div>
+        <div id="adv-list" class="space-y-2 mb-5"></div>
+
+        <!-- เพิ่มครูใหม่ -->
+        <div class="border-t border-slate-100 pt-4">
+          <p class="text-xs font-semibold text-slate-500 mb-3">เพิ่มครูประจำชั้น</p>
+          <div class="flex gap-3 flex-wrap">
+            <select id="adv-new-teacher" class="flex-1 min-w-[160px] border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+              <option value="">— เลือกครู —</option>
+            </select>
+            <select id="adv-new-role" class="border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
+              <option value="ครูที่ปรึกษา">ครูที่ปรึกษา</option>
+              <option value="ครูที่ปรึกษารอง">ครูที่ปรึกษารอง</option>
+            </select>
+            <button onclick="advAddAdvisor()"
+              class="flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition">
+              <i class="fa-solid fa-plus"></i> เพิ่ม
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="adv-empty" class="text-center py-16 text-slate-400">
+        <i class="fa-solid fa-chalkboard-user text-5xl mb-3 opacity-20"></i>
+        <p>เลือกห้องเรียนเพื่อดูและจัดการครูประจำชั้น</p>
+      </div>
+    </div>`;
+
+            await advLoadClasses();
+            await advLoadTeachers();
+        }
+
+        let _advTeachers = [];
+        let _advCurrentClassId = null;
+        let _advCurrentClassName = '';
+
+        window.advLoadClasses = async function () {
+            const year = document.getElementById('adv-sel-year')?.value;
+            if (!year) return;
+            try {
+                const { data } = await supabaseAdmin.from('classrooms')
+                    .select('id,name').eq('academic_year', year).order('name');
+                const sel = document.getElementById('adv-sel-class');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— เลือกห้อง —</option>';
+                (data || []).forEach(c => {
+                    const o = document.createElement('option');
+                    o.value = c.id; o.textContent = c.name;
+                    sel.appendChild(o);
+                });
+            } catch (e) { console.warn('advLoadClasses:', e.message); }
+        };
+
+        async function advLoadTeachers() {
+            try {
+                const { data } = await supabaseAdmin.from('teachers')
+                    .select('id,name').eq('is_active', true).order('name');
+                _advTeachers = data || [];
+                const sel = document.getElementById('adv-new-teacher');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— เลือกครู —</option>';
+                _advTeachers.forEach(t => {
+                    const o = document.createElement('option');
+                    o.value = t.id; o.textContent = t.name;
+                    sel.appendChild(o);
+                });
+            } catch (e) { }
+        }
+
+        window.advLoadAdvisors = async function () {
+            const sel = document.getElementById('adv-sel-class');
+            const cid = sel?.value;
+            const cname = sel?.selectedOptions[0]?.textContent || '';
+            if (!cid) {
+                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกห้องเรียน', timer: 2000, showConfirmButton: false });
+                return;
+            }
+            _advCurrentClassId = cid;
+            _advCurrentClassName = cname;
+            try {
+                const { data } = await supabaseAdmin.from('classroom_advisors')
+                    .select('id,role,sort_order,teachers(id,name)')
+                    .eq('classroom_id', cid).order('sort_order');
+                const list = document.getElementById('adv-list');
+                const title = document.getElementById('adv-class-title');
+                title.textContent = cname;
+                list.innerHTML = '';
+                if (!data?.length) {
+                    list.innerHTML = '<p class="text-center text-slate-400 text-sm py-4">ยังไม่มีครูประจำชั้น</p>';
+                } else {
+                    data.forEach(a => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px 14px;';
+                        div.innerHTML = `
+                    <i class="fa-solid fa-user-tie" style="color:#06b6d4;font-size:15px;flex-shrink:0;"></i>
+                    <span style="flex:1;font-weight:600;font-size:13px;color:#1e293b;">${a.teachers?.name || ''}</span>
+                    <span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:3px 10px;border-radius:20px;font-weight:600;">${a.role}</span>
+                    <button onclick="advRemove(${a.id},this)" style="border:none;background:none;cursor:pointer;color:#ef4444;padding:4px 6px;border-radius:6px;" title="ลบ">
+                        <i class="fa-solid fa-trash" style="font-size:13px;"></i>
+                    </button>`;
+                        list.appendChild(div);
+                    });
+                }
+                document.getElementById('adv-empty').classList.add('hidden');
+                document.getElementById('adv-result').classList.remove('hidden');
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
+            }
+        };
+
+        window.advRemove = async function (id, btn) {
+            if (!confirm('ลบครูประจำชั้นนี้?')) return;
+            try {
+                const { error } = await supabaseAdmin.from('classroom_advisors').delete().eq('id', id);
+                if (error) throw error;
+                btn.closest('div').remove();
+            } catch (e) { alert(e.message); }
+        };
+
+        window.advAddAdvisor = async function () {
+            const teachId = document.getElementById('adv-new-teacher')?.value;
+            const role = document.getElementById('adv-new-role')?.value;
+            if (!_advCurrentClassId || !teachId) {
+                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกครู', timer: 2000, showConfirmButton: false });
+                return;
+            }
+            try {
+                const { error } = await supabaseAdmin.from('classroom_advisors')
+                    .upsert({ classroom_id: parseInt(_advCurrentClassId), teacher_id: parseInt(teachId), role },
+                        { onConflict: 'classroom_id,teacher_id' });
+                if (error) throw error;
+                await advLoadAdvisors();
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: e.message });
+            }
+        };
+
+        // ── ครูผู้สอน ─────────────────────────────────────────────────────
+        async function loadTeacherSection() {
+            setActivePawMenu('menu-teachers');
+            document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › ครูผู้สอน';
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+    <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-teacher text-indigo-500"></i> จัดการครูผู้สอน
+                </h2>
+                <p class="text-slate-500 text-sm mt-0.5">เพิ่ม แก้ไข ลบ และกำหนดวิชาที่สอน</p>
+            </div>
+            <button onclick="openAddTeacher()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20 transition">
+                <i class="fa-solid fa-plus"></i> เพิ่มครู
+            </button>
+        </div>
+        <div id="teacher-loading" class="text-center py-12 text-slate-400">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>กำลังโหลด...
+        </div>
+        <div id="teacher-list" class="hidden grid gap-3"></div>
+    </div>
+    <!-- Modal เพิ่ม/แก้ไขครู -->
+    <div id="teacher-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 id="teacher-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-indigo-500"></i> เพิ่มครูผู้สอน
+                </h3>
+                <button onclick="closeTeacherModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+                    <i class="fa-solid fa-times text-sm"></i>
+                </button>
+            </div>
+            <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+                <input type="hidden" id="tm-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อ-นามสกุล *</label>
+                        <input id="tm-name" type="text" placeholder="นายสมชาย ใจดี" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">username *</label>
+                        <input id="tm-username" type="text" placeholder="somchai" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">รหัสผ่าน <span id="tm-pwd-hint" class="text-slate-400 font-normal">(ใส่เฉพาะเมื่อต้องการเปลี่ยน)</span></label>
+                        <input id="tm-password" type="password" placeholder="••••••••" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">ตำแหน่ง</label>
+                        <select id="tm-position" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                            <option value="ครู">ครู</option>
+                            <option value="ครูชำนาญการ">ครูชำนาญการ</option>
+                            <option value="ครูชำนาญการพิเศษ">ครูชำนาญการพิเศษ</option>
+                            <option value="ผู้อำนวยการ">ผู้อำนวยการ</option>
+                            <option value="รองผู้อำนวยการ">รองผู้อำนวยการ</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <input type="checkbox" id="tm-active" checked class="w-4 h-4 accent-indigo-600">
+                    <label for="tm-active" class="text-sm text-slate-600">บัญชีใช้งานได้ (is_active)</label>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-between">
+                <button id="tm-delete-btn" onclick="deleteTeacher()" class="hidden flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
+                    <i class="fa-solid fa-trash"></i> ลบครู
+                </button>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="closeTeacherModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
+                    <button onclick="saveTeacher()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow transition">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal กำหนดวิชาที่สอน -->
+    <div id="subject-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-book text-teal-500"></i>
+                    กำหนดวิชาที่สอน — <span id="sm-teacher-name" class="text-indigo-600"></span>
+                </h3>
+                <button onclick="closeSubjectModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+                    <i class="fa-solid fa-times text-sm"></i>
+                </button>
+            </div>
+            <div class="px-6 py-4 max-h-[60vh] overflow-y-auto">
+                <div id="subject-loading" class="text-center py-8 text-slate-400">
+                    <i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลด...
+                </div>
+                <div id="subject-list" class="hidden space-y-2"></div>
+                <!-- เพิ่มวิชาใหม่ -->
+                <div class="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">เพิ่มวิชาที่สอน</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">วิชา</label>
+                            <select id="sm-subject" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <option value="">— เลือกวิชา —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">ห้องเรียน</label>
+                            <select id="sm-classroom" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <option value="">— เลือกห้อง —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addTeacherSubject()" class="mt-3 flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                        <i class="fa-solid fa-plus"></i> เพิ่มวิชา
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-end">
+                <button onclick="closeSubjectModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition">เสร็จสิ้น</button>
+            </div>
+        </div>
+    </div>`;
+            await fetchTeachers();
+        }
+
+        let currentTeacherId = null;
+
+        async function fetchTeachers() {
+            const { data, error } = await pawDb.from('teachers').select('*').order('name');
+            const loading = document.getElementById('teacher-loading');
+            const list = document.getElementById('teacher-list');
+            if (!loading || !list) return;
+            loading.classList.add('hidden');
+            list.classList.remove('hidden');
+            if (error) { list.innerHTML = '<p class="text-red-500">เกิดข้อผิดพลาด: ' + error.message + '</p>'; return; }
+            if (!data || !data.length) {
+                list.innerHTML = '<div class="text-center py-12 text-slate-400"><i class="fa-solid fa-users-slash text-4xl mb-3 opacity-30"></i><p>ยังไม่มีครูในระบบ</p></div>';
+                return;
+            }
+            list.innerHTML = data.map(t => `
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition p-4 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-xl ${t.is_active ? 'bg-indigo-100' : 'bg-slate-100'} flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-user-tie text-lg ${t.is_active ? 'text-indigo-600' : 'text-slate-400'}"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+                <p class="font-semibold text-slate-800 text-sm">${t.name || '-'}</p>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${t.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}">${t.is_active ? 'ใช้งาน' : 'ปิด'}</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">@${t.username || '-'} &nbsp;|&nbsp; ${t.position || '-'}</p>
+        </div>
+        <div class="flex gap-2 flex-shrink-0">
+            <button onclick="openSubjectModal(${t.id},'${(t.name || '').replace(/'/g, "\'")}',${t.is_active})"
+                class="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-xs font-semibold transition">
+                <i class="fa-solid fa-book"></i> วิชา
+            </button>
+            <button onclick="openEditTeacher(${t.id},'${(t.name || '').replace(/'/g, "\'")}','${t.username || ''}','${t.position || ''}',${t.is_active})"
+                class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition">
+                <i class="fa-solid fa-pen"></i> แก้ไข
+            </button>
+        </div>
+    </div>`).join('');
+        }
+
+        function openAddTeacher() {
+            document.getElementById('tm-id').value = '';
+            document.getElementById('tm-name').value = '';
+            document.getElementById('tm-username').value = '';
+            document.getElementById('tm-password').value = '';
+            document.getElementById('tm-position').value = 'ครู';
+            document.getElementById('tm-active').checked = true;
+            document.getElementById('tm-pwd-hint').textContent = '(จำเป็น)';
+            document.getElementById('tm-delete-btn').classList.add('hidden');
+            document.getElementById('teacher-modal-title').innerHTML = '<i class="fa-solid fa-user-plus text-indigo-500"></i> เพิ่มครูผู้สอน';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        function openEditTeacher(id, name, username, position, isActive) {
+            document.getElementById('tm-id').value = id;
+            document.getElementById('tm-name').value = name;
+            document.getElementById('tm-username').value = username;
+            document.getElementById('tm-password').value = '';
+            document.getElementById('tm-position').value = position;
+            document.getElementById('tm-active').checked = isActive;
+            document.getElementById('tm-pwd-hint').textContent = '(ใส่เฉพาะเมื่อต้องการเปลี่ยน)';
+            document.getElementById('tm-delete-btn').classList.remove('hidden');
+            document.getElementById('teacher-modal-title').innerHTML = '<i class="fa-solid fa-pen text-indigo-500"></i> แก้ไขครูผู้สอน';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() { document.getElementById('teacher-modal').classList.add('hidden'); }
+
+        async function saveTeacher() {
+            const id = document.getElementById('tm-id').value;
+            const name = document.getElementById('tm-name').value.trim();
+            const username = document.getElementById('tm-username').value.trim();
+            const password = document.getElementById('tm-password').value;
+            const position = document.getElementById('tm-position').value;
+            const isActive = document.getElementById('tm-active').checked;
+
+            if (!name || !username) { alert('กรุณากรอกชื่อและ username'); return; }
+            if (!id && !password) { alert('กรุณาใส่รหัสผ่านสำหรับครูใหม่'); return; }
+
+            const obj = { name, username, position, is_active: isActive };
+            if (password) obj.password_hash = password; // store plain (or hash server-side)
+
+            let error;
+            if (id) {
+                ({ error } = await pawDb.from('teachers').update(obj).eq('id', id));
+            } else {
+                ({ error } = await pawDb.from('teachers').insert(obj));
+            }
+
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            closeTeacherModal();
+            await fetchTeachers();
+        }
+
+        async function deleteTeacher() {
+            const id = document.getElementById('tm-id').value;
+            if (!id) return;
+            if (!confirm('ยืนยันลบครูคนนี้? ข้อมูลที่เชื่อมกันจะถูกลบด้วย')) return;
+            const { error } = await pawDb.from('teachers').delete().eq('id', id);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            closeTeacherModal();
+            await fetchTeachers();
+        }
+
+        // ── กำหนดวิชาที่สอน ────────────────────────────────────────────────
+        let smTeacherId = null;
+
+        async function openSubjectModal(teacherId, teacherName) {
+            smTeacherId = teacherId;
+            document.getElementById('sm-teacher-name').textContent = teacherName;
+            document.getElementById('subject-modal').classList.remove('hidden');
+            document.getElementById('subject-loading').classList.remove('hidden');
+            document.getElementById('subject-list').classList.add('hidden');
+
+            const [tsRes, subjRes, clsRes] = await Promise.all([
+                pawDb.from('teacher_subjects').select('id,subjects(id,code,name),classrooms(id,name)').eq('teacher_id', teacherId),
+                pawDb.from('subjects').select('id,code,name').order('code'),
+                pawDb.from('classrooms').select('id,name').order('name'),
+            ]);
+
+            // subjects dropdown
+            const subj = subjRes.data || [];
+            const cls = clsRes.data || [];
+            document.getElementById('sm-subject').innerHTML =
+                '<option value="">— เลือกวิชา —</option>' +
+                subj.map(s => `<option value="${s.id}">${s.code} ${s.name}</option>`).join('');
+            document.getElementById('sm-classroom').innerHTML =
+                '<option value="">— เลือกห้อง —</option>' +
+                cls.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            // existing assignments
+            const ts = tsRes.data || [];
+            const list = document.getElementById('subject-list');
+            list.classList.remove('hidden');
+            document.getElementById('subject-loading').classList.add('hidden');
+
+            if (!ts.length) {
+                list.innerHTML = '<p class="text-center text-slate-400 py-4 text-sm">ยังไม่มีวิชาที่กำหนด</p>';
+            } else {
+                list.innerHTML = ts.map(x => `
+        <div class="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-2.5 border border-slate-100">
+            <div>
+                <span class="text-sm font-semibold text-slate-700">${x.subjects?.code || ''} ${x.subjects?.name || ''}</span>
+                <span class="text-xs text-slate-400 ml-2">→ ${x.classrooms?.name || ''}</span>
+            </div>
+            <button onclick="removeTeacherSubject(${x.id})" class="text-red-400 hover:text-red-600 text-xs hover:bg-red-50 px-2 py-1 rounded-lg transition">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>`).join('');
+            }
+        }
+
+        async function addTeacherSubject() {
+            const subjectId = document.getElementById('sm-subject').value;
+            const classroomId = document.getElementById('sm-classroom').value;
+            if (!subjectId || !classroomId) { alert('กรุณาเลือกวิชาและห้องเรียน'); return; }
+            const { error } = await pawDb.from('teacher_subjects').insert({ teacher_id: smTeacherId, subject_id: parseInt(subjectId), classroom_id: parseInt(classroomId) });
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            const name = document.getElementById('sm-teacher-name').textContent;
+            await openSubjectModal(smTeacherId, name);
+        }
+
+        async function removeTeacherSubject(tsId) {
+            if (!confirm('ลบการมอบหมายวิชานี้?')) return;
+            const { error } = await pawDb.from('teacher_subjects').delete().eq('id', tsId);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            const name = document.getElementById('sm-teacher-name').textContent;
+            await openSubjectModal(smTeacherId, name);
+        }
+
+        function closeSubjectModal() { document.getElementById('subject-modal').classList.add('hidden'); }
+
+        // placeholder for future sections
+        async function loadClassroomSection() {
+            setActivePawMenu('menu-classrooms');
+            document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › ห้องเรียน & วิชา';
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- ===== ห้องเรียน ===== -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-school text-teal-500"></i> ห้องเรียน
+            </h2>
+            <button onclick="openAddClassroom()" class="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition">
+              <i class="fa-solid fa-plus"></i> เพิ่มห้อง
+            </button>
+          </div>
+          <div id="cls-loading" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          <div id="cls-list" class="hidden space-y-2"></div>
+        </div>
+
+        <!-- ===== วิชา ===== -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-book text-violet-500"></i> วิชา
+            </h2>
+            <button onclick="openAddSubject()" class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition">
+              <i class="fa-solid fa-plus"></i> เพิ่มวิชา
+            </button>
+          </div>
+          <div id="subj-loading" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          <div id="subj-list" class="hidden space-y-2"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal ห้องเรียน -->
+    <div id="cls-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+      <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
+          <h3 id="cls-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-school text-teal-500"></i> เพิ่มห้องเรียน
+          </h3>
+          <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+            <i class="fa-solid fa-times text-sm"></i>
+          </button>
+        </div>
+        <div class="px-6 py-5 space-y-4">
+          <input type="hidden" id="cls-id">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อห้อง *</label>
+              <input id="cls-name" type="text" placeholder="ป.5/1" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ระดับ *</label>
+              <select id="cls-level" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                <option value="อนุบาล">อนุบาล</option>
+                <option value="ประถม" selected>ประถม</option>
+                <option value="มัธยม">มัธยม</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชั้นปี</label>
+              <input id="cls-grade" type="number" min="1" max="6" placeholder="5" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ห้อง</label>
+              <input id="cls-room" type="number" min="1" placeholder="1" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา *</label>
+              <input id="cls-year" type="text" placeholder="2568" value="2568" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t flex justify-between">
+          <button id="cls-delete-btn" onclick="deleteClassroom()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
+            <i class="fa-solid fa-trash mr-1"></i> ลบ
+          </button>
+          <div class="flex gap-2 ml-auto">
+            <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
+            <button onclick="saveClassroom()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold shadow transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal วิชา -->
+    <div id="subj-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
+          <h3 id="subj-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-book text-violet-500"></i> เพิ่มวิชา
+          </h3>
+          <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+            <i class="fa-solid fa-times text-sm"></i>
+          </button>
+        </div>
+        <div class="px-6 py-5 space-y-4">
+          <input type="hidden" id="subj-id">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">รหัสวิชา *</label>
+              <input id="subj-code" type="text" placeholder="ท15101" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อวิชา *</label>
+              <input id="subj-name" type="text" placeholder="ภาษาไทย 9" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">หน่วยกิต</label>
+              <input id="subj-credits" type="number" step="0.5" min="0" placeholder="1.0" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">คาบ/สัปดาห์</label>
+              <input id="subj-hours" type="number" min="0" placeholder="5" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">กลุ่มสาระ</label>
+              <select id="subj-group" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+                <option value="">— ไม่ระบุ —</option>
+                <option value="ภาษาไทย">ภาษาไทย</option>
+                <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+                <option value="สังคมศึกษา">สังคมศึกษา</option>
+                <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                <option value="ศิลปะ">ศิลปะ</option>
+                <option value="การงานอาชีพ">การงานอาชีพ</option>
+                <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภทรายวิชา</label>
+              <select id="subj-type" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+                <option value="พื้นฐาน">พื้นฐาน</option>
+                <option value="เพิ่มเติม">เพิ่มเติม</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t flex justify-between">
+          <button id="subj-delete-btn" onclick="deleteSubject()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
+            <i class="fa-solid fa-trash mr-1"></i> ลบ
+          </button>
+          <div class="flex gap-2 ml-auto">
+            <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
+            <button onclick="saveSubject()" class="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-semibold shadow transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+            await Promise.all([fetchClassrooms(), fetchSubjects()]);
+        }
+
+        async function fetchClassrooms() {
+            const { data } = await pawDb.from('classrooms').select('*').order('grade').order('name');
+            const el = document.getElementById('cls-list');
+            document.getElementById('cls-loading').classList.add('hidden');
+            el.classList.remove('hidden');
+            if (!data?.length) { el.innerHTML = '<p class="text-center text-slate-400 py-6 text-sm">ยังไม่มีห้องเรียน</p>'; return; }
+            const levelColors = { อนุบาล: 'bg-yellow-100 text-yellow-700', ประถม: 'bg-blue-100 text-blue-700', มัธยม: 'bg-purple-100 text-purple-700' };
+            el.innerHTML = data.map(c => `
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-3 flex items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-slate-800 text-sm">${c.name}</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${levelColors[c.level] || 'bg-slate-100 text-slate-600'}">${c.level}</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">ปีการศึกษา ${c.academic_year} &nbsp;|&nbsp; ชั้นปี ${c.grade || '-'} ห้อง ${c.room || '-'}</p>
+      </div>
+      <button onclick="openEditClassroom(${c.id},'${(c.name || '').replace(/'/g, "\\'")}','${c.level || ''}',${c.grade || 0},${c.room || 0},'${c.academic_year || ''}')"
+        class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-xs font-semibold transition">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+    </div>`).join('');
+        }
+
+        function openAddClassroom() {
+            ['cls-id', 'cls-name', 'cls-grade', 'cls-room'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            document.getElementById('cls-level').value = 'ประถม';
+            document.getElementById('cls-year').value = '2568';
+            document.getElementById('cls-delete-btn').classList.add('hidden');
+            document.getElementById('cls-modal-title').innerHTML = '<i class="fa-solid fa-school text-teal-500"></i> เพิ่มห้องเรียน';
+            document.getElementById('cls-modal').classList.remove('hidden');
+        }
+        function openEditClassroom(id, name, level, grade, room, year) {
+            document.getElementById('cls-id').value = id;
+            document.getElementById('cls-name').value = name;
+            document.getElementById('cls-level').value = level;
+            document.getElementById('cls-grade').value = grade;
+            document.getElementById('cls-room').value = room;
+            document.getElementById('cls-year').value = year;
+            document.getElementById('cls-delete-btn').classList.remove('hidden');
+            document.getElementById('cls-modal-title').innerHTML = '<i class="fa-solid fa-pen text-teal-500"></i> แก้ไขห้องเรียน';
+            document.getElementById('cls-modal').classList.remove('hidden');
+        }
+        async function saveClassroom() {
+            const id = document.getElementById('cls-id').value;
+            const obj = {
+                name: document.getElementById('cls-name').value.trim(),
+                level: document.getElementById('cls-level').value,
+                grade: parseInt(document.getElementById('cls-grade').value) || null,
+                room: parseInt(document.getElementById('cls-room').value) || null,
+                academic_year: document.getElementById('cls-year').value.trim(),
+            };
+            if (!obj.name || !obj.academic_year) { alert('กรุณากรอกชื่อห้องและปีการศึกษา'); return; }
+            const { error } = id ? await pawDb.from('classrooms').update(obj).eq('id', id)
+                : await pawDb.from('classrooms').insert(obj);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('cls-modal').classList.add('hidden');
+            await fetchClassrooms();
+        }
+        async function deleteClassroom() {
+            const id = document.getElementById('cls-id').value;
+            if (!confirm('ลบห้องเรียนนี้?')) return;
+            const { error } = await pawDb.from('classrooms').delete().eq('id', id);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('cls-modal').classList.add('hidden');
+            await fetchClassrooms();
+        }
+
+        async function fetchSubjects() {
+            const { data } = await pawDb.from('subjects').select('*').order('code');
+            const el = document.getElementById('subj-list');
+            document.getElementById('subj-loading').classList.add('hidden');
+            el.classList.remove('hidden');
+            if (!data?.length) { el.innerHTML = '<p class="text-center text-slate-400 py-6 text-sm">ยังไม่มีวิชา</p>'; return; }
+            el.innerHTML = data.map(s => `
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-3 flex items-center gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded">${s.code}</span>
+          <span class="font-semibold text-slate-800 text-sm">${s.name}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${s.subject_type === 'เพิ่มเติม' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">${s.subject_type || 'พื้นฐาน'}</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">${s.group_name || ''} &nbsp;|&nbsp; ${s.credits || 0} หน่วยกิต &nbsp;|&nbsp; ${s.hours_per_week || 0} คาบ/สัปดาห์</p>
+      </div>
+      <button onclick="openEditSubject(${s.id},'${(s.code || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}',${s.credits || 0},${s.hours_per_week || 0},'${(s.group_name || '').replace(/'/g, "\\'")}','${s.subject_type || 'พื้นฐาน'}') "
+        class="px-3 py-1.5 bg-violet-50 hover:bg-violet-100 text-violet-700 rounded-lg text-xs font-semibold transition">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+    </div>`).join('');
+        }
+
+        function openAddSubject() {
+            ['subj-id', 'subj-code', 'subj-name', 'subj-credits', 'subj-hours'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            document.getElementById('subj-group').value = '';
+            document.getElementById('subj-type').value = 'พื้นฐาน';
+            document.getElementById('subj-delete-btn').classList.add('hidden');
+            document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-book text-violet-500"></i> เพิ่มวิชา';
+            document.getElementById('subj-modal').classList.remove('hidden');
+        }
+        function openEditSubject(id, code, name, credits, hours, group, type) {
+            document.getElementById('subj-id').value = id;
+            document.getElementById('subj-code').value = code;
+            document.getElementById('subj-name').value = name;
+            document.getElementById('subj-credits').value = credits;
+            document.getElementById('subj-hours').value = hours;
+            document.getElementById('subj-group').value = group;
+            document.getElementById('subj-type').value = type || 'พื้นฐาน';
+            document.getElementById('subj-delete-btn').classList.remove('hidden');
+            document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-pen text-violet-500"></i> แก้ไขวิชา';
+            document.getElementById('subj-modal').classList.remove('hidden');
+        }
+        async function saveSubject() {
+            const id = document.getElementById('subj-id').value;
+            const obj = {
+                code: document.getElementById('subj-code').value.trim(),
+                name: document.getElementById('subj-name').value.trim(),
+                credits: parseFloat(document.getElementById('subj-credits').value) || null,
+                hours_per_week: parseInt(document.getElementById('subj-hours').value) || null,
+                group_name: document.getElementById('subj-group').value || null,
+                subject_type: document.getElementById('subj-type').value || 'พื้นฐาน',
+            };
+            if (!obj.code || !obj.name) { alert('กรุณากรอกรหัสและชื่อวิชา'); return; }
+            const { error } = id ? await pawDb.from('subjects').update(obj).eq('id', id)
+                : await pawDb.from('subjects').insert(obj);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('subj-modal').classList.add('hidden');
+            await fetchSubjects();
+        }
+        async function deleteSubject() {
+            const id = document.getElementById('subj-id').value;
+            if (!confirm('ลบวิชานี้?')) return;
+            const { error } = await pawDb.from('subjects').delete().eq('id', id);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('subj-modal').classList.add('hidden');
+            await fetchSubjects();
+        }
+        async function loadStudentSection() {
+            setActivePawMenu('menu-students');
+            document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › นักเรียน';
+            const main = document.getElementById('main-area');
+            main.innerHTML = `
+    <div class="max-w-5xl mx-auto">
+      <!-- Filter + Actions -->
+      <div class="flex flex-wrap items-end gap-3 mb-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+          <select id="stu-sel-class" onchange="fetchStudents()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white min-w-[180px]">
+            <option value="">— เลือกห้องเรียน —</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">ค้นหา</label>
+          <input id="stu-search" type="text" placeholder="ชื่อ หรือ รหัส..." oninput="filterStudents()"
+            class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 w-48">
+        </div>
+        <div class="ml-auto flex gap-2">
+          <button onclick="openAddStudent()" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition">
+            <i class="fa-solid fa-plus"></i> เพิ่มนักเรียน
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div id="stu-stats" class="hidden flex gap-4 mb-4">
+        <div class="bg-white rounded-xl border border-slate-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+          <i class="fa-solid fa-users text-emerald-500 text-lg"></i>
+          <div><p class="text-xs text-slate-500">ทั้งหมด</p><p id="stu-count-all" class="text-lg font-bold text-slate-800">0</p></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+          <i class="fa-solid fa-user-check text-blue-500 text-lg"></i>
+          <div><p class="text-xs text-slate-500">ใช้งาน</p><p id="stu-count-active" class="text-lg font-bold text-slate-800">0</p></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+          <i class="fa-solid fa-venus text-pink-500 text-lg"></i>
+          <div><p class="text-xs text-slate-500">หญิง</p><p id="stu-count-f" class="text-lg font-bold text-slate-800">0</p></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+          <i class="fa-solid fa-mars text-sky-500 text-lg"></i>
+          <div><p class="text-xs text-slate-500">ชาย</p><p id="stu-count-m" class="text-lg font-bold text-slate-800">0</p></div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div id="stu-loading" class="text-center py-12 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>เลือกห้องเรียนเพื่อโหลด</div>
+        <table id="stu-table" class="hidden w-full text-sm">
+          <thead>
+            <tr class="bg-emerald-50 border-b border-emerald-100">
+              <th class="px-4 py-3 text-left text-xs font-bold text-emerald-700 w-12">ที่</th>
+              <th class="px-4 py-3 text-left text-xs font-bold text-emerald-700 w-24">รหัสนักเรียน</th>
+              <th class="px-4 py-3 text-left text-xs font-bold text-emerald-700">ชื่อ-นามสกุล</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-emerald-700 w-20">เพศ</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-emerald-700 w-20">สถานะ</th>
+              <th class="px-4 py-3 text-center text-xs font-bold text-emerald-700 w-24 no-print">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="stu-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal เพิ่ม/แก้ไขนักเรียน -->
+    <div id="stu-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
+          <h3 id="stu-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-user-plus text-emerald-500"></i> เพิ่มนักเรียน
+          </h3>
+          <button onclick="document.getElementById('stu-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+            <i class="fa-solid fa-times text-sm"></i>
+          </button>
+        </div>
+        <div class="px-6 py-5 overflow-y-auto max-h-[70vh]">
+          <input type="hidden" id="sm2-id">
+
+          <p class="text-xs font-bold text-emerald-700 mb-2 uppercase tracking-wide">ข้อมูลพื้นฐาน</p>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">รหัสนักเรียน *</label>
+              <input id="sm2-no" type="text" placeholder="6501" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">เลขที่นั่ง</label>
+              <input id="sm2-seat" type="number" min="1" placeholder="1" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อ-นามสกุล * (รวมคำนำหน้า)</label>
+            <input id="sm2-name" type="text" placeholder="เด็กชายสมชาย ใจดี" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">เพศ</label>
+              <select id="sm2-gender" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                <option value="ชาย">ชาย</option>
+                <option value="หญิง">หญิง</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">วันเกิด</label>
+              <input id="sm2-birth" type="date" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">เลขบัตรประชาชน (13 หลัก)</label>
+            <input id="sm2-natid" type="text" maxlength="13" placeholder="1234567890123" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+          </div>
+          <div class="grid grid-cols-3 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">สัญชาติ</label>
+              <input id="sm2-nationality" type="text" value="ไทย" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">เชื้อชาติ</label>
+              <input id="sm2-ethnicity" type="text" value="ไทย" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ศาสนา</label>
+              <input id="sm2-religion" type="text" value="พุทธ" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ที่อยู่</label>
+            <textarea id="sm2-address" rows="2" placeholder="บ้านเลขที่ / หมู่ / ตำบล / อำเภอ / จังหวัด" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none"></textarea>
+          </div>
+
+          <p class="text-xs font-bold text-emerald-700 mb-2 uppercase tracking-wide">ข้อมูลผู้ปกครอง</p>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อบิดา</label>
+              <input id="sm2-father" type="text" placeholder="นายสมชาย ใจดี" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อมารดา</label>
+              <input id="sm2-mother" type="text" placeholder="นางสมศรี ใจดี" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อผู้ปกครอง</label>
+              <input id="sm2-parent" type="text" placeholder="กรณีไม่ใช่พ่อหรือแม่" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1">ความสัมพันธ์</label>
+              <select id="sm2-relation" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                <option value="บิดา">บิดา</option>
+                <option value="มารดา">มารดา</option>
+                <option value="ปู่/ย่า">ปู่/ย่า</option>
+                <option value="ตา/ยาย">ตา/ยาย</option>
+                <option value="ลุง/ป้า/น้า/อา">ลุง/ป้า/น้า/อา</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">เบอร์โทรผู้ปกครอง</label>
+            <input id="sm2-phone" type="text" placeholder="0812345678" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+          </div>
+
+          <p class="text-xs font-bold text-emerald-700 mb-2 uppercase tracking-wide">ข้อมูลระบบ</p>
+          <div class="mb-3">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน *</label>
+            <select id="sm2-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+              <option value="">— เลือกห้อง —</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+            <input type="checkbox" id="sm2-active" checked class="w-4 h-4 accent-emerald-600">
+            <label for="sm2-active" class="text-sm text-slate-600">นักเรียนยังอยู่ในระบบ (is_active)</label>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t flex justify-between">
+          <button id="stu-delete-btn" onclick="deleteStudent()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
+            <i class="fa-solid fa-trash mr-1"></i> ลบ
+          </button>
+          <div class="flex gap-2 ml-auto">
+            <button onclick="document.getElementById('stu-modal').classList.add('hidden')" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
+            <button onclick="saveStudent()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+            // โหลดห้องเรียน dropdown
+            const { data: cls } = await pawDb.from('classrooms').select('id,name,academic_year').order('grade').order('name');
+            const clsSel = document.getElementById('stu-sel-class');
+            const sm2Cls = document.getElementById('sm2-class');
+            (cls || []).forEach(c => {
+                const txt = `${c.name} (${c.academic_year})`;
+                clsSel.innerHTML += `<option value="${c.id}">${txt}</option>`;
+                sm2Cls.innerHTML += `<option value="${c.id}">${txt}</option>`;
+            });
+        }
+
+        let stuAllData = [];
+
+        async function fetchStudents() {
+            const cid = document.getElementById('stu-sel-class')?.value;
+            if (!cid) return;
+            document.getElementById('stu-loading').textContent = 'กำลังโหลด...';
+            document.getElementById('stu-loading').classList.remove('hidden');
+            document.getElementById('stu-table').classList.add('hidden');
+            document.getElementById('stu-stats').classList.add('hidden');
+
+            const { data } = await pawDb.from('students').select('*').eq('classroom_id', cid).order('student_no');
+            stuAllData = data || [];
+            renderStudents(stuAllData);
+        }
+
+        function filterStudents() {
+            const q = (document.getElementById('stu-search')?.value || '').toLowerCase();
+            renderStudents(q ? stuAllData.filter(s => s.name?.toLowerCase().includes(q) || s.student_no?.toLowerCase().includes(q)) : stuAllData);
+        }
+
+        function renderStudents(data) {
+            document.getElementById('stu-loading').classList.add('hidden');
+            const tbl = document.getElementById('stu-table');
+            const tbody = document.getElementById('stu-tbody');
+            if (!data?.length) {
+                tbl.classList.add('hidden');
+                document.getElementById('stu-loading').textContent = 'ไม่พบนักเรียน';
+                document.getElementById('stu-loading').classList.remove('hidden');
+                return;
+            }
+            tbl.classList.remove('hidden');
+            // stats
+            document.getElementById('stu-stats').classList.remove('hidden');
+            document.getElementById('stu-count-all').textContent = stuAllData.length;
+            document.getElementById('stu-count-active').textContent = stuAllData.filter(s => s.is_active).length;
+            document.getElementById('stu-count-f').textContent = stuAllData.filter(s => s.gender === 'หญิง').length;
+            document.getElementById('stu-count-m').textContent = stuAllData.filter(s => s.gender === 'ชาย').length;
+
+            tbody.innerHTML = data.map((s, i) => `
+    <tr class="${i % 2 === 0 ? '' : 'bg-slate-50/50'} hover:bg-emerald-50/30 border-b border-slate-50 transition">
+      <td class="px-4 py-2.5 text-slate-400 text-xs">${i + 1}</td>
+      <td class="px-4 py-2.5 font-mono text-xs text-slate-500">${s.student_no || '-'}</td>
+      <td class="px-4 py-2.5 font-medium text-slate-700">${s.name || '-'}</td>
+      <td class="px-4 py-2.5 text-center">
+        <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${s.gender === 'หญิง' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${s.gender || '-'}</span>
+      </td>
+      <td class="px-4 py-2.5 text-center">
+        <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${s.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}">${s.is_active ? 'ใช้งาน' : 'ออก'}</span>
+      </td>
+      <td class="px-4 py-2.5 text-center">
+        <button onclick="openEditStudent(stuAllData.find(x=>x.id===${s.id}))"
+          class="px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold transition">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+        }
+
+        function openAddStudent() {
+            ['sm2-id', 'sm2-no', 'sm2-name', 'sm2-seat', 'sm2-birth', 'sm2-natid', 'sm2-nationality', 'sm2-ethnicity', 'sm2-religion', 'sm2-address', 'sm2-father', 'sm2-mother', 'sm2-parent', 'sm2-phone'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.value = '';
+            });
+            const defMap = { 'sm2-nationality': 'ไทย', 'sm2-ethnicity': 'ไทย', 'sm2-religion': 'พุทธ', 'sm2-relation': 'บิดา' };
+            Object.entries(defMap).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+            document.getElementById('sm2-gender').value = 'ชาย';
+            document.getElementById('sm2-active').checked = true;
+            const cid = document.getElementById('stu-sel-class')?.value;
+            if (cid) document.getElementById('sm2-class').value = cid;
+            document.getElementById('stu-delete-btn').classList.add('hidden');
+            document.getElementById('stu-modal-title').innerHTML = '<i class="fa-solid fa-user-plus text-emerald-500"></i> เพิ่มนักเรียน';
+            document.getElementById('stu-modal').classList.remove('hidden');
+        }
+
+        function openEditStudent(s) {
+            document.getElementById('sm2-id').value = s.id || '';
+            document.getElementById('sm2-no').value = s.student_no || '';
+            document.getElementById('sm2-seat').value = s.seat_no || '';
+            document.getElementById('sm2-name').value = s.name || '';
+            document.getElementById('sm2-gender').value = s.gender || 'ชาย';
+            document.getElementById('sm2-birth').value = s.birth_date || '';
+            document.getElementById('sm2-natid').value = s.national_id || '';
+            document.getElementById('sm2-nationality').value = s.nationality || 'ไทย';
+            document.getElementById('sm2-ethnicity').value = s.ethnicity || 'ไทย';
+            document.getElementById('sm2-religion').value = s.religion || 'พุทธ';
+            document.getElementById('sm2-address').value = s.address || '';
+            document.getElementById('sm2-father').value = s.father_name || '';
+            document.getElementById('sm2-mother').value = s.mother_name || '';
+            document.getElementById('sm2-parent').value = s.parent_name || '';
+            document.getElementById('sm2-relation').value = s.parent_relation || 'บิดา';
+            document.getElementById('sm2-phone').value = s.parent_phone || '';
+            document.getElementById('sm2-class').value = s.classroom_id || '';
+            document.getElementById('sm2-active').checked = s.is_active !== false;
+            document.getElementById('stu-delete-btn').classList.remove('hidden');
+            document.getElementById('stu-modal-title').innerHTML = '<i class="fa-solid fa-pen text-emerald-500"></i> แก้ไขนักเรียน';
+            document.getElementById('stu-modal').classList.remove('hidden');
+        }
+
+        async function saveStudent() {
+            const id = document.getElementById('sm2-id').value;
+            const seatVal = document.getElementById('sm2-seat').value;
+            const obj = {
+                student_no: document.getElementById('sm2-no').value.trim(),
+                name: document.getElementById('sm2-name').value.trim(),
+                gender: document.getElementById('sm2-gender').value,
+                classroom_id: parseInt(document.getElementById('sm2-class').value) || null,
+                is_active: document.getElementById('sm2-active').checked,
+                seat_no: seatVal ? parseInt(seatVal) : null,
+                birth_date: document.getElementById('sm2-birth').value || null,
+                national_id: document.getElementById('sm2-natid').value.trim() || null,
+                nationality: document.getElementById('sm2-nationality').value.trim() || null,
+                ethnicity: document.getElementById('sm2-ethnicity').value.trim() || null,
+                religion: document.getElementById('sm2-religion').value.trim() || null,
+                address: document.getElementById('sm2-address').value.trim() || null,
+                father_name: document.getElementById('sm2-father').value.trim() || null,
+                mother_name: document.getElementById('sm2-mother').value.trim() || null,
+                parent_name: document.getElementById('sm2-parent').value.trim() || null,
+                parent_relation: document.getElementById('sm2-relation').value || null,
+                parent_phone: document.getElementById('sm2-phone').value.trim() || null,
+            };
+            if (!obj.student_no || !obj.name || !obj.classroom_id) { alert('กรุณากรอกข้อมูลให้ครบ'); return; }
+            const { error } = id ? await pawDb.from('students').update(obj).eq('id', id)
+                : await pawDb.from('students').insert(obj);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('stu-modal').classList.add('hidden');
+            await fetchStudents();
+        }
+
+        async function deleteStudent() {
+            const id = document.getElementById('sm2-id').value;
+            if (!confirm('ลบนักเรียนคนนี้?')) return;
+            const { error } = await pawDb.from('students').delete().eq('id', id);
+            if (error) { alert('เกิดข้อผิดพลาด: ' + error.message); return; }
+            document.getElementById('stu-modal').classList.add('hidden');
+            await fetchStudents();
+        }
+
     </script>
 </body>
 
