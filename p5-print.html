@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>พิมพ์ ปพ.5</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sarabun', sans-serif; font-size: 12px; background: #e5e7eb; color: #111; }
+
+/* ── Screen: toolbar ── */
+#toolbar {
+    background: #1e293b; color: #fff;
+    padding: 10px 20px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 100;
+}
+#toolbar button {
+    padding: 6px 16px; border-radius: 6px; border: none; cursor: pointer;
+    font-family: 'Sarabun', sans-serif; font-size: 13px; font-weight: 600;
+}
+#btn-print  { background: #4f46e5; color: #fff; }
+#btn-print:hover { background: #4338ca; }
+#btn-close  { background: #475569; color: #fff; }
+#btn-close:hover { background: #334155; }
+#toolbar-info { font-size: 12px; color: #94a3b8; margin-left: auto; }
+
+/* ── Page container ── */
+#page-wrap { padding: 24px; display: flex; justify-content: center; }
+
+/* ── A4 paper ── */
+.a4 {
+    background: #fff;
+    width: 190mm;
+    min-height: 277mm;
+    padding: 12mm 14mm 14mm;
+    box-shadow: 0 2px 16px rgba(0,0,0,.18);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 11.5px;
+    color: #111;
+}
+
+/* ── Header ── */
+.doc-title { text-align: center; margin-bottom: 10px; line-height: 1.9; }
+.doc-title h1 { font-size: 15px; font-weight: 700; }
+.doc-title .subtitle { font-size: 12px; }
+.uline { display: inline-block; padding: 0 5px; }
+
+/* ── Info grid ── */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 28px;
+    row-gap: 5px;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+.info-row { display: flex; align-items: baseline; }
+.info-lbl { flex-shrink: 0; white-space: nowrap; }
+.info-sep { padding: 0 4px; flex-shrink: 0; }
+.info-val { flex: 1; padding: 0 4px; min-width: 0; }
+.info-val.fixed { flex: none; text-align: center; }
+
+/* ── Score table ── */
+.score-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+.score-table th, .score-table td {
+    border: 1px solid #444; padding: 3px 4px;
+    text-align: center; vertical-align: middle; line-height: 1.35;
+}
+.score-table .tl { text-align: left; padding-left: 6px; }
+.s1h { background: #bfdbfe; }
+.s2h { background: #ddd6fe; }
+.syh { background: #bbf7d0; }
+.s1  { background: #eff6ff; }
+.s2  { background: #f5f3ff; }
+.sy  { background: #f0fdf4; }
+.avg-row { background: #f3f4f6; font-weight: 600; }
+.grade-cell { font-weight: 700; }
+
+/* ── Legend ── */
+.legend { font-size: 10px; color: #555; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+/* ── Signature ── */
+.sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 11.5px; text-align: center; }
+.sig-space { height: 28px; border-bottom: 1px solid #444; margin: 0 28px 5px; }
+
+/* ── Print ── */
+@media print {
+    body { background: white; }
+    #toolbar { display: none !important; }
+    #page-wrap { padding: 0; }
+    .a4 { box-shadow: none; width: 100%; padding: 8mm 10mm 10mm; }
+    @page { size: A4 portrait; margin: 10mm 12mm; }
+}
+
+/* ── Loading ── */
+#loading { text-align: center; padding: 60px; font-size: 14px; color: #64748b; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+    <button id="btn-print" onclick="window.print()">🖨 พิมพ์ / บันทึก PDF</button>
+    <button id="btn-close" onclick="window.close()">✕ ปิด</button>
+    <span id="toolbar-info">กำลังโหลดข้อมูล...</span>
+</div>
+
+<div id="page-wrap">
+    <div id="loading">⏳ กำลังโหลดข้อมูล...</div>
+    <div id="doc-root" style="display:none;"></div>
+</div>
+
+<script>
+const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+const ANON_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+const db = window.supabase.createClient(PROJECT_URL, ANON_KEY);
+
+// ── helpers ──────────────────────────────────────────────────────
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function gradeFromPct(pct){
+    if(pct>=80) return '4'; if(pct>=75) return '3.5'; if(pct>=70) return '3';
+    if(pct>=65) return '2.5'; if(pct>=60) return '2'; if(pct>=55) return '1.5';
+    if(pct>=50) return '1'; return '0';
+}
+function gradeColor(g){
+    return {'4':'#065f46','3.5':'#065f46','3':'#1d4ed8','2.5':'#3730a3',
+            '2':'#854d0e','1.5':'#9a3412','1':'#991b1b','0':'#374151'}[g]||'#111';
+}
+function avg(arr){ const v=arr.filter(x=>x!==null&&x!==undefined&&x!==''); return v.length?v.reduce((a,b)=>a+(parseFloat(b)||0),0)/v.length:null; }
+function fmt(v){ return (v===null||v===undefined||v==='')? '' : (Math.round(v*100)/100).toString(); }
+
+// ── main ──────────────────────────────────────────────────────────
+async function init() {
+    // รับพารามิเตอร์จาก sessionStorage (ส่งมาจาก paw.html)
+    let printData;
+    try { printData = JSON.parse(sessionStorage.getItem('p5_print_data')||'null'); } catch(e){}
+
+    if (!printData) {
+        document.getElementById('loading').innerHTML = '❌ ไม่พบข้อมูลสำหรับพิมพ์ กรุณาเปิดจากหน้า ปพ.5';
+        return;
+    }
+
+    const tsId_raw = printData.tsId;
+    const { classroomId, year, subjectTxt, classTxt, level,
+            keepMax1, examMax1, keepMax2, examMax2,
+            keepMaxM, midMaxM, finalMaxM } = printData;
+    const tsId = parseInt(tsId_raw);
+    const isMiddle = level === 'มัธยม';
+    console.log('tsId:', tsId, 'classroomId:', classroomId);
+
+    // ── ดึงข้อมูล parallel ──
+    const [schoolRes, assignRes, students, grades1, grades2] = await Promise.all([
+        db.from('school_info').select('school_name,affiliation').limit(1).single(),
+        db.from('teacher_subjects')
+          .select('subjects(code,name,credits,hours_per_week), classrooms(name,level,grade), teachers(name)')
+          .eq('id', tsId).single(),
+        db.from('students').select('id,student_no,name,gender').eq('classroom_id', classroomId).eq('is_active',true),
+        db.from('p5_grades').select('*').eq('teacher_subject_id', tsId).eq('semester', 1),
+        isMiddle ? Promise.resolve({data:[]}) :
+            db.from('p5_grades').select('*').eq('teacher_subject_id', tsId).eq('semester', 2),
+    ]);
+
+    const school   = schoolRes.data || {};
+    const assign   = assignRes.data || {};
+    const subj     = assign.subjects || {};
+    const cls      = assign.classrooms || {};
+    const tchr     = assign.teachers || {};
+    const studs = (students.data || []).sort((a,b)=>{
+        const gA=a.gender==='ชาย'?0:1, gB=b.gender==='ชาย'?0:1;
+        if(gA!==gB) return gA-gB;
+        return (a.student_no||'').localeCompare(b.student_no||'',undefined,{numeric:true});
+    });
+    const g1map = {}, g2map = {};
+    (grades1.data||[]).forEach(g => g1map[g.student_id] = g);
+    (grades2.data||[]).forEach(g => g2map[g.student_id] = g);
+
+    // ── คำนวณค่าเฉลี่ย ──
+    const colKeys1 = ['assignment_score','final_score'];
+    const colKeys2 = isMiddle ? ['assignment_score','midterm_score','final_score'] : ['assignment_score','final_score'];
+
+    // ── สร้าง HTML ──
+    const schoolName  = school.school_name  || 'โรงเรียน';
+    const affiliation = school.affiliation  || '';
+    const teacherName = tchr.name || '';
+    const subjCode    = subj.code || '';
+    const subjName    = subj.name || subjectTxt || '';
+    const className   = cls.name  || classTxt   || '';
+    const credits     = subj.credits || '';
+    const hours       = subj.hours_per_week || '';
+
+    // ── rows ──
+    let rows = '';
+    const totals1=[], totals2=[], totalsY=[];
+
+    studs.forEach((s, i) => {
+        const g1 = g1map[s.id] || {};
+        const g2 = g2map[s.id] || {};
+        const tr_bg = i%2===0 ? '' : 'style="background:#fafafa;"';
+
+        if (!isMiddle) {
+            const k1 = g1.assignment_score, e1 = g1.final_score;
+            const k2 = g2.assignment_score, e2 = g2.final_score;
+            const sub1 = (parseFloat(k1)||0)+(parseFloat(e1)||0);
+            const sub2 = (parseFloat(k2)||0)+(parseFloat(e2)||0);
+            const total = sub1+sub2;
+            const grade = total>0 ? gradeFromPct(total) : '';
+            const gColor = gradeColor(grade);
+            totals1.push(sub1||null); totals2.push(sub2||null); totalsY.push(total||null);
+            rows += `<tr ${tr_bg}>
+                <td>${i+1}</td><td>${esc(s.student_no)}</td><td class="tl" style="white-space:nowrap;">${esc(s.name)}</td>
+                <td class="s1">${fmt(k1)}</td><td class="s1">${fmt(e1)}</td>
+                <td class="s1" style="font-weight:600;">${sub1>0?fmt(sub1):''}</td>
+                <td class="s2">${fmt(k2)}</td><td class="s2">${fmt(e2)}</td>
+                <td class="s2" style="font-weight:600;">${sub2>0?fmt(sub2):''}</td>
+                <td class="sy" style="font-weight:700;">${total>0?fmt(total):''}</td>
+                <td class="grade-cell" style="color:${gColor};">${grade}</td>
+                <td>${g1.notes||''}</td>
+            </tr>`;
+        } else {
+            const kp = g1.assignment_score, mid = g1.midterm_score, fin = g1.final_score;
+            const total = (parseFloat(kp)||0)+(parseFloat(mid)||0)+(parseFloat(fin)||0);
+            const grade = total>0 ? gradeFromPct(total) : '';
+            const gColor = gradeColor(grade);
+            totalsY.push(total||null);
+            rows += `<tr ${tr_bg}>
+                <td>${i+1}</td><td>${esc(s.student_no)}</td><td class="tl" style="white-space:nowrap;">${esc(s.name)}</td>
+                <td class="s1">${fmt(kp)}</td><td class="s1">${fmt(mid)}</td><td class="s1">${fmt(fin)}</td>
+                <td class="sy" style="font-weight:700;">${total>0?fmt(total):''}</td>
+                <td class="grade-cell" style="color:${gColor};">${grade}</td>
+                <td>${g1.notes||''}</td>
+            </tr>`;
+        }
+    });
+
+    // ── avg row ──
+    let avgRow = '';
+    if (!isMiddle) {
+        const a1k = avg(studs.map(s=>(g1map[s.id]||{}).assignment_score));
+        const a1e = avg(studs.map(s=>(g1map[s.id]||{}).final_score));
+        const a1t = avg(totals1);
+        const a2k = avg(studs.map(s=>(g2map[s.id]||{}).assignment_score));
+        const a2e = avg(studs.map(s=>(g2map[s.id]||{}).final_score));
+        const a2t = avg(totals2);
+        const ay  = avg(totalsY);
+        avgRow = `<tr class="avg-row">
+            <td colspan="3" style="text-align:center;">ค่าเฉลี่ยของห้อง</td>
+            <td class="s1">${a1k!==null?a1k.toFixed(2):''}</td><td class="s1">${a1e!==null?a1e.toFixed(2):''}</td><td class="s1">${a1t!==null?a1t.toFixed(2):''}</td>
+            <td class="s2">${a2k!==null?a2k.toFixed(2):''}</td><td class="s2">${a2e!==null?a2e.toFixed(2):''}</td><td class="s2">${a2t!==null?a2t.toFixed(2):''}</td>
+            <td class="sy">${ay!==null?ay.toFixed(2):''}</td><td>—</td><td></td>
+        </tr>`;
+    } else {
+        const akp = avg(studs.map(s=>(g1map[s.id]||{}).assignment_score));
+        const amid = avg(studs.map(s=>(g1map[s.id]||{}).midterm_score));
+        const afin = avg(studs.map(s=>(g1map[s.id]||{}).final_score));
+        const ay   = avg(totalsY);
+        avgRow = `<tr class="avg-row">
+            <td colspan="3" style="text-align:center;">ค่าเฉลี่ยของห้อง</td>
+            <td class="s1">${akp!==null?akp.toFixed(2):''}</td><td class="s1">${amid!==null?amid.toFixed(2):''}</td><td class="s1">${afin!==null?afin.toFixed(2):''}</td>
+            <td class="sy">${ay!==null?ay.toFixed(2):''}</td><td>—</td><td></td>
+        </tr>`;
+    }
+
+    // ── header row ──
+    let thead = '';
+    if (!isMiddle) {
+        thead = `<thead>
+          <tr>
+            <th rowspan="2" style="width:26px;">ลำดับ</th>
+            <th rowspan="2" style="width:50px;">รหัส<br>นักเรียน</th>
+            <th rowspan="2" style="min-width:180px;">ชื่อ-นามสกุล</th>
+            <th colspan="3" class="s1h">ภาคเรียนที่ 1 (เต็ม 50)</th>
+            <th colspan="3" class="s2h">ภาคเรียนที่ 2 (เต็ม 50)</th>
+            <th rowspan="2" class="syh" style="width:46px;">รวม<br>ตลอดปี<br>(100)</th>
+            <th rowspan="2" style="width:36px;">ผลการ<br>เรียน</th>
+            <th rowspan="2" style="width:56px;">หมายเหตุ</th>
+          </tr>
+          <tr>
+            <th class="s1h" style="font-size:10px; width:44px;">คะแนนเก็บ<br>(${keepMax1})</th>
+            <th class="s1h" style="font-size:10px; width:44px;">สอบปลายภาค<br>(${examMax1})</th>
+            <th class="s1h" style="font-size:10px; width:44px;">รวมภาค 1</th>
+            <th class="s2h" style="font-size:10px; width:44px;">คะแนนเก็บ<br>(${keepMax2})</th>
+            <th class="s2h" style="font-size:10px; width:44px;">สอบปลายภาค<br>(${examMax2})</th>
+            <th class="s2h" style="font-size:10px; width:44px;">รวมภาค 2</th>
+          </tr>
+        </thead>`;
+    } else {
+        const termNo = printData.term || 1;
+        thead = `<thead>
+          <tr>
+            <th style="width:26px;">ลำดับ</th>
+            <th style="width:50px;">รหัส<br>นักเรียน</th>
+            <th style="min-width:180px;">ชื่อ-นามสกุล</th>
+            <th class="s1h" style="font-size:10px; width:50px;">คะแนนเก็บ<br>(${keepMaxM})</th>
+            <th class="s1h" style="font-size:10px; width:50px;">สอบกลางภาค<br>(${midMaxM})</th>
+            <th class="s1h" style="font-size:10px; width:50px;">สอบปลายภาค<br>(${finalMaxM})</th>
+            <th class="syh" style="width:46px;">รวม<br>(100)</th>
+            <th style="width:36px;">ผลการ<br>เรียน</th>
+            <th style="width:56px;">หมายเหตุ</th>
+          </tr>
+        </thead>`;
+    }
+
+    const termLabel = isMiddle ? `ภาคเรียนที่ ${printData.term || 1}` : 'ปีการศึกษา';
+
+    const html = `
+    <div class="a4">
+      <div class="doc-title">
+        <h1>ระบบบันทึกผลการพัฒนาคุณภาพของผู้เรียน (ปพ.5)</h1>
+        <div class="subtitle">${esc(schoolName)}</div>
+        <div class="subtitle" style="font-size:11px;">${esc(affiliation)}</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-lbl" style="width:90px;">รายวิชา</span>
+          <span class="info-sep">:</span>
+          <span>${esc(subjCode)}</span>
+          <span style="padding:0 6px;"></span>
+          <span>${esc(subjName)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl" style="width:90px;">ระดับชั้น</span>
+          <span class="info-sep">:</span>
+          <span>${esc(className)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl" style="width:90px;">ครูผู้สอน</span>
+          <span class="info-sep">:</span>
+          <span style="flex:1;">${esc(teacherName)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl" style="width:90px;">จำนวนนักเรียน</span>
+          <span class="info-sep">:</span>
+          <span style="white-space:nowrap;">${studs.length} คน</span>
+        </div>
+        <div class="info-row" style="gap:16px;">
+          <span style="display:flex; align-items:baseline;">
+            <span class="info-lbl" style="width:90px;">หน่วยกิต</span>
+            <span class="info-sep">:</span>
+            <span>${credits}</span>
+          </span>
+          <span style="display:flex; align-items:baseline; margin-left:12px;">
+            <span style="white-space:nowrap;">เวลาเรียน/สัปดาห์</span>
+            <span class="info-sep">:</span>
+            <span>${hours}</span>
+            <span style="padding:0 4px;">ชั่วโมง</span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl" style="width:90px;">ปีการศึกษา</span>
+          <span class="info-sep">:</span>
+          <span>${year}</span>
+          ${isMiddle ? `<span style="margin-left:12px; white-space:nowrap;">${termLabel}</span>` : ''}
+        </div>
+      </div>
+
+      <table class="score-table">
+        ${thead}
+        <tbody>
+          ${rows}
+          ${avgRow}
+        </tbody>
+      </table>
+
+
+      <div class="legend">
+        <span>เกณฑ์ผ่าน ≥ 50 คะแนน</span><span>|</span>
+        <span>4 = 80-100</span><span>3.5 = 75-79</span><span>3 = 70-74</span>
+        <span>2.5 = 65-69</span><span>2 = 60-64</span><span>1.5 = 55-59</span>
+        <span>1 = 50-54</span><span>0 = ต่ำกว่า 50</span>
+      </div>
+
+      <div class="sig-grid">
+        <div>
+          <div class="sig-space"></div>
+          <div>ลงชื่อ ...................................................</div>
+          <div style="color:#555;">( ..................................................... )</div>
+          <div style="font-weight:600; margin-top:3px;">ครูผู้สอน</div>
+          <div style="color:#555; font-size:10.5px; margin-top:2px;">วันที่ ........... / ........... / ...........</div>
+        </div>
+        <div>
+          <div class="sig-space"></div>
+          <div>ลงชื่อ ...................................................</div>
+          <div style="color:#555;">( ..................................................... )</div>
+          <div style="font-weight:600; margin-top:3px;">หัวหน้าวิชาการ</div>
+          <div style="color:#555; font-size:10.5px; margin-top:2px;">วันที่ ........... / ........... / ...........</div>
+        </div>
+      </div>
+    </div>`;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('doc-root').style.display = 'block';
+    document.getElementById('doc-root').innerHTML = html;
+    document.getElementById('toolbar-info').textContent =
+        `${esc(subjCode)} ${esc(subjName)} — ${esc(className)} — ปีการศึกษา ${year}`;
+}
+
+init().catch(e => {
+    document.getElementById('loading').innerHTML = '❌ เกิดข้อผิดพลาด: ' + e.message;
+});
+</script>
+</body>
+</html>

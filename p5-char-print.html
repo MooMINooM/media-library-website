@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <title>คุณลักษณะอันพึงประสงค์</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11.5px;
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    #toolbar {
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #toolbar button {
+      padding: 6px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #btn-print {
+      background: #be185d;
+      color: #fff;
+    }
+
+    #btn-close {
+      background: #475569;
+      color: #fff;
+    }
+
+    #toolbar-info {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-left: auto;
+    }
+
+    #page-wrap {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .a4 {
+      background: #fff;
+      width: 277mm;
+      padding: 8mm 10mm;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11.5px;
+      color: #111;
+    }
+
+    .doc-title {
+      text-align: center;
+      margin-bottom: 10px;
+      line-height: 1.9;
+    }
+
+    .doc-title h1 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .doc-title .subtitle {
+      font-size: 12px;
+    }
+
+    .info-line {
+      font-size: 12px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 28px;
+      line-height: 1.8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #444;
+      padding: 2px 3px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.3;
+      font-size: 9.5px;
+    }
+
+    .th-fix {
+      background: #fdf2f8;
+      color: #831843;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .th-grp {
+      background: #fce7f3;
+      color: #831843;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    .th-sub {
+      background: #fff5f7;
+      color: #9d174d;
+      font-size: 8.5px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      height: 64px;
+      padding: 3px 2px;
+    }
+
+    .th-sum {
+      background: #fce7f3;
+      color: #831843;
+      font-weight: 700;
+      font-size: 8.5px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      height: 64px;
+    }
+
+    .th-res {
+      background: #f0fdf4;
+      color: #065f46;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    .th-lvl {
+      background: #dcfce7;
+      color: #065f46;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    .name-col {
+      text-align: left;
+      padding-left: 5px;
+      min-width: 160px;
+      white-space: nowrap;
+    }
+
+    .v3 {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .v2 {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+    }
+
+    .v1 {
+      background: #fef9c3;
+      color: #854d0e;
+      font-weight: 700;
+    }
+
+    .v0 {
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    .vs {
+      background: #fdf2f8;
+      color: #831843;
+      font-weight: 700;
+    }
+
+    .lvl-3 {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .lvl-2 {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+    }
+
+    .lvl-1 {
+      background: #fef9c3;
+      color: #854d0e;
+      font-weight: 700;
+    }
+
+    .lvl-0 {
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    .avg-row {
+      background: #f3f4f6;
+      font-weight: 700;
+    }
+
+    .sig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      font-size: 11.5px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 60px;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      #toolbar {
+        display: none !important;
+      }
+
+      #page-wrap {
+        padding: 0;
+        gap: 0;
+      }
+
+      .a4 {
+        box-shadow: none;
+        width: 100%;
+        padding: 6mm 8mm;
+      }
+
+      .a4.break {
+        page-break-before: always;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toolbar">
+    <button id="btn-print" onclick="window.print()">&#128424; พิมพ์ / PDF</button>
+    <button id="btn-close" onclick="window.close()">&#10005; ปิด</button>
+    <span id="toolbar-info">กำลังโหลด...</span>
+  </div>
+  <div id="page-wrap">
+    <div id="loading">&#9203; กำลังโหลดข้อมูล...</div>
+    <div id="doc-root"></div>
+  </div>
+  <script>
+    const URL_ = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+    const KEY_ = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+    const db = window.supabase.createClient(URL_, KEY_);
+
+    const GROUPS = [
+      { key: 'c1', label: '1.รักชาติ ศาสน์ กษัตริย์', cols: [{ k: 'c1_1', l: 'เป็นพลเมืองดี' }, { k: 'c1_2', l: 'เอกภาพชาติ' }, { k: 'c1_3', l: 'หลักกฎหมาย' }, { k: 'c1_4', l: 'เทิดทูนฯ' }] },
+      { key: 'c2', label: '2.ซื่อสัตย์สุจริต', cols: [{ k: 'c2_1', l: 'จิตใจตรง' }, { k: 'c2_2', l: 'ต่อตนเอง' }, { k: 'c2_3', l: 'กฎระเบียบ' }] },
+      { key: 'c3', label: '3.มีวินัย', cols: [{ k: 'c3_1', l: 'ปฏิบัติกฎระเบียบ' }] },
+      { key: 'c4', label: '4.ใฝ่เรียนรู้', cols: [{ k: 'c4_1', l: 'ตั้งใจเรียน' }, { k: 'c4_2', l: 'แสวงหาความรู้' }] },
+      { key: 'c5', label: '5.อยู่อย่างพอเพียง', cols: [{ k: 'c5_1', l: 'พอประมาณ' }, { k: 'c5_2', l: 'มีความสุข' }] },
+      { key: 'c6', label: '6.มุ่งมั่นในการทำงาน', cols: [{ k: 'c6_1', l: 'รับผิดชอบ' }, { k: 'c6_2', l: 'อดทน' }] },
+      { key: 'c7', label: '7.รักความเป็นไทย', cols: [{ k: 'c7_1', l: 'ภูมิใจไทย' }, { k: 'c7_2', l: 'ธรรมเนียม' }, { k: 'c7_3', l: 'ภูมิปัญญา' }, { k: 'c7_4', l: 'ภาษาไทย' }] },
+      { key: 'c8', label: '8.จิตสาธารณะ', cols: [{ k: 'c8_1', l: 'ช่วยเหลือ' }, { k: 'c8_2', l: 'ร่วมกิจกรรม' }] },
+    ];
+    const VBG = { 3: '#dcfce7', 2: '#dbeafe', 1: '#fef9c3', 0: '#fee2e2' };
+    const VCOL = { 3: '#166534', 2: '#1e40af', 1: '#854d0e', 0: '#991b1b' };
+    const LBGS = { ดีเยี่ยม: '#dcfce7', ดี: '#dbeafe', ผ่าน: '#fef9c3', ไม่ผ่าน: '#fee2e2' };
+    const LCOLS = { ดีเยี่ยม: '#166534', ดี: '#1e40af', ผ่าน: '#854d0e', ไม่ผ่าน: '#991b1b' };
+    function esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function level(avg) { return avg >= 2.5 ? 'ดีเยี่ยม' : avg >= 1.5 ? 'ดี' : avg >= 0.5 ? 'ผ่าน' : 'ไม่ผ่าน'; }
+    function vcls(v) { return v === 3 ? 'v3' : v === 2 ? 'v2' : v === 1 ? 'v1' : v === 0 ? 'v0' : ''; }
+
+    async function init() {
+      let pd; try { pd = JSON.parse(sessionStorage.getItem('p5_print_data') || 'null'); } catch { }
+      if (!pd || !pd.classroomId) { document.getElementById('loading').innerHTML = '&#10060; ไม่พบข้อมูล'; return; }
+      const { classroomId, year, term, subjectTxt, classTxt } = pd;
+      const [sR, cR, stR, recR] = await Promise.all([
+        db.from('school_info').select('school_name,affiliation').limit(1).single(),
+        db.from('classrooms').select('name').eq('id', classroomId).single(),
+        db.from('students').select('id,student_no,name,gender').eq('classroom_id', classroomId).eq('is_active', true),
+        db.from('p5_summary').select('*').eq('classroom_id', classroomId).eq('academic_year', year).eq('semester', term),
+      ]);
+      const school = sR.data || {}, cls = cR.data || {};
+      const studs = (stR.data || []).sort((a, b) => {
+        const gA = a.gender === 'ชาย' ? 0 : 1, gB = b.gender === 'ชาย' ? 0 : 1;
+        if (gA !== gB) return gA - gB;
+        return (a.student_no || '').localeCompare(b.student_no || '', undefined, { numeric: true });
+      });
+      const recMap = {}; (recR.data || []).forEach(r => { recMap[r.student_id] = r; });
+      document.getElementById('toolbar-info').textContent = (classTxt || cls.name || '') + ' ภาคเรียนที่ ' + term + ' — ปีการศึกษา ' + year;
+
+      // ── header ──
+      let h = '<div class="a4">';
+      h += `<div class="doc-title">
+    <h1>บันทึกคุณลักษณะอันพึงประสงค์ 8 ประการ (ปพ.5)</h1>
+    <div class="subtitle">${esc(school.school_name || '')} — ${esc(school.affiliation || '')}</div>
+  </div>
+  <div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
+    <span><span style="font-weight:600;">รายวิชา</span> : ${esc(subjectTxt || '')}</span>
+    <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(classTxt || cls.name || '')}</span>
+    <span><span style="font-weight:600;">ภาคเรียนที่</span> : ${term} &emsp; <span style="font-weight:600;">ปีการศึกษา</span> : ${year}</span>
+  </div>`;
+
+
+      // ── table ──
+      h += '<table><thead>';
+      let r1 = `<th class="th-fix" rowspan="2" style="width:22px;">ที่</th>`
+        + `<th class="th-fix" rowspan="2" style="width:44px;">รหัส</th>`
+        + `<th class="th-fix" rowspan="2">ชื่อ-นามสกุล</th>`;
+      let r2 = '';
+      GROUPS.forEach(g => {
+        r1 += `<th class="th-grp" colspan="${g.cols.length + 1}">${g.label}</th>`;
+        g.cols.forEach(c => { r2 += `<th class="th-sub">${c.l}</th>`; });
+        r2 += `<th class="th-sum">สรุป</th>`;
+      });
+      r1 += `<th class="th-res" rowspan="2" style="min-width:28px;">สรุปผล</th>`;
+      r1 += `<th class="th-lvl" rowspan="2" style="min-width:44px;">ระดับ</th>`;
+      h += `<tr>${r1}</tr><tr>${r2}</tr></thead><tbody>`;
+
+      studs.forEach((s, i) => {
+        const bg = i % 2 === 0 ? '' : 'background:#fafafa;';
+        const r = recMap[s.id] || {};
+        let cells = '', sums = [];
+        GROUPS.forEach(g => {
+          const subVals = g.cols.map(c => r[c.k]);
+          g.cols.forEach(c => {
+            const v = r[c.k];
+            cells += `<td class="${vcls(v)}">${v !== null && v !== undefined ? v : ''}</td>`;
+          });
+          const sv = subVals.filter(x => x !== null && x !== undefined);
+          const calc = r[g.key] !== undefined ? r[g.key] : (sv.length ? Math.round(sv.reduce((a, b) => a + b, 0) / sv.length) : null);
+          sums.push(calc);
+          cells += `<td class="${vcls(calc)} vs">${calc !== null && calc !== undefined ? calc : ''}</td>`;
+        });
+        const validSums = sums.filter(x => x !== null && x !== undefined);
+        const total = validSums.reduce((a, b) => a + b, 0);
+        const avg = validSums.length ? total / validSums.length : null;
+        const lv = avg !== null ? level(avg) : '';
+        h += `<tr style="${bg}">
+      <td style="font-size:10px;color:#94a3b8;">${i + 1}</td>
+      <td style="font-size:10px;color:#64748b;">${esc(s.student_no)}</td>
+      <td class="name-col" style="font-size:10px;color:#1e293b;">${esc(s.name)}</td>
+      ${cells}
+      <td style="font-weight:700;background:#f0fdf4;color:#065f46;">${avg !== null ? total : ''}</td>
+      <td style="font-weight:700;background:${LBGS[lv] || ''};color:${LCOLS[lv] || ''};">${lv}</td>
+    </tr>`;
+      });
+
+      h += '</tbody></table>';
+      h += `<div class="sig-grid">
+    <div><div>ลงชื่อ .....................................................</div>
+    <div style="color:#555;">( ..................................................... )</div>
+    <div style="font-weight:600;margin-top:3px;">ครูผู้สอน</div>
+    <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
+    <div><div>ลงชื่อ .....................................................</div>
+    <div style="color:#555;">( ..................................................... )</div>
+    <div style="font-weight:600;margin-top:3px;">หัวหน้าวิชาการ</div>
+    <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
+  </div></div>`;
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('doc-root').innerHTML = h;
+    }
+    init().catch(e => { document.getElementById('loading').innerHTML = '&#10060; ' + e.message; });
+  </script>
+</body>
+
+</html>

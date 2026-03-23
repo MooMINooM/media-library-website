@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <title>บันทึกลงเวลามาเรียน</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11.5px;
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    #toolbar {
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #toolbar button {
+      padding: 6px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #btn-print {
+      background: #4f46e5;
+      color: #fff;
+    }
+
+    #btn-close {
+      background: #475569;
+      color: #fff;
+    }
+
+    #toolbar-info {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-left: auto;
+    }
+
+    #page-wrap {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .a4 {
+      background: #fff;
+      width: 277mm;
+      padding: 8mm 10mm;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11.5px;
+      color: #111;
+    }
+
+    .doc-title {
+      text-align: center;
+      margin-bottom: 10px;
+      line-height: 1.9;
+    }
+
+    .doc-title h1 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .doc-title .subtitle {
+      font-size: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 28px;
+      row-gap: 3px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: baseline;
+    }
+
+    .info-lbl {
+      flex-shrink: 0;
+      white-space: nowrap;
+      width: 90px;
+    }
+
+    .info-sep {
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .month-bar {
+      background: #e0f2fe;
+      color: #0c4a6e;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 3px 8px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid #bae6fd;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #444;
+      padding: 2px 3px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.3;
+      font-size: 10.5px;
+    }
+
+    .th-fix {
+      background: #f0fdf4;
+      color: #065f46;
+      font-weight: 700;
+    }
+
+    .th-day {
+      background: #e0f2fe;
+      color: #075985;
+      font-weight: 700;
+      font-size: 9.5px;
+    }
+
+    .th-dow {
+      background: #f0f9ff;
+      color: #075985;
+      font-size: 8.5px;
+    }
+
+    .th-we {
+      background: #ede9fe;
+      color: #5b21b6;
+      font-weight: 700;
+    }
+
+    .th-hol {
+      background: #fce7f3;
+      color: #9d174d;
+      font-weight: 700;
+    }
+
+    .th-sum {
+      font-weight: 700;
+    }
+
+    .off-vert {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 8px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .td-we {
+      background: #ede9fe;
+    }
+
+    .td-hol {
+      background: #fce7f3;
+    }
+
+    .td-sm {
+      background: #f0fdf4;
+      color: #166534;
+      font-size: 8.5px;
+    }
+
+    .td-A {
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    .td-L {
+      background: #fef9c3;
+      color: #854d0e;
+      font-weight: 700;
+    }
+
+    .td-E {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+    }
+
+    .td-S {
+      background: #fce7f3;
+      color: #9d174d;
+      font-weight: 700;
+    }
+
+    .s-p {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .s-a {
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    .s-l {
+      background: #fef9c3;
+      color: #854d0e;
+      font-weight: 700;
+    }
+
+    .s-e {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+    }
+
+    .s-s {
+      background: #fce7f3;
+      color: #9d174d;
+      font-weight: 700;
+    }
+
+    .avg-row {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    .legend {
+      font-size: 10px;
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .leg {
+      padding: 1px 6px;
+      border: 1px solid #ccc;
+    }
+
+    .sig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      font-size: 11px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .sig-space {
+      height: 20px;
+      border-bottom: 1px solid #444;
+      margin: 0 20px 3px;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 60px;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    @media print {
+      .sig-grid {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      #toolbar {
+        display: none !important;
+      }
+
+      #page-wrap {
+        padding: 0;
+        gap: 0;
+      }
+
+      .a4 {
+        box-shadow: none;
+        width: 100%;
+        padding: 6mm 8mm;
+      }
+
+      .a4.break {
+        page-break-before: always;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="toolbar">
+    <button id="btn-print" onclick="window.print()">&#128424; พิมพ์ / PDF</button>
+    <button id="btn-close" onclick="window.close()">&#10005; ปิด</button>
+    <span id="toolbar-info">กำลังโหลด...</span>
+  </div>
+  <div id="page-wrap">
+    <div id="loading">&#9203; กำลังโหลดข้อมูล...</div>
+    <div id="doc-root"></div>
+  </div>
+  <script>
+    const URL_ = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+    const KEY_ = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+    const db = window.supabase.createClient(URL_, KEY_);
+    const MF = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    const DW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+    const ACAD = [4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2];
+    const ATL = { P: 'ม', A: 'ข', L: 'ส', E: 'ล', S: 'ป' };
+
+    function esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    async function fetchHols(y) {
+      try {
+        const r = await fetch('https://date.nager.at/api/v3/PublicHolidays/' + y + '/TH');
+        if (!r.ok) return new Set(); return new Set((await r.json()).map(h => h.date));
+      } catch { return new Set(); }
+    }
+
+    async function fetchSchoolHols(ceYear) {
+      const s = new Set();
+      try {
+        const { data } = await db.from('calendar_events').select('start_date,end_date')
+          .eq('type', 'holiday').gte('start_date', ceYear + '-01-01').lte('start_date', ceYear + '-12-31');
+        (data || []).forEach(ev => {
+          const start = new Date(ev.start_date), end = ev.end_date ? new Date(ev.end_date) : new Date(ev.start_date);
+          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1))
+            s.add(d.toISOString().slice(0, 10));
+        });
+      } catch (e) { console.warn('fetchSchoolHols:', e.message); }
+      return s;
+    }
+
+    async function fetchAllHols(ceYear) {
+      const [nager, school] = await Promise.all([fetchHols(ceYear), fetchSchoolHols(ceYear)]);
+      return new Set([...nager, ...school]);
+    }
+    function getDays(cey, m, hs) {
+      const arr = [], last = new Date(cey, m + 1, 0).getDate();
+      for (let d = 1; d <= last; d++) {
+        const dow = new Date(cey, m, d).getDay();
+        const iso = cey + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const isWE = dow === 0 || dow === 6;
+        const isHol = !isWE && hs.has(iso);
+        arr.push({ d, iso, dow, isWE, isHol, isOff: isWE || hs.has(iso) });
+      }
+      return arr;
+    }
+
+    function buildPage(m, actYear, buddYear, days, studs, amap, headerHtml, isFirst) {
+      const workDays = days.filter(d => !d.isOff);
+      const mLabel = MF[m] + ' ' + (m <= 2 ? buddYear + 1 : buddYear);
+      let h = '<div class="a4' + (isFirst ? '' : ' break') + '">';
+
+      // header: single line with month embedded
+      if (typeof headerHtml === 'function') {
+        h += headerHtml(mLabel);
+      } else if (isFirst) {
+        h += headerHtml;
+      } else {
+        h += `<div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
+      <span><span style="font-weight:600;">รายวิชา</span> : ${esc(headerHtml._subj || '')}</span>
+      <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(headerHtml._cls || '')}</span>
+      <span><span style="font-weight:600;">ปีการศึกษา</span> : ${headerHtml._year || ''} &emsp; <span style="font-weight:600;">เดือน</span> : ${mLabel}</span>
+    </div>`;
+      }
+
+      h += '<table>';
+
+      // colgroup
+      h += '<colgroup><col style="width:18px;"><col style="width:44px;"><col style="width:100px;">';
+      days.forEach(d => { h += '<col style="width:15px;">'; });
+      for (let i = 0; i < 5; i++) h += '<col style="width:18px;">';
+      h += '</colgroup>';
+
+      // thead row1
+      h += '<thead><tr>';
+      h += '<th class="th-fix" rowspan="2">ที่</th>';
+      h += '<th class="th-fix" rowspan="2">รหัส<br>นักเรียน</th>';
+      h += '<th class="th-fix" rowspan="2">ชื่อ-นามสกุล</th>';
+      days.forEach(d => {
+        if (d.isWE) {
+          h += '<th class="th-we" rowspan="2"><span class="off-vert">' + (d.dow === 6 ? 'เสาร์' : 'อาทิตย์') + '</span></th>';
+        } else if (d.isHol) {
+          h += '<th class="th-hol" rowspan="2"><span class="off-vert">หยุด</span></th>';
+        } else {
+          h += '<th class="th-day">' + d.d + '</th>';
+        }
+      });
+      h += '<th class="th-sum s-p" rowspan="2">มา</th>';
+      h += '<th class="th-sum s-a" rowspan="2">ขาด</th>';
+      h += '<th class="th-sum s-l" rowspan="2">สาย</th>';
+      h += '<th class="th-sum s-e" rowspan="2">ลา</th>';
+      h += '<th class="th-sum s-s" rowspan="2">ป่วย</th>';
+      h += '</tr><tr>';
+      days.forEach(d => {
+        if (!d.isWE && !d.isHol) h += '<th class="th-dow">' + DW[d.dow] + '</th>';
+      });
+      h += '</tr></thead><tbody>';
+
+      const roomC = { P: 0, A: 0, L: 0, E: 0, S: 0 };
+      studs.forEach((s, i) => {
+        const bg = i % 2 === 0 ? '' : 'background:#fafafa;';
+        h += '<tr style="' + bg + '">';
+        h += '<td style="font-size:10px;color:#94a3b8;">' + (i + 1) + '</td>';
+        h += '<td style="font-size:10px;color:#64748b;">' + esc(s.student_no) + '</td>';
+        h += '<td style="text-align:left;padding-left:6px;white-space:nowrap;font-size:10px;color:#1e293b;">' + esc(s.name) + '</td>';
+        const c = { P: 0, A: 0, L: 0, E: 0, S: 0 };
+        days.forEach(d => {
+          if (d.isWE) { h += '<td class="td-we"></td>'; return; }
+          if (d.isHol) { h += '<td class="td-hol"></td>'; return; }
+          const st = (amap[s.id] || {})[d.iso] || 'P';
+          c[st]++;
+          const txt = ATL[st] || '';
+          h += '<td class="' + (st === 'P' ? 's-p td-sm' : 'td-' + st) + '">' + txt + '</td>';
+        });
+        ['P', 'A', 'L', 'E', 'S'].forEach(k => { roomC[k] += c[k]; });
+        h += '<td class="s-p">' + (c.P || '') + '</td>';
+        h += '<td class="s-a">' + (c.A || '') + '</td>';
+        h += '<td class="s-l">' + (c.L || '') + '</td>';
+        h += '<td class="s-e">' + (c.E || '') + '</td>';
+        h += '<td class="s-s">' + (c.S || '') + '</td>';
+        h += '</tr>';
+      });
+
+      // avg
+      const nn = studs.length || 1;
+      h += '<tr class="avg-row">';
+      h += '<td colspan="3" style="text-align:center;">ค่าเฉลี่ยของห้อง</td>';
+      days.forEach(d => { h += '<td class="' + (d.isWE ? 'td-we' : d.isHol ? 'td-hol' : '') + '"></td>'; });
+      h += '<td class="s-p">' + (roomC.P / nn).toFixed(1) + '</td>';
+      h += '<td class="s-a">' + (roomC.A / nn).toFixed(1) + '</td>';
+      h += '<td class="s-l">' + (roomC.L / nn).toFixed(1) + '</td>';
+      h += '<td class="s-e">' + (roomC.E / nn).toFixed(1) + '</td>';
+      h += '<td class="s-s">' + (roomC.S / nn).toFixed(1) + '</td>';
+      h += '</tr></tbody></table>';
+
+
+
+
+      h += `<div class="sig-grid">
+    <div><div>ลงชื่อ .....................................................</div>
+    <div style="color:#555;">( ..................................................... )</div>
+    <div style="font-weight:600;margin-top:3px;">ครูผู้สอน</div>
+    <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
+    <div><div>ลงชื่อ .....................................................</div>
+    <div style="color:#555;">( ..................................................... )</div>
+    <div style="font-weight:600;margin-top:3px;">หัวหน้าวิชาการ</div>
+    <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div></div>
+  </div>`;
+      h += '</div>';
+      return h;
+    }
+
+    async function init() {
+      let pd; try { pd = JSON.parse(sessionStorage.getItem('p5_print_data') || 'null'); } catch { }
+      if (!pd || !pd.classroomId) { document.getElementById('loading').innerHTML = '&#10060; ไม่พบข้อมูล'; return; }
+      const { classroomId, year } = pd;
+      console.log('printData received:', JSON.stringify(pd));
+      const by = parseInt(year), cey = by - 543, ncy = cey + 1;
+
+      const [sR, cR, aR, stR, hs1, hs2] = await Promise.all([
+        db.from('school_info').select('school_name,affiliation').limit(1).single(),
+        pd.tsId ? db.from('teacher_subjects').select('subjects(code,name,credits,hours_per_week),teachers(name)').eq('id', pd.tsId).maybeSingle() : Promise.resolve({ data: null }),
+        db.from('classrooms').select('name').eq('id', classroomId).single(),
+        db.from('students').select('id,student_no,name').eq('classroom_id', classroomId).eq('is_active', true).order('student_no'),
+        fetchAllHols(cey), fetchAllHols(ncy)
+      ]);
+
+      const school = sR.data || {}, assign = aR.data || {}, cls = cR.data || {}, studs = stR.data || [];
+      const subj = assign.subjects || {}, tchr = assign.teachers || {};
+      const subjTxt = pd.subjectTxt || ((subj.code || '') + (subj.name ? ' ' + subj.name : ''));
+      let teacherData = {};
+      try { teacherData = JSON.parse(sessionStorage.getItem('paw_teacher_session') || '{}'); } catch { }
+      const teacherName = tchr.name || teacherData.name || '';
+      // credits/hours: ส่งมาใน printData โดยตรง หรือดึงจาก assign
+      const credits = pd.credits !== undefined && pd.credits !== '' ? pd.credits : (subj.credits || '');
+      const hours = pd.hours !== undefined && pd.hours !== '' ? pd.hours : (subj.hours_per_week || '');
+
+      const { data: att } = await db.from('p5_attendance').select('*').eq('classroom_id', classroomId)
+        .gte('attend_date', cey + '-05-01').lte('attend_date', ncy + '-03-31');
+      const amap = {}; (att || []).forEach(r => { if (!amap[r.student_id]) amap[r.student_id] = {}; amap[r.student_id][r.attend_date] = r.status; });
+
+      document.getElementById('toolbar-info').textContent = cls.name + ' — ปีการศึกษา ' + year;
+
+      // header HTML (first page only)
+      // headerHtml is a function so mLabel can be passed in
+      function makeHeaderHtml(mLabel) {
+        return `
+  <div class="doc-title" style="margin-bottom:4px;">
+    <h1>บันทึกลงเวลามาเรียน (ปพ.5)</h1>
+    <div class="subtitle">${esc(school.school_name || '')} — ${esc(school.affiliation || '')}</div>
+  </div>
+  <div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
+    <span><span style="font-weight:600;">รายวิชา</span> : ${esc(subjTxt)}</span>
+    <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(cls.name || pd.classTxt || '')}</span>
+    <span><span style="font-weight:600;">ปีการศึกษา</span> : ${year} &emsp; <span style="font-weight:600;">เดือน</span> : ${mLabel}</span>
+  </div>`;
+      }
+      const headerHtml = makeHeaderHtml('');
+
+      // attach meta for subsequent pages
+      headerHtml._subj = subjTxt;
+      headerHtml._cls = cls.name || pd.classTxt || '';
+      headerHtml._year = year;
+
+      let html = '';
+      let pageIdx = 0;
+      ACAD.forEach(m => {
+        const ay = m <= 2 ? ncy : cey, hs_ = m <= 2 ? hs2 : hs1;
+        const dayArr = getDays(ay, m, hs_);
+        if (dayArr.filter(d => !d.isOff).length === 0) return;
+        html += buildPage(m, ay, by, dayArr, studs, amap, pageIdx === 0 ? makeHeaderHtml : Object.assign({ _subj: subjTxt, _cls: cls.name || pd.classTxt || '', _year: year }, {}), pageIdx === 0);
+        pageIdx++;
+      });
+
+
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('doc-root').innerHTML = html;
+    }
+    init().catch(e => { document.getElementById('loading').innerHTML = '&#10060; ' + e.message; });
+  </script>
+</body>
+
+</html>

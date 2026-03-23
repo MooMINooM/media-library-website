@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>การอ่าน คิดวิเคราะห์ เขียน</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 11.5px;
+            background: #e5e7eb;
+            color: #111;
+        }
+
+        #toolbar {
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #toolbar button {
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #btn-print {
+            background: #ea580c;
+            color: #fff;
+        }
+
+        #btn-close {
+            background: #475569;
+            color: #fff;
+        }
+
+        #toolbar-info {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+
+        #page-wrap {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .a4 {
+            background: #fff;
+            width: 277mm;
+            padding: 8mm 10mm;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 11.5px;
+            color: #111;
+        }
+
+        .doc-title {
+            text-align: center;
+            margin-bottom: 8px;
+            line-height: 1.9;
+        }
+
+        .doc-title h1 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .doc-title .subtitle {
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #444;
+            padding: 2px 3px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 1.3;
+            font-size: 10px;
+        }
+
+        .th-fix {
+            background: #fff7ed;
+            color: #9a3412;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .th-r {
+            background: #ffedd5;
+            color: #c2410c;
+            font-weight: 700;
+            font-size: 9.5px;
+        }
+
+        .th-t {
+            background: #dcfce7;
+            color: #15803d;
+            font-weight: 700;
+            font-size: 9.5px;
+        }
+
+        .th-w {
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-weight: 700;
+            font-size: 9.5px;
+        }
+
+        .th-fin {
+            background: #fdf4ff;
+            color: #7e22ce;
+            font-weight: 700;
+            font-size: 9.5px;
+        }
+
+        .th-sub {
+            border: 1px solid #d1d5db;
+            font-size: 7.5px;
+            color: #6b7280;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            height: 68px;
+            padding: 2px 1px;
+            white-space: nowrap;
+        }
+
+        .th-sum {
+            border: 1px solid #d1d5db;
+            font-size: 8px;
+            font-weight: 700;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            height: 68px;
+            padding: 2px 1px;
+        }
+
+        .name-col {
+            text-align: left;
+            padding-left: 5px;
+            min-width: 140px;
+            white-space: nowrap;
+        }
+
+        .v3 {
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+        }
+
+        .v2 {
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 700;
+        }
+
+        .v1 {
+            background: #fef9c3;
+            color: #854d0e;
+            font-weight: 700;
+        }
+
+        .v0 {
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 700;
+        }
+
+        .lv-ex {
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+        }
+
+        .lv-gd {
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 700;
+        }
+
+        .lv-ps {
+            background: #fef9c3;
+            color: #854d0e;
+            font-weight: 700;
+        }
+
+        .lv-fl {
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 700;
+        }
+
+        .avg-row {
+            background: #f3f4f6;
+            font-weight: 700;
+        }
+
+        .sig-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            font-size: 11.5px;
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            #toolbar {
+                display: none !important;
+            }
+
+            #page-wrap {
+                padding: 0;
+                gap: 0;
+            }
+
+            .a4 {
+                box-shadow: none;
+                width: 100%;
+                padding: 6mm 8mm;
+            }
+
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toolbar">
+        <button id="btn-print" onclick="window.print()">&#128424; พิมพ์ / PDF</button>
+        <button id="btn-close" onclick="window.close()">&#10005; ปิด</button>
+        <span id="toolbar-info">กำลังโหลด...</span>
+    </div>
+    <div id="page-wrap">
+        <div id="loading">&#9203; กำลังโหลดข้อมูล...</div>
+        <div id="doc-root"></div>
+    </div>
+    <script>
+        const URL_ = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+        const KEY_ = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        const db = window.supabase.createClient(URL_, KEY_);
+
+        const READ_BG = { 3: '#dcfce7', 2: '#dbeafe', 1: '#fef9c3', 0: '#fee2e2' };
+        const READ_COL = { 3: '#166534', 2: '#1e40af', 1: '#854d0e', 0: '#991b1b' };
+        const READ_LBL = { 3: 'ดีเยี่ยม', 2: 'ดี', 1: 'ผ่าน', 0: 'ไม่ผ่าน' };
+
+        const READ_GROUPS = [
+            {
+                key: 'read_sum', label: 'ด้านการอ่าน', thCls: 'th-r', sumBg: '#fff7ed', sumCol: '#c2410c',
+                cols: [
+                    { k: 'read_r1', l: 'อ่านจับใจความ' },
+                    { k: 'read_r2', l: 'จัดลำดับเรื่อง' },
+                    { k: 'read_r3', l: 'สรุปใจความสำคัญ' },
+                    { k: 'read_r4', l: 'แสดงความคิดเห็น' },
+                    { k: 'read_r5', l: 'รักการอ่าน' },
+                    { k: 'read_r6', l: 'เลือกอ่านหนังสือ' },
+                    { k: 'read_r7', l: 'มารยาทในการอ่าน' },
+                ]
+            },
+            {
+                key: 'think_sum', label: 'ด้านการคิดวิเคราะห์', thCls: 'th-t', sumBg: '#f0fdf4', sumCol: '#15803d',
+                cols: [
+                    { k: 'think_t1', l: 'การคาดคะเน' },
+                    { k: 'think_t2', l: 'การวางแผนฯ' },
+                    { k: 'think_t3', l: 'การแก้ไขปัญหา' },
+                    { k: 'think_t4', l: 'การให้เหตุผล' },
+                    { k: 'think_t5', l: 'การตัดสินใจ' },
+                    { k: 'think_t6', l: 'ความคิดริเริ่มสร้างสรรค์' },
+                    { k: 'think_t7', l: 'การสร้างองค์ความรู้' },
+                ]
+            },
+            {
+                key: 'write_sum', label: 'ด้านการเขียน', thCls: 'th-w', sumBg: '#eff6ff', sumCol: '#2563eb',
+                cols: [
+                    { k: 'write_w1', l: 'เขียนแสดงความรู้/ความคิด' },
+                    { k: 'write_w2', l: 'จดบันทึกความรู้' },
+                    { k: 'write_w3', l: 'การเขียนในการเรียน' },
+                    { k: 'write_w4', l: 'มารยาทในการเขียน' },
+                ]
+            },
+        ];
+
+        function esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+        function vCls(v) { return { 3: 'v3', 2: 'v2', 1: 'v1', 0: 'v0' }[v] ?? ''; }
+        function lvCls(lv) { return { ดีเยี่ยม: 'lv-ex', ดี: 'lv-gd', ผ่าน: 'lv-ps', ไม่ผ่าน: 'lv-fl' }[lv] ?? ''; }
+        function calcAvg(vals) {
+            const v = vals.filter(x => x !== null && x !== undefined);
+            return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+        }
+
+        async function init() {
+            let pd; try { pd = JSON.parse(sessionStorage.getItem('p5_print_data') || 'null'); } catch { }
+            if (!pd || !pd.classroomId) { document.getElementById('loading').innerHTML = '&#10060; ไม่พบข้อมูล'; return; }
+            const { classroomId, year, term, subjectTxt, classTxt } = pd;
+
+            const [sR, cR, stR, recR] = await Promise.all([
+                db.from('school_info').select('school_name,affiliation').limit(1).single(),
+                db.from('classrooms').select('name').eq('id', classroomId).single(),
+                db.from('students').select('id,student_no,name,gender').eq('classroom_id', classroomId).eq('is_active', true),
+                db.from('p5_summary').select('*').eq('classroom_id', classroomId).eq('academic_year', year).eq('semester', term),
+            ]);
+
+            const school = sR.data || {}, cls = cR.data || {};
+            const studs = (stR.data || []).sort((a, b) => {
+                const gA = a.gender === 'ชาย' ? 0 : 1, gB = b.gender === 'ชาย' ? 0 : 1;
+                if (gA !== gB) return gA - gB;
+                return (a.student_no || '').localeCompare(b.student_no || '', undefined, { numeric: true });
+            });
+            const recMap = {}; (recR.data || []).forEach(r => { recMap[r.student_id] = r; });
+            document.getElementById('toolbar-info').textContent = (classTxt || cls.name || '') + ' ภาคเรียนที่ ' + term + ' — ปีการศึกษา ' + year;
+
+            let h = '<div class="a4">';
+            h += `<div class="doc-title">
+    <h1>บันทึกการอ่าน คิดวิเคราะห์ และเขียน (ปพ.5)</h1>
+    <div class="subtitle">${esc(school.school_name || '')} — ${esc(school.affiliation || '')}</div>
+  </div>
+  <div style="font-size:12px;margin-bottom:5px;display:flex;flex-wrap:wrap;gap:0 28px;line-height:1.8;">
+    <span><span style="font-weight:600;">รายวิชา</span> : ${esc(subjectTxt || '')}</span>
+    <span><span style="font-weight:600;">ระดับชั้น</span> : ${esc(classTxt || cls.name || '')}</span>
+    <span><span style="font-weight:600;">ภาคเรียนที่</span> : ${term} &emsp; <span style="font-weight:600;">ปีการศึกษา</span> : ${year}</span>
+  </div>`;
+
+            let tr1 = `<th class="th-fix" rowspan="2" style="width:20px;">ที่</th>`
+                + `<th class="th-fix" rowspan="2" style="width:40px;">รหัส</th>`
+                + `<th class="th-fix name-col" rowspan="2">ชื่อ-นามสกุล</th>`;
+            let tr2 = '';
+            READ_GROUPS.forEach(g => {
+                tr1 += `<th class="${g.thCls}" colspan="${g.cols.length + 1}">${g.label}</th>`;
+                g.cols.forEach(c => { tr2 += `<th class="th-sub">${c.l}</th>`; });
+                tr2 += `<th class="th-sum" style="background:${g.sumBg};color:${g.sumCol};">สรุป</th>`;
+            });
+            tr1 += `<th class="th-fin" rowspan="2" style="min-width:44px;">สรุปผล<br>การประเมิน</th>`;
+            h += `<table><thead><tr>${tr1}</tr><tr>${tr2}</tr></thead><tbody>`;
+
+            const colAccum = {};
+            const allKeys = [];
+            READ_GROUPS.forEach(g => { g.cols.forEach(c => allKeys.push(c.k)); allKeys.push(g.key); });
+            allKeys.push('reading_result');
+            allKeys.forEach(k => { colAccum[k] = []; });
+
+            studs.forEach((s, i) => {
+                const bg = i % 2 === 0 ? '' : 'background:#fafafa;';
+                const r = recMap[s.id] || {};
+                let cells = '';
+
+                // ตรวจว่ามีข้อมูล sub-columns จริงหรือไม่ ถ้าไม่มีให้ default=3 เหมือนหน้าบันทึก
+                const hasSubData = READ_GROUPS.some(g => g.cols.some(c => r[c.k] !== null && r[c.k] !== undefined));
+
+                READ_GROUPS.forEach(g => {
+                    const subValsEff = g.cols.map(c => (r[c.k] !== null && r[c.k] !== undefined) ? r[c.k] : (hasSubData ? null : 3));
+                    g.cols.forEach(c => {
+                        const v = (r[c.k] !== null && r[c.k] !== undefined) ? r[c.k] : (hasSubData ? null : 3);
+                        colAccum[c.k].push(v);
+                        cells += `<td class="${vCls(v)}">${v !== null && v !== undefined ? v : ''}</td>`;
+                    });
+                    const sumVRaw = (r[g.key] !== null && r[g.key] !== undefined) ? r[g.key] : null;
+                    const sumVEff = sumVRaw !== null ? sumVRaw : calcAvg(subValsEff.filter(x => x !== null));
+                    colAccum[g.key].push(sumVEff);
+                    cells += `<td class="${vCls(sumVEff)}" style="font-weight:700;">${sumVEff !== null && sumVEff !== undefined ? sumVEff : ''}</td>`;
+                });
+
+                const groupSumsEff = READ_GROUPS.map(g => {
+                    if (r[g.key] !== null && r[g.key] !== undefined) return r[g.key];
+                    const sub = g.cols.map(c => (r[c.k] !== null && r[c.k] !== undefined) ? r[c.k] : (hasSubData ? null : 3));
+                    return calcAvg(sub.filter(x => x !== null));
+                });
+                const finalV = (r.reading_result !== null && r.reading_result !== undefined)
+                    ? r.reading_result
+                    : calcAvg(groupSumsEff.filter(x => x !== null && x !== undefined));
+                const finalLbl = finalV !== null && finalV !== undefined ? READ_LBL[finalV] || '' : '';
+                colAccum['reading_result'].push(finalV);
+                h += `<tr style="${bg}">
+      <td style="font-size:9px;color:#94a3b8;">${i + 1}</td>
+      <td style="font-size:9px;color:#64748b;">${esc(s.student_no)}</td>
+      <td class="name-col" style="font-size:9.5px;color:#1e293b;">${esc(s.name)}</td>
+      ${cells}
+      <td class="${lvCls(finalLbl)}" style="font-size:9px;">${finalLbl}</td>
+    </tr>`;
+            });
+
+            let avgCells = '';
+            READ_GROUPS.forEach(g => {
+                g.cols.forEach(c => {
+                    const vals = colAccum[c.k].filter(v => v !== null && v !== undefined);
+                    avgCells += `<td style="font-size:8.5px;">${vals.length ? (vals.reduce((x, y) => x + y, 0) / vals.length).toFixed(2) : ''}</td>`;
+                });
+                const svals = colAccum[g.key].filter(v => v !== null && v !== undefined);
+                avgCells += `<td style="font-size:8.5px;font-weight:700;">${svals.length ? (svals.reduce((x, y) => x + y, 0) / svals.length).toFixed(2) : ''}</td>`;
+            });
+            const cnt = { 3: 0, 2: 0, 1: 0, 0: 0 };
+            colAccum['reading_result'].filter(v => v !== null && v !== undefined).forEach(v => { if (cnt[v] !== undefined) cnt[v]++; });
+            h += `<tr class="avg-row">
+    <td colspan="3" style="text-align:center;">ค่าเฉลี่ย / สรุปห้อง</td>
+    ${avgCells}
+    <td style="font-size:8px;text-align:left;padding-left:3px;">ดีเยี่ยม ${cnt[3]}<br>ดี ${cnt[2]}<br>ผ่าน ${cnt[1]}<br>ไม่ผ่าน ${cnt[0]}</td>
+  </tr>`;
+
+            h += '</tbody></table>';
+            h += `<div style="font-size:10px;display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;color:#555;">
+    <span>เกณฑ์ :</span>
+    <span style="background:#dcfce7;color:#166534;padding:1px 5px;border:1px solid #ccc;">3 = ดีเยี่ยม</span>
+    <span style="background:#dbeafe;color:#1e40af;padding:1px 5px;border:1px solid #ccc;">2 = ดี</span>
+    <span style="background:#fef9c3;color:#854d0e;padding:1px 5px;border:1px solid #ccc;">1 = ผ่าน</span>
+    <span style="background:#fee2e2;color:#991b1b;padding:1px 5px;border:1px solid #ccc;">0 = ไม่ผ่าน</span>
+  </div>`;
+            h += `<div class="sig-grid">
+    <div>
+      <div>ลงชื่อ .....................................................</div>
+      <div style="color:#555;">( ..................................................... )</div>
+      <div style="font-weight:600;margin-top:3px;">ครูผู้สอน</div>
+      <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div>
+    </div>
+    <div>
+      <div>ลงชื่อ .....................................................</div>
+      <div style="color:#555;">( ..................................................... )</div>
+      <div style="font-weight:600;margin-top:3px;">หัวหน้าวิชาการ</div>
+      <div style="color:#555;font-size:10.5px;">วันที่ ......... / ......... / .........</div>
+    </div>
+  </div></div>`;
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('doc-root').innerHTML = h;
+        }
+        init().catch(e => { document.getElementById('loading').innerHTML = '&#10060; ' + e.message; });
+    </script>
+</body>
+
+</html>

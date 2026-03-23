@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ปก ปพ.5</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #e5e7eb;
+            color: #111;
+        }
+
+        #toolbar {
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #toolbar button {
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #btn-print {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        #btn-close {
+            background: #475569;
+            color: #fff;
+        }
+
+        #toolbar-info {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+
+        #page-wrap {
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .a4 {
+            background: #fff;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 16mm 18mm 16mm;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, .18);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 14px;
+            color: #111;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .corner-label {
+            position: absolute;
+            top: 10mm;
+            right: 12mm;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid #111;
+            padding: 2px 10px;
+        }
+
+        .logo-box {
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box img {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
+            margin-bottom: 18px;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .hdiv {
+            border: none;
+            border-top: 1.5px solid #111;
+            margin: 9px 0;
+        }
+
+        /* info rows */
+        .irow {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            margin-bottom: 7px;
+            font-size: 14px;
+            border-bottom: 1px solid #111;
+            padding-bottom: 3px;
+        }
+
+        .lbl {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .ul {
+            min-width: 16px;
+        }
+
+        .f1 {
+            flex: 1;
+        }
+
+        /* tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #111;
+            padding: 3px 5px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 1.5;
+            font-size: 12px;
+        }
+
+        .sh {
+            background: #f3f4f6;
+            font-weight: 700;
+        }
+
+        .gh {
+            background: #dcfce7;
+        }
+
+        .gm {
+            background: #dbeafe;
+        }
+
+        .gl {
+            background: #fef9c3;
+        }
+
+        .gf {
+            background: #fee2e2;
+        }
+
+        /* approval */
+        .approval {
+            border: 1px solid #111;
+            padding: 12px 16px;
+        }
+
+        .at {
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            padding-bottom: 7px;
+            margin-bottom: 9px;
+        }
+
+        .adivider {
+            border: none;
+            border-top: 0.8px solid #111;
+            margin: 10px 0;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            #toolbar {
+                display: none !important;
+            }
+
+            #page-wrap {
+                padding: 0;
+            }
+
+            .a4 {
+                box-shadow: none;
+                width: 100%;
+                padding: 12mm 15mm;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toolbar">
+        <button id="btn-print" onclick="window.print()">&#128424; พิมพ์ / PDF</button>
+        <button id="btn-close" onclick="window.close()">&#10005; ปิด</button>
+        <span id="toolbar-info">กำลังโหลด...</span>
+    </div>
+    <div id="page-wrap">
+        <div id="loading">&#9203; กำลังโหลดข้อมูล...</div>
+        <div id="doc-root"></div>
+    </div>
+    <script>
+        const URL_ = 'https://dazypxnsfwdwrqluicbc.supabase.co';
+        const KEY_ = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+        const db = window.supabase.createClient(URL_, KEY_);
+
+        function esc(s) { return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+        function gradeFromPct(p) {
+            if (p >= 80) return '4'; if (p >= 75) return '3.5'; if (p >= 70) return '3';
+            if (p >= 65) return '2.5'; if (p >= 60) return '2'; if (p >= 55) return '1.5';
+            if (p >= 50) return '1'; return '0';
+        }
+        function lvl(v) { return v >= 2.5 ? 'ดีเยี่ยม' : v >= 1.5 ? 'ดี' : v >= 0.5 ? 'ผ่าน' : 'ไม่ผ่าน'; }
+
+        async function init() {
+            let pd; try { pd = JSON.parse(sessionStorage.getItem('p5_print_data') || 'null'); } catch { }
+            if (!pd || !pd.classroomId) { document.getElementById('loading').innerHTML = '&#10060; ไม่พบข้อมูล'; return; }
+            const { classroomId, year, tsId: tsId_raw, level, term: pdTerm } = pd;
+            const tsId = parseInt(tsId_raw);
+            const isMiddle = level === 'มัธยม';
+            const term = pdTerm || 1;
+
+            const [sR, aR, stR, g1R, g2R, sumR] = await Promise.all([
+                db.from('school_info').select('school_name,affiliation,district,province,logo_url,principal').limit(1).single(),
+                tsId ? db.from('teacher_subjects')
+                    .select('subjects(code,name,credits,hours_per_week,group_name),classrooms(name,room,level,grade),teachers(name)')
+                    .eq('id', tsId).single() : Promise.resolve({ data: null }),
+                db.from('students').select('id,student_no,name,gender').eq('classroom_id', classroomId).eq('is_active', true),
+                tsId ? db.from('p5_grades').select('*').eq('teacher_subject_id', tsId).eq('semester', 1) : Promise.resolve({ data: [] }),
+                (tsId && !isMiddle) ? db.from('p5_grades').select('*').eq('teacher_subject_id', tsId).eq('semester', 2) : Promise.resolve({ data: [] }),
+                db.from('p5_summary').select('student_id,reading_result,read_sum,think_sum,write_sum,c1_nation,c2_honest,c3_discipline,c4_study,c5_economy,c6_work,c7_thai,c8_public')
+                    .eq('classroom_id', classroomId).eq('academic_year', year),
+            ]);
+            // ดึง classroom_advisors แยก ป้องกัน error ถ้ายังไม่ได้รัน migration
+            let advR = { data: [] };
+            try { advR = await db.from('classroom_advisors').select('role,sort_order,teachers(name)').eq('classroom_id', classroomId).order('sort_order'); } catch (e) { }
+
+            const school = sR.data || {};
+            const assign = aR.data || {};
+            const subj = assign.subjects || {};
+            const cls = assign.classrooms || {};
+            const tchr = assign.teachers || {};
+            const studs = stR.data || [];
+            const males = studs.filter(s => s.gender === 'ชาย');
+            const females = studs.filter(s => s.gender === 'หญิง');
+
+            // เกรด
+            const gradeCount = { '4': 0, '3.5': 0, '3': 0, '2.5': 0, '2': 0, '1.5': 0, '1': 0, '0': 0 };
+            const g1map = {}, g2map = {};
+            (g1R.data || []).forEach(g => g1map[g.student_id] = g);
+            (g2R.data || []).forEach(g => g2map[g.student_id] = g);
+            studs.forEach(s => {
+                let grade = '';
+                if (!isMiddle) {
+                    const g1 = g1map[s.id] || {}, g2 = g2map[s.id] || {};
+                    const t = (parseFloat(g1.assignment_score) || 0) + (parseFloat(g1.final_score) || 0)
+                        + (parseFloat(g2.assignment_score) || 0) + (parseFloat(g2.final_score) || 0);
+                    if (t > 0) grade = gradeFromPct(t);
+                } else {
+                    const g1 = g1map[s.id] || {};
+                    const t = (parseFloat(g1.assignment_score) || 0) + (parseFloat(g1.midterm_score) || 0) + (parseFloat(g1.final_score) || 0);
+                    if (t > 0) grade = gradeFromPct(t);
+                }
+                if (grade && gradeCount[grade] !== undefined) gradeCount[grade]++;
+            });
+
+            // ครูที่ปรึกษา
+            const advisorStr = (advR.data || []).map(a => a.teachers?.name || '').filter(Boolean).join(' , ');
+
+            // ผลการประเมิน
+            const readCnt = { ดีเยี่ยม: 0, ดี: 0, ผ่าน: 0, ไม่ผ่าน: 0 };
+            const charCnt = { ดีเยี่ยม: 0, ดี: 0, ผ่าน: 0, ไม่ผ่าน: 0 };
+            (sumR.data || []).forEach(r => {
+                // การอ่านฯ — ใช้ reading_result หรือ fallback จาก read_sum/think_sum/write_sum
+                const rv = r.reading_result !== null && r.reading_result !== undefined ? r.reading_result
+                    : (() => { const s = [r.read_sum, r.think_sum, r.write_sum].filter(x => x !== null && x !== undefined); return s.length ? Math.round(s.reduce((a, b) => a + b, 0) / s.length) : null; })();
+                if (rv !== null && rv !== undefined) readCnt[lvl(rv)]++;
+                // คุณลักษณะ — ใช้ c1–c8
+                const chars = [r.c1_nation, r.c2_honest, r.c3_discipline, r.c4_study, r.c5_economy, r.c6_work, r.c7_thai, r.c8_public]
+                    .filter(x => x !== null && x !== undefined);
+                if (chars.length) { const avg = chars.reduce((a, b) => a + b, 0) / chars.length; charCnt[lvl(avg)]++; }
+            });
+            const readTotal = Object.values(readCnt).reduce((a, b) => a + b, 0);
+            const charTotal = Object.values(charCnt).reduce((a, b) => a + b, 0);
+
+            const clsName = cls.name || pd.classTxt || '';
+            const room = cls.room || '';
+            const subjCode = subj.code || '';
+            const subjName = subj.name || pd.subjectTxt || '';
+            const credits = subj.credits || '';
+            const hours = subj.hours_per_week || '';
+            const teacherName = tchr.name || '';
+            const princP = school.principal || '';
+
+            document.getElementById('toolbar-info').textContent = clsName + ' — ' + subjCode + ' — ปีการศึกษา ' + year;
+
+            const logoHtml = school.logo_url
+                ? `<img src="${esc(school.logo_url)}" alt="โลโก้" style="width:76px;height:76px;object-fit:contain;">`
+                : `<svg width="76" height="76" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="27" r="8" fill="none" stroke="#111" stroke-width="1.5"/>
+        <ellipse cx="40" cy="40" rx="13" ry="15" fill="none" stroke="#111" stroke-width="1.5"/>
+        <path d="M27 36 Q10 24 8 42 Q16 46 27 42Z" fill="none" stroke="#111" stroke-width="1.2"/>
+        <path d="M53 36 Q70 24 72 42 Q64 46 53 42Z" fill="none" stroke="#111" stroke-width="1.2"/>
+        <path d="M27 32 Q12 20 9 27 M27 35 Q10 26 8 34" stroke="#111" stroke-width="0.9" fill="none"/>
+        <path d="M53 32 Q68 20 71 27 M53 35 Q70 26 72 34" stroke="#111" stroke-width="0.9" fill="none"/>
+        <path d="M33 55 L27 68 M30 62 L24 66" stroke="#111" stroke-width="1.1" fill="none"/>
+        <path d="M47 55 L53 68 M50 62 L56 66" stroke="#111" stroke-width="1.1" fill="none"/>
+        <path d="M35 56 Q31 72 27 77 M40 56 Q40 74 40 79 M45 56 Q49 72 53 77" stroke="#111" stroke-width="0.9" fill="none"/>
+        <path d="M36 18 L38 13 L40 18 L42 13 L44 18" stroke="#111" stroke-width="1" fill="none"/>
+      </svg>`;
+
+            const h = `
+<div class="a4">
+  <div class="corner-label">ปพ.5</div>
+
+  <div>
+    <!-- โลโก้ + หัวเรื่อง -->
+    <div class="logo-box">${logoHtml}</div>
+    <div class="main-title">แบบบันทึกผลการเรียนประจำรายวิชา</div>
+
+    <!-- ข้อมูลส่วนหัว -->
+    <table style="width:100%;border:none;border-collapse:collapse;font-size:14px;margin-bottom:0;">
+      <colgroup>
+        <col style="width:45%">
+        <col style="width:55%">
+      </colgroup>
+      <tbody style="text-align:left;">
+        <tr style="border-bottom:0px solid #111;">
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">โรงเรียน</span>&nbsp;&nbsp;${esc(school.school_name || '')}
+          </td>
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">สังกัด</span>&nbsp;&nbsp;${esc(school.affiliation || '')}
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">อำเภอ</span>&nbsp;&nbsp;${esc(school.district || '')}
+          </td>
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">จังหวัด</span>&nbsp;&nbsp;${esc(school.province || '')}
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">ชั้น</span>&nbsp;&nbsp;${esc(clsName)}&nbsp;&nbsp;<span style="font-weight:700;">ห้อง</span>&nbsp;&nbsp;${esc(String(room))}
+          </td>
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">ภาคเรียนที่</span>&nbsp;&nbsp;${term}&nbsp;&nbsp;<span style="font-weight:700;">ปีการศึกษา</span>&nbsp;&nbsp;${esc(year)}
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">รายวิชา</span>&nbsp;&nbsp;${esc(subjName)}
+          </td>
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">รหัสวิชา</span>&nbsp;&nbsp;${esc(subjCode)}
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">หน่วยกิต</span>&nbsp;&nbsp;${esc(String(credits))}
+          </td>
+          <td style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">เวลาเรียน</span>&nbsp;&nbsp;${esc(String(hours))}&nbsp;&nbsp;<span style="font-weight:700;">ชั่วโมง/สัปดาห์</span>
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td colspan="2" style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">ครูผู้สอน</span>&nbsp;&nbsp;${esc(teacherName)}
+          </td>
+        </tr>
+        <tr style="border-bottom:0px solid #111;">
+          <td colspan="2" style="padding:3px 0 3px;border:none;text-align:left;">
+            <span style="font-weight:700;">ครูที่ปรึกษา</span>&nbsp;&nbsp;${esc(advisorStr)}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="hdiv"></div>
+
+    <!-- ตารางจำนวนนักเรียน -->
+    <table style="margin-bottom:20px;table-layout:fixed;">
+      <colgroup>
+        <col style="width:160px;">
+        <col style="width:36px;"><col style="width:36px;">
+        <col style="width:36px;"><col style="width:36px;">
+        <col style="width:36px;"><col style="width:36px;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th rowspan="2" class="sh" style="font-size:12px;">ข้อมูลนักเรียน</th>
+          <th colspan="2" class="sh" style="font-size:11px;">ชาย</th>
+          <th colspan="2" class="sh" style="font-size:11px;">หญิง</th>
+          <th colspan="2" class="sh" style="font-size:11px;">รวม</th>
+        </tr>
+        <tr>
+          <th class="sh" style="font-size:10px;">คน</th><th class="sh" style="font-size:10px;">ร้อยละ</th>
+          <th class="sh" style="font-size:10px;">คน</th><th class="sh" style="font-size:10px;">ร้อยละ</th>
+          <th class="sh" style="font-size:10px;">คน</th><th class="sh" style="font-size:10px;">ร้อยละ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:11px;font-weight:700;text-align:left;padding-left:8px;">จำนวนนักเรียนวันเปิดภาคเรียน</td>
+          <td style="font-size:12px;font-weight:700;">${males.length}</td>
+          <td style="font-size:11px;">${studs.length > 0 ? ((males.length / studs.length) * 100).toFixed(1) : '0'}</td>
+          <td style="font-size:12px;font-weight:700;">${females.length}</td>
+          <td style="font-size:11px;">${studs.length > 0 ? ((females.length / studs.length) * 100).toFixed(1) : '0'}</td>
+          <td style="font-size:12px;font-weight:700;">${studs.length}</td>
+          <td style="font-size:11px;">100</td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;font-weight:700;text-align:left;padding-left:8px;">จำนวนนักเรียนวันสิ้นสุดภาคเรียน</td>
+          <td style="font-size:12px;font-weight:700;">${males.length}</td>
+          <td style="font-size:11px;">${studs.length > 0 ? ((males.length / studs.length) * 100).toFixed(1) : '0'}</td>
+          <td style="font-size:12px;font-weight:700;">${females.length}</td>
+          <td style="font-size:11px;">${studs.length > 0 ? ((females.length / studs.length) * 100).toFixed(1) : '0'}</td>
+          <td style="font-size:12px;font-weight:700;">${studs.length}</td>
+          <td style="font-size:11px;">100</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ตาราง 1: ผลการเรียน -->
+    <table style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:54px;font-size:12px;">จำนวน<br>นักเรียน<br>ทั้งหมด</th>
+          <th colspan="8" style="font-size:11px;">จำนวนนักเรียนที่ได้รับผลการเรียน</th>
+          <th rowspan="2" style="width:24px;font-size:11px;">ร/<br>มส</th>
+          <th rowspan="2" style="width:32px;font-size:12px;">หมาย<br>เหตุ</th>
+        </tr>
+        <tr>
+          <th class="gh" style="width:26px;">4</th><th class="gh" style="width:26px;">3.5</th>
+          <th class="gh" style="width:26px;">3</th><th class="gm" style="width:26px;">2.5</th>
+          <th class="gm" style="width:26px;">2</th><th class="gl" style="width:26px;">1.5</th>
+          <th class="gl" style="width:26px;">1</th><th class="gf" style="width:26px;">0</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:16px;font-weight:700;">${studs.length}</td>
+          ${['4', '3.5', '3', '2.5', '2', '1.5', '1', '0'].map(k => `<td class="${['4', '3.5', '3'].includes(k) ? 'gh' : ['2.5', '2'].includes(k) ? 'gm' : k === '0' ? 'gf' : 'gl'}" style="font-size:13px;font-weight:700;">${gradeCount[k] !== undefined ? gradeCount[k] : 0}</td>`).join('')}
+          <td>0</td><td></td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;font-weight:700;background:#f9fafb;">ร้อยละ</td>
+          ${['4', '3.5', '3', '2.5', '2', '1.5', '1', '0'].map(k => {
+                const pct = studs.length > 0 ? ((gradeCount[k] / studs.length) * 100).toFixed(1) : '0';
+                return `<td class="${['4', '3.5', '3'].includes(k) ? 'gh' : ['2.5', '2'].includes(k) ? 'gm' : k === '0' ? 'gf' : 'gl'}" style="font-size:11px;">${pct}</td>`;
+            }).join('')}
+          <td style="font-size:11px;">0</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ตาราง 2: ผลการประเมิน -->
+    <table style="table-layout:fixed;">
+      <colgroup>
+        <col style="width:70px;">
+        <col><col><col><col><col>
+        <col><col><col><col><col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="sh" style="font-size:12px;">สรุปผล</th>
+          <th colspan="5" class="sh" style="font-size:11px;">ผลการประเมินการอ่าน คิดวิเคราะห์ เขียน</th>
+          <th colspan="5" class="sh" style="font-size:11px;">ผลการประเมินคุณลักษณะอันพึงประสงค์</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:11px;font-weight:700;background:#f9fafb;">ผลการประเมิน</td>
+          <td class="gh" style="font-size:10px;font-weight:700;">3<br>ดีเยี่ยม</td>
+          <td class="gm" style="font-size:10px;font-weight:700;">2<br>ดี</td>
+          <td class="gl" style="font-size:10px;font-weight:700;">1<br>ผ่าน</td>
+          <td class="gf" style="font-size:10px;font-weight:700;">0<br>ไม่ผ่าน</td>
+          <td style="font-size:10px;font-weight:700;background:#f0f9ff;">รวม</td>
+          <td class="gh" style="font-size:10px;font-weight:700;">3<br>ดีเยี่ยม</td>
+          <td class="gm" style="font-size:10px;font-weight:700;">2<br>ดี</td>
+          <td class="gl" style="font-size:10px;font-weight:700;">1<br>ผ่าน</td>
+          <td class="gf" style="font-size:10px;font-weight:700;">0<br>ไม่ผ่าน</td>
+          <td style="font-size:10px;font-weight:700;background:#f0f9ff;">รวม</td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;font-weight:700;background:#f9fafb;">จำนวนนักเรียน</td>
+          <td class="gh" style="font-size:12px;font-weight:700;">${readCnt['ดีเยี่ยม']}</td>
+          <td class="gm" style="font-size:12px;font-weight:700;">${readCnt['ดี']}</td>
+          <td class="gl" style="font-size:12px;font-weight:700;">${readCnt['ผ่าน']}</td>
+          <td class="gf" style="font-size:12px;font-weight:700;">${readCnt['ไม่ผ่าน']}</td>
+          <td style="font-size:12px;font-weight:700;">${readTotal}</td>
+          <td class="gh" style="font-size:12px;font-weight:700;">${charCnt['ดีเยี่ยม']}</td>
+          <td class="gm" style="font-size:12px;font-weight:700;">${charCnt['ดี']}</td>
+          <td class="gl" style="font-size:12px;font-weight:700;">${charCnt['ผ่าน']}</td>
+          <td class="gf" style="font-size:12px;font-weight:700;">${charCnt['ไม่ผ่าน']}</td>
+          <td style="font-size:12px;font-weight:700;">${charTotal}</td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;font-weight:700;background:#f9fafb;">ร้อยละ</td>
+          ${['ดีเยี่ยม', 'ดี', 'ผ่าน', 'ไม่ผ่าน'].map(l => {
+                const pct = readTotal > 0 ? ((readCnt[l] / readTotal) * 100).toFixed(1) : '0';
+                return `<td class="${l === 'ดีเยี่ยม' ? 'gh' : l === 'ดี' ? 'gm' : l === 'ผ่าน' ? 'gl' : 'gf'}" style="font-size:11px;">${pct}</td>`;
+            }).join('')}
+          <td style="font-size:11px;">${readTotal > 0 ? '100' : '0'}</td>
+          ${['ดีเยี่ยม', 'ดี', 'ผ่าน', 'ไม่ผ่าน'].map(l => {
+                const pct = charTotal > 0 ? ((charCnt[l] / charTotal) * 100).toFixed(1) : '0';
+                return `<td class="${l === 'ดีเยี่ยม' ? 'gh' : l === 'ดี' ? 'gm' : l === 'ผ่าน' ? 'gl' : 'gf'}" style="font-size:11px;">${pct}</td>`;
+            }).join('')}
+          <td style="font-size:11px;">${charTotal > 0 ? '100' : '0'}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- การอนุมัติ -->
+  <div class="approval">
+    <div class="at">การอนุมัติผลการเรียน</div>
+    <div style="display:flex;align-items:baseline;gap:8px;font-size:13px;margin-bottom:14px;">
+      <span style="white-space:nowrap;">เรียน เสนอมาเพื่อโปรดพิจารณา</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:4px;">
+      <div style="display:inline-flex;flex-direction:column;gap:12px;margin-left:80px;">
+        <div style="display:flex;align-items:baseline;gap:8px;font-size:13px;">
+          <span style="white-space:nowrap;">ลงชื่อ</span>
+          <span style="width:130px;border-bottom:1px solid #111;display:inline-block;margin-bottom:2px;"></span>
+          <span style="white-space:nowrap;">ครูผู้สอน</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;font-size:13px;">
+          <span style="white-space:nowrap;">ลงชื่อ</span>
+          <span style="width:130px;border-bottom:1px solid #111;display:inline-block;margin-bottom:2px;"></span>
+          <span style="white-space:nowrap;">หัวหน้าฝ่ายวิชาการ</span>
+        </div>
+      </div>
+    </div>
+    <div class="adivider"></div>
+    <div style="display:flex;justify-content:center;gap:60px;margin:8px 0 14px;font-size:14px;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:15px;height:15px;border:1.5px solid #111;display:inline-block;flex-shrink:0;"></span><span>อนุมัติ</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:15px;height:15px;border:1.5px solid #111;display:inline-block;flex-shrink:0;"></span><span>ไม่อนุมัติ</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;align-items:baseline;gap:8px;font-size:13px;margin-bottom:4px;margin-left:-30px;">
+      <span>ลงชื่อ</span>
+      <span style="width:130px;border-bottom:1px solid #111;display:inline-block;margin-bottom:2px;"></span>
+    </div>
+    <div style="text-align:center;font-size:12px;margin-bottom:3px;">(${princP ? esc(princP) : '........................................................'})</div>
+    <div style="text-align:center;font-size:13px;">ผู้อำนวยการโรงเรียน</div>
+  </div>
+</div>`;
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('doc-root').innerHTML = h;
+        }
+        init().catch(e => { document.getElementById('loading').innerHTML = '&#10060; ' + e.message; });
+    </script>
+</body>
+
+</html>
