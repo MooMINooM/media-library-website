@@ -78,7 +78,7 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="window.print()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
+            <button id="btn-print" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
                 <i class="fa-solid fa-print"></i> พิมพ์
             </button>
             <button id="btn-logout" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
@@ -748,6 +748,39 @@ document.getElementById('btn-save-all').addEventListener('click', async () => {
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
+// ── Print → ส่ง ratio ไปให้ p5-print.html ผ่าน sessionStorage ──────────
+document.getElementById('btn-print').addEventListener('click', () => {
+    if (!currentAssignment) { window.print(); return; }
+
+    const selClass   = document.getElementById('sel-class');
+    const selectedOpt = selClass.options[selClass.selectedIndex];
+    const classId    = selectedOpt?.dataset.classId || '';
+    const subjectEl  = document.getElementById('sel-subject');
+    const year       = document.getElementById('sel-year').value;
+    const term       = document.getElementById('sel-term').value;
+
+    const printData = {
+        tsId:       currentAssignment.id,
+        classroomId: classId,
+        year,
+        subjectTxt: subjectEl.options[subjectEl.selectedIndex]?.text || '',
+        classTxt:   selectedOpt?.text || '',
+        level:      mode === 'matayom' ? 'มัธยม' : 'ประถม',
+        // ประถม: ทั้ง 2 ภาคใช้สัดส่วนเดียวกัน
+        keepMax1:  ratio.keep,
+        examMax1:  ratio.exam,
+        keepMax2:  ratio.keep,
+        examMax2:  ratio.exam,
+        // มัธยม: keep = keep, mid = 0, final = exam
+        keepMaxM:  ratio.keep,
+        midMaxM:   0,
+        finalMaxM: ratio.exam,
+        term:      parseInt(term),
+    };
+    sessionStorage.setItem('p5_print_data', JSON.stringify(printData));
+    window.open('p5-print.html', '_blank');
+});
+
 loadAssignments();
 </script>
 </body>
