@@ -2997,7 +2997,13 @@
                     });
                     const calc = r[g.key] !== undefined && r[g.key] !== null ? r[g.key] : readCalcSum(subValsDefault);
                     groupSums.push(calc);
-                    cells += `<td style="border:1px solid #e5e7eb; padding:2px; text-align:center;">${mkSel(g.key, calc, 'readAutoFinal(this)')}</td>`;
+                    const sumBg  = READ_BG[calc]  || '#f3f4f6';
+                    const sumCol = READ_COL[calc] || '#374151';
+                    const sumLbl = READ_LBL[calc] || (calc !== null ? calc : '—');
+                    cells += `<td style="border:1px solid #e5e7eb; padding:2px; text-align:center; background:${sumBg};">`
+                           + `<input type="hidden" name="${g.key}" value="${calc !== null ? calc : ''}">`
+                           + `<span data-sum-lbl="${g.key}" style="font-size:11px; font-weight:700; color:${sumCol};">${sumLbl}</span>`
+                           + `</td>`;
                 });
 
                 const finalVal = (r.reading_result !== undefined && r.reading_result !== null) ? r.reading_result : readCalcSum(groupSums);
@@ -3018,19 +3024,31 @@
         window.readAutoSum = function (sel) {
             const row = sel.closest('tr');
             if (!row) return;
+            const groupSumVals = [];
             READ_GROUPS.forEach(g => {
                 const subVals = g.cols.map(c => { const el = row.querySelector(`[name="${c.k}"]`); return el ? el.value : ''; });
-                const sumEl = row.querySelector(`[name="${g.key}"]`);
-                if (sumEl) {
-                    const calc = readCalcSum(subVals);
-                    if (calc !== null) {
-                        sumEl.value = calc;
-                        sumEl.style.background = READ_BG[calc] || '#fff';
-                        sumEl.style.color = READ_COL[calc] || '#374151';
-                    }
+                const calc = readCalcSum(subVals);
+                // อัปเดต hidden input (ใช้ตอน save)
+                const hiddenEl = row.querySelector(`input[type="hidden"][name="${g.key}"]`);
+                if (hiddenEl && calc !== null) hiddenEl.value = calc;
+                // อัปเดต badge แสดงผล (อ่านอย่างเดียว)
+                const spanEl = row.querySelector(`[data-sum-lbl="${g.key}"]`);
+                if (spanEl && calc !== null) {
+                    spanEl.textContent = READ_LBL[calc] || calc;
+                    spanEl.style.color  = READ_COL[calc] || '#374151';
+                    spanEl.closest('td').style.background = READ_BG[calc] || '#f3f4f6';
                 }
+                groupSumVals.push(calc);
             });
-            readAutoFinal(sel);
+            // อัปเดต สรุปผลการประเมิน (คอลัมน์สุดท้าย)
+            const finalCalc = readCalcSum(groupSumVals);
+            const sid = row.dataset.sid;
+            const finalEl = document.querySelector(`[data-read-final-${sid}]`);
+            if (finalEl && finalCalc !== null) {
+                finalEl.textContent = READ_LBL[finalCalc] || '';
+                finalEl.style.background = READ_BG[finalCalc] || '#f3f4f6';
+                finalEl.style.color = READ_COL[finalCalc] || '#374151';
+            }
         };
 
         window.readAutoFinal = function (sel) {
