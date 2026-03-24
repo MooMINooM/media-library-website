@@ -324,11 +324,28 @@
       }
 
       const tsId_raw = printData.tsId;
-      const { classroomId, year, subjectTxt, classTxt, level,
+      const tsId = parseInt(tsId_raw);
+      let { classroomId, year, subjectTxt, classTxt, level,
         keepMax1, examMax1, keepMax2, examMax2,
         keepMaxM, midMaxM, finalMaxM } = printData;
-      const tsId = parseInt(tsId_raw);
       const isMiddle = level === 'มัธยม';
+
+      // fallback: ถ้า paw.html ส่งค่า 0 มา ให้อ่านจาก localStorage ที่ p5.html บันทึกไว้
+      if (!keepMax1 && !examMax1 && !isMiddle) {
+        try {
+          const saved = JSON.parse(localStorage.getItem('p5_ratio_' + tsId) || 'null');
+          keepMax1 = (saved && saved.keep) || 30; examMax1 = (saved && saved.exam) || 20;
+          keepMax2 = (saved && saved.keep) || 30; examMax2 = (saved && saved.exam) || 20;
+        } catch (e) { keepMax1 = 30; examMax1 = 20; keepMax2 = 30; examMax2 = 20; }
+      }
+      if (!keepMaxM && !finalMaxM && isMiddle) {
+        try {
+          const saved = JSON.parse(localStorage.getItem('p5_ratio_' + tsId) || 'null');
+          keepMaxM = (saved && saved.keep) || 70;
+          midMaxM = 0;
+          finalMaxM = (saved && saved.exam) || 30;
+        } catch (e) { keepMaxM = 70; midMaxM = 0; finalMaxM = 30; }
+      }
       console.log('tsId:', tsId, 'classroomId:', classroomId);
 
       // ── ดึงข้อมูล parallel ──
