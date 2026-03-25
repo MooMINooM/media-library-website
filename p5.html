@@ -100,18 +100,6 @@
                     <option value="2566">2566</option>
                 </select>
             </div>
-            <!--
-                ภาคเรียน:
-                  - มัธยม → แสดง (เลือกดูทีละภาค)
-                  - ประถม → ซ่อน (แสดงทั้ง 2 ภาคในตารางเดียว)
-            -->
-            <div id="term-selector-wrap">
-                <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
-                <select id="sel-term" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
-                    <option value="1">ภาคเรียนที่ 1</option>
-                    <option value="2">ภาคเรียนที่ 2</option>
-                </select>
-            </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
                 <select id="sel-subject" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
@@ -122,6 +110,14 @@
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
                 <select id="sel-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— เลือกวิชาก่อน —</option>
+                </select>
+            </div>
+            <!-- ภาคเรียน: มัธยม=visible, ประถม=hidden (กินพื้นที่เท่าเดิม ไม่เด้ง) -->
+            <div id="term-selector-wrap">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+                <select id="sel-term" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+                    <option value="1">ภาคเรียนที่ 1</option>
+                    <option value="2">ภาคเรียนที่ 2</option>
                 </select>
             </div>
         </div>
