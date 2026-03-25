@@ -95,18 +95,23 @@
 <!-- FILTER BAR -->
 <div class="max-w-7xl mx-auto px-4 py-4 no-print">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <!--
-            ใช้ CSS Grid 4 คอลัมน์คงที่ แทน flex-wrap
-            คอลัมน์ที่ 4 (ภาคเรียน) จองพื้นที่ไว้ตลอด
-            แค่ visibility เปลี่ยน → ไม่มี layout shift เลย
-        -->
-        <div style="display:grid; grid-template-columns:1fr 2fr 2fr 1fr; gap:12px; align-items:end;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 2fr 2fr; gap:12px; align-items:end;">
             <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
                 <select id="sel-year" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="2568">2568</option>
                     <option value="2567">2567</option>
                     <option value="2566">2566</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-indigo-500 mb-1">
+                    <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
+                </label>
+                <select id="sel-term" class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
+                    <option value="">ทั้งปีการศึกษา</option>
+                    <option value="1">ภาคเรียนที่ 1</option>
+                    <option value="2">ภาคเรียนที่ 2</option>
                 </select>
             </div>
             <div>
@@ -119,16 +124,6 @@
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
                 <select id="sel-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— เลือกวิชาก่อน —</option>
-                </select>
-            </div>
-            <div id="term-selector-wrap">
-                <label class="block text-xs font-semibold text-indigo-500 mb-1">
-                    <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
-                </label>
-                <select id="sel-term" class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
-                    <option value="">ทั้งปีการศึกษา</option>
-                    <option value="1">ภาคเรียนที่ 1</option>
-                    <option value="2">ภาคเรียนที่ 2</option>
                 </select>
             </div>
         </div>
@@ -243,22 +238,38 @@ async function loadAssignments() {
         if (!subjectMap[sid]) subjectMap[sid] = [];
         subjectMap[sid].push(a);
     });
+    rebuildSubjectDropdown();
+}
+
+// กรองและสร้าง dropdown วิชาใหม่ตามภาคที่เลือก
+function rebuildSubjectDropdown() {
+    const selectedTerm = document.getElementById('sel-term').value; // '' | '1' | '2'
     const selSubject = document.getElementById('sel-subject');
     selSubject.innerHTML = '<option value="">— เลือกวิชา —</option>';
+    selSubject.disabled = false;
+    document.getElementById('sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+
     const seen = new Set();
     assignments.forEach(a => {
-        if (!seen.has(a.subjects.id)) {
-            seen.add(a.subjects.id);
-            const opt = document.createElement('option');
-            opt.value       = a.subjects.id;
-            const sem = a.subjects.semester;
-            const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
-            opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
-            opt.dataset.semester = sem != null ? String(sem) : '';
-            selSubject.appendChild(opt);
+        if (seen.has(a.subjects.id)) return;
+        const subSem = a.subjects.semester; // null | 1 | 2
+
+        // กรองตามเทอมที่ผู้ใช้เลือก:
+        // - เลือก "ทั้งปี" (selectedTerm='') → แสดงทุกวิชา
+        // - เลือกเทอม 1 หรือ 2 → แสดงวิชาที่ตรงเทอม หรือวิชาที่ไม่ได้กำหนดเทอม (null)
+        if (selectedTerm !== '') {
+            const termNum = parseInt(selectedTerm);
+            if (subSem !== null && subSem !== termNum) return; // ข้ามวิชาที่เทอมไม่ตรง
         }
+
+        seen.add(a.subjects.id);
+        const opt = document.createElement('option');
+        opt.value = a.subjects.id;
+        const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
+        opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
+        opt.dataset.semester = subSem != null ? String(subSem) : '';
+        selSubject.appendChild(opt);
     });
-    document.getElementById('sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
 }
 
 document.getElementById('sel-subject').addEventListener('change', function () {
@@ -275,7 +286,7 @@ document.getElementById('sel-subject').addEventListener('change', function () {
         selClass.appendChild(opt);
     });
 
-    // Auto-lock term selector based on subjects.semester
+    // Auto-lock term selector ถ้าวิชานี้ผูกกับเทอมใดเทอมหนึ่ง
     const subjectSem = this.selectedOptions[0]?.dataset?.semester || '';
     const selTerm = document.getElementById('sel-term');
     if (subjectSem === '1' || subjectSem === '2') {
@@ -291,6 +302,19 @@ document.getElementById('sel-subject').addEventListener('change', function () {
 });
 
 document.getElementById('sel-year').addEventListener('change', loadAssignments);
+
+// เมื่อเปลี่ยนเทอม → กรองวิชาใหม่ทันที (ถ้าโหลด assignments แล้ว)
+document.getElementById('sel-term').addEventListener('change', function () {
+    if (assignments.length > 0) rebuildSubjectDropdown();
+    // reset ห้องเรียนและตาราง
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('grade-table-wrap').classList.add('hidden');
+    document.getElementById('btn-save-all').classList.add('hidden');
+    document.getElementById('ratio-bar').classList.add('hidden');
+    document.getElementById('print-header').classList.add('hidden');
+    currentStudents = [];
+    currentAssignment = null;
+});
 
 // รีเซ็ตตาราง เมื่อเปลี่ยนห้องเรียน
 document.getElementById('sel-class').addEventListener('change', function () {
