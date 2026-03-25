@@ -91,8 +91,8 @@
 <!-- FILTER BAR -->
 <div class="max-w-7xl mx-auto px-4 py-4 no-print">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
+        <div class="flex flex-wrap gap-3">
+            <div class="flex-1 min-w-[140px]">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
                 <select id="sel-year" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="2568">2568</option>
@@ -100,20 +100,20 @@
                     <option value="2566">2566</option>
                 </select>
             </div>
-            <div>
+            <div class="flex-[2] min-w-[180px]">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
                 <select id="sel-subject" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— กำลังโหลด —</option>
                 </select>
             </div>
-            <div>
+            <div class="flex-[2] min-w-[180px]">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
                 <select id="sel-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— เลือกวิชาก่อน —</option>
                 </select>
             </div>
-            <!-- ภาคเรียน: มัธยม=visible, ประถม=hidden (กินพื้นที่เท่าเดิม ไม่เด้ง) -->
-            <div id="term-selector-wrap">
+            <!-- ภาคเรียน: แสดงเฉพาะมัธยม ต่อท้ายสุด ไม่เลื่อนเพื่อน -->
+            <div id="term-selector-wrap" class="flex-1 min-w-[150px]" style="display:none;">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
                 <select id="sel-term" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="1">ภาคเรียนที่ 1</option>
@@ -279,12 +279,12 @@ function applyModeUI() {
     if (mode === 'matayom') {
         badge.textContent = '🎓 มัธยม';
         badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-400/40';
-        termWrap.style.visibility = 'visible';
+        termWrap.style.display = 'flex';
         hint.textContent  = 'ต่อภาค รวม = 100 — ออกเกรดแยกแต่ละภาค';
     } else {
         badge.textContent = '📚 ประถม';
         badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-400/40';
-        termWrap.style.visibility = 'hidden';
+        termWrap.style.display = 'none';
         hint.textContent  = 'ต่อภาค รวม = 50 — สองภาครวมกัน = 100/ปี';
     }
     badge.classList.remove('hidden');
