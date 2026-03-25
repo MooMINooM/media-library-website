@@ -23,7 +23,7 @@ export function logoutTeacher() { sessionStorage.removeItem(SESSION_KEY); }
 export async function getTeacherAssignments(teacherId, academicYear) {
     const { data, error } = await db
         .from('teacher_subjects')
-        .select('id, subjects(id,code,name,group_name,credits,hours_per_week), classrooms(id,name,level,grade,academic_year,semester)')
+        .select('id, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,academic_year,semester)')
         .eq('teacher_id', teacherId);
     if (error) throw error;
     return (data || []).filter(a => a.classrooms?.academic_year === academicYear);
