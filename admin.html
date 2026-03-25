@@ -1985,48 +1985,123 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('breadcrumb-text').textContent = 'ระบบ ปพ. › ห้องเรียน & วิชา';
             const main = document.getElementById('main-area');
             main.innerHTML = `
-    <div class="max-w-6xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="max-w-7xl mx-auto animate-fade-in-up">
 
-        <!-- ===== ห้องเรียน ===== -->
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-school text-teal-500"></i> ห้องเรียน
-            </h2>
-            <button onclick="openAddClassroom()" class="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition">
-              <i class="fa-solid fa-plus"></i> เพิ่มห้อง
-            </button>
+      <!-- ===== Hero Header ===== -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 via-teal-700 to-violet-700 text-white p-6 md:p-8 mb-6 shadow-xl">
+        <div class="absolute -top-20 -right-20 w-60 h-60 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-16 -left-16 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-12 h-12 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-boxes-stacked text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-xl md:text-2xl font-extrabold tracking-tight">ห้องเรียน & วิชา</h2>
+                <p class="text-teal-100 text-xs font-medium mt-0.5">จัดการข้อมูลห้องเรียนและรายวิชาทั้งหมดในระบบ ปพ.</p>
+              </div>
+            </div>
           </div>
-          <div id="cls-loading" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div>
-          <div id="cls-list" class="hidden space-y-2"></div>
-        </div>
-
-        <!-- ===== วิชา ===== -->
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-book text-violet-500"></i> วิชา
-            </h2>
-            <button onclick="openAddSubject()" class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition">
-              <i class="fa-solid fa-plus"></i> เพิ่มวิชา
-            </button>
+          <div class="flex gap-5">
+            <div class="text-center px-4">
+              <p id="stat-cls-count" class="text-3xl font-black">—</p>
+              <p class="text-[10px] uppercase tracking-widest text-teal-200 font-semibold mt-0.5">ห้องเรียน</p>
+            </div>
+            <div class="w-px bg-white/20 self-stretch"></div>
+            <div class="text-center px-4">
+              <p id="stat-subj-count" class="text-3xl font-black">—</p>
+              <p class="text-[10px] uppercase tracking-widest text-teal-200 font-semibold mt-0.5">รายวิชา</p>
+            </div>
           </div>
-          <div id="subj-loading" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div>
-          <div id="subj-list" class="hidden space-y-2"></div>
         </div>
+      </div>
 
+      <!-- ===== Tab Switcher ===== -->
+      <div class="flex gap-1 mb-5 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+        <button id="tab-cls" onclick="switchClsTab('cls')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all bg-teal-600 text-white shadow-md">
+          <i class="fa-solid fa-school text-xs"></i> ห้องเรียน
+        </button>
+        <button id="tab-subj" onclick="switchClsTab('subj')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all text-slate-500 hover:bg-slate-50">
+          <i class="fa-solid fa-book text-xs"></i> รายวิชา
+        </button>
+      </div>
+
+      <!-- ===== ห้องเรียน Panel ===== -->
+      <div id="panel-cls">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+              <input id="cls-search" type="text" placeholder="ค้นหาห้องเรียน..." oninput="filterClsList()"
+                class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-52 bg-white">
+            </div>
+            <select id="cls-filter-level" onchange="filterClsList()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white">
+              <option value="">ทุกระดับ</option>
+              <option value="อนุบาล">อนุบาล</option>
+              <option value="ประถม">ประถม</option>
+              <option value="มัธยม">มัธยม</option>
+            </select>
+          </div>
+          <button onclick="openAddClassroom()" class="flex items-center gap-1.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-teal-500/20 transition-all hover:shadow-xl">
+            <i class="fa-solid fa-plus"></i> เพิ่มห้อง
+          </button>
+        </div>
+        <div id="cls-loading" class="text-center py-12 text-slate-400">
+          <div class="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-spinner fa-spin text-teal-500 text-xl"></i></div>
+          <p class="text-sm font-medium">กำลังโหลดห้องเรียน...</p>
+        </div>
+        <div id="cls-list" class="hidden"></div>
+      </div>
+
+      <!-- ===== วิชา Panel ===== -->
+      <div id="panel-subj" class="hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+              <input id="subj-search" type="text" placeholder="ค้นหารหัส/ชื่อวิชา..." oninput="filterSubjList()"
+                class="pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 w-56 bg-white">
+            </div>
+            <select id="subj-filter-group" onchange="filterSubjList()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white">
+              <option value="">ทุกกลุ่มสาระ</option>
+              <option value="ภาษาไทย">ภาษาไทย</option>
+              <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+              <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+              <option value="สังคมศึกษา">สังคมศึกษา</option>
+              <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+              <option value="ศิลปะ">ศิลปะ</option>
+              <option value="การงานอาชีพ">การงานอาชีพ</option>
+              <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+            </select>
+            <select id="subj-filter-sem" onchange="filterSubjList()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white">
+              <option value="">ทุกเทอม</option>
+              <option value="1">เทอม 1</option>
+              <option value="2">เทอม 2</option>
+              <option value="all">ทั้งปี</option>
+            </select>
+          </div>
+          <button onclick="openAddSubject()" class="flex items-center gap-1.5 bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-violet-500/20 transition-all hover:shadow-xl">
+            <i class="fa-solid fa-plus"></i> เพิ่มวิชา
+          </button>
+        </div>
+        <div id="subj-loading" class="text-center py-12 text-slate-400">
+          <div class="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-spinner fa-spin text-violet-500 text-xl"></i></div>
+          <p class="text-sm font-medium">กำลังโหลดรายวิชา...</p>
+        </div>
+        <div id="subj-list" class="hidden"></div>
       </div>
     </div>
 
     <!-- Modal ห้องเรียน -->
-    <div id="cls-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
-      <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
-          <h3 id="cls-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-school text-teal-500"></i> เพิ่มห้องเรียน
+    <div id="cls-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-md p-4" style="animation:modalFadeIn .2s ease">
+      <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200/50" style="animation:modalSlideIn .3s cubic-bezier(.4,0,.2,1) forwards">
+        <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-teal-600 to-teal-700 text-white">
+          <h3 id="cls-modal-title" class="font-bold flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-school text-sm"></i></div>
+            เพิ่มห้องเรียน
           </h3>
-          <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+          <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
             <i class="fa-solid fa-times text-sm"></i>
           </button>
         </div>
@@ -2034,12 +2109,12 @@ AND auth.role() = 'authenticated');</code>
           <input type="hidden" id="cls-id">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อห้อง *</label>
-              <input id="cls-name" type="text" placeholder="ป.5/1" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ชื่อห้อง *</label>
+              <input id="cls-name" type="text" placeholder="ป.5/1" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 hover:border-slate-300 transition bg-slate-50/50">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ระดับ *</label>
-              <select id="cls-level" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ระดับ *</label>
+              <select id="cls-level" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-slate-50/50">
                 <option value="อนุบาล">อนุบาล</option>
                 <option value="ประถม" selected>ประถม</option>
                 <option value="มัธยม">มัธยม</option>
@@ -2048,27 +2123,27 @@ AND auth.role() = 'authenticated');</code>
           </div>
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ชั้นปี</label>
-              <input id="cls-grade" type="number" min="1" max="6" placeholder="5" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ชั้นปี</label>
+              <input id="cls-grade" type="number" min="1" max="6" placeholder="5" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-slate-50/50">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ห้อง</label>
-              <input id="cls-room" type="number" min="1" placeholder="1" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ห้อง</label>
+              <input id="cls-room" type="number" min="1" placeholder="1" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-slate-50/50">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา *</label>
-              <input id="cls-year" type="text" placeholder="2568" value="2568" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ปีการศึกษา *</label>
+              <input id="cls-year" type="text" placeholder="2568" value="2568" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-slate-50/50">
             </div>
           </div>
         </div>
-        <div class="px-6 py-4 border-t flex justify-between">
-          <button id="cls-delete-btn" onclick="deleteClassroom()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
-            <i class="fa-solid fa-trash mr-1"></i> ลบ
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between">
+          <button id="cls-delete-btn" onclick="deleteClassroom()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2.5 hover:bg-red-50 rounded-xl transition flex items-center gap-1">
+            <i class="fa-solid fa-trash text-xs"></i> ลบ
           </button>
           <div class="flex gap-2 ml-auto">
-            <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
-            <button onclick="saveClassroom()" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold shadow transition">
-              <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+            <button onclick="document.getElementById('cls-modal').classList.add('hidden')" class="px-4 py-2.5 text-sm text-slate-600 hover:bg-white rounded-xl transition font-medium">ยกเลิก</button>
+            <button onclick="saveClassroom()" class="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-teal-500/20 transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-floppy-disk text-xs"></i> บันทึก
             </button>
           </div>
         </div>
@@ -2076,13 +2151,14 @@ AND auth.role() = 'authenticated');</code>
     </div>
 
     <!-- Modal วิชา -->
-    <div id="subj-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-        <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
-          <h3 id="subj-modal-title" class="font-bold text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-book text-violet-500"></i> เพิ่มวิชา
+    <div id="subj-modal" class="fixed inset-0 bg-slate-900/60 hidden z-50 flex items-center justify-center backdrop-blur-md p-4" style="animation:modalFadeIn .2s ease">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200/50" style="animation:modalSlideIn .3s cubic-bezier(.4,0,.2,1) forwards">
+        <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-violet-600 to-violet-700 text-white">
+          <h3 id="subj-modal-title" class="font-bold flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-book text-sm"></i></div>
+            เพิ่มวิชา
           </h3>
-          <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 flex items-center justify-center transition">
+          <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
             <i class="fa-solid fa-times text-sm"></i>
           </button>
         </div>
@@ -2090,28 +2166,28 @@ AND auth.role() = 'authenticated');</code>
           <input type="hidden" id="subj-id">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">รหัสวิชา *</label>
-              <input id="subj-code" type="text" placeholder="ท15101" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">รหัสวิชา *</label>
+              <input id="subj-code" type="text" placeholder="ท15101" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ชื่อวิชา *</label>
-              <input id="subj-name" type="text" placeholder="ภาษาไทย 9" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">หน่วยกิต</label>
-              <input id="subj-credits" type="number" step="0.5" min="0" placeholder="1.0" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">คาบ/สัปดาห์</label>
-              <input id="subj-hours" type="number" min="0" placeholder="5" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ชื่อวิชา *</label>
+              <input id="subj-name" type="text" placeholder="ภาษาไทย 9" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">กลุ่มสาระ</label>
-              <select id="subj-group" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">หน่วยกิต</label>
+              <input id="subj-credits" type="number" step="0.5" min="0" placeholder="1.0" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">คาบ/สัปดาห์</label>
+              <input id="subj-hours" type="number" min="0" placeholder="5" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">กลุ่มสาระ</label>
+              <select id="subj-group" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
                 <option value="">— ไม่ระบุ —</option>
                 <option value="ภาษาไทย">ภาษาไทย</option>
                 <option value="คณิตศาสตร์">คณิตศาสตร์</option>
@@ -2124,31 +2200,31 @@ AND auth.role() = 'authenticated');</code>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภทรายวิชา</label>
-              <select id="subj-type" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">ประเภทรายวิชา</label>
+              <select id="subj-type" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
                 <option value="พื้นฐาน">พื้นฐาน</option>
                 <option value="เพิ่มเติม">เพิ่มเติม</option>
               </select>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียนที่สอน</label>
-            <select id="subj-semester" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">ภาคเรียนที่สอน</label>
+            <select id="subj-semester" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-slate-50/50">
               <option value="">ทั้งปีการศึกษา (ไม่ระบุ)</option>
               <option value="1">ภาคเรียนที่ 1 เท่านั้น</option>
               <option value="2">ภาคเรียนที่ 2 เท่านั้น</option>
             </select>
-            <p class="text-xs text-slate-400 mt-1">ระบุเพื่อให้ระบบล็อกเทอมให้อัตโนมัติ — ถ้าสอนทั้งปีให้เลือก "ทั้งปีการศึกษา"</p>
+            <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1"><i class="fa-solid fa-circle-info text-violet-300"></i> ระบุเพื่อให้ระบบล็อกเทอมให้อัตโนมัติ — ถ้าสอนทั้งปีให้เลือก "ทั้งปีการศึกษา"</p>
           </div>
         </div>
-        <div class="px-6 py-4 border-t flex justify-between">
-          <button id="subj-delete-btn" onclick="deleteSubject()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
-            <i class="fa-solid fa-trash mr-1"></i> ลบ
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between">
+          <button id="subj-delete-btn" onclick="deleteSubject()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2.5 hover:bg-red-50 rounded-xl transition flex items-center gap-1">
+            <i class="fa-solid fa-trash text-xs"></i> ลบ
           </button>
           <div class="flex gap-2 ml-auto">
-            <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition">ยกเลิก</button>
-            <button onclick="saveSubject()" class="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-semibold shadow transition">
-              <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก
+            <button onclick="document.getElementById('subj-modal').classList.add('hidden')" class="px-4 py-2.5 text-sm text-slate-600 hover:bg-white rounded-xl transition font-medium">ยกเลิก</button>
+            <button onclick="saveSubject()" class="px-6 py-2.5 bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-violet-500/20 transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-floppy-disk text-xs"></i> บันทึก
             </button>
           </div>
         </div>
@@ -2157,27 +2233,217 @@ AND auth.role() = 'authenticated');</code>
             await Promise.all([fetchClassrooms(), fetchSubjects()]);
         }
 
+        // ── Tab switching ──────────────────────────────────────────────────
+        window.switchClsTab = function(tab) {
+            const clsPanel = document.getElementById('panel-cls');
+            const subjPanel = document.getElementById('panel-subj');
+            const tabCls = document.getElementById('tab-cls');
+            const tabSubj = document.getElementById('tab-subj');
+            if (tab === 'cls') {
+                clsPanel.classList.remove('hidden'); subjPanel.classList.add('hidden');
+                tabCls.className = 'flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all bg-teal-600 text-white shadow-md';
+                tabSubj.className = 'flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all text-slate-500 hover:bg-slate-50';
+            } else {
+                clsPanel.classList.add('hidden'); subjPanel.classList.remove('hidden');
+                tabSubj.className = 'flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all bg-violet-600 text-white shadow-md';
+                tabCls.className = 'flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all text-slate-500 hover:bg-slate-50';
+            }
+        };
+
+        // ── Filter functions ───────────────────────────────────────────────
+        let _allClassrooms = [];
+        let _allSubjects = [];
+
+        window.filterClsList = function() {
+            const q = (document.getElementById('cls-search')?.value || '').trim().toLowerCase();
+            const lvl = document.getElementById('cls-filter-level')?.value || '';
+            const filtered = _allClassrooms.filter(c => {
+                if (q && !(c.name||'').toLowerCase().includes(q) && !(c.academic_year||'').includes(q)) return false;
+                if (lvl && c.level !== lvl) return false;
+                return true;
+            });
+            renderClsList(filtered);
+        };
+
+        window.filterSubjList = function() {
+            const q = (document.getElementById('subj-search')?.value || '').trim().toLowerCase();
+            const grp = document.getElementById('subj-filter-group')?.value || '';
+            const sem = document.getElementById('subj-filter-sem')?.value || '';
+            const filtered = _allSubjects.filter(s => {
+                if (q && !(s.code||'').toLowerCase().includes(q) && !(s.name||'').toLowerCase().includes(q)) return false;
+                if (grp && s.group_name !== grp) return false;
+                if (sem === '1' && s.semester !== 1) return false;
+                if (sem === '2' && s.semester !== 2) return false;
+                if (sem === 'all' && s.semester != null) return false;
+                return true;
+            });
+            renderSubjList(filtered);
+        };
+
         async function fetchClassrooms() {
             const { data } = await pawDb.from('classrooms').select('*').order('grade').order('name');
+            _allClassrooms = data || [];
             const el = document.getElementById('cls-list');
-            document.getElementById('cls-loading').classList.add('hidden');
-            el.classList.remove('hidden');
-            if (!data?.length) { el.innerHTML = '<p class="text-center text-slate-400 py-6 text-sm">ยังไม่มีห้องเรียน</p>'; return; }
-            const levelColors = { อนุบาล: 'bg-yellow-100 text-yellow-700', ประถม: 'bg-blue-100 text-blue-700', มัธยม: 'bg-purple-100 text-purple-700' };
-            el.innerHTML = data.map(c => `
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-3 flex items-center gap-3">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
-          <span class="font-semibold text-slate-800 text-sm">${c.name}</span>
-          <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${levelColors[c.level] || 'bg-slate-100 text-slate-600'}">${c.level}</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-0.5">ปีการศึกษา ${c.academic_year} &nbsp;|&nbsp; ชั้นปี ${c.grade || '-'} ห้อง ${c.room || '-'}</p>
-      </div>
-      <button onclick="openEditClassroom(${c.id},'${(c.name || '').replace(/'/g, "\\'")}','${c.level || ''}',${c.grade || 0},${c.room || 0},'${c.academic_year || ''}')"
-        class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-xs font-semibold transition">
-        <i class="fa-solid fa-pen"></i>
-      </button>
-    </div>`).join('');
+            document.getElementById('cls-loading')?.classList.add('hidden');
+            el?.classList.remove('hidden');
+            // Update stat
+            const statEl = document.getElementById('stat-cls-count');
+            if (statEl) statEl.textContent = _allClassrooms.length;
+            renderClsList(_allClassrooms);
+        }
+
+        function renderClsList(data) {
+            const el = document.getElementById('cls-list');
+            if (!el) return;
+            if (!data?.length) {
+                el.innerHTML = `<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-300 text-2xl mx-auto mb-4"><i class="fa-solid fa-school"></i></div>
+                    <p class="text-slate-500 font-semibold">ยังไม่มีห้องเรียน</p>
+                    <p class="text-xs text-slate-400 mt-1">กดปุ่ม "เพิ่มห้อง" เพื่อเริ่มต้น</p>
+                </div>`;
+                return;
+            }
+
+            const levelConfig = {
+                'อนุบาล': { bg: 'bg-gradient-to-br from-amber-50 to-yellow-50', border: 'border-amber-200', icon: 'fa-solid fa-child', iconBg: 'bg-amber-100 text-amber-600', badge: 'bg-amber-100 text-amber-700', accent: 'text-amber-600' },
+                'ประถม': { bg: 'bg-gradient-to-br from-sky-50 to-blue-50', border: 'border-sky-200', icon: 'fa-solid fa-book-open-reader', iconBg: 'bg-sky-100 text-sky-600', badge: 'bg-sky-100 text-sky-700', accent: 'text-sky-600' },
+                'มัธยม': { bg: 'bg-gradient-to-br from-violet-50 to-purple-50', border: 'border-violet-200', icon: 'fa-solid fa-user-graduate', iconBg: 'bg-violet-100 text-violet-600', badge: 'bg-violet-100 text-violet-700', accent: 'text-violet-600' },
+            };
+
+            // Group by level
+            const groups = {};
+            data.forEach(c => {
+                const lvl = c.level || 'อื่นๆ';
+                if (!groups[lvl]) groups[lvl] = [];
+                groups[lvl].push(c);
+            });
+
+            let html = '';
+            const levelOrder = ['อนุบาล', 'ประถม', 'มัธยม'];
+            const sortedKeys = Object.keys(groups).sort((a, b) => {
+                const ia = levelOrder.indexOf(a), ib = levelOrder.indexOf(b);
+                return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+            });
+
+            sortedKeys.forEach(lvl => {
+                const cfg = levelConfig[lvl] || { bg: 'bg-slate-50', border: 'border-slate-200', icon: 'fa-solid fa-folder', iconBg: 'bg-slate-100 text-slate-500', badge: 'bg-slate-100 text-slate-600', accent: 'text-slate-600' };
+                const items = groups[lvl];
+                html += `<div class="mb-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-7 h-7 rounded-lg ${cfg.iconBg} flex items-center justify-center"><i class="${cfg.icon} text-xs"></i></div>
+                        <h3 class="font-bold text-sm ${cfg.accent}">${lvl}</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${cfg.badge} font-bold">${items.length} ห้อง</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">`;
+                items.forEach(c => {
+                    html += `<div class="${cfg.bg} rounded-xl border ${cfg.border} hover:shadow-lg transition-all duration-300 p-4 group cursor-pointer"
+                        onclick="openEditClassroom(${c.id},'${(c.name || '').replace(/'/g, "\\'")}','${c.level || ''}',${c.grade || 0},${c.room || 0},'${c.academic_year || ''}')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-slate-800 text-base">${c.name}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${cfg.badge} font-semibold">${c.level}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-slate-500">
+                            <span class="flex items-center gap-1"><i class="fa-solid fa-calendar text-[10px] opacity-50"></i> ${c.academic_year || '-'}</span>
+                            <span>ชั้น ${c.grade || '-'}</span>
+                            <span>ห้อง ${c.room || '-'}</span>
+                        </div>
+                        <div class="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-xs text-teal-600 font-semibold flex items-center gap-1"><i class="fa-solid fa-pen text-[10px]"></i> แก้ไข</span>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            el.innerHTML = html;
+        }
+
+        async function fetchSubjects() {
+            const { data } = await pawDb.from('subjects').select('*').order('code');
+            _allSubjects = data || [];
+            const el = document.getElementById('subj-list');
+            document.getElementById('subj-loading')?.classList.add('hidden');
+            el?.classList.remove('hidden');
+            // Update stat
+            const statEl = document.getElementById('stat-subj-count');
+            if (statEl) statEl.textContent = _allSubjects.length;
+            renderSubjList(_allSubjects);
+        }
+
+        function renderSubjList(data) {
+            const el = document.getElementById('subj-list');
+            if (!el) return;
+            if (!data?.length) {
+                el.innerHTML = `<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-violet-50 flex items-center justify-center text-violet-300 text-2xl mx-auto mb-4"><i class="fa-solid fa-book"></i></div>
+                    <p class="text-slate-500 font-semibold">ยังไม่มีรายวิชา</p>
+                    <p class="text-xs text-slate-400 mt-1">กดปุ่ม "เพิ่มวิชา" เพื่อเริ่มต้น</p>
+                </div>`;
+                return;
+            }
+
+            const groupColors = {
+                'ภาษาไทย': { bg: 'from-blue-500 to-blue-600', light: 'bg-blue-50 border-blue-200', ring: 'ring-blue-400' },
+                'คณิตศาสตร์': { bg: 'from-red-500 to-rose-600', light: 'bg-red-50 border-red-200', ring: 'ring-red-400' },
+                'วิทยาศาสตร์': { bg: 'from-emerald-500 to-green-600', light: 'bg-emerald-50 border-emerald-200', ring: 'ring-emerald-400' },
+                'สังคมศึกษา': { bg: 'from-amber-500 to-orange-600', light: 'bg-amber-50 border-amber-200', ring: 'ring-amber-400' },
+                'สุขศึกษาและพลศึกษา': { bg: 'from-pink-500 to-rose-600', light: 'bg-pink-50 border-pink-200', ring: 'ring-pink-400' },
+                'ศิลปะ': { bg: 'from-fuchsia-500 to-purple-600', light: 'bg-fuchsia-50 border-fuchsia-200', ring: 'ring-fuchsia-400' },
+                'การงานอาชีพ': { bg: 'from-teal-500 to-cyan-600', light: 'bg-teal-50 border-teal-200', ring: 'ring-teal-400' },
+                'ภาษาต่างประเทศ': { bg: 'from-indigo-500 to-violet-600', light: 'bg-indigo-50 border-indigo-200', ring: 'ring-indigo-400' },
+            };
+            const defaultColor = { bg: 'from-slate-500 to-slate-600', light: 'bg-slate-50 border-slate-200', ring: 'ring-slate-400' };
+
+            // Group by group_name
+            const groups = {};
+            data.forEach(s => {
+                const grp = s.group_name || 'ไม่ระบุ';
+                if (!groups[grp]) groups[grp] = [];
+                groups[grp].push(s);
+            });
+
+            let html = '';
+            Object.entries(groups).forEach(([grp, items]) => {
+                const clr = groupColors[grp] || defaultColor;
+                html += `<div class="mb-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2 h-5 rounded-full bg-gradient-to-b ${clr.bg}"></div>
+                        <h3 class="font-bold text-sm text-slate-700">${grp}</h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-bold">${items.length}</span>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-50">`;
+                items.forEach(s => {
+                    const semBadge = s.semester === 1
+                        ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-sky-100 text-sky-700 border border-sky-200">เทอม 1</span>'
+                        : s.semester === 2
+                        ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-violet-100 text-violet-700 border border-violet-200">เทอม 2</span>'
+                        : '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-500">ทั้งปี</span>';
+                    const typeBadge = s.subject_type === 'เพิ่มเติม'
+                        ? '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-600 border border-amber-200">เพิ่มเติม</span>'
+                        : '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">พื้นฐาน</span>';
+                    html += `
+                    <div class="px-4 py-3.5 flex items-center gap-3 hover:bg-slate-50/80 transition-all group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${clr.bg} flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-sm">
+                            ${(s.code || '??').slice(0, 2)}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">${s.code}</span>
+                                <span class="font-semibold text-slate-800 text-sm truncate">${s.name}</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                ${typeBadge} ${semBadge}
+                                <span class="text-[10px] text-slate-400">${s.credits || 0} หน่วยกิต  •  ${s.hours_per_week || 0} คาบ/สัปดาห์</span>
+                            </div>
+                        </div>
+                        <button onclick="event.stopPropagation(); openEditSubject(${s.id},'${(s.code||'').replace(/'/g,"\\'")}','${(s.name||'').replace(/'/g,"\\'")}',${s.credits||0},${s.hours_per_week||0},'${(s.group_name||'').replace(/'/g,"\\'")}','${s.subject_type||'พื้นฐาน'}',${s.semester!=null?s.semester:'null'})"
+                            class="px-3 py-2 bg-violet-50 hover:bg-violet-100 text-violet-600 rounded-xl text-xs font-bold transition-all opacity-60 group-hover:opacity-100 flex items-center gap-1.5 flex-shrink-0">
+                            <i class="fa-solid fa-pen text-[10px]"></i> แก้ไข
+                        </button>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            el.innerHTML = html;
         }
 
         function openAddClassroom() {
@@ -2185,7 +2451,7 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('cls-level').value = 'ประถม';
             document.getElementById('cls-year').value = '2568';
             document.getElementById('cls-delete-btn').classList.add('hidden');
-            document.getElementById('cls-modal-title').innerHTML = '<i class="fa-solid fa-school text-teal-500"></i> เพิ่มห้องเรียน';
+            document.getElementById('cls-modal-title').innerHTML = '<div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-school text-sm"></i></div> เพิ่มห้องเรียน';
             document.getElementById('cls-modal').classList.remove('hidden');
         }
         function openEditClassroom(id, name, level, grade, room, year) {
@@ -2196,7 +2462,7 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('cls-room').value = room;
             document.getElementById('cls-year').value = year;
             document.getElementById('cls-delete-btn').classList.remove('hidden');
-            document.getElementById('cls-modal-title').innerHTML = '<i class="fa-solid fa-pen text-teal-500"></i> แก้ไขห้องเรียน';
+            document.getElementById('cls-modal-title').innerHTML = '<div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-pen text-sm"></i></div> แก้ไขห้องเรียน';
             document.getElementById('cls-modal').classList.remove('hidden');
         }
         async function saveClassroom() {
@@ -2258,7 +2524,7 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('subj-type').value = 'พื้นฐาน';
             document.getElementById('subj-semester').value = '';
             document.getElementById('subj-delete-btn').classList.add('hidden');
-            document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-book text-violet-500"></i> เพิ่มวิชา';
+            document.getElementById('subj-modal-title').innerHTML = '<div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-book text-sm"></i></div> เพิ่มวิชา';
             document.getElementById('subj-modal').classList.remove('hidden');
         }
         function openEditSubject(id, code, name, credits, hours, group, type, semester) {
@@ -2271,7 +2537,7 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('subj-type').value = type || 'พื้นฐาน';
             document.getElementById('subj-semester').value = semester != null ? String(semester) : '';
             document.getElementById('subj-delete-btn').classList.remove('hidden');
-            document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-pen text-violet-500"></i> แก้ไขวิชา';
+            document.getElementById('subj-modal-title').innerHTML = '<div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i class="fa-solid fa-pen text-sm"></i></div> แก้ไขวิชา';
             document.getElementById('subj-modal').classList.remove('hidden');
         }
         async function saveSubject() {
