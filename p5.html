@@ -121,12 +121,12 @@
                     <option value="">— เลือกวิชาก่อน —</option>
                 </select>
             </div>
-            <!-- col 4: จองพื้นที่ไว้เสมอ — visibility:hidden ไม่กิน layout -->
-            <div id="term-selector-wrap" style="visibility:hidden;">
+            <div id="term-selector-wrap">
                 <label class="block text-xs font-semibold text-indigo-500 mb-1">
                     <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
                 </label>
                 <select id="sel-term" class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
+                    <option value="">ทั้งปีการศึกษา</option>
                     <option value="1">ภาคเรียนที่ 1</option>
                     <option value="2">ภาคเรียนที่ 2</option>
                 </select>
@@ -275,20 +275,16 @@ document.getElementById('sel-subject').addEventListener('change', function () {
 
 document.getElementById('sel-year').addEventListener('change', loadAssignments);
 
-// เด้ง/ซ่อน ภาคเรียน ทันทีเมื่อเลือกห้องเรียน (ก่อนกดโหลด)
+// รีเซ็ตตาราง เมื่อเปลี่ยนห้องเรียน
 document.getElementById('sel-class').addEventListener('change', function () {
-    const opt = this.options[this.selectedIndex];
-    const termWrap = document.getElementById('term-selector-wrap');
-    if (opt && opt.value) {
-        const m = detectMode(opt.dataset.level || '', opt.dataset.grade || 0);
-        if (m === 'matayom') {
-            termWrap.style.visibility = 'visible';
-        } else {
-            termWrap.style.visibility = 'hidden';
-        }
-    } else {
-        termWrap.style.visibility = 'hidden';
-    }
+    // ซ่อนตารางเก่าถ้ามี เพื่อไม่ให้ข้อมูลเดิมค้างหน้า
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('grade-table-wrap').classList.add('hidden');
+    document.getElementById('btn-save-all').classList.add('hidden');
+    document.getElementById('ratio-bar').classList.add('hidden');
+    document.getElementById('print-header').classList.add('hidden');
+    currentStudents = [];
+    currentAssignment = null;
 });
 
 // ── Mode detection ────────────────────────────────────────────────────────
@@ -434,8 +430,10 @@ function buildTableHeader() {
     const thead = document.getElementById('grade-thead');
     const tfoot = document.getElementById('grade-tfoot');
     const perTerm = ratio.keep + ratio.exam;
+    const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
 
-    if (mode === 'pratom') {
+    if (!term) {
+        // ── ทั้งปีการศึกษา: แสดง 2 ภาคควบคู่ ──────────────────────────────
         thead.innerHTML = `
         <tr class="border-b border-slate-100 text-[11px] font-bold text-center">
             <th rowspan="2" class="px-3 py-2 text-left text-slate-400 w-8">ที่</th>
@@ -443,7 +441,7 @@ function buildTableHeader() {
             <th rowspan="2" class="px-3 py-2 text-left text-slate-700 min-w-[180px]">ชื่อ-สกุล</th>
             <th colspan="3" class="px-3 py-2 th-keep border-l border-green-100">ภาคเรียนที่ 1 (${perTerm})</th>
             <th colspan="3" class="px-3 py-2 th-keep border-l border-green-100">ภาคเรียนที่ 2 (${perTerm})</th>
-            <th rowspan="2" class="px-3 py-2 th-sum border-l border-indigo-100">รวมปี<br><span class="font-normal text-indigo-400">(100)</span></th>
+            <th rowspan="2" class="px-3 py-2 th-sum border-l border-indigo-100">รวมปี<br><span class="font-normal text-indigo-400">(${perTerm * 2})</span></th>
             <th rowspan="2" class="px-3 py-2 th-sum">เกรด</th>
             <th rowspan="2" class="px-3 py-2 text-slate-400 no-print">ผล</th>
         </tr>
@@ -469,7 +467,7 @@ function buildTableHeader() {
             <td colspan="2"></td>
         </tr>`;
     } else {
-        const term = document.getElementById('sel-term').value;
+        // ── ภาคเรียนที่ 1 หรือ 2: แสดงเทอมเดียว ──────────────────────────
         thead.innerHTML = `
         <tr class="border-b border-slate-100 text-[11px] font-bold text-center">
             <th class="px-3 py-3 text-left text-slate-400 w-8">ที่</th>
@@ -477,7 +475,7 @@ function buildTableHeader() {
             <th class="px-3 py-3 text-left text-slate-700 min-w-[200px]">ชื่อ-สกุล</th>
             <th class="px-3 py-3 th-keep border-l border-green-100">คะแนนเก็บ<br><span class="font-normal text-green-600">(${ratio.keep})</span></th>
             <th class="px-3 py-3 th-exam">คะแนนสอบ<br><span class="font-normal text-amber-600">(${ratio.exam})</span></th>
-            <th class="px-3 py-3 th-sum border-l border-indigo-100">รวม ภาค ${term}<br><span class="font-normal text-indigo-400">(100)</span></th>
+            <th class="px-3 py-3 th-sum border-l border-indigo-100">รวม ภาค ${term}<br><span class="font-normal text-indigo-400">(${perTerm})</span></th>
             <th class="px-3 py-3 th-sum">เกรด ภาค ${term}</th>
             <th class="px-3 py-3 text-slate-400 no-print">ผล</th>
         </tr>`;
@@ -497,14 +495,15 @@ function buildTableHeader() {
 function buildTableBody() {
     const tbody = document.getElementById('grade-tbody');
     tbody.innerHTML = '';
-    const term = parseInt(document.getElementById('sel-term').value);
+    const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
 
     currentStudents.forEach((s, i) => {
         const row = document.createElement('tr');
         row.className = i % 2 === 0 ? 'border-b border-slate-50' : 'border-b border-slate-50 bg-slate-50/50';
         row.dataset.studentId = s.id;
 
-        if (mode === 'pratom') {
+        if (!term) {
+            // ── ทั้งปีการศึกษา: แสดง 2 ภาค ──────────────────────────────
             const g1 = readGrade(s.id, 1);
             const g2 = readGrade(s.id, 2);
             const k1 = g1.keep, e1 = g1.exam;
@@ -515,11 +514,13 @@ function buildTableBody() {
             const gradeVal = hasVal(yr) ? scoreToGrade(yr) : '';
             row.innerHTML = buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal);
         } else {
-            const g = readGrade(s.id, term);
+            // ── เทอมเดียว (1 หรือ 2) ─────────────────────────────────────
+            const termNum = parseInt(term);
+            const g = readGrade(s.id, termNum);
             const k = g.keep, e = g.exam;
             const total = hasVal(k) && hasVal(e) ? +k + +e : '';
             const gradeVal = hasVal(total) ? scoreToGrade(total) : '';
-            row.innerHTML = buildMatayomRow(i, s, k, e, total, gradeVal);
+            row.innerHTML = buildSingleTermRow(i, s, k, e, total, gradeVal, termNum);
         }
         tbody.appendChild(row);
         row.querySelectorAll('.score-input').forEach(inp =>
@@ -582,18 +583,17 @@ function buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal) {
         <td class="px-2 py-2 text-center no-print result-cell">${resultHtml(gradeVal)}</td>`;
 }
 
-function buildMatayomRow(i, s, k, e, total, gradeVal) {
-    const term = document.getElementById('sel-term').value;
+function buildSingleTermRow(i, s, k, e, total, gradeVal, termNum) {
     return `
         <td class="px-3 py-2 text-slate-400 text-xs">${i+1}</td>
         <td class="px-3 py-2 text-slate-500 text-xs">${s.student_no}</td>
         <td class="px-3 py-2 text-slate-700 font-medium">${s.name}</td>
         <td class="px-2 py-2 text-center">
-            <input type="number" class="score-input keep-inp" data-sem="${term}" data-type="keep"
+            <input type="number" class="score-input keep-inp" data-sem="${termNum}" data-type="keep"
                 value="${k}" min="0" max="${ratio.keep}" data-max="${ratio.keep}" placeholder="—">
         </td>
         <td class="px-2 py-2 text-center">
-            <input type="number" class="score-input exam-inp" data-sem="${term}" data-type="exam"
+            <input type="number" class="score-input exam-inp" data-sem="${termNum}" data-type="exam"
                 value="${e}" min="0" max="${ratio.exam}" data-max="${ratio.exam}" placeholder="—">
         </td>
         <td class="px-2 py-2 text-center font-bold text-slate-700 total-cell">${hasVal(total) ? (+total).toFixed(2) : ''}</td>
@@ -603,8 +603,9 @@ function buildMatayomRow(i, s, k, e, total, gradeVal) {
 
 // ── Recalc row (real-time) ────────────────────────────────────────────────
 function recalcRow(row) {
-    if (mode === 'matayom') recalcMat(row);
-    else recalcPrat(row);
+    const term = document.getElementById('sel-term').value;
+    if (!term) recalcPrat(row);
+    else recalcMat(row);
     updateAverages();
 }
 
@@ -654,7 +655,9 @@ function updateAverages() {
         const el = document.getElementById(id);
         if (el) el.textContent = cnt > 0 ? (sum/cnt).toFixed(1) : '—';
     };
-    if (mode === 'pratom') {
+    const term = document.getElementById('sel-term').value;
+    if (!term) {
+        // ── ทั้งปีการศึกษา ─────────────────────────────────────────────
         let sk1=0,se1=0,sk2=0,se2=0, ck1=0,ce1=0,ck2=0,ce2=0;
         let ts1=0,ts2=0,tyr=0, cs1=0,cs2=0,cyr=0;
         rows.forEach(row => {
@@ -676,6 +679,7 @@ function updateAverages() {
         setEl('avg-k2',sk2,ck2); setEl('avg-e2',se2,ce2); setEl('avg-s2',ts2,cs2);
         setEl('avg-yr',tyr,cyr);
     } else {
+        // ── เทอมเดียว ──────────────────────────────────────────────────
         let sk=0,se=0,st=0, ck=0,ce=0,ct=0;
         rows.forEach(row => {
             row.querySelectorAll('.score-input').forEach(inp => {
@@ -690,9 +694,9 @@ function updateAverages() {
     }
 }
 
-// มัธยม: เปลี่ยนภาค → re-render
+// เปลี่ยนภาคเรียน → re-render ตารางทันที (ทุก mode)
 document.getElementById('sel-term').addEventListener('change', () => {
-    if (mode === 'matayom' && currentStudents.length) renderTable();
+    if (currentStudents.length) renderTable();
 });
 
 // ── Save All ──────────────────────────────────────────────────────────────
@@ -700,11 +704,12 @@ document.getElementById('btn-save-all').addEventListener('click', async () => {
     if (!currentAssignment) return;
     const tsid = currentAssignment.id;
     const year = document.getElementById('sel-year').value;
+    const termSel = document.getElementById('sel-term').value;   // '' | '1' | '2'
     const rows = [...document.querySelectorAll('#grade-tbody tr')];
     const toSave = [];
 
-    if (mode === 'pratom') {
-        // ประถม: เก็บ 2 ภาค พร้อมกัน, เกรดจากรวมปี
+    if (!termSel) {
+        // ── ทั้งปีการศึกษา: บันทึกทั้ง 2 ภาค ──────────────────────────
         const byStudent = {};
         rows.forEach(row => {
             const sid = parseInt(row.dataset.studentId);
@@ -733,20 +738,32 @@ document.getElementById('btn-save-all').addEventListener('click', async () => {
             });
         });
     } else {
-        // มัธยม: บันทึกแค่ภาคที่ดูอยู่
-        const sem = parseInt(document.getElementById('sel-term').value);
+        // ── เทอมเดียว: บันทึกแค่ภาคที่เลือก ──────────────────────────
+        const sem = parseInt(termSel);
         rows.forEach(row => {
+            const sid = parseInt(row.dataset.studentId);
             const k   = parseFloat(row.querySelector('.keep-inp')?.value) || 0;
             const e   = parseFloat(row.querySelector('.exam-inp')?.value) || 0;
             const tot = k + e;
-            const g   = scoreToGrade(tot);
+            // สำหรับประถม: คำนวณเกรดจากรวมปี (ภาคนี้ + ภาคอื่นใน DB)
+            let grade;
+            if (mode === 'matayom') {
+                grade = scoreToGrade(tot);
+            } else {
+                const otherSem = sem === 1 ? 2 : 1;
+                const other = readGrade(sid, otherSem);
+                const otherTotal = (hasVal(other.keep) && hasVal(other.exam))
+                    ? +other.keep + +other.exam : null;
+                const yrTotal = otherTotal !== null ? tot + otherTotal : null;
+                grade = yrTotal !== null ? scoreToGrade(yrTotal) : '';
+            }
             toSave.push({
-                teacher_subject_id: tsid, student_id: parseInt(row.dataset.studentId),
+                teacher_subject_id: tsid, student_id: sid,
                 semester: sem, academic_year: year,
                 score_behavior: 0, score_activity: 0,
                 score_midterm: k, score_final: e, score_extra: 0,
-                total_score: tot, grade: g,
-                result: parseFloat(g) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
+                total_score: tot, grade,
+                result: grade && parseFloat(grade) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
                 updated_at: new Date().toISOString()
             });
         });
