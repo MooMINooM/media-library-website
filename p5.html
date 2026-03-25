@@ -252,21 +252,25 @@ function rebuildSubjectDropdown() {
     const seen = new Set();
     assignments.forEach(a => {
         if (seen.has(a.subjects.id)) return;
-        const subSem = a.subjects.semester; // null | 1 | 2
+
+        // ใช้ loose != null เพื่อรองรับทั้ง null และ undefined
+        // (undefined เกิดเมื่อคอลัมน์ semester ยังไม่ถูกเพิ่มใน Supabase หรือ schema cache ยังไม่อัปเดต)
+        const rawSem = a.subjects && a.subjects.semester;
+        const subSem = (rawSem != null) ? parseInt(rawSem) : null; // null = สอนทั้งปี
 
         // กรองตามเทอมที่ผู้ใช้เลือก:
         // - เลือก "ทั้งปี" (selectedTerm='') → แสดงทุกวิชา
-        // - เลือกเทอม 1 หรือ 2 → แสดงวิชาที่ตรงเทอม หรือวิชาที่ไม่ได้กำหนดเทอม (null)
+        // - เลือกเทอม 1/2 → แสดงวิชาที่ตรงเทอม + วิชาที่ไม่ได้กำหนดเทอม (null = ทั้งปี)
         if (selectedTerm !== '') {
             const termNum = parseInt(selectedTerm);
-            if (subSem !== null && subSem !== termNum) return; // ข้ามวิชาที่เทอมไม่ตรง
+            if (subSem !== null && subSem !== termNum) return;
         }
 
         seen.add(a.subjects.id);
         const opt = document.createElement('option');
         opt.value = a.subjects.id;
         const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
-        opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
+        opt.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
         opt.dataset.semester = subSem != null ? String(subSem) : '';
         selSubject.appendChild(opt);
     });
