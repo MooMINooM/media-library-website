@@ -1185,19 +1185,21 @@
                 const o = document.createElement('option');
                 o.value = a.id;
                 o.dataset.classroomId = a.classrooms.id;
-                o.dataset.level = a.classrooms.level;
+                o.dataset.level = a.classrooms.level || '';
+                o.dataset.grade = a.classrooms.grade || 0;
                 o.textContent = a.classrooms.name;
                 sel.appendChild(o);
             });
             document.getElementById('p5-score-panel')?.classList.add('hidden');
             document.getElementById('p5-level-badge')?.classList.add('hidden');
+            const _tw2 = document.getElementById('p5-term-wrap'); if (_tw2) _tw2.style.visibility = 'hidden';
         });
 
         document.getElementById('p5-sel-class')?.addEventListener('change', function () {
             const opt = this.selectedOptions[0];
             if (!opt || !opt.value) return;
             p5CurrentLevel = opt.dataset.level || '';
-            const isMiddle = p5IsMiddle(p5CurrentLevel);
+            const isMiddle = p5IsMiddle(p5CurrentLevel, opt.dataset.grade || 0);
             // Show/hide term selector
             const termWrap = document.getElementById('p5-term-wrap');
             termWrap.style.visibility = isMiddle ? 'visible' : 'hidden';
