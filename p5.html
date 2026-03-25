@@ -95,8 +95,13 @@
 <!-- FILTER BAR -->
 <div class="max-w-7xl mx-auto px-4 py-4 no-print">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[140px]">
+        <!--
+            ใช้ CSS Grid 4 คอลัมน์คงที่ แทน flex-wrap
+            คอลัมน์ที่ 4 (ภาคเรียน) จองพื้นที่ไว้ตลอด
+            แค่ visibility เปลี่ยน → ไม่มี layout shift เลย
+        -->
+        <div style="display:grid; grid-template-columns:1fr 2fr 2fr 1fr; gap:12px; align-items:end;">
+            <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
                 <select id="sel-year" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="2568">2568</option>
@@ -104,25 +109,20 @@
                     <option value="2566">2566</option>
                 </select>
             </div>
-            <div class="flex-[2] min-w-[180px]">
+            <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
                 <select id="sel-subject" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— กำลังโหลด —</option>
                 </select>
             </div>
-            <div class="flex-[2] min-w-[180px]">
+            <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
                 <select id="sel-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
                     <option value="">— เลือกวิชาก่อน —</option>
                 </select>
             </div>
-            <!--
-                ภาคเรียน: อยู่ท้ายสุดเสมอ
-                - display:none ตอนเริ่ม
-                - เด้งขึ้นทันทีเมื่อเลือกห้องมัธยม (ก่อนกดโหลด)
-                - ซ่อนอีกครั้งถ้าเปลี่ยนไปห้องประถม
-            -->
-            <div id="term-selector-wrap" class="flex-1 min-w-[160px]" style="display:none; animation:fadeSlideIn .2s ease;">
+            <!-- col 4: จองพื้นที่ไว้เสมอ — visibility:hidden ไม่กิน layout -->
+            <div id="term-selector-wrap" style="visibility:hidden;">
                 <label class="block text-xs font-semibold text-indigo-500 mb-1">
                     <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
                 </label>
@@ -282,13 +282,12 @@ document.getElementById('sel-class').addEventListener('change', function () {
     if (opt && opt.value) {
         const m = detectMode(opt.dataset.level || '', opt.dataset.grade || 0);
         if (m === 'matayom') {
-            termWrap.style.display = 'flex';
-            termWrap.style.flexDirection = 'column';
+            termWrap.style.visibility = 'visible';
         } else {
-            termWrap.style.display = 'none';
+            termWrap.style.visibility = 'hidden';
         }
     } else {
-        termWrap.style.display = 'none';
+        termWrap.style.visibility = 'hidden';
     }
 });
 
