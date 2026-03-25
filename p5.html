@@ -251,7 +251,10 @@ async function loadAssignments() {
             seen.add(a.subjects.id);
             const opt = document.createElement('option');
             opt.value       = a.subjects.id;
-            opt.textContent = `${a.subjects.code} ${a.subjects.name}`;
+            const sem = a.subjects.semester;
+            const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
+            opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
+            opt.dataset.semester = sem != null ? String(sem) : '';
             selSubject.appendChild(opt);
         }
     });
@@ -271,6 +274,20 @@ document.getElementById('sel-subject').addEventListener('change', function () {
         opt.textContent     = a.classrooms.name;
         selClass.appendChild(opt);
     });
+
+    // Auto-lock term selector based on subjects.semester
+    const subjectSem = this.selectedOptions[0]?.dataset?.semester || '';
+    const selTerm = document.getElementById('sel-term');
+    if (subjectSem === '1' || subjectSem === '2') {
+        selTerm.value    = subjectSem;
+        selTerm.disabled = true;
+        selTerm.style.opacity = '0.6';
+        selTerm.title = 'เทอมถูกกำหนดไว้ในรายวิชาแล้ว';
+    } else {
+        selTerm.disabled = false;
+        selTerm.style.opacity = '';
+        selTerm.title = '';
+    }
 });
 
 document.getElementById('sel-year').addEventListener('change', loadAssignments);
