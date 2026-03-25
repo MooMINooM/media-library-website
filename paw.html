@@ -2727,6 +2727,13 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลด...'; btn.disabled = true;
             try {
                 coverAssignments = await getTeacherAssignments(teacher.id, year);
+                // กรองเฉพาะวิชาที่ตรงกับภาคเรียนที่เลือก
+                // semester = null/undefined → วิชาสอนทั้งปี → แสดงทุกเทอม
+                coverAssignments = coverAssignments.filter(a => {
+                    const subSem = a.subjects?.semester;
+                    if (subSem == null) return true;
+                    return parseInt(subSem) === term;
+                });
                 if (!coverAssignments.length) {
                     (function () { var _e = document.getElementById('cover-empty'); if (_e) _e.innerHTML = '<i class="fa-solid fa-inbox text-4xl mb-3 opacity-20"></i><p class="text-lg">ไม่พบรายวิชาในปีการศึกษานี้</p>' })();
                     document.getElementById('cover-empty')?.classList.remove('hidden');
