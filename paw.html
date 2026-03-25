@@ -1138,6 +1138,15 @@
             keepMax1: 30, examMax1: 20, keepMax2: 30, examMax2: 20,
             mKeep: 40, mMid: 30, mFinal: 30
         };
+        // helper: ตรวจ level ทุกรูปแบบ ('มัธยม', 'ม.1', 'ม.2', grade>=7)
+        function p5IsMiddle(levelStr, grade) {
+            if (!levelStr && !grade) return false;
+            const l = (levelStr || '').trim();
+            if (l === 'มัธยม') return true;
+            if (l.startsWith('ม')) return true;
+            if (parseInt(grade) >= 7) return true;
+            return false;
+        }
         let p5CurrentLevel = '';
         let p5KeepMax1 = 30, p5ExamMax1 = 20;
         let p5KeepMax2 = 30, p5ExamMax2 = 20;
@@ -1188,7 +1197,7 @@
             const opt = this.selectedOptions[0];
             if (!opt || !opt.value) return;
             p5CurrentLevel = opt.dataset.level || '';
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             // Show/hide term selector
             const termWrap = document.getElementById('p5-term-wrap');
             termWrap.style.visibility = isMiddle ? 'visible' : 'hidden';
@@ -1200,7 +1209,7 @@
         function p5ShowLevelBadge(level) {
             const badge = document.getElementById('p5-level-badge');
             badge.classList.remove('hidden');
-            if (level === 'มัธยม') {
+            if (p5IsMiddle(level)) {
                 badge.className = 'text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-100 text-amber-800';
                 badge.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i>มัธยมต้น — ปพ.5 รายภาค (100 คะแนน/เทอม)';
             } else {
@@ -1210,7 +1219,7 @@
         }
 
         function p5RenderScorePanel() {
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             const container = document.getElementById('p5-score-inputs');
             container.innerHTML = '';
 
@@ -1273,7 +1282,7 @@
         }
 
         window.p5UpdateMaxTotal = function () {
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             let sum = 0;
             if (!isMiddle) {
                 p5KeepMax1 = parseFloat(document.getElementById('p5-max-keep1')?.value) || 0;
@@ -1306,7 +1315,7 @@
             if (!tsId || !classroomId) {
                 Swal.fire({ icon: 'warning', title: 'กรุณาเลือกวิชาและห้องเรียน', timer: 2000, showConfirmButton: false }); return;
             }
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             const sum = isMiddle ? (p5MKeep + p5MMid + p5MFinal) : (p5KeepMax1 + p5ExamMax1 + p5KeepMax2 + p5ExamMax2);
             if (sum !== 100) {
                 Swal.fire({ icon: 'warning', title: 'คะแนนรวมต้องเท่ากับ 100', text: 'ปัจจุบันรวม ' + sum + ' คะแนน', confirmButtonText: 'ตกลง' }); return;
@@ -1366,7 +1375,7 @@
         });
 
         function p5BuildTable(students, gradeMap1, gradeMap2, ctx) {
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             const thS = 'px-2 py-2 text-center text-[10px] font-bold leading-tight';
 
             let headerHtml, minW;
@@ -1487,7 +1496,7 @@
 
         window.p5UpdateRow = function (input) {
             const row = input.closest('tr');
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
 
             if (!isMiddle) {
                 // คำนวณรวมแต่ละเทอม
@@ -1559,7 +1568,7 @@
 
         window.p5ExportExcel = function () {
             if (typeof XLSX === 'undefined') { Swal.fire({ icon: 'warning', title: 'กรุณารอสักครู่', timer: 2000, showConfirmButton: false }); return; }
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             const rows = document.querySelectorAll('#p5-tbody tr');
             const headers = isMiddle
                 ? ['ที่', 'เลขที่', 'ชื่อ-สกุล', 'คะแนนเก็บ', 'สอบกลางภาค', 'สอบปลายภาค', 'รวม', 'เกรด']
@@ -1586,7 +1595,7 @@
         };
 
         document.getElementById('p5-btn-save')?.addEventListener('click', async () => {
-            const isMiddle = p5CurrentLevel === 'มัธยม';
+            const isMiddle = p5IsMiddle(p5CurrentLevel);
             const rows = document.querySelectorAll('#p5-tbody tr');
             const records = [];
 
