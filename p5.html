@@ -52,6 +52,10 @@
         .th-exam { background: #fffbeb; color: #92400e; }
         .th-sum  { background: #eef2ff; color: #3730a3; }
 
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
         @media print {
             .no-print { display:none !important; }
             body { background: white; }
@@ -91,7 +95,7 @@
 <!-- FILTER BAR -->
 <div class="max-w-7xl mx-auto px-4 py-4 no-print">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[140px]">
                 <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
                 <select id="sel-year" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
@@ -112,10 +116,17 @@
                     <option value="">— เลือกวิชาก่อน —</option>
                 </select>
             </div>
-            <!-- ภาคเรียน: แสดงเฉพาะมัธยม ต่อท้ายสุด ไม่เลื่อนเพื่อน -->
-            <div id="term-selector-wrap" class="flex-1 min-w-[150px]" style="display:none;">
-                <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
-                <select id="sel-term" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+            <!--
+                ภาคเรียน: อยู่ท้ายสุดเสมอ
+                - display:none ตอนเริ่ม
+                - เด้งขึ้นทันทีเมื่อเลือกห้องมัธยม (ก่อนกดโหลด)
+                - ซ่อนอีกครั้งถ้าเปลี่ยนไปห้องประถม
+            -->
+            <div id="term-selector-wrap" class="flex-1 min-w-[160px]" style="display:none; animation:fadeSlideIn .2s ease;">
+                <label class="block text-xs font-semibold text-indigo-500 mb-1">
+                    <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
+                </label>
+                <select id="sel-term" class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
                     <option value="1">ภาคเรียนที่ 1</option>
                     <option value="2">ภาคเรียนที่ 2</option>
                 </select>
@@ -264,6 +275,23 @@ document.getElementById('sel-subject').addEventListener('change', function () {
 
 document.getElementById('sel-year').addEventListener('change', loadAssignments);
 
+// เด้ง/ซ่อน ภาคเรียน ทันทีเมื่อเลือกห้องเรียน (ก่อนกดโหลด)
+document.getElementById('sel-class').addEventListener('change', function () {
+    const opt = this.options[this.selectedIndex];
+    const termWrap = document.getElementById('term-selector-wrap');
+    if (opt && opt.value) {
+        const m = detectMode(opt.dataset.level || '', opt.dataset.grade || 0);
+        if (m === 'matayom') {
+            termWrap.style.display = 'flex';
+            termWrap.style.flexDirection = 'column';
+        } else {
+            termWrap.style.display = 'none';
+        }
+    } else {
+        termWrap.style.display = 'none';
+    }
+});
+
 // ── Mode detection ────────────────────────────────────────────────────────
 // มัธยม = level ขึ้นต้น 'ม' หรือ grade >= 7
 function detectMode(levelStr, grade) {
@@ -273,18 +301,15 @@ function detectMode(levelStr, grade) {
 }
 
 function applyModeUI() {
-    const badge    = document.getElementById('mode-badge');
-    const termWrap = document.getElementById('term-selector-wrap');
-    const hint     = document.getElementById('ratio-hint');
+    const badge = document.getElementById('mode-badge');
+    const hint  = document.getElementById('ratio-hint');
     if (mode === 'matayom') {
         badge.textContent = '🎓 มัธยม';
         badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-400/40';
-        termWrap.style.display = 'flex';
         hint.textContent  = 'ต่อภาค รวม = 100 — ออกเกรดแยกแต่ละภาค';
     } else {
         badge.textContent = '📚 ประถม';
         badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-400/40';
-        termWrap.style.display = 'none';
         hint.textContent  = 'ต่อภาค รวม = 50 — สองภาครวมกัน = 100/ปี';
     }
     badge.classList.remove('hidden');
