@@ -2131,6 +2131,15 @@ AND auth.role() = 'authenticated');</code>
               </select>
             </div>
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียนที่สอน</label>
+            <select id="subj-semester" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400">
+              <option value="">ทั้งปีการศึกษา (ไม่ระบุ)</option>
+              <option value="1">ภาคเรียนที่ 1 เท่านั้น</option>
+              <option value="2">ภาคเรียนที่ 2 เท่านั้น</option>
+            </select>
+            <p class="text-xs text-slate-400 mt-1">ระบุเพื่อให้ระบบล็อกเทอมให้อัตโนมัติ — ถ้าสอนทั้งปีให้เลือก "ทั้งปีการศึกษา"</p>
+          </div>
         </div>
         <div class="px-6 py-4 border-t flex justify-between">
           <button id="subj-delete-btn" onclick="deleteSubject()" class="hidden text-red-500 hover:text-red-700 text-sm font-semibold px-4 py-2 hover:bg-red-50 rounded-lg transition">
@@ -2221,32 +2230,38 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('subj-loading').classList.add('hidden');
             el.classList.remove('hidden');
             if (!data?.length) { el.innerHTML = '<p class="text-center text-slate-400 py-6 text-sm">ยังไม่มีวิชา</p>'; return; }
-            el.innerHTML = data.map(s => `
+            el.innerHTML = data.map(s => {
+                const semBadge = s.semester === 1 ? '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-sky-100 text-sky-700">เทอม 1</span>'
+                              : s.semester === 2 ? '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700">เทอม 2</span>'
+                              : '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-500">ทั้งปี</span>';
+                return `
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-3 flex items-center gap-3">
       <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="font-mono text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded">${s.code}</span>
           <span class="font-semibold text-slate-800 text-sm">${s.name}</span>
           <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${s.subject_type === 'เพิ่มเติม' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">${s.subject_type || 'พื้นฐาน'}</span>
+          ${semBadge}
         </div>
         <p class="text-xs text-slate-400 mt-0.5">${s.group_name || ''} &nbsp;|&nbsp; ${s.credits || 0} หน่วยกิต &nbsp;|&nbsp; ${s.hours_per_week || 0} คาบ/สัปดาห์</p>
       </div>
-      <button onclick="openEditSubject(${s.id},'${(s.code || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}',${s.credits || 0},${s.hours_per_week || 0},'${(s.group_name || '').replace(/'/g, "\\'")}','${s.subject_type || 'พื้นฐาน'}') "
+      <button onclick="openEditSubject(${s.id},'${(s.code || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}',${s.credits || 0},${s.hours_per_week || 0},'${(s.group_name || '').replace(/'/g, "\\'")}','${s.subject_type || 'พื้นฐาน'}',${s.semester != null ? s.semester : 'null'}) "
         class="px-3 py-1.5 bg-violet-50 hover:bg-violet-100 text-violet-700 rounded-lg text-xs font-semibold transition">
         <i class="fa-solid fa-pen"></i>
       </button>
-    </div>`).join('');
+    </div>`}).join('');
         }
 
         function openAddSubject() {
             ['subj-id', 'subj-code', 'subj-name', 'subj-credits', 'subj-hours'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             document.getElementById('subj-group').value = '';
             document.getElementById('subj-type').value = 'พื้นฐาน';
+            document.getElementById('subj-semester').value = '';
             document.getElementById('subj-delete-btn').classList.add('hidden');
             document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-book text-violet-500"></i> เพิ่มวิชา';
             document.getElementById('subj-modal').classList.remove('hidden');
         }
-        function openEditSubject(id, code, name, credits, hours, group, type) {
+        function openEditSubject(id, code, name, credits, hours, group, type, semester) {
             document.getElementById('subj-id').value = id;
             document.getElementById('subj-code').value = code;
             document.getElementById('subj-name').value = name;
@@ -2254,12 +2269,14 @@ AND auth.role() = 'authenticated');</code>
             document.getElementById('subj-hours').value = hours;
             document.getElementById('subj-group').value = group;
             document.getElementById('subj-type').value = type || 'พื้นฐาน';
+            document.getElementById('subj-semester').value = semester != null ? String(semester) : '';
             document.getElementById('subj-delete-btn').classList.remove('hidden');
             document.getElementById('subj-modal-title').innerHTML = '<i class="fa-solid fa-pen text-violet-500"></i> แก้ไขวิชา';
             document.getElementById('subj-modal').classList.remove('hidden');
         }
         async function saveSubject() {
             const id = document.getElementById('subj-id').value;
+            const semVal = document.getElementById('subj-semester').value;
             const obj = {
                 code: document.getElementById('subj-code').value.trim(),
                 name: document.getElementById('subj-name').value.trim(),
@@ -2267,6 +2284,7 @@ AND auth.role() = 'authenticated');</code>
                 hours_per_week: parseInt(document.getElementById('subj-hours').value) || null,
                 group_name: document.getElementById('subj-group').value || null,
                 subject_type: document.getElementById('subj-type').value || 'พื้นฐาน',
+                semester: semVal !== '' ? parseInt(semVal) : null,
             };
             if (!obj.code || !obj.name) { alert('กรุณากรอกรหัสและชื่อวิชา'); return; }
             const { error } = id ? await pawDb.from('subjects').update(obj).eq('id', id)
