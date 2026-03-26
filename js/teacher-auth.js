@@ -2,7 +2,7 @@
 // teacher-auth.js — ระบบล็อกอินครู ปพ.5 / ปพ.6
 // ================================================
 const PROJECT_URL = 'https://dazypxnsfwdwrqluicbc.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
+const ANON_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhenlweG5zZndkd3JxbHVpY2JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDkzMDIsImV4cCI6MjA4MjcyNTMwMn0.hAxjy_poDer5ywgRAZwzTkXF-OAcpduLxESW3v5adxo';
 
 export const db = window.supabase.createClient(PROJECT_URL, ANON_KEY);
 const SESSION_KEY = 'paw_teacher_session';
@@ -19,45 +19,15 @@ export function getTeacherSession() {
 }
 export function logoutTeacher() { sessionStorage.removeItem(SESSION_KEY); }
 
-// getTeacherAssignments — รองรับทั้งปีปัจจุบันและปีย้อนหลัง
-// ปีปัจจุบัน: กรอง classrooms.academic_year ปกติ
-// ปีย้อนหลัง: ดึงห้องที่ครูสอนจาก teacher_subjects ทั้งหมด
-//              แล้วกรองเฉพาะห้องที่มีนักเรียนอยู่จริงในปีนั้น (จาก student_promotions)
+// getTeacherAssignments — กรองด้วย teacher_subjects.academic_year โดยตรง
+// ถูกต้องไม่ว่า classrooms.academic_year จะเปลี่ยนไปแล้วหรือเปล่า
 export async function getTeacherAssignments(teacherId, academicYear) {
-    const currentYear = await getCurrentAcademicYear();
-    const isCurrentYear = academicYear === currentYear;
-
-    if (isCurrentYear) {
-        // ── ปีปัจจุบัน: กรองด้วย classrooms.academic_year ───────────
-        const { data, error } = await db
-            .from('teacher_subjects')
-            .select('id, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,academic_year,semester)')
-            .eq('teacher_id', teacherId)
-            .eq('classrooms.academic_year', academicYear);
-        if (error) throw error;
-        return (data || []).filter(a => a.classrooms != null);
-    }
-
-    // ── ปีย้อนหลัง ────────────────────────────────────────────────
-    // 1. หา classroom_id ทั้งหมดที่มีนักเรียน (จาก student_promotions ปีนั้น)
-    const { data: promoData, error: promoErr } = await db
-        .from('student_promotions')
-        .select('from_classroom_id')
-        .eq('academic_year', academicYear);
-    if (promoErr) throw promoErr;
-
-    const historyClassroomIds = [...new Set((promoData || []).map(p => p.from_classroom_id).filter(Boolean))];
-    if (!historyClassroomIds.length) return [];
-
-    // 2. ดึง teacher_subjects ของครูคนนี้ทั้งหมด (ไม่กรองปี)
     const { data, error } = await db
         .from('teacher_subjects')
-        .select('id, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,academic_year,semester)')
+        .select('id, academic_year, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,academic_year,semester)')
         .eq('teacher_id', teacherId)
-        .in('classroom_id', historyClassroomIds);
+        .eq('academic_year', academicYear);
     if (error) throw error;
-
-    // 3. return เฉพาะห้องที่มีใน history ปีนั้น
     return (data || []).filter(a => a.classrooms != null);
 }
 
@@ -155,7 +125,7 @@ export function scoreToGrade(pct) {
     return '0';
 }
 export function traitLabel(val) {
-    return { 3: 'ดีเยี่ยม', 2: 'ดี', 1: 'ผ่าน', 0: 'ไม่ผ่าน' }[val] ?? '—';
+    return { 3:'ดีเยี่ยม', 2:'ดี', 1:'ผ่าน', 0:'ไม่ผ่าน' }[val] ?? '—';
 }
 
 export async function getP5Summary(classroomId, academicYear, semester) {
