@@ -1520,14 +1520,7 @@ AND auth.role() = 'authenticated');</code>
 
       <!-- Filter -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-5">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
-            <select id="adv-sel-year" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300"
-              onchange="advLoadClasses()">
-              <option value="">— กำลังโหลด —</option>
-            </select>
-          </div>
+        <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
             <select id="adv-sel-class" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-300">
@@ -1575,17 +1568,6 @@ AND auth.role() = 'authenticated');</code>
       </div>
     </div>`;
 
-            // โหลดปีการศึกษาจาก DB
-            try {
-                const { data: yrs } = await supabaseAdmin.from('classrooms')
-                    .select('academic_year').order('academic_year', { ascending: false });
-                const uniqueYears = [...new Set((yrs || []).map(r => r.academic_year))];
-                const advYearSel = document.getElementById('adv-sel-year');
-                if (advYearSel && uniqueYears.length) {
-                    advYearSel.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join('');
-                }
-            } catch (e) { console.warn('load years:', e.message); }
-
             await advLoadClasses();
             await advLoadTeachers();
         }
@@ -1595,11 +1577,9 @@ AND auth.role() = 'authenticated');</code>
         let _advCurrentClassName = '';
 
         window.advLoadClasses = async function () {
-            const year = document.getElementById('adv-sel-year')?.value;
-            if (!year) return;
             try {
                 const { data } = await supabaseAdmin.from('classrooms')
-                    .select('id,name').eq('academic_year', year).order('name');
+                    .select('id,name,grade,level').order('grade').order('name');
                 const sel = document.getElementById('adv-sel-class');
                 if (!sel) return;
                 sel.innerHTML = '<option value="">— เลือกห้อง —</option>';
@@ -2630,18 +2610,19 @@ AND auth.role() = 'authenticated');</code>
     </div>`;
 
             // โหลดห้องเรียน dropdown (นักเรียน + เลื่อนชั้น)
-            const { data: cls } = await pawDb.from('classrooms').select('id,name,academic_year,grade').order('academic_year', { ascending: false }).order('grade').order('name');
+            const { data: cls } = await pawDb.from('classrooms').select('id,name,grade').order('grade').order('name');
             allClassrooms = cls || [];  // cache ไว้ให้ promotion modal ใช้
             const clsSel = document.getElementById('stu-sel-class');
             const sm2Cls = document.getElementById('sm2-class');
             const prmYear = document.getElementById('prm-year');
 
-            // สร้าง options ปีการศึกษาแบบ unique เรียงจากใหม่ไปเก่า
-            const uniqueYears = [...new Set((cls || []).map(c => c.academic_year))].sort((a, b) => b.localeCompare(a));
+            // ปีการศึกษาดึงจาก teacher_subjects แทน
+            const { data: tsYears } = await pawDb.from('teacher_subjects').select('academic_year');
+            const uniqueYears = [...new Set((tsYears || []).map(r => r.academic_year).filter(Boolean))].sort((a,b) => b.localeCompare(a));
             if (prmYear) prmYear.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join('');
 
             (cls || []).forEach(c => {
-                const txt = `${c.name} (${c.academic_year})`;
+                const txt = c.name;
                 clsSel.innerHTML += `<option value="${c.id}">${txt}</option>`;
                 if (sm2Cls) sm2Cls.innerHTML += `<option value="${c.id}">${txt}</option>`;
             });
