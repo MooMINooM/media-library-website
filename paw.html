@@ -1154,28 +1154,48 @@
             const year = document.getElementById('p5-sel-year').value;
             try { p5Assignments = await getTeacherAssignments(teacher.id, year); }
             catch (e) { p5Assignments = []; }
+            rebuildP5SubjectDropdown();
+        }
+
+        function rebuildP5SubjectDropdown() {
+            const selectedTerm = document.getElementById('p5-sel-term').value; // '' | '1' | '2'
             const sel = document.getElementById('p5-sel-subject');
             sel.innerHTML = '<option value="">— เลือกรายวิชา —</option>';
-            const seen = new Set();
-            p5Assignments.forEach(a => {
-                if (!seen.has(a.subjects.id)) {
-                    seen.add(a.subjects.id);
-                    const o = document.createElement('option');
-                    o.value = a.subjects.id;
-                    const sem = a.subjects.semester;
-                    const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
-                    o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
-                    o.dataset.semester = sem != null ? String(sem) : '';
-                    sel.appendChild(o);
-                }
-            });
+            sel.disabled = false;
             (function () { var _e = document.getElementById('p5-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
             document.getElementById('p5-score-panel')?.classList.add('hidden');
             document.getElementById('p5-level-badge')?.classList.add('hidden');
-            const _tw = document.getElementById('p5-term-wrap'); if (_tw) _tw.style.visibility = 'hidden';
+
+            const seen = new Set();
+            p5Assignments.forEach(a => {
+                if (seen.has(a.subjects.id)) return;
+                const rawSem = a.subjects && a.subjects.semester;
+                const subSem = (rawSem != null) ? parseInt(rawSem) : null;
+
+                // กรองตามเทอม: '' = แสดงทุกวิชา, '1'/'2' = แสดงเฉพาะวิชาที่ตรงเทอม + วิชาทั้งปี (null)
+                if (selectedTerm !== '') {
+                    const termNum = parseInt(selectedTerm);
+                    if (subSem !== null && subSem !== termNum) return;
+                }
+
+                seen.add(a.subjects.id);
+                const o = document.createElement('option');
+                o.value = a.subjects.id;
+                const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
+                o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
+                o.dataset.semester = subSem != null ? String(subSem) : '';
+                sel.appendChild(o);
+            });
         }
 
         document.getElementById('p5-sel-year')?.addEventListener('change', p5LoadSubjects);
+
+        // เมื่อเปลี่ยนเทอม → กรองวิชาใหม่ทันที
+        document.getElementById('p5-sel-term')?.addEventListener('change', function () {
+            if (p5Assignments.length > 0) rebuildP5SubjectDropdown();
+            document.getElementById('p5-score-panel')?.classList.add('hidden');
+            document.getElementById('p5-level-badge')?.classList.add('hidden');
+        });
 
         document.getElementById('p5-sel-subject')?.addEventListener('change', function () {
             const subjectId = parseInt(this.value);
@@ -2074,26 +2094,15 @@
             const year = document.getElementById('att-sel-year').value;
             try {
                 attAssignments = await getTeacherAssignments(teacher.id, year);
-                const sel = document.getElementById('att-sel-subject');
-                sel.innerHTML = '<option value="">— เลือกวิชา —</option>';
-                const seen = new Set();
-                attAssignments.forEach(a => {
-                    if (!seen.has(a.subjects.id)) {
-                        seen.add(a.subjects.id);
-                        const o = document.createElement('option');
-                        o.value = a.subjects.id;
-                        const sem = a.subjects.semester;
-                        const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
-                        o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
-                        o.dataset.semester = sem != null ? String(sem) : '';
-                        sel.appendChild(o);
-                    }
-                });
-                (function () { var _e = document.getElementById('att-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
+                _rebuildSubjectSel('att-sel-subject', 'att-sel-class', 'att-sel-term', attAssignments);
             } catch (e) { console.error(e); }
         }
 
         document.getElementById('att-sel-year')?.addEventListener('change', attLoadClasses);
+        document.getElementById('att-sel-term')?.addEventListener('change', function () {
+            if (attAssignments.length > 0)
+                _rebuildSubjectSel('att-sel-subject', 'att-sel-class', 'att-sel-term', attAssignments);
+        });
         document.getElementById('att-sel-subject')?.addEventListener('change', function () {
             const subjectId = parseInt(this.value);
             const sel = document.getElementById('att-sel-class');
@@ -2415,26 +2424,15 @@
             const year = document.getElementById('char-sel-year').value;
             try {
                 charAssignments = await getTeacherAssignments(teacher.id, year);
-                const sel = document.getElementById('char-sel-subject');
-                sel.innerHTML = '<option value="">— เลือกวิชา —</option>';
-                const seen = new Set();
-                charAssignments.forEach(a => {
-                    if (!seen.has(a.subjects.id)) {
-                        seen.add(a.subjects.id);
-                        const o = document.createElement('option');
-                        o.value = a.subjects.id;
-                        const sem = a.subjects.semester;
-                        const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
-                        o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
-                        o.dataset.semester = sem != null ? String(sem) : '';
-                        sel.appendChild(o);
-                    }
-                });
-                (function () { var _e = document.getElementById('char-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
+                _rebuildSubjectSel('char-sel-subject', 'char-sel-class', 'char-sel-term', charAssignments);
             } catch (e) { }
         }
 
         document.getElementById('char-sel-year')?.addEventListener('change', charLoadClasses);
+        document.getElementById('char-sel-term')?.addEventListener('change', function () {
+            if (charAssignments.length > 0)
+                _rebuildSubjectSel('char-sel-subject', 'char-sel-class', 'char-sel-term', charAssignments);
+        });
         document.getElementById('char-sel-subject')?.addEventListener('change', function () {
             const subjectId = parseInt(this.value);
             const sel = document.getElementById('char-sel-class');
@@ -2725,6 +2723,41 @@
         };
         if (window._pendingPage) { window.switchPage(...window._pendingPage); window._pendingPage = null; }
 
+        // ── helper: กรองวิชาตามเทอมที่เลือก (ใช้ร่วมกันทุก section) ──────
+        function _rebuildSubjectSel(subjectSelId, classSelId, termSelId, assignments) {
+            const selectedTerm = document.getElementById(termSelId)?.value || '';
+            const sel = document.getElementById(subjectSelId);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">— เลือกวิชา —</option>';
+            const classEl = document.getElementById(classSelId);
+            if (classEl) classEl.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+
+            const seen = new Set();
+            assignments.forEach(a => {
+                if (seen.has(a.subjects.id)) return;
+                const rawSem = a.subjects && a.subjects.semester;
+                const subSem = (rawSem != null) ? parseInt(rawSem) : null;
+
+                // กรองตามเทอม: '' = แสดงทุกวิชา, '1'/'2' = เฉพาะวิชาตรงเทอม + วิชาทั้งปี (null)
+                if (selectedTerm !== '') {
+                    const termNum = parseInt(selectedTerm);
+                    if (subSem !== null && subSem !== termNum) return;
+                }
+
+                seen.add(a.subjects.id);
+                const o = document.createElement('option');
+                o.value = a.subjects.id;
+                const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
+                o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
+                o.dataset.semester = subSem != null ? String(subSem) : '';
+                sel.appendChild(o);
+            });
+
+            // auto-lock term ถ้ายังมีวิชาเดิมเลือกอยู่
+            const curSubject = sel.querySelector('option[selected]');
+            if (curSubject) sel.dispatchEvent(new Event('change'));
+        }
+
         // ── Init ──────────────────────────────────────────────────────────
         // โหลดปีการศึกษาจาก DB แล้วใส่ทุก dropdown พร้อมกัน
         (async () => {
@@ -2990,26 +3023,15 @@
             const year = document.getElementById('read-sel-year').value;
             try {
                 readAssignments = await getTeacherAssignments(teacher.id, year);
-                const sel = document.getElementById('read-sel-subject');
-                sel.innerHTML = '<option value="">— เลือกวิชา —</option>';
-                const seen = new Set();
-                readAssignments.forEach(a => {
-                    if (!seen.has(a.subjects.id)) {
-                        seen.add(a.subjects.id);
-                        const o = document.createElement('option');
-                        o.value = a.subjects.id;
-                        const sem = a.subjects.semester;
-                        const semTag = sem === 1 ? ' [เทอม 1]' : sem === 2 ? ' [เทอม 2]' : '';
-                        o.textContent = a.subjects.code + ' ' + a.subjects.name + semTag;
-                        o.dataset.semester = sem != null ? String(sem) : '';
-                        sel.appendChild(o);
-                    }
-                });
-                (function () { var _e = document.getElementById('read-sel-class'); if (_e) _e.innerHTML = '<option value="">— เลือกวิชาก่อน —</option>' })();
+                _rebuildSubjectSel('read-sel-subject', 'read-sel-class', 'read-sel-term', readAssignments);
             } catch (e) { }
         }
 
         document.getElementById('read-sel-year')?.addEventListener('change', readLoadClasses);
+        document.getElementById('read-sel-term')?.addEventListener('change', function () {
+            if (readAssignments.length > 0)
+                _rebuildSubjectSel('read-sel-subject', 'read-sel-class', 'read-sel-term', readAssignments);
+        });
         document.getElementById('read-sel-subject')?.addEventListener('change', function () {
             const subjectId = parseInt(this.value);
             const sel = document.getElementById('read-sel-class');
