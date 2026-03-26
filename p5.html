@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,653 +8,504 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun','sans-serif'] } } } }</script>
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background: #f1f5f9;
-        }
-
-        input[type=number]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-        }
-
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
+        body { font-family: 'Sarabun', sans-serif; background: #f1f5f9; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        input[type=number] { -moz-appearance: textfield; }
 
         .score-input {
-            width: 64px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 4px 4px;
-            font-size: 14px;
-            transition: border-color .15s;
+            width: 64px; text-align: center;
+            border: 1px solid #e2e8f0; border-radius: 6px;
+            padding: 4px 4px; font-size: 14px; transition: border-color .15s;
         }
+        .score-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,.15); }
+        .score-input.keep-inp { border-color: #86efac; background: #f0fdf4; }
+        .score-input.keep-inp:focus { border-color: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,.15); }
+        .score-input.exam-inp { border-color: #fcd34d; background: #fffbeb; }
+        .score-input.exam-inp:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,.15); }
 
-        .score-input:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
-        }
-
-        .score-input.keep-inp {
-            border-color: #86efac;
-            background: #f0fdf4;
-        }
-
-        .score-input.keep-inp:focus {
-            border-color: #22c55e;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, .15);
-        }
-
-        .score-input.exam-inp {
-            border-color: #fcd34d;
-            background: #fffbeb;
-        }
-
-        .score-input.exam-inp:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, .15);
-        }
-
-        .grade-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 28px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .grade-4 {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .grade-35 {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .grade-3 {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .grade-25 {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .grade-2 {
-            background: #fef9c3;
-            color: #854d0e;
-        }
-
-        .grade-15 {
-            background: #ffedd5;
-            color: #9a3412;
-        }
-
-        .grade-1 {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .grade-0 {
-            background: #f1f5f9;
-            color: #64748b;
-        }
+        .grade-badge { display:inline-flex; align-items:center; justify-content:center; width:44px; height:28px; border-radius:6px; font-weight:700; font-size:14px; }
+        .grade-4   { background:#dcfce7; color:#166534; }
+        .grade-35  { background:#d1fae5; color:#065f46; }
+        .grade-3   { background:#dbeafe; color:#1e40af; }
+        .grade-25  { background:#e0e7ff; color:#3730a3; }
+        .grade-2   { background:#fef9c3; color:#854d0e; }
+        .grade-15  { background:#ffedd5; color:#9a3412; }
+        .grade-1   { background:#fee2e2; color:#991b1b; }
+        .grade-0   { background:#f1f5f9; color:#64748b; }
 
         .ratio-input {
-            width: 52px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 5px 4px;
-            background: #fff;
-            transition: border-color .15s;
+            width: 52px; text-align: center; font-weight: 700; font-size: 15px;
+            border: 1px solid #e2e8f0; border-radius: 8px; padding: 5px 4px;
+            background: #fff; transition: border-color .15s;
         }
+        .ratio-input:focus { outline: none; }
+        .ratio-input.keep { border-color: #86efac; color: #166534; background: #f0fdf4; }
+        .ratio-input.keep:focus { border-color: #22c55e; }
+        .ratio-input.exam { border-color: #fcd34d; color: #92400e; background: #fffbeb; }
+        .ratio-input.exam:focus { border-color: #f59e0b; }
 
-        .ratio-input:focus {
-            outline: none;
-        }
-
-        .ratio-input.keep {
-            border-color: #86efac;
-            color: #166534;
-            background: #f0fdf4;
-        }
-
-        .ratio-input.keep:focus {
-            border-color: #22c55e;
-        }
-
-        .ratio-input.exam {
-            border-color: #fcd34d;
-            color: #92400e;
-            background: #fffbeb;
-        }
-
-        .ratio-input.exam:focus {
-            border-color: #f59e0b;
-        }
-
-        .th-keep {
-            background: #f0fdf4;
-            color: #166534;
-        }
-
-        .th-exam {
-            background: #fffbeb;
-            color: #92400e;
-        }
-
-        .th-sum {
-            background: #eef2ff;
-            color: #3730a3;
-        }
+        .th-keep { background: #f0fdf4; color: #166534; }
+        .th-exam { background: #fffbeb; color: #92400e; }
+        .th-sum  { background: #eef2ff; color: #3730a3; }
 
         @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
         }
-
         @media print {
-            .no-print {
-                display: none !important;
-            }
-
-            body {
-                background: white;
-            }
-
-            .print-container {
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
+            .no-print { display:none !important; }
+            body { background: white; }
+            .print-container { box-shadow:none !important; border-radius:0 !important; }
         }
     </style>
 </head>
-
 <body class="min-h-screen">
 
-    <!-- HEADER -->
-    <header class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white shadow-lg no-print">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <a href="index.html"
-                    class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
-                    <i class="fa-solid fa-arrow-left text-sm"></i>
-                </a>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-book-open text-indigo-200 text-sm"></i>
-                        <h1 class="text-base font-bold">ปพ.5 — บันทึกผลการเรียน</h1>
-                        <span id="mode-badge"
-                            class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/20"></span>
-                    </div>
-                    <p id="teacher-name-display" class="text-indigo-200 text-xs mt-0.5"></p>
+<!-- HEADER -->
+<header class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-indigo-200 text-sm"></i>
+                    <h1 class="text-base font-bold">ปพ.5 — บันทึกผลการเรียน</h1>
+                    <span id="mode-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/20"></span>
                 </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="btn-print"
-                    class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
-                    <i class="fa-solid fa-print"></i> พิมพ์
-                </button>
-                <button id="btn-logout"
-                    class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
-                    <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
-                </button>
+                <p id="teacher-name-display" class="text-indigo-200 text-xs mt-0.5"></p>
             </div>
         </div>
-    </header>
-
-    <!-- FILTER BAR -->
-    <div class="max-w-7xl mx-auto px-4 py-4 no-print">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-            <div style="display:grid; grid-template-columns:1fr 1fr 2fr 2fr; gap:12px; align-items:end;">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
-                    <select id="sel-year"
-                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
-                        <option value="">— กำลังโหลด —</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-indigo-500 mb-1">
-                        <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
-                    </label>
-                    <select id="sel-term"
-                        class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
-                        <option value="">ทั้งปีการศึกษา</option>
-                        <option value="1">ภาคเรียนที่ 1</option>
-                        <option value="2">ภาคเรียนที่ 2</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
-                    <select id="sel-subject"
-                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
-                        <option value="">— กำลังโหลด —</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
-                    <select id="sel-class"
-                        class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
-                        <option value="">— เลือกวิชาก่อน —</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-3 flex gap-2">
-                <button id="btn-load"
-                    class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition">
-                    <i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ
-                </button>
-                <button id="btn-save-all"
-                    class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition hidden">
-                    <i class="fa-solid fa-floppy-disk"></i> บันทึกทั้งหมด
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- RATIO BAR
-     ประถม: เก็บ + สอบ ต้องรวม = 50 ต่อภาค  (× 2 ภาค = 100/ปี)
-     มัธยม: เก็บ + สอบ ต้องรวม = 100 ต่อภาค (ออกเกรดแยก)
--->
-    <div id="ratio-bar" class="max-w-7xl mx-auto px-4 pb-2 no-print hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-3 flex flex-wrap items-center gap-4">
-            <div class="flex items-center gap-2 text-slate-500 text-sm font-semibold shrink-0">
-                <i class="fa-solid fa-sliders text-indigo-400"></i>
-                สัดส่วนคะแนน
-            </div>
-            <span id="ratio-hint" class="text-xs text-slate-400"></span>
-            <div class="flex items-center gap-2">
-                <span
-                    class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-1 rounded-md shrink-0">คะแนนเก็บ</span>
-                <input id="ratio-keep" type="number" class="ratio-input keep" min="1" max="99" value="70">
-                <span class="text-slate-400 font-bold">+</span>
-                <span
-                    class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded-md shrink-0">คะแนนสอบ</span>
-                <input id="ratio-exam" type="number" class="ratio-input exam" min="1" max="99" value="30">
-                <span class="text-slate-400 font-bold">=</span>
-                <span id="ratio-total"
-                    class="text-sm font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors">100
-                    / ภาค</span>
-            </div>
-            <span id="ratio-warn" class="hidden text-xs text-red-500 font-semibold">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                <span id="ratio-warn-msg"></span>
-            </span>
-            <button id="ratio-save-btn"
-                class="ml-auto text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg transition shrink-0">
-                <i class="fa-solid fa-check mr-1"></i>ใช้สัดส่วนนี้
+        <div class="flex items-center gap-2">
+            <button id="btn-print" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
+                <i class="fa-solid fa-print"></i> พิมพ์
+            </button>
+            <button id="btn-logout" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs transition">
+                <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
             </button>
         </div>
     </div>
+</header>
 
-    <!-- TABLE AREA -->
-    <div class="max-w-7xl mx-auto px-4 pb-8 print-container">
-        <div id="empty-state" class="text-center py-20 text-slate-400">
-            <i class="fa-solid fa-book-open text-5xl mb-3 opacity-30"></i>
-            <p class="text-lg font-medium">เลือกรายวิชาและห้องเรียนเพื่อเริ่มกรอกคะแนน</p>
-        </div>
-        <div id="print-header" class="hidden mb-6">
-            <div class="text-center mb-2">
-                <h2 class="text-lg font-bold">แบบบันทึกผลการเรียน (ปพ.5)</h2>
-                <p id="print-school-name" class="text-sm text-slate-600">โรงเรียน...</p>
+<!-- FILTER BAR -->
+<div class="max-w-7xl mx-auto px-4 py-4 no-print">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+        <div style="display:grid; grid-template-columns:1fr 1fr 2fr 2fr; gap:12px; align-items:end;">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">ปีการศึกษา</label>
+                <select id="sel-year" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+                    <option value="">— กำลังโหลด —</option>
+                </select>
             </div>
-            <div class="flex justify-between text-sm text-slate-600 border-b pb-2">
-                <span id="print-subject-info"></span>
-                <span id="print-class-info"></span>
-                <span id="print-year-info"></span>
+            <div>
+                <label class="block text-xs font-semibold text-indigo-500 mb-1">
+                    <i class="fa-solid fa-calendar-days mr-1 opacity-70"></i>ภาคเรียน
+                </label>
+                <select id="sel-term" class="w-full border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none bg-indigo-50/40 font-semibold text-indigo-700">
+                    <option value="">ทั้งปีการศึกษา</option>
+                    <option value="1">ภาคเรียนที่ 1</option>
+                    <option value="2">ภาคเรียนที่ 2</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">รายวิชา</label>
+                <select id="sel-subject" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+                    <option value="">— กำลังโหลด —</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">ห้องเรียน</label>
+                <select id="sel-class" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400 outline-none">
+                    <option value="">— เลือกวิชาก่อน —</option>
+                </select>
             </div>
         </div>
-        <div id="grade-table-wrap"
-            class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-            <table class="w-full text-sm" id="grade-table">
-                <thead id="grade-thead"></thead>
-                <tbody id="grade-tbody"></tbody>
-                <tfoot id="grade-tfoot"></tfoot>
-            </table>
+        <div class="mt-3 flex gap-2">
+            <button id="btn-load" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition">
+                <i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ
+            </button>
+            <button id="btn-save-all" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition hidden">
+                <i class="fa-solid fa-floppy-disk"></i> บันทึกทั้งหมด
+            </button>
         </div>
     </div>
+</div>
 
-    <script type="module">
-        import {
-            db, getTeacherSession, logoutTeacher,
-            getTeacherAssignments, getStudentsByClass, getStudentsByClassHistory,
-            getP5Grades, saveP5Grade, scoreToGrade, getCurrentAcademicYear, getAcademicYears
-        } from './js/teacher-auth.js';
+<!-- RATIO BAR
+     ประถม: เก็บ + สอบ ต้องรวม = 50 ต่อภาค  (× 2 ภาค = 100/ปี)
+     มัธยม: เก็บ + สอบ ต้องรวม = 100 ต่อภาค (ออกเกรดแยก)
+-->
+<div id="ratio-bar" class="max-w-7xl mx-auto px-4 pb-2 no-print hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 px-5 py-3 flex flex-wrap items-center gap-4">
+        <div class="flex items-center gap-2 text-slate-500 text-sm font-semibold shrink-0">
+            <i class="fa-solid fa-sliders text-indigo-400"></i>
+            สัดส่วนคะแนน
+        </div>
+        <span id="ratio-hint" class="text-xs text-slate-400"></span>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-1 rounded-md shrink-0">คะแนนเก็บ</span>
+            <input id="ratio-keep" type="number" class="ratio-input keep" min="1" max="99" value="70">
+            <span class="text-slate-400 font-bold">+</span>
+            <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded-md shrink-0">คะแนนสอบ</span>
+            <input id="ratio-exam" type="number" class="ratio-input exam" min="1" max="99" value="30">
+            <span class="text-slate-400 font-bold">=</span>
+            <span id="ratio-total" class="text-sm font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors">100 / ภาค</span>
+        </div>
+        <span id="ratio-warn" class="hidden text-xs text-red-500 font-semibold">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+            <span id="ratio-warn-msg"></span>
+        </span>
+        <button id="ratio-save-btn" class="ml-auto text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg transition shrink-0">
+            <i class="fa-solid fa-check mr-1"></i>ใช้สัดส่วนนี้
+        </button>
+    </div>
+</div>
 
-        // ปีการศึกษาปัจจุบัน — ใช้ตรวจ read-only mode
-        let CURRENT_YEAR = null;
-        getCurrentAcademicYear().then(y => { CURRENT_YEAR = y; });
+<!-- TABLE AREA -->
+<div class="max-w-7xl mx-auto px-4 pb-8 print-container">
+    <div id="empty-state" class="text-center py-20 text-slate-400">
+        <i class="fa-solid fa-book-open text-5xl mb-3 opacity-30"></i>
+        <p class="text-lg font-medium">เลือกรายวิชาและห้องเรียนเพื่อเริ่มกรอกคะแนน</p>
+    </div>
+    <div id="print-header" class="hidden mb-6">
+        <div class="text-center mb-2">
+            <h2 class="text-lg font-bold">แบบบันทึกผลการเรียน (ปพ.5)</h2>
+            <p id="print-school-name" class="text-sm text-slate-600">โรงเรียน...</p>
+        </div>
+        <div class="flex justify-between text-sm text-slate-600 border-b pb-2">
+            <span id="print-subject-info"></span>
+            <span id="print-class-info"></span>
+            <span id="print-year-info"></span>
+        </div>
+    </div>
+    <div id="grade-table-wrap" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
+        <table class="w-full text-sm" id="grade-table">
+            <thead id="grade-thead"></thead>
+            <tbody id="grade-tbody"></tbody>
+            <tfoot id="grade-tfoot"></tfoot>
+        </table>
+    </div>
+</div>
 
-        // ── Auth ──────────────────────────────────────────────────────────────────
-        const teacher = getTeacherSession();
-        if (!teacher) {
-            window.location.href = 'index.html?openTeacherLogin=1';
-            throw new Error('not logged in');
-        }
-        document.getElementById('teacher-name-display').textContent =
-            `${teacher.name} — ${teacher.position || 'ครู'}`;
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            logoutTeacher(); window.location.href = 'index.html';
-        });
+<script type="module">
+import {
+    db, getTeacherSession, logoutTeacher,
+    getTeacherAssignments, getStudentsByClass, getStudentsByClassHistory,
+    getP5Grades, saveP5Grade, scoreToGrade, getCurrentAcademicYear, getAcademicYears
+} from './js/teacher-auth.js';
 
-        // ── State ─────────────────────────────────────────────────────────────────
-        let assignments = [];
-        let subjectMap = {};
-        let currentAssignment = null;
-        let currentStudents = [];
-        let existingGrades = {};   // `${studentId}_${semester}` → grade row
+// ปีการศึกษาปัจจุบัน — ใช้ตรวจ read-only mode
+let CURRENT_YEAR = null;
+getCurrentAcademicYear().then(y => { CURRENT_YEAR = y; });
 
-        // 'pratom' = ประถม (2 ภาครวม = 100/ปี)
-        // 'matayom' = มัธยม (ภาคละ 100, ออกเกรดแยก)
-        let mode = 'pratom';
-        let ratio = { keep: 30, exam: 20 };  // default ประถม (50/ภาค)
+// ── Auth ──────────────────────────────────────────────────────────────────
+const teacher = getTeacherSession();
+if (!teacher) {
+    window.location.href = 'index.html?openTeacherLogin=1';
+    throw new Error('not logged in');
+}
+document.getElementById('teacher-name-display').textContent =
+    `${teacher.name} — ${teacher.position || 'ครู'}`;
+document.getElementById('btn-logout').addEventListener('click', () => {
+    logoutTeacher(); window.location.href = 'index.html';
+});
 
-        const RATIO_KEY = id => `p5_ratio_${id}`;
-        const MAX_PER_TERM = () => mode === 'matayom' ? 100 : 50;
+// ── State ─────────────────────────────────────────────────────────────────
+let assignments      = [];
+let subjectMap       = {};
+let currentAssignment = null;
+let currentStudents  = [];
+let existingGrades   = {};   // `${studentId}_${semester}` → grade row
 
-        // ── Load Assignments ──────────────────────────────────────────────────────
-        async function loadAssignments() {
-            const year = document.getElementById('sel-year').value;
-            assignments = await getTeacherAssignments(teacher.id, year);
-            subjectMap = {};
-            assignments.forEach(a => {
-                const sid = a.subjects.id;
-                if (!subjectMap[sid]) subjectMap[sid] = [];
-                subjectMap[sid].push(a);
-            });
-            rebuildSubjectDropdown();
-        }
+// 'pratom' = ประถม (2 ภาครวม = 100/ปี)
+// 'matayom' = มัธยม (ภาคละ 100, ออกเกรดแยก)
+let mode = 'pratom';
+let ratio = { keep: 30, exam: 20 };  // default ประถม (50/ภาค)
 
-        // กรองและสร้าง dropdown วิชาใหม่ตามภาคที่เลือก
-        function rebuildSubjectDropdown() {
-            const selectedTerm = document.getElementById('sel-term').value; // '' | '1' | '2'
-            const selSubject = document.getElementById('sel-subject');
-            selSubject.innerHTML = '<option value="">— เลือกวิชา —</option>';
-            selSubject.disabled = false;
-            document.getElementById('sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
+const RATIO_KEY  = id  => `p5_ratio_${id}`;
+const MAX_PER_TERM  = () => mode === 'matayom' ? 100 : 50;
 
-            const seen = new Set();
-            assignments.forEach(a => {
-                if (seen.has(a.subjects.id)) return;
-                const subSem = a.subjects.semester; // null | 1 | 2
+// ── Load Assignments ──────────────────────────────────────────────────────
+async function loadAssignments() {
+    const year = document.getElementById('sel-year').value;
+    assignments = await getTeacherAssignments(teacher.id, year);
+    subjectMap  = {};
+    assignments.forEach(a => {
+        const sid = a.subjects.id;
+        if (!subjectMap[sid]) subjectMap[sid] = [];
+        subjectMap[sid].push(a);
+    });
+    rebuildSubjectDropdown();
+}
 
-                // กรองตามเทอมที่ผู้ใช้เลือก:
-                // - เลือก "ทั้งปี" (selectedTerm='') → แสดงทุกวิชา
-                // - เลือกเทอม 1 หรือ 2 → แสดงวิชาที่ตรงเทอม หรือวิชาที่ไม่ได้กำหนดเทอม (null)
-                if (selectedTerm !== '') {
-                    const termNum = parseInt(selectedTerm);
-                    if (subSem !== null && subSem !== termNum) return; // ข้ามวิชาที่เทอมไม่ตรง
-                }
+// กรองและสร้าง dropdown วิชาใหม่ตามภาคที่เลือก
+function rebuildSubjectDropdown() {
+    const selectedTerm = document.getElementById('sel-term').value; // '' | '1' | '2'
+    const selSubject = document.getElementById('sel-subject');
+    selSubject.innerHTML = '<option value="">— เลือกวิชา —</option>';
+    selSubject.disabled = false;
+    document.getElementById('sel-class').innerHTML = '<option value="">— เลือกวิชาก่อน —</option>';
 
-                seen.add(a.subjects.id);
-                const opt = document.createElement('option');
-                opt.value = a.subjects.id;
-                const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
-                opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
-                opt.dataset.semester = subSem != null ? String(subSem) : '';
-                selSubject.appendChild(opt);
-            });
-        }
+    const seen = new Set();
+    assignments.forEach(a => {
+        if (seen.has(a.subjects.id)) return;
+        const subSem = a.subjects.semester; // null | 1 | 2
 
-        document.getElementById('sel-subject').addEventListener('change', function () {
-            const selClass = document.getElementById('sel-class');
-            selClass.innerHTML = '<option value="">— เลือกห้อง —</option>';
-            if (!this.value) return;
-            (subjectMap[this.value] || []).forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.id;                  // teacher_subject id
-                opt.dataset.classId = a.classrooms.id;
-                opt.dataset.level = a.classrooms.level || '';
-                opt.dataset.grade = a.classrooms.grade || 0;
-                opt.textContent = a.classrooms.name;
-                selClass.appendChild(opt);
-            });
-
-            // Auto-lock term selector ถ้าวิชานี้ผูกกับเทอมใดเทอมหนึ่ง
-            const subjectSem = this.selectedOptions[0]?.dataset?.semester || '';
-            const selTerm = document.getElementById('sel-term');
-            if (subjectSem === '1' || subjectSem === '2') {
-                selTerm.value = subjectSem;
-                selTerm.disabled = true;
-                selTerm.style.opacity = '0.6';
-                selTerm.title = 'เทอมถูกกำหนดไว้ในรายวิชาแล้ว';
-            } else {
-                selTerm.disabled = false;
-                selTerm.style.opacity = '';
-                selTerm.title = '';
-            }
-        });
-
-        document.getElementById('sel-year').addEventListener('change', loadAssignments);
-
-        // เมื่อเปลี่ยนเทอม → กรองวิชาใหม่ทันที (ถ้าโหลด assignments แล้ว)
-        document.getElementById('sel-term').addEventListener('change', function () {
-            if (assignments.length > 0) rebuildSubjectDropdown();
-            // reset ห้องเรียนและตาราง
-            document.getElementById('empty-state').classList.remove('hidden');
-            document.getElementById('grade-table-wrap').classList.add('hidden');
-            document.getElementById('btn-save-all').classList.add('hidden');
-            document.getElementById('ratio-bar').classList.add('hidden');
-            document.getElementById('print-header').classList.add('hidden');
-            currentStudents = [];
-            currentAssignment = null;
-        });
-
-        // รีเซ็ตตาราง เมื่อเปลี่ยนห้องเรียน
-        document.getElementById('sel-class').addEventListener('change', function () {
-            // ซ่อนตารางเก่าถ้ามี เพื่อไม่ให้ข้อมูลเดิมค้างหน้า
-            document.getElementById('empty-state').classList.remove('hidden');
-            document.getElementById('grade-table-wrap').classList.add('hidden');
-            document.getElementById('btn-save-all').classList.add('hidden');
-            document.getElementById('ratio-bar').classList.add('hidden');
-            document.getElementById('print-header').classList.add('hidden');
-            currentStudents = [];
-            currentAssignment = null;
-        });
-
-        // ── Mode detection ────────────────────────────────────────────────────────
-        // มัธยม = level ขึ้นต้น 'ม' หรือ grade >= 7
-        function detectMode(levelStr, grade) {
-            if (levelStr && levelStr.trim().startsWith('ม')) return 'matayom';
-            if (parseInt(grade) >= 7) return 'matayom';
-            return 'pratom';
+        // กรองตามเทอมที่ผู้ใช้เลือก:
+        // - เลือก "ทั้งปี" (selectedTerm='') → แสดงทุกวิชา
+        // - เลือกเทอม 1 หรือ 2 → แสดงวิชาที่ตรงเทอม หรือวิชาที่ไม่ได้กำหนดเทอม (null)
+        if (selectedTerm !== '') {
+            const termNum = parseInt(selectedTerm);
+            if (subSem !== null && subSem !== termNum) return; // ข้ามวิชาที่เทอมไม่ตรง
         }
 
-        function applyModeUI() {
-            const badge = document.getElementById('mode-badge');
-            const hint = document.getElementById('ratio-hint');
-            if (mode === 'matayom') {
-                badge.textContent = '🎓 มัธยม';
-                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-400/40';
-                hint.textContent = 'ต่อภาค รวม = 100 — ออกเกรดแยกแต่ละภาค';
-            } else {
-                badge.textContent = '📚 ประถม';
-                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-400/40';
-                hint.textContent = 'ต่อภาค รวม = 50 — สองภาครวมกัน = 100/ปี';
+        seen.add(a.subjects.id);
+        const opt = document.createElement('option');
+        opt.value = a.subjects.id;
+        const semTag = subSem === 1 ? ' [เทอม 1]' : subSem === 2 ? ' [เทอม 2]' : '';
+        opt.textContent = `${a.subjects.code} ${a.subjects.name}${semTag}`;
+        opt.dataset.semester = subSem != null ? String(subSem) : '';
+        selSubject.appendChild(opt);
+    });
+}
+
+document.getElementById('sel-subject').addEventListener('change', function () {
+    const selClass = document.getElementById('sel-class');
+    selClass.innerHTML = '<option value="">— เลือกห้อง —</option>';
+    if (!this.value) return;
+    (subjectMap[this.value] || []).forEach(a => {
+        const opt = document.createElement('option');
+        opt.value           = a.id;                  // teacher_subject id
+        opt.dataset.classId = a.classrooms.id;
+        opt.dataset.level   = a.classrooms.level || '';
+        opt.dataset.grade   = a.classrooms.grade  || 0;
+        opt.textContent     = a.classrooms.name;
+        selClass.appendChild(opt);
+    });
+
+    // Auto-lock term selector ถ้าวิชานี้ผูกกับเทอมใดเทอมหนึ่ง
+    const subjectSem = this.selectedOptions[0]?.dataset?.semester || '';
+    const selTerm = document.getElementById('sel-term');
+    if (subjectSem === '1' || subjectSem === '2') {
+        selTerm.value    = subjectSem;
+        selTerm.disabled = true;
+        selTerm.style.opacity = '0.6';
+        selTerm.title = 'เทอมถูกกำหนดไว้ในรายวิชาแล้ว';
+    } else {
+        selTerm.disabled = false;
+        selTerm.style.opacity = '';
+        selTerm.title = '';
+    }
+});
+
+document.getElementById('sel-year').addEventListener('change', loadAssignments);
+
+// เมื่อเปลี่ยนเทอม → กรองวิชาใหม่ทันที (ถ้าโหลด assignments แล้ว)
+document.getElementById('sel-term').addEventListener('change', function () {
+    if (assignments.length > 0) rebuildSubjectDropdown();
+    // reset ห้องเรียนและตาราง
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('grade-table-wrap').classList.add('hidden');
+    document.getElementById('btn-save-all').classList.add('hidden');
+    document.getElementById('ratio-bar').classList.add('hidden');
+    document.getElementById('print-header').classList.add('hidden');
+    currentStudents = [];
+    currentAssignment = null;
+});
+
+// รีเซ็ตตาราง เมื่อเปลี่ยนห้องเรียน
+document.getElementById('sel-class').addEventListener('change', function () {
+    // ซ่อนตารางเก่าถ้ามี เพื่อไม่ให้ข้อมูลเดิมค้างหน้า
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('grade-table-wrap').classList.add('hidden');
+    document.getElementById('btn-save-all').classList.add('hidden');
+    document.getElementById('ratio-bar').classList.add('hidden');
+    document.getElementById('print-header').classList.add('hidden');
+    currentStudents = [];
+    currentAssignment = null;
+});
+
+// ── Mode detection ────────────────────────────────────────────────────────
+// มัธยม = level ขึ้นต้น 'ม' หรือ grade >= 7
+function detectMode(levelStr, grade) {
+    if (levelStr && levelStr.trim().startsWith('ม')) return 'matayom';
+    if (parseInt(grade) >= 7) return 'matayom';
+    return 'pratom';
+}
+
+function applyModeUI() {
+    const badge = document.getElementById('mode-badge');
+    const hint  = document.getElementById('ratio-hint');
+    if (mode === 'matayom') {
+        badge.textContent = '🎓 มัธยม';
+        badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-400/40';
+        hint.textContent  = 'ต่อภาค รวม = 100 — ออกเกรดแยกแต่ละภาค';
+    } else {
+        badge.textContent = '📚 ประถม';
+        badge.className   = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-400/40';
+        hint.textContent  = 'ต่อภาค รวม = 50 — สองภาครวมกัน = 100/ปี';
+    }
+    badge.classList.remove('hidden');
+    updateRatioUI();
+}
+
+// ── Ratio bar ─────────────────────────────────────────────────────────────
+function loadRatio(tsid) {
+    const saved = localStorage.getItem(RATIO_KEY(tsid));
+    if (saved) { try { ratio = JSON.parse(saved); return; } catch {} }
+    ratio = mode === 'matayom' ? { keep: 70, exam: 30 } : { keep: 30, exam: 20 };
+}
+
+function updateRatioUI() {
+    document.getElementById('ratio-keep').value = ratio.keep;
+    document.getElementById('ratio-exam').value = ratio.exam;
+    recalcRatioTotal();
+}
+
+function recalcRatioTotal() {
+    const k   = parseInt(document.getElementById('ratio-keep').value) || 0;
+    const e   = parseInt(document.getElementById('ratio-exam').value) || 0;
+    const sum = k + e;
+    const max = MAX_PER_TERM();
+    const totalEl = document.getElementById('ratio-total');
+    const warnEl  = document.getElementById('ratio-warn');
+    const warnMsg = document.getElementById('ratio-warn-msg');
+    totalEl.textContent = `${sum} / ภาค`;
+    if (sum !== max) {
+        totalEl.className = 'text-sm font-bold text-red-600 bg-red-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors';
+        warnMsg.textContent = `ต้องรวมได้ ${max} (ตอนนี้ = ${sum})`;
+        warnEl.classList.remove('hidden');
+    } else {
+        totalEl.className = 'text-sm font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors';
+        warnEl.classList.add('hidden');
+    }
+}
+
+document.getElementById('ratio-keep').addEventListener('input', recalcRatioTotal);
+document.getElementById('ratio-exam').addEventListener('input', recalcRatioTotal);
+
+document.getElementById('ratio-save-btn').addEventListener('click', () => {
+    const k = parseInt(document.getElementById('ratio-keep').value) || 0;
+    const e = parseInt(document.getElementById('ratio-exam').value) || 0;
+    if (k + e !== MAX_PER_TERM()) {
+        Swal.fire({ icon:'warning', title:'สัดส่วนไม่ถูกต้อง',
+            text:`กรุณาตั้งให้รวมได้ ${MAX_PER_TERM()} ต่อภาค`, timer:2500, showConfirmButton:false });
+        return;
+    }
+    ratio = { keep: k, exam: e };
+    if (currentAssignment) localStorage.setItem(RATIO_KEY(currentAssignment.id), JSON.stringify(ratio));
+    // อัปเดต header + max attr ของ inputs ทันที
+    if (currentStudents.length) {
+        buildTableHeader();
+        document.querySelectorAll('.score-input.keep-inp').forEach(i => { i.dataset.max = k; i.max = k; });
+        document.querySelectorAll('.score-input.exam-inp').forEach(i => { i.dataset.max = e; i.max = e; });
+    }
+    Swal.fire({ icon:'success', title:'บันทึกสัดส่วนแล้ว', timer:1500, showConfirmButton:false });
+});
+
+// ── Load Students ─────────────────────────────────────────────────────────
+document.getElementById('btn-load').addEventListener('click', loadStudents);
+
+async function loadStudents() {
+    const selClass  = document.getElementById('sel-class');
+    const selSubject = document.getElementById('sel-subject');
+    const tsid      = selClass.value;
+    if (!tsid || !selSubject.value) {
+        Swal.fire({ icon:'warning', title:'กรุณาเลือกวิชาและห้องเรียน', timer:2000, showConfirmButton:false });
+        return;
+    }
+    const selectedOpt = selClass.options[selClass.selectedIndex];
+    const classId = selectedOpt.dataset.classId;
+    const level   = selectedOpt.dataset.level || '';
+    const grade   = selectedOpt.dataset.grade || 0;
+
+    mode = detectMode(level, grade);
+    currentAssignment = assignments.find(a => String(a.id) === String(tsid)) || null;
+    loadRatio(tsid);
+    applyModeUI();
+    document.getElementById('ratio-bar').classList.remove('hidden');
+
+    const btn = document.getElementById('btn-load');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลด...';
+    btn.disabled  = true;
+
+    try {
+        const year = document.getElementById('sel-year').value;
+        const isReadOnly = CURRENT_YEAR && year !== CURRENT_YEAR;
+
+        // FIX: ใช้ query ย้อนหลังเมื่อดูปีที่ผ่านมา
+        if (isReadOnly) {
+            currentStudents = await getStudentsByClassHistory(classId, year);
+        } else {
+            currentStudents = await getStudentsByClass(classId);
+        }
+
+        // FIX วิกฤต 1: ส่ง academic_year เพื่อกรองเฉพาะปีนั้น
+        const allGrades = await getP5Grades(tsid, null, year);
+        existingGrades  = {};
+        allGrades.forEach(g => { existingGrades[`${g.student_id}_${g.semester}`] = g; });
+
+        renderTable();
+
+        // FIX: ซ่อนปุ่มบันทึกเมื่อดูย้อนหลัง
+        const saveBtn = document.getElementById('btn-save-all');
+        if (isReadOnly) {
+            saveBtn.classList.add('hidden');
+            // แสดง badge แจ้งเตือน read-only
+            let badge = document.getElementById('readonly-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.id = 'readonly-badge';
+                badge.className = 'flex items-center gap-1 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-100 text-amber-800 border border-amber-200';
+                badge.innerHTML = '<i class="fa-solid fa-lock"></i> ดูย้อนหลัง — ไม่สามารถแก้ไขได้';
+                saveBtn.parentNode.insertBefore(badge, saveBtn);
             }
             badge.classList.remove('hidden');
-            updateRatioUI();
+        } else {
+            saveBtn.classList.remove('hidden');
+            const badge = document.getElementById('readonly-badge');
+            if (badge) badge.classList.add('hidden');
         }
 
-        // ── Ratio bar ─────────────────────────────────────────────────────────────
-        function loadRatio(tsid) {
-            const saved = localStorage.getItem(RATIO_KEY(tsid));
-            if (saved) { try { ratio = JSON.parse(saved); return; } catch { } }
-            ratio = mode === 'matayom' ? { keep: 70, exam: 30 } : { keep: 30, exam: 20 };
-        }
+        document.getElementById('empty-state').classList.add('hidden');
+        document.getElementById('grade-table-wrap').classList.remove('hidden');
 
-        function updateRatioUI() {
-            document.getElementById('ratio-keep').value = ratio.keep;
-            document.getElementById('ratio-exam').value = ratio.exam;
-            recalcRatioTotal();
-        }
+        const subjectText = selSubject.options[selSubject.selectedIndex].text;
+        const classText   = selectedOpt.text;
+        document.getElementById('print-subject-info').textContent = `วิชา: ${subjectText}`;
+        document.getElementById('print-class-info').textContent   = `ห้อง: ${classText}`;
+        document.getElementById('print-year-info').textContent    = `ปีการศึกษา ${year}`;
+        document.getElementById('print-header').classList.remove('hidden');
+    } catch(err) {
+        Swal.fire({ icon:'error', title:'เกิดข้อผิดพลาด', text: err.message });
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ';
+        btn.disabled  = false;
+    }
+}
 
-        function recalcRatioTotal() {
-            const k = parseInt(document.getElementById('ratio-keep').value) || 0;
-            const e = parseInt(document.getElementById('ratio-exam').value) || 0;
-            const sum = k + e;
-            const max = MAX_PER_TERM();
-            const totalEl = document.getElementById('ratio-total');
-            const warnEl = document.getElementById('ratio-warn');
-            const warnMsg = document.getElementById('ratio-warn-msg');
-            totalEl.textContent = `${sum} / ภาค`;
-            if (sum !== max) {
-                totalEl.className = 'text-sm font-bold text-red-600 bg-red-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors';
-                warnMsg.textContent = `ต้องรวมได้ ${max} (ตอนนี้ = ${sum})`;
-                warnEl.classList.remove('hidden');
-            } else {
-                totalEl.className = 'text-sm font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-lg min-w-[84px] text-center transition-colors';
-                warnEl.classList.add('hidden');
-            }
-        }
+// ── Render ────────────────────────────────────────────────────────────────
+function renderTable() {
+    buildTableHeader();
+    buildTableBody();
+    updateAverages();
+}
 
-        document.getElementById('ratio-keep').addEventListener('input', recalcRatioTotal);
-        document.getElementById('ratio-exam').addEventListener('input', recalcRatioTotal);
+// ── Table Header ──────────────────────────────────────────────────────────
+function buildTableHeader() {
+    const thead = document.getElementById('grade-thead');
+    const tfoot = document.getElementById('grade-tfoot');
+    const perTerm = ratio.keep + ratio.exam;
+    const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
 
-        document.getElementById('ratio-save-btn').addEventListener('click', () => {
-            const k = parseInt(document.getElementById('ratio-keep').value) || 0;
-            const e = parseInt(document.getElementById('ratio-exam').value) || 0;
-            if (k + e !== MAX_PER_TERM()) {
-                Swal.fire({
-                    icon: 'warning', title: 'สัดส่วนไม่ถูกต้อง',
-                    text: `กรุณาตั้งให้รวมได้ ${MAX_PER_TERM()} ต่อภาค`, timer: 2500, showConfirmButton: false
-                });
-                return;
-            }
-            ratio = { keep: k, exam: e };
-            if (currentAssignment) localStorage.setItem(RATIO_KEY(currentAssignment.id), JSON.stringify(ratio));
-            // อัปเดต header + max attr ของ inputs ทันที
-            if (currentStudents.length) {
-                buildTableHeader();
-                document.querySelectorAll('.score-input.keep-inp').forEach(i => { i.dataset.max = k; i.max = k; });
-                document.querySelectorAll('.score-input.exam-inp').forEach(i => { i.dataset.max = e; i.max = e; });
-            }
-            Swal.fire({ icon: 'success', title: 'บันทึกสัดส่วนแล้ว', timer: 1500, showConfirmButton: false });
-        });
-
-        // ── Load Students ─────────────────────────────────────────────────────────
-        document.getElementById('btn-load').addEventListener('click', loadStudents);
-
-        async function loadStudents() {
-            const selClass = document.getElementById('sel-class');
-            const selSubject = document.getElementById('sel-subject');
-            const tsid = selClass.value;
-            if (!tsid || !selSubject.value) {
-                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกวิชาและห้องเรียน', timer: 2000, showConfirmButton: false });
-                return;
-            }
-            const selectedOpt = selClass.options[selClass.selectedIndex];
-            const classId = selectedOpt.dataset.classId;
-            const level = selectedOpt.dataset.level || '';
-            const grade = selectedOpt.dataset.grade || 0;
-
-            mode = detectMode(level, grade);
-            currentAssignment = assignments.find(a => String(a.id) === String(tsid)) || null;
-            loadRatio(tsid);
-            applyModeUI();
-            document.getElementById('ratio-bar').classList.remove('hidden');
-
-            const btn = document.getElementById('btn-load');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลด...';
-            btn.disabled = true;
-
-            try {
-                const year = document.getElementById('sel-year').value;
-                const isReadOnly = CURRENT_YEAR && year !== CURRENT_YEAR;
-
-                // FIX: ใช้ query ย้อนหลังเมื่อดูปีที่ผ่านมา
-                if (isReadOnly) {
-                    currentStudents = await getStudentsByClassHistory(classId, year);
-                } else {
-                    currentStudents = await getStudentsByClass(classId);
-                }
-
-                // FIX วิกฤต 1: ส่ง academic_year เพื่อกรองเฉพาะปีนั้น
-                const allGrades = await getP5Grades(tsid, null, year);
-                existingGrades = {};
-                allGrades.forEach(g => { existingGrades[`${g.student_id}_${g.semester}`] = g; });
-
-                renderTable();
-
-                // FIX: ซ่อนปุ่มบันทึกเมื่อดูย้อนหลัง
-                const saveBtn = document.getElementById('btn-save-all');
-                if (isReadOnly) {
-                    saveBtn.classList.add('hidden');
-                    // แสดง badge แจ้งเตือน read-only
-                    let badge = document.getElementById('readonly-badge');
-                    if (!badge) {
-                        badge = document.createElement('span');
-                        badge.id = 'readonly-badge';
-                        badge.className = 'flex items-center gap-1 text-xs font-semibold px-3 py-2 rounded-lg bg-amber-100 text-amber-800 border border-amber-200';
-                        badge.innerHTML = '<i class="fa-solid fa-lock"></i> ดูย้อนหลัง — ไม่สามารถแก้ไขได้';
-                        saveBtn.parentNode.insertBefore(badge, saveBtn);
-                    }
-                    badge.classList.remove('hidden');
-                } else {
-                    saveBtn.classList.remove('hidden');
-                    const badge = document.getElementById('readonly-badge');
-                    if (badge) badge.classList.add('hidden');
-                }
-
-                document.getElementById('empty-state').classList.add('hidden');
-                document.getElementById('grade-table-wrap').classList.remove('hidden');
-
-                const subjectText = selSubject.options[selSubject.selectedIndex].text;
-                const classText = selectedOpt.text;
-                document.getElementById('print-subject-info').textContent = `วิชา: ${subjectText}`;
-                document.getElementById('print-class-info').textContent = `ห้อง: ${classText}`;
-                document.getElementById('print-year-info').textContent = `ปีการศึกษา ${year}`;
-                document.getElementById('print-header').classList.remove('hidden');
-            } catch (err) {
-                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.message });
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> โหลดรายชื่อ';
-                btn.disabled = false;
-            }
-        }
-
-        // ── Render ────────────────────────────────────────────────────────────────
-        function renderTable() {
-            buildTableHeader();
-            buildTableBody();
-            updateAverages();
-        }
-
-        // ── Table Header ──────────────────────────────────────────────────────────
-        function buildTableHeader() {
-            const thead = document.getElementById('grade-thead');
-            const tfoot = document.getElementById('grade-tfoot');
-            const perTerm = ratio.keep + ratio.exam;
-            const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
-
-            if (!term) {
-                // ── ทั้งปีการศึกษา: แสดง 2 ภาคควบคู่ ──────────────────────────────
-                thead.innerHTML = `
+    if (!term) {
+        // ── ทั้งปีการศึกษา: แสดง 2 ภาคควบคู่ ──────────────────────────────
+        thead.innerHTML = `
         <tr class="border-b border-slate-100 text-[11px] font-bold text-center">
             <th rowspan="2" class="px-3 py-2 text-left text-slate-400 w-8">ที่</th>
             <th rowspan="2" class="px-3 py-2 text-left text-slate-400 w-14">เลขที่</th>
@@ -675,7 +525,7 @@
             <th class="px-2 py-1 text-indigo-500 bg-indigo-50/50">รวม</th>
         </tr>`;
 
-                tfoot.innerHTML = `
+        tfoot.innerHTML = `
         <tr class="bg-slate-50 border-t border-slate-200 text-[11px] font-semibold">
             <td colspan="3" class="px-3 py-2 text-slate-500">เฉลี่ย</td>
             <td id="avg-k1" class="px-2 py-2 text-center text-green-700"></td>
@@ -687,9 +537,9 @@
             <td id="avg-yr" class="px-2 py-2 text-center text-indigo-700 font-bold"></td>
             <td colspan="2"></td>
         </tr>`;
-            } else {
-                // ── ภาคเรียนที่ 1 หรือ 2: แสดงเทอมเดียว ──────────────────────────
-                thead.innerHTML = `
+    } else {
+        // ── ภาคเรียนที่ 1 หรือ 2: แสดงเทอมเดียว ──────────────────────────
+        thead.innerHTML = `
         <tr class="border-b border-slate-100 text-[11px] font-bold text-center">
             <th class="px-3 py-3 text-left text-slate-400 w-8">ที่</th>
             <th class="px-3 py-3 text-left text-slate-400 w-14">เลขที่</th>
@@ -701,7 +551,7 @@
             <th class="px-3 py-3 text-slate-400 no-print">ผล</th>
         </tr>`;
 
-                tfoot.innerHTML = `
+        tfoot.innerHTML = `
         <tr class="bg-slate-50 border-t border-slate-200 text-[11px] font-semibold">
             <td colspan="3" class="px-3 py-2 text-slate-500">เฉลี่ย</td>
             <td id="avg-k1" class="px-2 py-2 text-center text-green-700"></td>
@@ -709,76 +559,76 @@
             <td id="avg-s1" class="px-2 py-2 text-center text-indigo-700 font-bold"></td>
             <td colspan="2"></td>
         </tr>`;
-            }
+    }
+}
+
+// ── Table Body ────────────────────────────────────────────────────────────
+function buildTableBody() {
+    const tbody = document.getElementById('grade-tbody');
+    tbody.innerHTML = '';
+    const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
+
+    currentStudents.forEach((s, i) => {
+        const row = document.createElement('tr');
+        row.className = i % 2 === 0 ? 'border-b border-slate-50' : 'border-b border-slate-50 bg-slate-50/50';
+        row.dataset.studentId = s.id;
+
+        if (!term) {
+            // ── ทั้งปีการศึกษา: แสดง 2 ภาค ──────────────────────────────
+            const g1 = readGrade(s.id, 1);
+            const g2 = readGrade(s.id, 2);
+            const k1 = g1.keep, e1 = g1.exam;
+            const k2 = g2.keep, e2 = g2.exam;
+            const s1 = hasVal(k1) && hasVal(e1) ? +k1 + +e1 : '';
+            const s2 = hasVal(k2) && hasVal(e2) ? +k2 + +e2 : '';
+            const yr = hasVal(s1) && hasVal(s2) ? s1 + s2 : '';
+            const gradeVal = hasVal(yr) ? scoreToGrade(yr) : '';
+            row.innerHTML = buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal);
+        } else {
+            // ── เทอมเดียว (1 หรือ 2) ─────────────────────────────────────
+            const termNum = parseInt(term);
+            const g = readGrade(s.id, termNum);
+            const k = g.keep, e = g.exam;
+            const total = hasVal(k) && hasVal(e) ? +k + +e : '';
+            const gradeVal = hasVal(total) ? scoreToGrade(total) : '';
+            row.innerHTML = buildSingleTermRow(i, s, k, e, total, gradeVal, termNum);
         }
+        tbody.appendChild(row);
+        row.querySelectorAll('.score-input').forEach(inp =>
+            inp.addEventListener('input', () => recalcRow(row)));
+    });
+}
 
-        // ── Table Body ────────────────────────────────────────────────────────────
-        function buildTableBody() {
-            const tbody = document.getElementById('grade-tbody');
-            tbody.innerHTML = '';
-            const term = document.getElementById('sel-term').value;   // '' | '1' | '2'
+function hasVal(v) { return v !== '' && v != null && !isNaN(Number(v)); }
 
-            currentStudents.forEach((s, i) => {
-                const row = document.createElement('tr');
-                row.className = i % 2 === 0 ? 'border-b border-slate-50' : 'border-b border-slate-50 bg-slate-50/50';
-                row.dataset.studentId = s.id;
+// ─ Read grade from existingGrades (backwards compatible) ─────────────────
+// เดิมเก็บ behavior+activity+midterm+extra = keep
+// ใหม่: behavior=0, activity=0, extra=0, midterm = keep ทั้งก้อน
+function readGrade(studentId, semester) {
+    const g = existingGrades[`${studentId}_${semester}`];
+    if (!g) return { keep: '', exam: '' };
+    // ถ้า new format: behavior+activity+extra ล้วนเป็น 0 → keep = score_midterm
+    const isNew = !g.score_behavior && !g.score_activity && !g.score_extra;
+    const keep  = isNew
+        ? (g.score_midterm ?? '')
+        : (g.score_behavior||0) + (g.score_activity||0) + (g.score_midterm||0) + (g.score_extra||0);
+    const exam  = g.score_final ?? '';
+    return { keep: keep === '' ? '' : keep, exam };
+}
 
-                if (!term) {
-                    // ── ทั้งปีการศึกษา: แสดง 2 ภาค ──────────────────────────────
-                    const g1 = readGrade(s.id, 1);
-                    const g2 = readGrade(s.id, 2);
-                    const k1 = g1.keep, e1 = g1.exam;
-                    const k2 = g2.keep, e2 = g2.exam;
-                    const s1 = hasVal(k1) && hasVal(e1) ? +k1 + +e1 : '';
-                    const s2 = hasVal(k2) && hasVal(e2) ? +k2 + +e2 : '';
-                    const yr = hasVal(s1) && hasVal(s2) ? s1 + s2 : '';
-                    const gradeVal = hasVal(yr) ? scoreToGrade(yr) : '';
-                    row.innerHTML = buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal);
-                } else {
-                    // ── เทอมเดียว (1 หรือ 2) ─────────────────────────────────────
-                    const termNum = parseInt(term);
-                    const g = readGrade(s.id, termNum);
-                    const k = g.keep, e = g.exam;
-                    const total = hasVal(k) && hasVal(e) ? +k + +e : '';
-                    const gradeVal = hasVal(total) ? scoreToGrade(total) : '';
-                    row.innerHTML = buildSingleTermRow(i, s, k, e, total, gradeVal, termNum);
-                }
-                tbody.appendChild(row);
-                row.querySelectorAll('.score-input').forEach(inp =>
-                    inp.addEventListener('input', () => recalcRow(row)));
-            });
-        }
+function gradeHtml(gradeVal) {
+    if (!gradeVal) return '<span class="text-slate-300">—</span>';
+    return `<span class="grade-badge grade-${gradeVal.replace('.', '')}">${gradeVal}</span>`;
+}
+function resultHtml(gradeVal) {
+    if (!gradeVal) return '<span class="text-xs text-slate-300">—</span>';
+    const passed = parseFloat(gradeVal) >= 1;
+    return `<span class="text-xs ${passed ? 'text-emerald-600 font-semibold' : 'text-red-500 font-semibold'}">${passed ? 'ผ่าน' : 'ไม่ผ่าน'}</span>`;
+}
 
-        function hasVal(v) { return v !== '' && v != null && !isNaN(Number(v)); }
-
-        // ─ Read grade from existingGrades (backwards compatible) ─────────────────
-        // เดิมเก็บ behavior+activity+midterm+extra = keep
-        // ใหม่: behavior=0, activity=0, extra=0, midterm = keep ทั้งก้อน
-        function readGrade(studentId, semester) {
-            const g = existingGrades[`${studentId}_${semester}`];
-            if (!g) return { keep: '', exam: '' };
-            // ถ้า new format: behavior+activity+extra ล้วนเป็น 0 → keep = score_midterm
-            const isNew = !g.score_behavior && !g.score_activity && !g.score_extra;
-            const keep = isNew
-                ? (g.score_midterm ?? '')
-                : (g.score_behavior || 0) + (g.score_activity || 0) + (g.score_midterm || 0) + (g.score_extra || 0);
-            const exam = g.score_final ?? '';
-            return { keep: keep === '' ? '' : keep, exam };
-        }
-
-        function gradeHtml(gradeVal) {
-            if (!gradeVal) return '<span class="text-slate-300">—</span>';
-            return `<span class="grade-badge grade-${gradeVal.replace('.', '')}">${gradeVal}</span>`;
-        }
-        function resultHtml(gradeVal) {
-            if (!gradeVal) return '<span class="text-xs text-slate-300">—</span>';
-            const passed = parseFloat(gradeVal) >= 1;
-            return `<span class="text-xs ${passed ? 'text-emerald-600 font-semibold' : 'text-red-500 font-semibold'}">${passed ? 'ผ่าน' : 'ไม่ผ่าน'}</span>`;
-        }
-
-        function buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal) {
-            return `
-        <td class="px-3 py-2 text-slate-400 text-xs">${i + 1}</td>
+function buildPratomRow(i, s, k1, e1, s1, k2, e2, s2, yr, gradeVal) {
+    return `
+        <td class="px-3 py-2 text-slate-400 text-xs">${i+1}</td>
         <td class="px-3 py-2 text-slate-500 text-xs">${s.student_no}</td>
         <td class="px-3 py-2 text-slate-700 font-medium">${s.name}</td>
         <td class="px-2 py-2 text-center">
@@ -802,11 +652,11 @@
         <td class="px-2 py-2 text-center font-bold text-slate-700 yr-cell">${yr}</td>
         <td class="px-2 py-2 text-center grade-cell">${gradeHtml(gradeVal)}</td>
         <td class="px-2 py-2 text-center no-print result-cell">${resultHtml(gradeVal)}</td>`;
-        }
+}
 
-        function buildSingleTermRow(i, s, k, e, total, gradeVal, termNum) {
-            return `
-        <td class="px-3 py-2 text-slate-400 text-xs">${i + 1}</td>
+function buildSingleTermRow(i, s, k, e, total, gradeVal, termNum) {
+    return `
+        <td class="px-3 py-2 text-slate-400 text-xs">${i+1}</td>
         <td class="px-3 py-2 text-slate-500 text-xs">${s.student_no}</td>
         <td class="px-3 py-2 text-slate-700 font-medium">${s.name}</td>
         <td class="px-2 py-2 text-center">
@@ -820,241 +670,238 @@
         <td class="px-2 py-2 text-center font-bold text-slate-700 total-cell">${hasVal(total) ? (+total).toFixed(2) : ''}</td>
         <td class="px-2 py-2 text-center grade-cell">${gradeHtml(gradeVal)}</td>
         <td class="px-2 py-2 text-center no-print result-cell">${resultHtml(gradeVal)}</td>`;
-        }
+}
 
-        // ── Recalc row (real-time) ────────────────────────────────────────────────
-        function recalcRow(row) {
-            const term = document.getElementById('sel-term').value;
-            if (!term) recalcPrat(row);
-            else recalcMat(row);
-            updateAverages();
-        }
+// ── Recalc row (real-time) ────────────────────────────────────────────────
+function recalcRow(row) {
+    const term = document.getElementById('sel-term').value;
+    if (!term) recalcPrat(row);
+    else recalcMat(row);
+    updateAverages();
+}
 
-        function recalcMat(row) {
-            const k = parseFloat(row.querySelector('.keep-inp')?.value);
-            const e = parseFloat(row.querySelector('.exam-inp')?.value);
-            const totalCell = row.querySelector('.total-cell');
-            const gradeCell = row.querySelector('.grade-cell');
-            const resultCell = row.querySelector('.result-cell');
-            if (!isNaN(k) || !isNaN(e)) {
-                const total = (isNaN(k) ? 0 : k) + (isNaN(e) ? 0 : e);
-                const g = scoreToGrade(total);
-                totalCell.textContent = total.toFixed(2);
-                gradeCell.innerHTML = gradeHtml(g);
-                resultCell.innerHTML = resultHtml(g);
-            } else {
-                totalCell.textContent = '';
-                gradeCell.innerHTML = gradeHtml('');
-                resultCell.innerHTML = resultHtml('');
-            }
-        }
+function recalcMat(row) {
+    const k = parseFloat(row.querySelector('.keep-inp')?.value);
+    const e = parseFloat(row.querySelector('.exam-inp')?.value);
+    const totalCell  = row.querySelector('.total-cell');
+    const gradeCell  = row.querySelector('.grade-cell');
+    const resultCell = row.querySelector('.result-cell');
+    if (!isNaN(k) || !isNaN(e)) {
+        const total = (isNaN(k) ? 0 : k) + (isNaN(e) ? 0 : e);
+        const g = scoreToGrade(total);
+        totalCell.textContent  = total.toFixed(2);
+        gradeCell.innerHTML    = gradeHtml(g);
+        resultCell.innerHTML   = resultHtml(g);
+    } else {
+        totalCell.textContent  = '';
+        gradeCell.innerHTML    = gradeHtml('');
+        resultCell.innerHTML   = resultHtml('');
+    }
+}
 
-        function recalcPrat(row) {
-            const vals = {};
+function recalcPrat(row) {
+    const vals = {};
+    row.querySelectorAll('.score-input').forEach(inp => {
+        const v = parseFloat(inp.value);
+        vals[`${inp.dataset.sem}_${inp.dataset.type}`] = isNaN(v) ? '' : v;
+    });
+    const k1 = vals['1_keep'], e1 = vals['1_exam'];
+    const k2 = vals['2_keep'], e2 = vals['2_exam'];
+    const s1 = hasVal(k1) && hasVal(e1) ? +k1 + +e1 : '';
+    const s2 = hasVal(k2) && hasVal(e2) ? +k2 + +e2 : '';
+    const yr  = hasVal(s1) && hasVal(s2) ? s1 + s2 : '';
+    row.querySelector('.sum1-cell').textContent = s1;
+    row.querySelector('.sum2-cell').textContent = s2;
+    row.querySelector('.yr-cell').textContent   = yr;
+    const gradeVal = hasVal(yr) ? scoreToGrade(yr) : '';
+    row.querySelector('.grade-cell').innerHTML  = gradeHtml(gradeVal);
+    row.querySelector('.result-cell').innerHTML = resultHtml(gradeVal);
+}
+
+// ── Averages ──────────────────────────────────────────────────────────────
+function updateAverages() {
+    const rows = [...document.querySelectorAll('#grade-tbody tr')];
+    if (!rows.length) return;
+    const setEl = (id, sum, cnt) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = cnt > 0 ? (sum/cnt).toFixed(1) : '—';
+    };
+    const term = document.getElementById('sel-term').value;
+    if (!term) {
+        // ── ทั้งปีการศึกษา ─────────────────────────────────────────────
+        let sk1=0,se1=0,sk2=0,se2=0, ck1=0,ce1=0,ck2=0,ce2=0;
+        let ts1=0,ts2=0,tyr=0, cs1=0,cs2=0,cyr=0;
+        rows.forEach(row => {
             row.querySelectorAll('.score-input').forEach(inp => {
-                const v = parseFloat(inp.value);
-                vals[`${inp.dataset.sem}_${inp.dataset.type}`] = isNaN(v) ? '' : v;
+                const v = parseFloat(inp.value); if (isNaN(v)) return;
+                if (inp.dataset.sem==='1' && inp.dataset.type==='keep') { sk1+=v; ck1++; }
+                if (inp.dataset.sem==='1' && inp.dataset.type==='exam') { se1+=v; ce1++; }
+                if (inp.dataset.sem==='2' && inp.dataset.type==='keep') { sk2+=v; ck2++; }
+                if (inp.dataset.sem==='2' && inp.dataset.type==='exam') { se2+=v; ce2++; }
             });
-            const k1 = vals['1_keep'], e1 = vals['1_exam'];
-            const k2 = vals['2_keep'], e2 = vals['2_exam'];
-            const s1 = hasVal(k1) && hasVal(e1) ? +k1 + +e1 : '';
-            const s2 = hasVal(k2) && hasVal(e2) ? +k2 + +e2 : '';
-            const yr = hasVal(s1) && hasVal(s2) ? s1 + s2 : '';
-            row.querySelector('.sum1-cell').textContent = s1;
-            row.querySelector('.sum2-cell').textContent = s2;
-            row.querySelector('.yr-cell').textContent = yr;
-            const gradeVal = hasVal(yr) ? scoreToGrade(yr) : '';
-            row.querySelector('.grade-cell').innerHTML = gradeHtml(gradeVal);
-            row.querySelector('.result-cell').innerHTML = resultHtml(gradeVal);
-        }
-
-        // ── Averages ──────────────────────────────────────────────────────────────
-        function updateAverages() {
-            const rows = [...document.querySelectorAll('#grade-tbody tr')];
-            if (!rows.length) return;
-            const setEl = (id, sum, cnt) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = cnt > 0 ? (sum / cnt).toFixed(1) : '—';
-            };
-            const term = document.getElementById('sel-term').value;
-            if (!term) {
-                // ── ทั้งปีการศึกษา ─────────────────────────────────────────────
-                let sk1 = 0, se1 = 0, sk2 = 0, se2 = 0, ck1 = 0, ce1 = 0, ck2 = 0, ce2 = 0;
-                let ts1 = 0, ts2 = 0, tyr = 0, cs1 = 0, cs2 = 0, cyr = 0;
-                rows.forEach(row => {
-                    row.querySelectorAll('.score-input').forEach(inp => {
-                        const v = parseFloat(inp.value); if (isNaN(v)) return;
-                        if (inp.dataset.sem === '1' && inp.dataset.type === 'keep') { sk1 += v; ck1++; }
-                        if (inp.dataset.sem === '1' && inp.dataset.type === 'exam') { se1 += v; ce1++; }
-                        if (inp.dataset.sem === '2' && inp.dataset.type === 'keep') { sk2 += v; ck2++; }
-                        if (inp.dataset.sem === '2' && inp.dataset.type === 'exam') { se2 += v; ce2++; }
-                    });
-                    const v1 = parseFloat(row.querySelector('.sum1-cell')?.textContent);
-                    const v2 = parseFloat(row.querySelector('.sum2-cell')?.textContent);
-                    const vy = parseFloat(row.querySelector('.yr-cell')?.textContent);
-                    if (!isNaN(v1)) { ts1 += v1; cs1++; }
-                    if (!isNaN(v2)) { ts2 += v2; cs2++; }
-                    if (!isNaN(vy)) { tyr += vy; cyr++; }
-                });
-                setEl('avg-k1', sk1, ck1); setEl('avg-e1', se1, ce1); setEl('avg-s1', ts1, cs1);
-                setEl('avg-k2', sk2, ck2); setEl('avg-e2', se2, ce2); setEl('avg-s2', ts2, cs2);
-                setEl('avg-yr', tyr, cyr);
-            } else {
-                // ── เทอมเดียว ──────────────────────────────────────────────────
-                let sk = 0, se = 0, st = 0, ck = 0, ce = 0, ct = 0;
-                rows.forEach(row => {
-                    row.querySelectorAll('.score-input').forEach(inp => {
-                        const v = parseFloat(inp.value); if (isNaN(v)) return;
-                        if (inp.dataset.type === 'keep') { sk += v; ck++; }
-                        if (inp.dataset.type === 'exam') { se += v; ce++; }
-                    });
-                    const t = parseFloat(row.querySelector('.total-cell')?.textContent);
-                    if (!isNaN(t)) { st += t; ct++; }
-                });
-                setEl('avg-k1', sk, ck); setEl('avg-e1', se, ce); setEl('avg-s1', st, ct);
-            }
-        }
-
-        // เปลี่ยนภาคเรียน → re-render ตารางทันที (ทุก mode)
-        document.getElementById('sel-term').addEventListener('change', () => {
-            if (currentStudents.length) renderTable();
+            const v1 = parseFloat(row.querySelector('.sum1-cell')?.textContent);
+            const v2 = parseFloat(row.querySelector('.sum2-cell')?.textContent);
+            const vy = parseFloat(row.querySelector('.yr-cell')?.textContent);
+            if (!isNaN(v1)) { ts1+=v1; cs1++; }
+            if (!isNaN(v2)) { ts2+=v2; cs2++; }
+            if (!isNaN(vy)) { tyr+=vy; cyr++; }
         });
-
-        // ── Save All ──────────────────────────────────────────────────────────────
-        document.getElementById('btn-save-all').addEventListener('click', async () => {
-            if (!currentAssignment) return;
-            const tsid = currentAssignment.id;
-            const year = document.getElementById('sel-year').value;
-            const termSel = document.getElementById('sel-term').value;   // '' | '1' | '2'
-            const rows = [...document.querySelectorAll('#grade-tbody tr')];
-            const toSave = [];
-
-            if (!termSel) {
-                // ── ทั้งปีการศึกษา: บันทึกทั้ง 2 ภาค ──────────────────────────
-                const byStudent = {};
-                rows.forEach(row => {
-                    const sid = parseInt(row.dataset.studentId);
-                    byStudent[sid] = {};
-                    [1, 2].forEach(sem => {
-                        const k = parseFloat(row.querySelector(`.keep-inp[data-sem="${sem}"]`)?.value) || 0;
-                        const e = parseFloat(row.querySelector(`.exam-inp[data-sem="${sem}"]`)?.value) || 0;
-                        byStudent[sid][sem] = { k, e, total: k + e };
-                    });
-                });
-                Object.entries(byStudent).forEach(([sid, sems]) => {
-                    const yr = (sems[1].total + sems[2].total);
-                    const grade = scoreToGrade(yr);
-                    [1, 2].forEach(sem => {
-                        toSave.push({
-                            teacher_subject_id: tsid, student_id: parseInt(sid),
-                            semester: sem, academic_year: year,
-                            score_behavior: 0, score_activity: 0,
-                            score_midterm: sems[sem].k,
-                            score_final: sems[sem].e,
-                            score_extra: 0,
-                            total_score: sems[sem].total,
-                            grade, result: parseFloat(grade) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
-                            updated_at: new Date().toISOString()
-                        });
-                    });
-                });
-            } else {
-                // ── เทอมเดียว: บันทึกแค่ภาคที่เลือก ──────────────────────────
-                const sem = parseInt(termSel);
-                rows.forEach(row => {
-                    const sid = parseInt(row.dataset.studentId);
-                    const k = parseFloat(row.querySelector('.keep-inp')?.value) || 0;
-                    const e = parseFloat(row.querySelector('.exam-inp')?.value) || 0;
-                    const tot = k + e;
-                    // สำหรับประถม: คำนวณเกรดจากรวมปี (ภาคนี้ + ภาคอื่นใน DB)
-                    let grade;
-                    if (mode === 'matayom') {
-                        grade = scoreToGrade(tot);
-                    } else {
-                        const otherSem = sem === 1 ? 2 : 1;
-                        const other = readGrade(sid, otherSem);
-                        const otherTotal = (hasVal(other.keep) && hasVal(other.exam))
-                            ? +other.keep + +other.exam : null;
-                        const yrTotal = otherTotal !== null ? tot + otherTotal : null;
-                        grade = yrTotal !== null ? scoreToGrade(yrTotal) : '';
-                    }
-                    toSave.push({
-                        teacher_subject_id: tsid, student_id: sid,
-                        semester: sem, academic_year: year,
-                        score_behavior: 0, score_activity: 0,
-                        score_midterm: k, score_final: e, score_extra: 0,
-                        total_score: tot, grade,
-                        result: grade && parseFloat(grade) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
-                        updated_at: new Date().toISOString()
-                    });
-                });
-            }
-
-            const btn = document.getElementById('btn-save-all');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
-            btn.disabled = true;
-            try {
-                for (const r of toSave) await saveP5Grade(r);
-                Swal.fire({
-                    icon: 'success', title: 'บันทึกสำเร็จ!',
-                    text: `บันทึก ${toSave.length} รายการเรียบร้อย`, timer: 2500, showConfirmButton: false
-                });
-            } catch (err) {
-                Swal.fire({ icon: 'error', title: 'บันทึกไม่สำเร็จ', text: err.message });
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกทั้งหมด';
-                btn.disabled = false;
-            }
+        setEl('avg-k1',sk1,ck1); setEl('avg-e1',se1,ce1); setEl('avg-s1',ts1,cs1);
+        setEl('avg-k2',sk2,ck2); setEl('avg-e2',se2,ce2); setEl('avg-s2',ts2,cs2);
+        setEl('avg-yr',tyr,cyr);
+    } else {
+        // ── เทอมเดียว ──────────────────────────────────────────────────
+        let sk=0,se=0,st=0, ck=0,ce=0,ct=0;
+        rows.forEach(row => {
+            row.querySelectorAll('.score-input').forEach(inp => {
+                const v = parseFloat(inp.value); if (isNaN(v)) return;
+                if (inp.dataset.type==='keep') { sk+=v; ck++; }
+                if (inp.dataset.type==='exam') { se+=v; ce++; }
+            });
+            const t = parseFloat(row.querySelector('.total-cell')?.textContent);
+            if (!isNaN(t)) { st+=t; ct++; }
         });
+        setEl('avg-k1',sk,ck); setEl('avg-e1',se,ce); setEl('avg-s1',st,ct);
+    }
+}
 
-        // ── Init ──────────────────────────────────────────────────────────────────
-        // ── Print → ส่ง ratio ไปให้ p5-print.html ผ่าน sessionStorage ──────────
-        document.getElementById('btn-print').addEventListener('click', () => {
-            if (!currentAssignment) { window.print(); return; }
+// เปลี่ยนภาคเรียน → re-render ตารางทันที (ทุก mode)
+document.getElementById('sel-term').addEventListener('change', () => {
+    if (currentStudents.length) renderTable();
+});
 
-            const selClass = document.getElementById('sel-class');
-            const selectedOpt = selClass.options[selClass.selectedIndex];
-            const classId = selectedOpt?.dataset.classId || '';
-            const subjectEl = document.getElementById('sel-subject');
-            const year = document.getElementById('sel-year').value;
-            const term = document.getElementById('sel-term').value;
+// ── Save All ──────────────────────────────────────────────────────────────
+document.getElementById('btn-save-all').addEventListener('click', async () => {
+    if (!currentAssignment) return;
+    const tsid = currentAssignment.id;
+    const year = document.getElementById('sel-year').value;
+    const termSel = document.getElementById('sel-term').value;   // '' | '1' | '2'
+    const rows = [...document.querySelectorAll('#grade-tbody tr')];
+    const toSave = [];
 
-            const printData = {
-                tsId: currentAssignment.id,
-                classroomId: classId,
-                year,
-                subjectTxt: subjectEl.options[subjectEl.selectedIndex]?.text || '',
-                classTxt: selectedOpt?.text || '',
-                level: mode === 'matayom' ? 'มัธยม' : 'ประถม',
-                // ประถม: ทั้ง 2 ภาคใช้สัดส่วนเดียวกัน
-                keepMax1: ratio.keep,
-                examMax1: ratio.exam,
-                keepMax2: ratio.keep,
-                examMax2: ratio.exam,
-                // มัธยม: keep = keep, mid = 0, final = exam
-                keepMaxM: ratio.keep,
-                midMaxM: 0,
-                finalMaxM: ratio.exam,
-                term: parseInt(term),
-            };
-            sessionStorage.setItem('p5_print_data', JSON.stringify(printData));
-            window.open('p5-print.html', '_blank');
+    if (!termSel) {
+        // ── ทั้งปีการศึกษา: บันทึกทั้ง 2 ภาค ──────────────────────────
+        const byStudent = {};
+        rows.forEach(row => {
+            const sid = parseInt(row.dataset.studentId);
+            byStudent[sid] = {};
+            [1,2].forEach(sem => {
+                const k = parseFloat(row.querySelector(`.keep-inp[data-sem="${sem}"]`)?.value) || 0;
+                const e = parseFloat(row.querySelector(`.exam-inp[data-sem="${sem}"]`)?.value) || 0;
+                byStudent[sid][sem] = { k, e, total: k + e };
+            });
         });
-
-        // ── Init ──────────────────────────────────────────────────────────────────
-        // โหลดปีการศึกษาจาก DB ก่อน แล้วค่อย loadAssignments
-        (async () => {
-            const years = await getAcademicYears();
-            const sel = document.getElementById('sel-year');
-            if (years.length) {
-                sel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+        Object.entries(byStudent).forEach(([sid, sems]) => {
+            const yr    = (sems[1].total + sems[2].total);
+            const grade = scoreToGrade(yr);
+            [1,2].forEach(sem => {
+                toSave.push({
+                    teacher_subject_id: tsid, student_id: parseInt(sid),
+                    semester: sem, academic_year: year,
+                    score_behavior: 0, score_activity: 0,
+                    score_midterm: sems[sem].k,
+                    score_final:   sems[sem].e,
+                    score_extra:   0,
+                    total_score:   sems[sem].total,
+                    grade, result: parseFloat(grade) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
+                    updated_at: new Date().toISOString()
+                });
+            });
+        });
+    } else {
+        // ── เทอมเดียว: บันทึกแค่ภาคที่เลือก ──────────────────────────
+        const sem = parseInt(termSel);
+        rows.forEach(row => {
+            const sid = parseInt(row.dataset.studentId);
+            const k   = parseFloat(row.querySelector('.keep-inp')?.value) || 0;
+            const e   = parseFloat(row.querySelector('.exam-inp')?.value) || 0;
+            const tot = k + e;
+            // สำหรับประถม: คำนวณเกรดจากรวมปี (ภาคนี้ + ภาคอื่นใน DB)
+            let grade;
+            if (mode === 'matayom') {
+                grade = scoreToGrade(tot);
             } else {
-                sel.innerHTML = '<option value="2568">2568</option>';
+                const otherSem = sem === 1 ? 2 : 1;
+                const other = readGrade(sid, otherSem);
+                const otherTotal = (hasVal(other.keep) && hasVal(other.exam))
+                    ? +other.keep + +other.exam : null;
+                const yrTotal = otherTotal !== null ? tot + otherTotal : null;
+                grade = yrTotal !== null ? scoreToGrade(yrTotal) : '';
             }
-            CURRENT_YEAR = years[0] || null;
-            await loadAssignments();
-        })();
-    </script>
+            toSave.push({
+                teacher_subject_id: tsid, student_id: sid,
+                semester: sem, academic_year: year,
+                score_behavior: 0, score_activity: 0,
+                score_midterm: k, score_final: e, score_extra: 0,
+                total_score: tot, grade,
+                result: grade && parseFloat(grade) >= 1 ? 'ผ่าน' : 'ไม่ผ่าน',
+                updated_at: new Date().toISOString()
+            });
+        });
+    }
+
+    const btn = document.getElementById('btn-save-all');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+    btn.disabled  = true;
+    try {
+        for (const r of toSave) await saveP5Grade(r);
+        Swal.fire({ icon:'success', title:'บันทึกสำเร็จ!',
+            text:`บันทึก ${toSave.length} รายการเรียบร้อย`, timer:2500, showConfirmButton:false });
+    } catch(err) {
+        Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text: err.message });
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> บันทึกทั้งหมด';
+        btn.disabled  = false;
+    }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+// ── Print → ส่ง ratio ไปให้ p5-print.html ผ่าน sessionStorage ──────────
+document.getElementById('btn-print').addEventListener('click', () => {
+    if (!currentAssignment) { window.print(); return; }
+
+    const selClass   = document.getElementById('sel-class');
+    const selectedOpt = selClass.options[selClass.selectedIndex];
+    const classId    = selectedOpt?.dataset.classId || '';
+    const subjectEl  = document.getElementById('sel-subject');
+    const year       = document.getElementById('sel-year').value;
+    const term       = document.getElementById('sel-term').value;
+
+    const printData = {
+        tsId:       currentAssignment.id,
+        classroomId: classId,
+        year,
+        subjectTxt: subjectEl.options[subjectEl.selectedIndex]?.text || '',
+        classTxt:   selectedOpt?.text || '',
+        level:      mode === 'matayom' ? 'มัธยม' : 'ประถม',
+        // ประถม: ทั้ง 2 ภาคใช้สัดส่วนเดียวกัน
+        keepMax1:  ratio.keep,
+        examMax1:  ratio.exam,
+        keepMax2:  ratio.keep,
+        examMax2:  ratio.exam,
+        // มัธยม: keep = keep, mid = 0, final = exam
+        keepMaxM:  ratio.keep,
+        midMaxM:   0,
+        finalMaxM: ratio.exam,
+        term:      parseInt(term),
+    };
+    sessionStorage.setItem('p5_print_data', JSON.stringify(printData));
+    window.open('p5-print.html', '_blank');
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+// โหลดปีการศึกษาจาก DB ก่อน แล้วค่อย loadAssignments
+(async () => {
+    const years = await getAcademicYears();
+    const sel = document.getElementById('sel-year');
+    if (years.length) {
+        sel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+    } else {
+        sel.innerHTML = '<option value="2568">2568</option>';
+    }
+    CURRENT_YEAR = years[0] || null;
+    await loadAssignments();
+})();
+</script>
 </body>
-
 </html>
