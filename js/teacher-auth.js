@@ -168,11 +168,11 @@ export async function saveAttendance(records) {
     return data;
 }
 
-// NEW: ดึงปีการศึกษาทั้งหมด — รวมปีในอดีต (จาก student_promotions) + ปีปัจจุบัน (จาก classrooms)
+// ดึงปีการศึกษาทั้งหมด — รวมปีปัจจุบัน (teacher_subjects) + ปีเก่า (student_promotions)
 export async function getAcademicYears() {
     const [r1, r2] = await Promise.all([
-        db.from('student_promotions').select('academic_year'),
-        db.from('classrooms').select('academic_year')
+        db.from('teacher_subjects').select('academic_year'),
+        db.from('student_promotions').select('academic_year')
     ]);
     const all = [
         ...((r1.data || []).map(r => r.academic_year)),
@@ -181,11 +181,11 @@ export async function getAcademicYears() {
     return [...new Set(all)].filter(Boolean).sort((a, b) => b.localeCompare(a));
 }
 
-// ปีปัจจุบัน = ปีที่อยู่ใน classrooms ตอนนี้
-// หลัง execute เลื่อนชั้น classrooms.academic_year จะถูกอัปเดตเป็นปีใหม่อัตโนมัติ
+// ปีปัจจุบัน = ปีล่าสุดใน teacher_subjects
+// classrooms ไม่มี academic_year แล้ว
 export async function getCurrentAcademicYear() {
     const { data, error } = await db
-        .from('classrooms')
+        .from('teacher_subjects')
         .select('academic_year')
         .order('academic_year', { ascending: false })
         .limit(1);
