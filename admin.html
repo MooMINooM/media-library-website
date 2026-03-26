@@ -2246,8 +2246,8 @@ AND auth.role() = 'authenticated');</code>
             if (!data?.length) { el.innerHTML = '<p class="text-center text-slate-400 py-6 text-sm">ยังไม่มีวิชา</p>'; return; }
             el.innerHTML = data.map(s => {
                 const semBadge = s.semester === 1 ? '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-sky-100 text-sky-700">เทอม 1</span>'
-                    : s.semester === 2 ? '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700">เทอม 2</span>'
-                        : '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-500">ทั้งปี</span>';
+                              : s.semester === 2 ? '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-violet-100 text-violet-700">เทอม 2</span>'
+                              : '<span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-500">ทั้งปี</span>';
                 return `
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition p-3 flex items-center gap-3">
       <div class="flex-1 min-w-0">
@@ -2802,18 +2802,18 @@ AND auth.role() = 'authenticated');</code>
         // ระบบเลื่อนชั้น — Promotion Plan (3 ขั้นตอน)
         // ══════════════════════════════════════════════════════════
 
-        let currentPlanId = null;  // plan_id ที่กำลังดำเนินการ
+        let currentPlanId   = null;  // plan_id ที่กำลังดำเนินการ
         let currentPlanYear = null;  // ปีของ plan นี้
-        let allClassrooms = [];    // cache รายการห้องทั้งหมด
+        let allClassrooms   = [];    // cache รายการห้องทั้งหมด
 
         function openPromoteModal() {
-            currentPlanId = null;
+            currentPlanId   = null;
             currentPlanYear = null;
             document.getElementById('prm-admin-pass').value = '';
             document.getElementById('prm-pass-err').classList.add('hidden');
             // set ปีที่ dropdown สูงสุดเป็น default
             const yearSel = document.getElementById('prm-year');
-            const uniqueYears = [...new Set((allClassrooms).map(c => c.academic_year))].sort((a, b) => b.localeCompare(a));
+            const uniqueYears = [...new Set((allClassrooms).map(c => c.academic_year))].sort((a,b) => b.localeCompare(a));
             yearSel.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join('');
             goStep(1);
             document.getElementById('promote-modal').classList.remove('hidden');
@@ -2854,7 +2854,7 @@ AND auth.role() = 'authenticated');</code>
                 if (error) throw error;
                 if (!data?.success) throw new Error(data?.message || 'เกิดข้อผิดพลาด');
 
-                currentPlanId = data.plan_id;
+                currentPlanId   = data.plan_id;
                 currentPlanYear = year;
 
                 // โหลด plan_items สำหรับแสดงใน step 2
@@ -2890,14 +2890,14 @@ AND auth.role() = 'authenticated');</code>
             (items || []).forEach(item => {
                 const fid = item.from_classroom?.id || 'null';
                 if (!roomMap[fid]) roomMap[fid] = {
-                    from_id: item.from_classroom?.id,
-                    from_name: item.from_classroom?.name || '—',
+                    from_id:    item.from_classroom?.id,
+                    from_name:  item.from_classroom?.name || '—',
                     from_grade: item.from_classroom?.grade ?? 99,
-                    to_id: item.to_classroom?.id || null,
-                    to_name: item.to_classroom?.name || 'จบการศึกษา',
-                    to_grade: item.to_classroom?.grade ?? 99,
-                    note: item.note || '',
-                    students: []
+                    to_id:      item.to_classroom?.id || null,
+                    to_name:    item.to_classroom?.name || 'จบการศึกษา',
+                    to_grade:   item.to_classroom?.grade ?? 99,
+                    note:       item.note || '',
+                    students:   []
                 };
                 roomMap[fid].students.push(item.student_id);
             });
@@ -2923,10 +2923,10 @@ AND auth.role() = 'authenticated');</code>
                            <i class="fa-solid fa-arrow-down" style="font-size:10px"></i> ลดชั้น
                        </span>`
                     : isGraduate
-                        ? `<span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 ml-1">
+                    ? `<span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 ml-1">
                            <i class="fa-solid fa-graduation-cap" style="font-size:10px"></i> จบ
                        </span>`
-                        : '';
+                    : '';
                 return `
                 <tr class="hover:bg-slate-50 transition border-b border-slate-50" data-from="${room.from_id}">
                     <td class="px-3 py-2.5">
@@ -2972,12 +2972,12 @@ AND auth.role() = 'authenticated');</code>
         }
 
         function onMappingChange(sel) {
-            const fromId = parseInt(sel.dataset.fromId);
+            const fromId    = parseInt(sel.dataset.fromId);
             const fromGrade = parseInt(sel.dataset.fromGrade) || 0;
-            const toValue = sel.value;
-            const toId = toValue === '' ? null : parseInt(toValue);
-            const toOpt = sel.selectedOptions[0];
-            const toGrade = toOpt ? parseInt(toOpt.dataset.grade) || 0 : 0;
+            const toValue   = sel.value;
+            const toId      = toValue === '' ? null : parseInt(toValue);
+            const toOpt     = sel.selectedOptions[0];
+            const toGrade   = toOpt ? parseInt(toOpt.dataset.grade) || 0 : 0;
 
             // อัป badge ทันที
             const badgeCell = sel.closest('td').querySelector('.badge-cell');
@@ -2988,10 +2988,10 @@ AND auth.role() = 'authenticated');</code>
                        <i class="fa-solid fa-arrow-down" style="font-size:10px"></i> ลดชั้น
                    </span>`
                 : isGraduate
-                    ? `<span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                ? `<span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
                        <i class="fa-solid fa-graduation-cap" style="font-size:10px"></i> จบ
                    </span>`
-                    : '';
+                : '';
 
             // หาหมายเหตุปัจจุบันจาก note input ใน row เดียวกัน
             const noteEl = sel.closest('tr').querySelector('input[data-from-id]');
@@ -3000,8 +3000,8 @@ AND auth.role() = 'authenticated');</code>
         }
 
         function onNoteChange(input) {
-            const fromId = parseInt(input.dataset.fromId);
-            const sel = input.closest('tr').querySelector('select[data-from-id]');
+            const fromId  = parseInt(input.dataset.fromId);
+            const sel     = input.closest('tr').querySelector('select[data-from-id]');
             const toValue = sel ? sel.value : '';
             updateMapping(currentPlanId, fromId, toValue, input.value.trim());
         }
@@ -3009,9 +3009,9 @@ AND auth.role() = 'authenticated');</code>
         async function updateMapping(planId, fromClassroomId, toValue, note = '') {
             const toId = toValue === '' ? null : parseInt(toValue);
             const { data, error } = await pawDb.rpc('update_plan_item_mapping', {
-                p_plan_id: planId,
+                p_plan_id:           planId,
                 p_from_classroom_id: fromClassroomId,
-                p_to_classroom_id: toId
+                p_to_classroom_id:   toId
             });
             if (error || !data?.success) {
                 Swal.fire({ icon: 'error', title: 'แก้ mapping ไม่สำเร็จ', text: error?.message || data?.message, timer: 2500, showConfirmButton: false });
@@ -3038,7 +3038,7 @@ AND auth.role() = 'authenticated');</code>
             list.innerHTML = students.length
                 ? students.map((s, i) => `
                     <div class="flex items-center gap-2 py-1">
-                        <span class="text-slate-400 w-5 text-right">${i + 1}.</span>
+                        <span class="text-slate-400 w-5 text-right">${i+1}.</span>
                         <span class="font-mono text-slate-400 w-20">${s.student_no || '-'}</span>
                         <span class="text-slate-700 font-medium flex-1">${s.name}</span>
                         <span class="text-xs px-1.5 rounded ${s.gender === 'หญิง' ? 'bg-pink-100 text-pink-600' : 'bg-sky-100 text-sky-600'}">${s.gender}</span>
@@ -3054,23 +3054,23 @@ AND auth.role() = 'authenticated');</code>
             let demotionCount = 0;
             let summaryHtml = `<p class="font-semibold text-slate-700 mb-2">สรุปแผนปีการศึกษา ${currentPlanYear}</p>`;
             rows.forEach(row => {
-                const fromName = row.querySelector('td:first-child .font-semibold')?.textContent || '';
-                const countBtn = row.querySelector('td:nth-child(2) button');
-                const toSel = row.querySelector('select[data-from-id]');
+                const fromName  = row.querySelector('td:first-child .font-semibold')?.textContent || '';
+                const countBtn  = row.querySelector('td:nth-child(2) button');
+                const toSel     = row.querySelector('select[data-from-id]');
                 const noteInput = row.querySelector('input[data-from-id]');
-                const badgeEl = row.querySelector('.badge-cell');
-                const n = parseInt(countBtn?.textContent) || 0;
-                const toName = toSel?.selectedOptions[0]?.text || 'จบการศึกษา';
+                const badgeEl   = row.querySelector('.badge-cell');
+                const n         = parseInt(countBtn?.textContent) || 0;
+                const toName    = toSel?.selectedOptions[0]?.text || 'จบการศึกษา';
                 const isDemotion = badgeEl?.innerHTML.includes('ลดชั้น');
-                const note = noteInput?.value.trim() || '';
-                totalStudents += n;
+                const note      = noteInput?.value.trim() || '';
+                totalStudents  += n;
                 if (isDemotion) demotionCount += n;
 
                 const rowBadge = isDemotion
                     ? `<span class="text-xs font-semibold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 ml-1">ลดชั้น</span>`
                     : toName === 'จบการศึกษา'
-                        ? `<span class="text-xs font-semibold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 ml-1">จบ</span>`
-                        : '';
+                    ? `<span class="text-xs font-semibold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 ml-1">จบ</span>`
+                    : '';
 
                 summaryHtml += `<div class="flex items-center gap-2 text-xs py-0.5">
                     <span class="text-slate-500 w-20 font-medium shrink-0">${fromName}</span>
@@ -3096,7 +3096,7 @@ AND auth.role() = 'authenticated');</code>
 
         async function executePlan() {
             const adminPass = document.getElementById('prm-admin-pass').value;
-            const passErr = document.getElementById('prm-pass-err');
+            const passErr   = document.getElementById('prm-pass-err');
 
             if (!adminPass) {
                 passErr.textContent = 'กรุณาใส่รหัสผ่าน Admin';
@@ -3113,7 +3113,7 @@ AND auth.role() = 'authenticated');</code>
 
             // re-authenticate ด้วยรหัสที่กรอกเพื่อยืนยัน
             const { error: signInErr } = await supabaseAdmin.auth.signInWithPassword({
-                email: user.email,
+                email:    user.email,
                 password: adminPass
             });
             if (signInErr) {
@@ -3140,7 +3140,7 @@ AND auth.role() = 'authenticated');</code>
 
             try {
                 const { data, error } = await pawDb.rpc('execute_promotion_plan', {
-                    p_plan_id: currentPlanId,
+                    p_plan_id:    currentPlanId,
                     p_teacher_id: null
                 });
                 if (error) throw error;
@@ -3154,9 +3154,12 @@ AND auth.role() = 'authenticated');</code>
                         <p>ย้ายนักเรียนทั้งหมด <strong>${data.count} คน</strong> เรียบร้อยแล้ว</p>
                         <p class="text-emerald-700">
                             <i class="fa-solid fa-circle-check mr-1"></i>
-                            ระบบอัปเดตเป็นปีการศึกษา <strong>${data.new_year}</strong> แล้ว
+                            อัปเดตเป็นปีการศึกษา <strong>${data.new_year}</strong>
                         </p>
-                        <p class="text-slate-400 text-xs">ข้อมูลปี ${data.year} ยังดูย้อนหลังได้ตามปกติ</p>
+                        <p class="text-slate-500 text-xs">
+                            รายวิชาที่อัปเดต ${data.teacher_subjects_updated || 0} รายการ
+                            &nbsp;·&nbsp; ข้อมูลปี ${data.year} ดูย้อนหลังได้ตามปกติ
+                        </p>
                     </div>`,
                     confirmButtonColor: '#7c3aed'
                 });
