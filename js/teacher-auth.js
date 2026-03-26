@@ -24,7 +24,7 @@ export function logoutTeacher() { sessionStorage.removeItem(SESSION_KEY); }
 export async function getTeacherAssignments(teacherId, academicYear) {
     const { data, error } = await db
         .from('teacher_subjects')
-        .select('id, academic_year, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,academic_year,semester)')
+        .select('id, academic_year, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,semester)')
         .eq('teacher_id', teacherId)
         .eq('academic_year', academicYear);
     if (error) throw error;
