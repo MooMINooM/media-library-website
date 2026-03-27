@@ -292,12 +292,13 @@
     let teachers = [], subjects = [], classrooms = [], tsMap = {};
 
     async function init() {
-      const [tR, sR, cR, tsR, tsYearR] = await Promise.all([
+      const [tR, sR, cR, tsR, tsYearR, spYearR] = await Promise.all([
         db.from("teachers").select("id,name,username,position,is_active").order("name"),
         db.from("subjects").select("id,code,name").order("code"),
         db.from("classrooms").select("id,name,grade,level").order("grade").order("name"),
         db.from("teacher_subjects").select("teacher_id"),
-        db.from("teacher_subjects").select("academic_year")
+        db.from("teacher_subjects").select("academic_year"),
+        db.from("student_promotions").select("academic_year")
       ]);
       teachers = tR.data || [];
       subjects = sR.data || [];
@@ -305,8 +306,18 @@
       tsMap = {};
       (tsR.data || []).forEach(r => { tsMap[r.teacher_id] = (tsMap[r.teacher_id] || 0) + 1; });
 
-      // สร้าง dropdown ปีการศึกษาจาก teacher_subjects
-      const uniqueYears = [...new Set((tsYearR.data || []).map(r => r.academic_year).filter(Boolean))].sort((a,b) => b.localeCompare(a));
+      // คำนวณปีการศึกษาทั้งหมด — เหมือน getAcademicYears() ใน teacher-auth.js
+      const tsYears = (tsYearR.data || []).map(r => r.academic_year).filter(Boolean);
+      const spYears = (spYearR.data || []).map(r => r.academic_year).filter(Boolean);
+      const allYears = [...tsYears, ...spYears];
+
+      // เพิ่มปีปัจจุบัน = MAX(student_promotions) + 1
+      if (spYears.length > 0) {
+        const maxSpYear = spYears.sort((a,b) => b.localeCompare(a))[0];
+        allYears.push((parseInt(maxSpYear) + 1).toString());
+      }
+
+      const uniqueYears = [...new Set(allYears)].filter(Boolean).sort((a,b) => b.localeCompare(a));
       const syEl = document.getElementById("s-year");
       if (syEl) syEl.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join("") || `<option value="2568">2568</option>`;
 
