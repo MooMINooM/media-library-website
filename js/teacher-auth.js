@@ -19,14 +19,44 @@ export function getTeacherSession() {
 }
 export function logoutTeacher() { sessionStorage.removeItem(SESSION_KEY); }
 
-// getTeacherAssignments — กรองด้วย teacher_subjects.academic_year โดยตรง
-// ถูกต้องไม่ว่า classrooms.academic_year จะเปลี่ยนไปแล้วหรือเปล่า
+// getTeacherAssignments — แยก 2 เส้นทางตามปีที่เลือก
+// ปีปัจจุบัน → query teacher_subjects.academic_year ตรงๆ
+// ปีย้อนหลัง → หาห้องจาก student_promotions ก่อน เพราะ
+//              teacher_subjects.academic_year ถูก UPDATE ไปแล้วหลังเลื่อนชั้น
 export async function getTeacherAssignments(teacherId, academicYear) {
+    const currentYear = await getCurrentAcademicYear();
+
+    if (academicYear === currentYear) {
+        // ── ปีปัจจุบัน ─────────────────────────────────────────────
+        const { data, error } = await db
+            .from('teacher_subjects')
+            .select('id, academic_year, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,semester)')
+            .eq('teacher_id', teacherId)
+            .eq('academic_year', academicYear);
+        if (error) throw error;
+        return (data || []).filter(a => a.classrooms != null);
+    }
+
+    // ── ปีย้อนหลัง ─────────────────────────────────────────────────
+    // 1. หา classroom_id ที่มีนักเรียนจริงในปีนั้น จาก student_promotions
+    const { data: sp, error: spErr } = await db
+        .from('student_promotions')
+        .select('from_classroom_id')
+        .eq('academic_year', academicYear);
+    if (spErr) throw spErr;
+
+    const classroomIds = [...new Set(
+        (sp || []).map(r => r.from_classroom_id).filter(Boolean)
+    )];
+    if (!classroomIds.length) return [];
+
+    // 2. ดึง teacher_subjects ของครูที่ classroom_id อยู่ในชุดนั้น
+    //    (ไม่กรอง academic_year เพราะมันถูก UPDATE ไปแล้ว)
     const { data, error } = await db
         .from('teacher_subjects')
         .select('id, academic_year, subjects(id,code,name,group_name,credits,hours_per_week,semester), classrooms(id,name,level,grade,semester)')
         .eq('teacher_id', teacherId)
-        .eq('academic_year', academicYear);
+        .in('classroom_id', classroomIds);
     if (error) throw error;
     return (data || []).filter(a => a.classrooms != null);
 }
