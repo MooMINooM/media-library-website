@@ -198,7 +198,10 @@ export async function saveAttendance(records) {
     return data;
 }
 
-// ดึงปีการศึกษาทั้งหมด — รวมปีปัจจุบัน (teacher_subjects) + ปีเก่า (student_promotions)
+// ดึงปีการศึกษาทั้งหมด รวม:
+// - ปีใน teacher_subjects (ปีที่มีวิชา)
+// - ปีใน student_promotions (ปีที่เคยเลื่อนชั้น)
+// - ปีถัดจาก promotion ล่าสุด (ปีปัจจุบันที่ยังไม่มี teacher_subjects)
 export async function getAcademicYears() {
     const [r1, r2] = await Promise.all([
         db.from('teacher_subjects').select('academic_year'),
@@ -207,18 +210,28 @@ export async function getAcademicYears() {
     const all = [
         ...((r1.data || []).map(r => r.academic_year)),
         ...((r2.data || []).map(r => r.academic_year))
-    ];
-    return [...new Set(all)].filter(Boolean).sort((a, b) => b.localeCompare(a));
+    ].filter(Boolean);
+
+    // เพิ่มปีปัจจุบัน = MAX(student_promotions.academic_year) + 1
+    // เพราะหลังเลื่อนชั้น teacher_subjects ยังเป็นปีเก่า แต่ปีจริงคือปีถัดไป
+    const spYears = (r2.data || []).map(r => r.academic_year).filter(Boolean);
+    if (spYears.length > 0) {
+        const maxSpYear = spYears.sort((a, b) => b.localeCompare(a))[0];
+        const nextYear = (parseInt(maxSpYear) + 1).toString();
+        all.push(nextYear);
+    }
+
+    return [...new Set(all)].sort((a, b) => b.localeCompare(a));
 }
 
-// ปีปัจจุบัน = ปีล่าสุดใน teacher_subjects
-// classrooms ไม่มี academic_year แล้ว
+// ปีปัจจุบัน = MAX(student_promotions.academic_year) + 1 ถ้ามี promotion แล้ว
+// ถ้ายังไม่เคยเลื่อนชั้น → ใช้ MAX(teacher_subjects.academic_year)
 export async function getCurrentAcademicYear() {
-    const { data, error } = await db
-        .from('teacher_subjects')
-        .select('academic_year')
-        .order('academic_year', { ascending: false })
-        .limit(1);
-    if (error || !data || !data.length) return null;
-    return data[0].academic_year;
+    const [spRes, tsRes] = await Promise.all([
+        db.from('student_promotions').select('academic_year').order('academic_year', { ascending: false }).limit(1),
+        db.from('teacher_subjects').select('academic_year').order('academic_year', { ascending: false }).limit(1)
+    ]);
+    const lastPromoYear = spRes.data?.[0]?.academic_year;
+    if (lastPromoYear) return (parseInt(lastPromoYear) + 1).toString();
+    return tsRes.data?.[0]?.academic_year || null;
 }
