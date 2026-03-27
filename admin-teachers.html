@@ -222,7 +222,14 @@
       <div class="p-5 space-y-4">
         <div class="bg-slate-50 rounded-xl p-4">
           <p class="text-xs font-semibold text-slate-500 mb-3">เพิ่มวิชาที่สอน</p>
-          <div class="grid grid-cols-2 gap-2 mb-2">
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">ปีการศึกษา</label>
+              <select id="s-year"
+                class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-indigo-300">
+                <option value="">— ปี —</option>
+              </select>
+            </div>
             <div>
               <label class="block text-xs text-slate-400 mb-1">รายวิชา</label>
               <select id="s-subject"
@@ -285,17 +292,24 @@
     let teachers = [], subjects = [], classrooms = [], tsMap = {};
 
     async function init() {
-      const [tR, sR, cR, tsR] = await Promise.all([
+      const [tR, sR, cR, tsR, tsYearR] = await Promise.all([
         db.from("teachers").select("id,name,username,position,is_active").order("name"),
         db.from("subjects").select("id,code,name").order("code"),
-        db.from("classrooms").select("id,name,academic_year").order("name"),
-        db.from("teacher_subjects").select("teacher_id")
+        db.from("classrooms").select("id,name,grade,level").order("grade").order("name"),
+        db.from("teacher_subjects").select("teacher_id"),
+        db.from("teacher_subjects").select("academic_year")
       ]);
       teachers = tR.data || [];
       subjects = sR.data || [];
       classrooms = cR.data || [];
       tsMap = {};
       (tsR.data || []).forEach(r => { tsMap[r.teacher_id] = (tsMap[r.teacher_id] || 0) + 1; });
+
+      // สร้าง dropdown ปีการศึกษาจาก teacher_subjects
+      const uniqueYears = [...new Set((tsYearR.data || []).map(r => r.academic_year).filter(Boolean))].sort((a,b) => b.localeCompare(a));
+      const syEl = document.getElementById("s-year");
+      if (syEl) syEl.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join("") || `<option value="2568">2568</option>`;
+
       renderStats();
       renderTable(teachers);
       fillDropdowns();
@@ -472,7 +486,7 @@
       subjects.forEach(s => { const o = document.createElement("option"); o.value = s.id; o.textContent = s.code + " " + s.name; ss.appendChild(o); });
       const sc = document.getElementById("s-classroom");
       sc.innerHTML = "<option value=''>— เลือกห้อง —</option>";
-      classrooms.forEach(c => { const o = document.createElement("option"); o.value = c.id; o.textContent = c.name + " (" + c.academic_year + ")"; sc.appendChild(o); });
+      classrooms.forEach(c => { const o = document.createElement("option"); o.value = c.id; o.textContent = c.name; sc.appendChild(o); });
     }
 
     async function openSubModal(tid, name) {
@@ -485,7 +499,7 @@
 
     async function loadAssignments() {
       const { data } = await db.from("teacher_subjects")
-        .select("id,subjects(code,name),classrooms(name,academic_year)")
+        .select("id, academic_year, subjects(code,name), classrooms(name)")
         .eq("teacher_id", curTeacherId).order("id");
       const list = document.getElementById("s-list");
       if (!data || !data.length) {
@@ -496,7 +510,8 @@
       <div>
         <span class="text-xs font-semibold text-indigo-700">${r.subjects?.code || ""}</span>
         <span class="text-xs text-slate-600 ml-1">${r.subjects?.name || ""}</span>
-        <span class="text-xs text-slate-400 ml-2">— ${r.classrooms?.name || ""} (${r.classrooms?.academic_year || ""})</span>
+        <span class="text-xs text-slate-400 ml-2">→ ${r.classrooms?.name || ""}</span>
+        ${r.academic_year ? `<span class="text-xs text-violet-500 ml-1">(${r.academic_year})</span>` : ""}
       </div>
       <button onclick="removeAssignment(${r.id})"
         class="w-6 h-6 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition">
@@ -508,8 +523,14 @@
     async function addAssignment() {
       const sid = document.getElementById("s-subject").value;
       const cid = document.getElementById("s-classroom").value;
-      if (!sid || !cid) { Swal.fire({ icon: "warning", title: "เลือกวิชาและห้องเรียน", timer: 2000, showConfirmButton: false }); return; }
-      const { error } = await db.from("teacher_subjects").insert({ teacher_id: curTeacherId, subject_id: parseInt(sid), classroom_id: parseInt(cid) });
+      const yr  = document.getElementById("s-year").value;
+      if (!sid || !cid || !yr) { Swal.fire({ icon: "warning", title: "เลือกวิชา ห้องเรียน และปีการศึกษา", timer: 2000, showConfirmButton: false }); return; }
+      const { error } = await db.from("teacher_subjects").insert({
+        teacher_id:   curTeacherId,
+        subject_id:   parseInt(sid),
+        classroom_id: parseInt(cid),
+        academic_year: yr
+      });
       if (error) {
         Swal.fire({ icon: "error", title: error.code === "23505" ? "มีการกำหนดนี้อยู่แล้ว" : "เกิดข้อผิดพลาด", text: error.code !== "23505" ? error.message : "", timer: 2000, showConfirmButton: false });
         return;
