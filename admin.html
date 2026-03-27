@@ -1720,8 +1720,14 @@ AND auth.role() = 'authenticated');</code>
                 closeRollbackModal();
                 await Swal.fire({
                     icon: 'success', title: 'ย้อนปีสำเร็จ!',
-                    html: `<p>ย้อนจาก ${data.from_year} → ${data.to_year}<br>
-                           นักเรียน <strong>${data.students_rolledback} คน</strong> · รายวิชา ${data.teacher_subjects_updated} รายการ</p>`,
+                    html: `<div class="text-sm space-y-2 text-left">
+                        <p>ย้อนจาก ${data.from_year} → ${data.to_year} เรียบร้อย</p>
+                        <p>นักเรียน <strong>${data.students_rolledback} คน</strong> กลับสู่ห้องเดิม</p>
+                        <p class="text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            กรุณาตรวจสอบและมอบหมายรายวิชาครูสำหรับปี <strong>${data.to_year}</strong> ใน <em>กำหนดวิชาที่สอน</em>
+                        </p>
+                    </div>`,
                     confirmButtonColor: '#dc2626'
                 });
                 await loadSettingsSection();
@@ -3359,15 +3365,11 @@ AND auth.role() = 'authenticated');</code>
                 await Swal.fire({
                     icon: 'success',
                     title: 'เลื่อนชั้นสำเร็จ!',
-                    html: `<div class="text-sm space-y-1 text-left">
+                    html: `<div class="text-sm space-y-2 text-left">
                         <p>ย้ายนักเรียนทั้งหมด <strong>${data.count} คน</strong> เรียบร้อยแล้ว</p>
-                        <p class="text-emerald-700">
-                            <i class="fa-solid fa-circle-check mr-1"></i>
-                            อัปเดตเป็นปีการศึกษา <strong>${data.new_year}</strong>
-                        </p>
-                        <p class="text-slate-500 text-xs">
-                            รายวิชาที่อัปเดต ${data.teacher_subjects_updated || 0} รายการ
-                            &nbsp;·&nbsp; ข้อมูลปี ${data.year} ดูย้อนหลังได้ตามปกติ
+                        <p class="text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            กรุณามอบหมายรายวิชาครูสำหรับปี <strong>${data.new_year}</strong> ใหม่ใน <em>กำหนดวิชาที่สอน</em>
                         </p>
                     </div>`,
                     confirmButtonColor: '#7c3aed'
