@@ -498,12 +498,16 @@
     function closeSubModal() { document.getElementById("m-subject").classList.add("hidden"); curTeacherId = null; }
 
     async function loadAssignments() {
-      const { data } = await db.from("teacher_subjects")
+      const yr = document.getElementById("s-year").value;
+      let query = db.from("teacher_subjects")
         .select("id, academic_year, subjects(code,name), classrooms(name)")
-        .eq("teacher_id", curTeacherId).order("id");
+        .eq("teacher_id", curTeacherId)
+        .order("id");
+      if (yr) query = query.eq("academic_year", yr);
+      const { data } = await query;
       const list = document.getElementById("s-list");
       if (!data || !data.length) {
-        list.innerHTML = "<p class='text-xs text-slate-400 text-center py-3'>ยังไม่มีวิชาที่กำหนด</p>"; return;
+        list.innerHTML = `<p class='text-xs text-slate-400 text-center py-3'>${yr ? "ยังไม่มีวิชาปี " + yr : "ยังไม่มีวิชาที่กำหนด"}</p>`; return;
       }
       list.innerHTML = data.map(r => `
     <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
@@ -554,6 +558,10 @@
 
     // Auto-init
     if (sessionStorage.getItem("at_admin") === "1") init();
+
+    document.getElementById("s-year")?.addEventListener("change", () => {
+      if (curTeacherId) loadAssignments();
+    });
   </script>
 </body>
 
