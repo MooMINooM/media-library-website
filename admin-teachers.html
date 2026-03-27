@@ -70,7 +70,7 @@
 
     <div class="flex-1 p-6 max-w-6xl mx-auto w-full space-y-5">
       <!-- Stats -->
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
             <i class="fa-solid fa-users text-violet-600"></i>
@@ -96,6 +96,15 @@
           <div>
             <p class="text-2xl font-bold" id="stat-inactive">—</p>
             <p class="text-xs text-slate-400">ปิดใช้งาน</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-violet-100 p-4 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-calendar-check text-white"></i>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-violet-700" id="stat-cur-year">—</p>
+            <p class="text-xs text-slate-400">ปีการศึกษาปัจจุบัน</p>
           </div>
         </div>
       </div>
@@ -320,6 +329,16 @@
       const uniqueYears = [...new Set(allYears)].filter(Boolean).sort((a,b) => b.localeCompare(a));
       const syEl = document.getElementById("s-year");
       if (syEl) syEl.innerHTML = uniqueYears.map(y => `<option value="${y}">${y}</option>`).join("") || `<option value="2568">2568</option>`;
+
+      // แสดงปีปัจจุบันในกล่อง stat
+      const curYear = (() => {
+        if (spYears.length > 0) return (parseInt(spYears.sort((a,b) => b.localeCompare(a))[0]) + 1).toString();
+        return tsYears.sort((a,b) => b.localeCompare(a))[0] || '—';
+      })();
+      const statYearEl = document.getElementById("stat-cur-year");
+      if (statYearEl) statYearEl.textContent = curYear;
+      // auto-select ปีปัจจุบันใน dropdown
+      if (syEl && curYear !== '—') syEl.value = curYear;
 
       renderStats();
       renderTable(teachers);
