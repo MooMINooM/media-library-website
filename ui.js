@@ -333,7 +333,7 @@ export function renderAchievementSystem(containerId, data, type, page = 1) {
 
         sortedKeys.forEach(name => {
             const div = document.createElement('div');
-            div.className = "group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:border-blue-200 hover:-translate-y-2 transition-all duration-500 cursor-pointer text-center relative overflow-hidden h-full flex flex-col items-center justify-center";
+            div.className = "group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 transition-all duration-500 cursor-pointer text-center relative overflow-hidden h-full flex flex-col items-center justify-center";
             div.onclick = () => window.selectFolder(containerId, type, name);
             div.innerHTML = `
                 <div class="w-20 h-20 bg-white rounded-[1.5rem] flex items-center justify-center text-4xl text-blue-500 mx-auto mb-4 shadow-sm border border-blue-50 group-hover:scale-110 transition duration-500 overflow-hidden relative">
@@ -359,7 +359,7 @@ export function renderAchievementSystem(containerId, data, type, page = 1) {
             cardGrid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in";
             pageItems.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "group bg-white rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col";
+                div.className = "group bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-lg transition-all duration-500 flex flex-col";
                 div.onclick = () => window.open(item.image || item.file_url || '#', '_blank');
                 div.innerHTML = `
                     <div class="aspect-[1.414/1] bg-slate-100 relative overflow-hidden">
@@ -522,7 +522,7 @@ export function renderNews(data, page = 1) {
     const items = data.slice((page - 1) * NEWS_ITEMS_PER_PAGE, page * NEWS_ITEMS_PER_PAGE);
     items.forEach(news => {
         const div = document.createElement('div');
-        div.className = "bg-white/80 border border-slate-100 rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row gap-6 mb-6 group cursor-pointer";
+        div.className = "bg-white/80 border border-slate-100 rounded-[2rem] p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col md:flex-row gap-6 mb-6 group cursor-pointer";
         div.onclick = () => { if (news.link) window.open(news.link, '_blank'); };
         // ✅ เปลี่ยนมาใช้ formatDateThai
         div.innerHTML = `<div class="w-full md:w-64 h-48 bg-slate-100 rounded-[1.5rem] overflow-hidden shrink-0 relative">${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-[1.5s]">` : ''}<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[9px] font-black text-slate-500 border border-white">News</div></div><div class="flex-1 flex flex-col justify-between py-1"><div class="space-y-3"><h4 class="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">${news.title}</h4><p class="text-slate-500 text-sm leading-relaxed flex items-center gap-2 flex-wrap">ข้อมูลประชาสัมพันธ์วันที่ ${formatDateThai(news.date)}${news.academic_year ? ` <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full border border-indigo-100">ปี ${news.academic_year}</span>` : ''}</p></div><div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-50"><span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400"></i> ${formatDateThai(news.date)}</span><span class="text-blue-600 text-[10px] font-black group-hover:translate-x-2 transition-transform">Read More <i class="fa-solid fa-arrow-right"></i></span></div></div>`;
@@ -541,7 +541,7 @@ export function renderInnovations(data, page = 1) {
     container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in";
     items.forEach(item => {
         const div = document.createElement('div');
-        div.className = "group bg-white rounded-[2.5rem] shadow-lg border border-slate-100 overflow-hidden hover:-translate-y-2 transition-all cursor-pointer flex flex-col";
+        div.className = "group bg-white rounded-[2.5rem] shadow-sm hover:shadow-lg border border-slate-100 overflow-hidden hover:-translate-y-1 transition-all cursor-pointer flex flex-col";
         div.onclick = () => window.open(item.fileUrl, '_blank');
         div.innerHTML = `<div class="aspect-[16/10] bg-slate-50 relative overflow-hidden">${item.coverImageUrl ? `<img src="${item.coverImageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition duration-[2s]">` : ''}<div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-xl text-[10px] font-black text-blue-600 shadow-sm border border-white">Innovation</div></div><div class="p-6 flex-1 flex flex-col"><h4 class="font-bold text-lg text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors">${item.title}</h4><div class="mt-auto pt-5 border-t border-slate-50"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fa-solid fa-user-pen text-sm"></i></div><div class="min-w-0"><p class="text-xs font-black text-slate-700 truncate uppercase tracking-tight">${item.creator || '-'}</p><p class="text-[10px] font-bold text-slate-400 uppercase italic">ระดับ: ${item.class || '-'}</p></div></div></div></div>`;
         container.appendChild(div);
@@ -714,7 +714,7 @@ window.clearDocFolder  = () => {};
 export function renderPersonGrid(data, containerId) {
     const container = document.getElementById(containerId); if (!container) return; container.innerHTML = '';
     const sorted = [...data].sort((a, b) => a.id - b.id);
-    const createCard = (p, isL = false) => `<div class="relative group rounded-[2.5rem] p-8 ${isL ? 'bg-gradient-to-b from-white to-blue-50 border-blue-100 shadow-xl' : 'bg-white border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2'} border overflow-hidden transition-all duration-700 flex flex-col items-center text-center h-full"><div class="w-32 h-32 rounded-full overflow-hidden border-[6px] ${isL ? 'border-blue-100 ring-4 ring-blue-50' : 'border-white shadow-md'} bg-white mb-6 group-hover:scale-105 transition duration-700 relative z-10">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-5xl"><i class="fa-solid fa-user"></i></div>`}</div><div class="relative z-10 w-full"><h3 class="text-lg font-bold text-slate-800 mb-2">${p.name}</h3><div class="inline-block px-4 py-1 bg-slate-50 rounded-full border border-slate-100 shadow-sm"><p class="text-[10px] font-black text-slate-500 uppercase">${p.role}</p></div></div></div>`;
+    const createCard = (p, isL = false) => `<div class="relative group rounded-[2.5rem] p-8 ${isL ? 'bg-gradient-to-b from-white to-blue-50 border-blue-100 shadow-xl' : 'bg-white border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1'} border overflow-hidden transition-all duration-700 flex flex-col items-center text-center h-full"><div class="w-32 h-32 rounded-full overflow-hidden border-[6px] ${isL ? 'border-blue-100 ring-4 ring-blue-50' : 'border-white shadow-md'} bg-white mb-6 group-hover:scale-105 transition duration-700 relative z-10">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-5xl"><i class="fa-solid fa-user"></i></div>`}</div><div class="relative z-10 w-full"><h3 class="text-lg font-bold text-slate-800 mb-2">${p.name}</h3><div class="inline-block px-4 py-1 bg-slate-50 rounded-full border border-slate-100 shadow-sm"><p class="text-[10px] font-black text-slate-500 uppercase">${p.role}</p></div></div></div>`;
     if (sorted[0]) container.innerHTML += `<div class="flex justify-center mb-12 animate-fade-in"><div class="w-full max-w-sm">${createCard(sorted[0], true)}</div></div>`;
     if (sorted.slice(1).length > 0) { let g = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">`; sorted.slice(1).forEach(p => g += createCard(p)); g += `</div>`; container.innerHTML += g; }
 }
@@ -920,7 +920,7 @@ export function renderHomeGallery(albums) {
             ? new Date(a.event_date).toLocaleDateString('th-TH', {year:'numeric',month:'short',day:'numeric'})
             : (a.academic_year ? `ปี ${a.academic_year}` : '');
         return `<a href="${url}" target="_blank" rel="noopener"
-            class="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 block"
+            class="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 block"
             style="height:100%;min-height:0">
             ${cover
                 ? `<img src="${cover}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" style="position:absolute;inset:0">`
@@ -964,7 +964,7 @@ export function renderGalleryPage(albums) {
             ? new Date(a.event_date).toLocaleDateString('th-TH', {year:'numeric',month:'short',day:'numeric'})
             : (a.academic_year ? `ปีการศึกษา ${a.academic_year}` : '');
         return `<a href="${url}" target="_blank" rel="noopener"
-            class="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-100 block">
+            class="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-1 border border-slate-100 block">
             <div class="relative aspect-[4/3] overflow-hidden">
                 ${cover
                     ? `<img src="${cover}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">`
