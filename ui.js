@@ -739,8 +739,6 @@ export function renderHomeNews(newsList) {
     [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
 }
 
-console.log("Lumina Final Super Full Version: Connected with Maps, Colors & Announcement System");
-
 // =============================================================================
 // CALENDAR EVENTS RENDERER
 // =============================================================================
@@ -1022,4 +1020,3 @@ window.closeLightbox = function() {
     if (lb) lb.classList.add('hidden');
 };
 
-console.log("Calendar, Gallery, Ticker modules loaded ✅");
