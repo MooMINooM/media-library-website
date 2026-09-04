@@ -84,6 +84,13 @@ export function renderSchoolInfo(dataList) {
         heroNameEl.innerText = `"${shortName}"`;
     }
 
+    const heroMottoEl = document.getElementById('hero-motto');
+    const heroTagline = info.motto || info.vision;
+    if (heroMottoEl && heroTagline) {
+        heroMottoEl.innerText = heroTagline;
+        heroMottoEl.classList.remove('hidden');
+    }
+
     const mapping = {
         'header-school-name': info.school_name, 'header-affiliation': info.affiliation, 'hero-motto': info.motto,
         'info-name-th': info.school_name, 'info-name-en': info.school_name_en, 'info-school-code': info.school_code_10,
@@ -116,6 +123,13 @@ export function renderSchoolInfo(dataList) {
             logoBasic.src = info.logo_url;
             logoBasic.classList.remove('hidden');
             if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
+        }
+        const heroImg = document.getElementById('hero-featured-image');
+        const heroImgPlaceholder = document.getElementById('hero-image-placeholder');
+        if (heroImg) {
+            heroImg.src = info.logo_url;
+            heroImg.classList.remove('hidden');
+            if (heroImgPlaceholder) heroImgPlaceholder.classList.add('hidden');
         }
     }
 
@@ -737,6 +751,73 @@ export function renderHomeNews(newsList) {
     const c = document.getElementById('home-news-container'); if (!c) return; c.innerHTML = '';
     // ✅ เปลี่ยนมาใช้ formatDateThai ในหน้าแรกด้วย
     [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
+}
+
+// ✅ Homepage: ผลงานเด่น (ครู/นักเรียน/สถานศึกษา ผสมกัน เรียงตาม id ล่าสุด)
+export function renderHomeAchievements(teachers, students, school) {
+    const c = document.getElementById('home-achievements-container');
+    if (!c) return;
+    const tag = (arr, kind) => (arr || []).map(i => ({ ...i, _kind: kind }));
+    const pool = [...tag(teachers, 'teacher'), ...tag(students, 'student'), ...tag(school, 'school')]
+        .sort((a, b) => (b.id || 0) - (a.id || 0))
+        .slice(0, 6);
+
+    if (pool.length === 0) {
+        c.innerHTML = `<div class="col-span-full text-center py-10 bg-white/50 rounded-2xl border border-dashed border-slate-200 text-slate-300 text-sm">ยังไม่มีผลงาน</div>`;
+        return;
+    }
+
+    const kindMeta = {
+        teacher: { label: 'ครู', cls: 'bg-indigo-50 text-indigo-600' },
+        student: { label: 'นักเรียน', cls: 'bg-emerald-50 text-emerald-600' },
+        school:  { label: 'สถานศึกษา', cls: 'bg-amber-50 text-amber-600' }
+    };
+
+    c.innerHTML = pool.map(item => {
+        const meta = kindMeta[item._kind];
+        const title = item.students || item.name || item.title || 'เกียรติบัตร';
+        const link = (item.image || item.fileUrl || item.file_url || '#').replace(/'/g, "&#39;");
+        return `<div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer overflow-hidden flex flex-col"
+                onclick="window.open('${link}', '_blank')">
+            <div class="aspect-square bg-slate-50 relative overflow-hidden">
+                ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-3xl"><i class="fa-solid fa-award"></i></div>`}
+                <span class="absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-full ${meta.cls}">${meta.label}</span>
+            </div>
+            <div class="p-2.5">
+                <p class="text-xs font-bold text-slate-700 line-clamp-2 leading-snug">${title}</p>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ✅ Homepage: คลังสื่อ & เอกสารล่าสุด (พรีวิวจากเอกสารราชการ + นวัตกรรมที่มีอยู่แล้ว —
+//    จะเปลี่ยนไปผูกกับหน้า Media Library จริงใน Phase 2)
+export function renderHomeMedia(documents, innovations) {
+    const c = document.getElementById('home-media-container');
+    if (!c) return;
+    const items = [
+        ...(innovations || []).map(d => ({ title: d.title, sub: 'นวัตกรรม', url: d.fileUrl, image: d.coverImageUrl, icon: 'fa-lightbulb', id: d.id })),
+        ...(documents || []).map(d => ({ title: d.title, sub: 'เอกสารราชการ', url: d.fileUrl, image: null, icon: _fileIconSplit(d.fileUrl).icon, id: d.id }))
+    ].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 4);
+
+    if (items.length === 0) {
+        c.innerHTML = `<div class="col-span-full text-center py-10 bg-white/50 rounded-2xl border border-dashed border-slate-200 text-slate-300 text-sm">ยังไม่มีเอกสาร</div>`;
+        return;
+    }
+
+    c.innerHTML = items.map(item => {
+        const link = (item.url || '#').replace(/'/g, "&#39;");
+        return `<div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer overflow-hidden flex flex-col"
+            onclick="window.open('${link}', '_blank')">
+            <div class="aspect-[4/3] bg-slate-50 relative overflow-hidden flex items-center justify-center">
+                ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">` : `<i class="fa-solid ${item.icon} text-3xl text-slate-300"></i>`}
+                <span class="absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-full bg-teal-50 text-teal-600">${item.sub}</span>
+            </div>
+            <div class="p-2.5">
+                <p class="text-xs font-bold text-slate-700 line-clamp-2 leading-snug">${item.title || '-'}</p>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 console.log("Lumina Final Super Full Version: Connected with Maps, Colors & Announcement System");

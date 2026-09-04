@@ -221,6 +221,7 @@ async function fetchAndRenderAll() {
         ];
 
         UI.renderSchoolAchievements(allAcademic);
+        UI.renderHomeAchievements(teachers, students, school);
 
     } catch (e) { console.warn("Load Achievements Failed", e); }
 
@@ -238,6 +239,8 @@ async function fetchAndRenderAll() {
 
         const { data: innov } = await supabase.from('innovations').select('*');
         if(innov) UI.renderInnovations(innov);
+
+        UI.renderHomeMedia(docs, innov);
     } catch (e) { console.warn("Load Docs Failed", e); }
 
     // 5. บุคลากร & นักเรียน
