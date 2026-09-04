@@ -521,6 +521,150 @@ window.filterInnovations = (inputId) => {
     renderInnovations(filtered, 1);
 };
 
+// =============================================================================
+// MEDIA LIBRARY (คลังสื่อ) — รวมเอกสารราชการ/แบบฟอร์ม/นวัตกรรม/ข่าว/อัลบั้มภาพ
+// (พรีวิวจากตารางที่มีอยู่แล้ว ไม่มีการเปลี่ยนโครงสร้าง Supabase)
+// =============================================================================
+const ML_ITEMS_PER_PAGE = 12;
+const ML_TYPE_META = {
+    document:   { label: 'เอกสารราชการ', color: 'bg-red-50 text-red-600 border-red-100',        icon: 'fa-file-pdf' },
+    form:       { label: 'แบบฟอร์ม',      color: 'bg-blue-50 text-blue-600 border-blue-100',      icon: 'fa-file-lines' },
+    innovation: { label: 'นวัตกรรม',      color: 'bg-amber-50 text-amber-600 border-amber-100',   icon: 'fa-lightbulb' },
+    news:       { label: 'ข่าว',          color: 'bg-indigo-50 text-indigo-600 border-indigo-100',icon: 'fa-newspaper' },
+    gallery:    { label: 'รูปภาพ',        color: 'bg-pink-50 text-pink-600 border-pink-100',      icon: 'fa-images' },
+};
+let allMediaData = [];
+let _mlState = { type: 'all', search: '', year: '', subject: '', creator: '', sort: 'newest' };
+
+export function setMediaLibraryData(items) {
+    allMediaData = items || [];
+    _mlPopulateFilters();
+    renderMediaLibrary(1);
+}
+
+function _mlPopulateFilters() {
+    const years = [...new Set(allMediaData.map(i => i.academic_year).filter(Boolean))].sort((a, b) => String(b).localeCompare(String(a), 'th', { numeric: true }));
+    const yearSel = document.getElementById('ml-filter-year');
+    if (yearSel) yearSel.innerHTML = `<option value="">ทุกปีการศึกษา</option>` + years.map(y => `<option value="${y}">ปีการศึกษา ${y}</option>`).join('');
+
+    const creators = [...new Set(allMediaData.map(i => i.creator).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'th'));
+    const creatorSel = document.getElementById('ml-filter-creator');
+    if (creatorSel) creatorSel.innerHTML = `<option value="">ทุกผู้จัดทำ</option>` + creators.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    const chipsEl = document.getElementById('ml-type-chips');
+    if (!chipsEl) return;
+    const counts = {};
+    allMediaData.forEach(i => { counts[i.type] = (counts[i.type] || 0) + 1; });
+    const chip = (type, label, icon, count) => `<button type="button" onclick="window.setMediaType('${type}')" data-ml-chip="${type}"
+        class="ml-chip px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5 ${_mlState.type === type ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'}">
+        <i class="fa-solid ${icon}"></i> ${label} <span class="opacity-70">${count}</span></button>`;
+    let html = chip('all', 'ทั้งหมด', 'fa-grip', allMediaData.length);
+    Object.keys(ML_TYPE_META).forEach(t => { if (counts[t]) html += chip(t, ML_TYPE_META[t].label, ML_TYPE_META[t].icon, counts[t]); });
+    chipsEl.innerHTML = html;
+}
+
+window.setMediaType = (type) => { _mlState.type = type; renderMediaLibrary(1); };
+
+window.filterMediaLibrary = () => {
+    _mlState.search  = document.getElementById('ml-search')?.value.trim().toLowerCase() || '';
+    _mlState.year    = document.getElementById('ml-filter-year')?.value || '';
+    _mlState.subject = document.getElementById('ml-filter-subject')?.value || '';
+    _mlState.creator = document.getElementById('ml-filter-creator')?.value || '';
+    _mlState.sort    = document.getElementById('ml-sort')?.value || 'newest';
+    renderMediaLibrary(1);
+};
+
+function _mlFilteredSorted() {
+    let items = allMediaData.filter(i => {
+        if (_mlState.type !== 'all' && i.type !== _mlState.type) return false;
+        if (_mlState.search && !`${i.title || ''} ${i.creator || ''}`.toLowerCase().includes(_mlState.search)) return false;
+        if (_mlState.year && i.academic_year !== _mlState.year) return false;
+        if (_mlState.subject && i.subject !== _mlState.subject) return false;
+        if (_mlState.creator && i.creator !== _mlState.creator) return false;
+        return true;
+    });
+    if (_mlState.sort === 'name') items = items.slice().sort((a, b) => (a.title || '').localeCompare(b.title || '', 'th'));
+    else if (_mlState.sort === 'oldest') items = items.slice().sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    else items = items.slice().sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
+    return items;
+}
+
+export function renderMediaLibrary(page = 1) {
+    const container = document.getElementById('media-library-container');
+    if (!container) return;
+    const filtered = _mlFilteredSorted();
+
+    const countEl = document.getElementById('ml-count');
+    if (countEl) countEl.textContent = filtered.length;
+    document.querySelectorAll('.ml-chip').forEach(c => {
+        const active = c.getAttribute('data-ml-chip') === _mlState.type;
+        c.className = `ml-chip px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5 ${active ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300'}`;
+    });
+
+    const paginationEl = document.getElementById('media-library-pagination');
+    if (allMediaData.length === 0) {
+        container.innerHTML = `<div class="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">${Array(6).fill('<div class="skel aspect-[16/10] rounded-[2rem]"></div>').join('')}</div>`;
+        if (paginationEl) paginationEl.innerHTML = '';
+        return;
+    }
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-20 bg-white/50 backdrop-blur rounded-[2.5rem] border border-dashed border-slate-200 text-slate-400 font-medium">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</div>`;
+        if (paginationEl) paginationEl.innerHTML = '';
+        return;
+    }
+
+    const start = (page - 1) * ML_ITEMS_PER_PAGE;
+    const items = filtered.slice(start, start + ML_ITEMS_PER_PAGE);
+
+    container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in';
+    container.innerHTML = items.map(item => {
+        const meta = ML_TYPE_META[item.type];
+        const metaLine = [item.creator, item.academic_year ? `ปี ${item.academic_year}` : ''].filter(Boolean).join(' · ');
+        return `<div class="group bg-white rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col">
+            <div class="aspect-[16/10] bg-slate-50 relative overflow-hidden cursor-pointer" onclick="window.openMediaDetail('${item._uid}')">
+                ${item.thumbnail ? `<img src="${item.thumbnail}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-4xl"><i class="fa-solid ${meta.icon}"></i></div>`}
+                <span class="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full border ${meta.color}">${meta.label}</span>
+            </div>
+            <div class="p-5 flex-1 flex flex-col">
+                <h4 class="font-bold text-slate-800 text-sm line-clamp-2 leading-snug cursor-pointer hover:text-teal-600 transition-colors" onclick="window.openMediaDetail('${item._uid}')">${item.title || '-'}</h4>
+                <p class="text-xs text-slate-400 mt-2 line-clamp-1">${metaLine || '-'}</p>
+                <div class="mt-auto pt-4 flex gap-2">
+                    <button onclick="window.openMediaDetail('${item._uid}')" class="flex-1 text-xs font-bold text-slate-500 border border-slate-200 rounded-xl py-2 hover:bg-slate-50 transition-colors">ดูรายละเอียด</button>
+                    ${item.url
+                        ? `<a href="${item.url}" target="_blank" rel="noopener" class="flex-1 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl py-2 text-center transition-colors"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>เปิดไฟล์</a>`
+                        : `<span class="flex-1 text-xs font-bold text-slate-300 border border-slate-100 rounded-xl py-2 text-center">ไม่มีไฟล์แนบ</span>`}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    renderPagination('media-library-pagination', filtered.length, ML_ITEMS_PER_PAGE, page, 'window.pagedMediaLibrary');
+}
+window.pagedMediaLibrary = (p) => renderMediaLibrary(p);
+
+window.openMediaDetail = (uid) => {
+    const item = allMediaData.find(i => i._uid === uid);
+    if (!item) return;
+    const meta = ML_TYPE_META[item.type];
+    const thumb = document.getElementById('ml-detail-thumb');
+    const thumbIcon = document.getElementById('ml-detail-thumb-icon');
+    if (item.thumbnail) { thumb.src = item.thumbnail; thumb.classList.remove('hidden'); thumbIcon.classList.add('hidden'); }
+    else { thumb.classList.add('hidden'); thumbIcon.className = `fa-solid ${meta.icon} text-5xl text-slate-300`; thumbIcon.classList.remove('hidden'); }
+
+    const typeEl = document.getElementById('ml-detail-type');
+    typeEl.textContent = meta.label;
+    typeEl.className = `text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${meta.color}`;
+    document.getElementById('ml-detail-title').textContent = item.title || '-';
+    document.getElementById('ml-detail-meta').textContent =
+        [item.creator, item.academic_year ? `ปีการศึกษา ${item.academic_year}` : '', item.subject].filter(Boolean).join(' · ') || 'ไม่มีข้อมูลเพิ่มเติม';
+
+    const openBtn = document.getElementById('ml-detail-open');
+    if (item.url) { openBtn.href = item.url; openBtn.classList.remove('hidden'); }
+    else { openBtn.classList.add('hidden'); }
+
+    document.getElementById('media-detail-modal').classList.remove('hidden');
+};
+
 // filterDocuments replaced by filterDocs window function in renderDocumentsList
 
 // Pagination Bridges

@@ -40,6 +40,7 @@ function setupNavigation() {
     });
 }
 
+window.navigateToPage = navigateToPage; // ให้ HTML ที่ render แบบไดนามิก (การ์ด/โมดัล) เรียกเปลี่ยนหน้าได้
 function navigateToPage(pageId) {
     document.querySelectorAll('.page-content').forEach(section => {
         section.classList.add('hidden');
@@ -99,6 +100,14 @@ function setupMobileAccordion() {
 const RECENT_SEARCH_KEY = 'site_recent_searches';
 let _menuIndex = null;
 let _contentIndex = [];
+let _mediaLibraryItems = [];
+function pushMediaItems(type, items, mapper) {
+    if (!items) return;
+    items.forEach((raw, i) => {
+        const mapped = mapper(raw);
+        if (mapped && mapped.title) _mediaLibraryItems.push({ type, _uid: `${type}-${raw.id ?? i}`, sortKey: raw.id ?? 0, ...mapped });
+    });
+}
 
 function buildMenuIndex() {
     const seen = new Map();
@@ -255,6 +264,7 @@ window.closeSiteSearch = function () {
 // ✅ Data Fetching System
 async function fetchAndRenderAll() {
     _contentIndex = [];
+    _mediaLibraryItems = [];
 
     // 1. ข้อมูลโรงเรียน & ป๊อปอัพประกาศพิเศษ
     try {
@@ -275,6 +285,7 @@ async function fetchAndRenderAll() {
             UI.renderNews(news);
             UI.renderNewsTicker(news);
             indexContentItems('ข่าว', 'fa-newspaper', news, n => ({ label: n.title, sub: n.date, url: n.link, pageId: 'news' }));
+            pushMediaItems('news', news, n => ({ title: n.title, thumbnail: n.image, url: n.link, academic_year: n.academic_year, pageId: 'news' }));
         }
     } catch (e) { console.warn("Load News Failed", e); }
 
@@ -336,18 +347,21 @@ async function fetchAndRenderAll() {
         if(docs) {
             UI.renderDocumentsList(docs, 'documents-official-container', 'official');
             indexContentItems('เอกสารราชการ', 'fa-file-pdf', docs, d => ({ label: d.title, sub: d.category, url: d.fileUrl, pageId: 'documents-official' }));
+            pushMediaItems('document', docs, d => ({ title: d.title, url: d.fileUrl, pageId: 'documents-official' }));
         }
 
         const { data: forms } = await supabase.from('forms').select('*');
         if(forms) {
             UI.renderDocumentsList(forms, 'documents-forms-container', 'form');
             indexContentItems('แบบฟอร์ม', 'fa-file-lines', forms, f => ({ label: f.title, sub: f.category, url: f.fileUrl, pageId: 'documents-forms' }));
+            pushMediaItems('form', forms, f => ({ title: f.title, url: f.fileUrl, pageId: 'documents-forms' }));
         }
 
         const { data: innov } = await supabase.from('innovations').select('*');
         if(innov) {
             UI.renderInnovations(innov);
             indexContentItems('นวัตกรรม', 'fa-lightbulb', innov, i => ({ label: i.title, sub: i.creator, url: i.fileUrl, pageId: 'innovations' }));
+            pushMediaItems('innovation', innov, i => ({ title: i.title, creator: i.creator, subject: i.subject, thumbnail: i.coverImageUrl, url: i.fileUrl, pageId: 'innovations' }));
         }
 
         UI.renderHomeMedia(docs, innov);
@@ -407,6 +421,10 @@ async function fetchAndRenderAll() {
         if (albums) {
             UI.renderHomeGallery(albums);
             UI.renderGalleryPage(albums);
+            pushMediaItems('gallery', albums, a => ({ title: a.title, thumbnail: a.cover_url, url: a.album_url, academic_year: a.academic_year, pageId: 'gallery' }));
         }
     } catch (e) { console.warn("Load Gallery Failed", e); }
+
+    // 9. คลังสื่อ (รวมจากทุกหมวดด้านบน)
+    UI.setMediaLibraryData(_mediaLibraryItems);
 }
