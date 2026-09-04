@@ -695,23 +695,94 @@ export function renderSchoolAchievements(data) {
 export function renderTeacherAchievements(data) { allTeacherData = data; renderAchievementSystem('teacher-achievements-container', data, 'teacher'); }
 export function renderStudentAchievements(data) { allStudentData = data; renderAchievementSystem('student-achievements-container', data, 'student'); }
 
+function _newsCard(news, big = false) {
+    const yearBadge = news.academic_year ? `<span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-100">ปี ${news.academic_year}</span>` : '';
+    if (big) {
+        return `<div class="group bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col md:flex-row cursor-pointer" onclick="window.openNewsDetail(${news.id})">
+            <div class="md:w-1/2 aspect-video md:aspect-auto bg-slate-100 relative overflow-hidden">
+                ${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-4xl"><i class="fa-regular fa-newspaper"></i></div>`}
+                <span class="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wide px-3 py-1 rounded-full shadow">ข่าวล่าสุด</span>
+            </div>
+            <div class="p-6 md:w-1/2 flex flex-col justify-center">
+                <div class="flex items-center gap-2 mb-3 flex-wrap"><span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400 mr-1"></i>${formatDateThai(news.date)}</span>${yearBadge}</div>
+                <h3 class="font-black text-xl md:text-2xl text-slate-800 leading-snug line-clamp-3 group-hover:text-blue-600 transition-colors">${news.title}</h3>
+                <span class="text-blue-600 text-xs font-black mt-4 flex items-center gap-1 group-hover:translate-x-1 transition-transform">อ่านต่อ <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+            </div>
+        </div>`;
+    }
+    return `<div class="group bg-white rounded-[1.75rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden flex flex-col cursor-pointer" onclick="window.openNewsDetail(${news.id})">
+        <div class="aspect-[16/10] bg-slate-100 relative overflow-hidden">
+            ${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : `<div class="w-full h-full flex items-center justify-center text-slate-200 text-3xl"><i class="fa-regular fa-newspaper"></i></div>`}
+        </div>
+        <div class="p-5 flex-1 flex flex-col">
+            <div class="flex items-center gap-2 mb-2 flex-wrap"><span class="text-[10px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400 mr-1"></i>${formatDateThai(news.date)}</span>${yearBadge}</div>
+            <h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">${news.title}</h4>
+        </div>
+    </div>`;
+}
+
 export function renderNews(data, page = 1) {
     if (!data) return;
     if (allNewsData.length === 0 || data.length > allNewsData.length) { allNewsData = data; }
     const container = document.getElementById('news-container');
+    const featuredEl = document.getElementById('news-featured');
     if (!container) return;
-    container.innerHTML = '';
-    const items = data.slice((page - 1) * NEWS_ITEMS_PER_PAGE, page * NEWS_ITEMS_PER_PAGE);
-    items.forEach(news => {
-        const div = document.createElement('div');
-        div.className = "bg-white/80 border border-slate-100 rounded-[2rem] p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col md:flex-row gap-6 mb-6 group cursor-pointer";
-        div.onclick = () => { if (news.link) window.open(news.link, '_blank'); };
-        // ✅ เปลี่ยนมาใช้ formatDateThai
-        div.innerHTML = `<div class="w-full md:w-64 h-48 bg-slate-100 rounded-[1.5rem] overflow-hidden shrink-0 relative">${news.image ? `<img src="${news.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-[1.5s]">` : ''}<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[9px] font-black text-slate-500 border border-white">News</div></div><div class="flex-1 flex flex-col justify-between py-1"><div class="space-y-3"><h4 class="font-bold text-xl text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">${news.title}</h4><p class="text-slate-500 text-sm leading-relaxed flex items-center gap-2 flex-wrap">ข้อมูลประชาสัมพันธ์วันที่ ${formatDateThai(news.date)}${news.academic_year ? ` <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full border border-indigo-100">ปี ${news.academic_year}</span>` : ''}</p></div><div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-50"><span class="text-[11px] font-bold text-slate-400"><i class="fa-regular fa-clock text-blue-400"></i> ${formatDateThai(news.date)}</span><span class="text-blue-600 text-[10px] font-black group-hover:translate-x-2 transition-transform">Read More <i class="fa-solid fa-arrow-right"></i></span></div></div>`;
-        container.appendChild(div);
-    });
-    renderPagination('news-pagination', data.length, NEWS_ITEMS_PER_PAGE, page, "window.pagedNews");
+
+    if (data.length === 0) {
+        if (featuredEl) featuredEl.innerHTML = '';
+        container.innerHTML = `<div class="col-span-full text-center py-20 bg-white/50 backdrop-blur rounded-[2.5rem] border border-dashed border-slate-200 text-slate-400 font-medium">ไม่พบข่าวที่ตรงกับเงื่อนไข</div>`;
+        document.getElementById('news-pagination').innerHTML = '';
+        return;
+    }
+
+    // ชุดข้อมูลแบบไม่กรอง (เทียบกับ allNewsData ทั้งหมด) เท่านั้นที่ตัดข่าวล่าสุดออกไปทำเป็น featured การ์ด
+    const isUnfiltered = data.length === allNewsData.length && data[0] === allNewsData[0];
+    const listData = isUnfiltered ? data.slice(1) : data;
+
+    if (isUnfiltered && page === 1 && featuredEl) {
+        featuredEl.innerHTML = _newsCard(data[0], true);
+    } else if (featuredEl) {
+        featuredEl.innerHTML = '';
+    }
+
+    const items = listData.slice((page - 1) * NEWS_ITEMS_PER_PAGE, page * NEWS_ITEMS_PER_PAGE);
+    container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5';
+    container.innerHTML = items.map(n => _newsCard(n, false)).join('');
+
+    renderPagination('news-pagination', listData.length, NEWS_ITEMS_PER_PAGE, page, "window.pagedNews");
 }
+
+window.openNewsDetail = (id) => {
+    const news = allNewsData.find(n => String(n.id) === String(id));
+    if (!news) return;
+
+    const imgWrap = document.getElementById('news-detail-image-wrap');
+    const img = document.getElementById('news-detail-image');
+    if (news.image) { img.src = news.image; img.classList.remove('hidden'); if (imgWrap) imgWrap.classList.remove('hidden'); }
+    else if (imgWrap) { imgWrap.classList.add('hidden'); }
+
+    document.getElementById('news-detail-date').innerHTML = `<i class="fa-regular fa-clock text-blue-400 mr-1"></i>${formatDateThai(news.date)}`;
+    const yearEl = document.getElementById('news-detail-year');
+    if (news.academic_year) { yearEl.textContent = `ปีการศึกษา ${news.academic_year}`; yearEl.classList.remove('hidden'); }
+    else { yearEl.classList.add('hidden'); }
+
+    document.getElementById('news-detail-title').textContent = news.title || '-';
+    document.getElementById('news-detail-breadcrumb-title').textContent = news.title || '-';
+
+    const readmore = document.getElementById('news-detail-readmore');
+    if (news.link) { readmore.href = news.link; readmore.classList.remove('hidden'); }
+    else { readmore.classList.add('hidden'); }
+
+    const related = allNewsData.filter(n => n.id !== news.id).slice(0, 3);
+    const relatedEl = document.getElementById('news-detail-related');
+    const relatedWrap = document.getElementById('news-detail-related-wrap');
+    if (relatedEl) {
+        relatedEl.innerHTML = related.map(n => _newsCard(n, false)).join('');
+        if (relatedWrap) relatedWrap.classList.toggle('hidden', related.length === 0);
+    }
+
+    window.navigateToPage('news-detail');
+};
 window.pagedNews = (p) => renderNews(allNewsData, p);
 
 export function renderInnovations(data, page = 1) {
@@ -923,7 +994,7 @@ export function renderHomeNews(newsList) {
     }
     c.innerHTML = '';
     // ✅ เปลี่ยนมาใช้ formatDateThai ในหน้าแรกด้วย
-    [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
+    [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.openNewsDetail(${n.id})"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
 }
 
 // ✅ Homepage: ผลงานเด่น (ครู/นักเรียน/สถานศึกษา ผสมกัน เรียงตาม id ล่าสุด)

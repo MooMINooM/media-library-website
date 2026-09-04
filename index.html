@@ -1154,9 +1154,45 @@
                         </div>
                     </div>
 
-                    <div id="news-container" class="space-y-8"></div>
+                    <div id="news-featured" class="mb-8"></div>
+
+                    <div id="news-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div class="skel aspect-[16/10] rounded-[1.75rem]"></div><div class="skel aspect-[16/10] rounded-[1.75rem]"></div><div class="skel aspect-[16/10] rounded-[1.75rem] hidden sm:block"></div>
+                    </div>
 
                     <div id="news-pagination" class="mt-16 flex justify-center"></div>
+                </div>
+            </section>
+
+            <section id="page-news-detail" class="page-content hidden">
+                <div class="max-w-3xl mx-auto animate-fade-in pb-20">
+                    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-2 flex-wrap">
+                        <a href="#" data-page="home" class="hover:text-blue-600 transition-colors">หน้าแรก</a>
+                        <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                        <a href="#" data-page="news" class="hover:text-blue-600 transition-colors">ข่าวประชาสัมพันธ์</a>
+                        <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                        <span id="news-detail-breadcrumb-title" class="text-slate-500 truncate max-w-[200px]"></span>
+                    </nav>
+
+                    <div id="news-detail-image-wrap" class="rounded-[2rem] overflow-hidden bg-slate-100 aspect-video mb-6 hidden">
+                        <img id="news-detail-image" src="" alt="" class="w-full h-full object-cover hidden">
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap mb-3">
+                        <span id="news-detail-date" class="text-xs font-bold text-slate-400"></span>
+                        <span id="news-detail-year" class="hidden bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-full border border-indigo-100"></span>
+                    </div>
+                    <h1 id="news-detail-title" class="text-2xl md:text-3xl font-black text-slate-800 leading-snug mb-6"></h1>
+
+                    <a id="news-detail-readmore" href="#" target="_blank" rel="noopener"
+                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-lg transition-colors mb-12">
+                        อ่านข่าวเต็มที่แหล่งข่าว <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+
+                    <div id="news-detail-related-wrap" class="border-t border-slate-100 pt-8">
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">ข่าวที่เกี่ยวข้อง</h3>
+                        <div id="news-detail-related" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                    </div>
                 </div>
             </section>
             <section id="page-teacher-achievements" class="page-content hidden">
