@@ -1559,9 +1559,28 @@
                             </h2>
                             <p class="text-slate-500 mt-2">ภาพกิจกรรมและความประทับใจของโรงเรียน</p>
                         </div>
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="relative group">
+                                <div class="flex items-center w-full md:w-[260px] bg-white border border-slate-200 rounded-full shadow-sm focus-within:ring-4 focus-within:ring-pink-500/10 focus-within:border-pink-500 transition-all duration-300">
+                                    <i class="fa-solid fa-magnifying-glass text-slate-400 pl-5 pr-2"></i>
+                                    <input type="text" id="search-gallery" oninput="window.filterGallery()"
+                                        placeholder="ค้นหาชื่อกิจกรรม..."
+                                        class="w-full bg-transparent py-3 text-sm outline-none text-slate-700 placeholder:text-slate-400">
+                                </div>
+                            </div>
+                            <select id="filter-gallery-year" onchange="window.filterGallery()"
+                                class="bg-white border border-slate-200 rounded-full px-4 py-3 text-sm text-slate-600 font-semibold shadow-sm focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none cursor-pointer">
+                                <option value="">ทุกปีการศึกษา</option>
+                            </select>
+                            <select id="sort-gallery" onchange="window.filterGallery()"
+                                class="bg-white border border-slate-200 rounded-full px-4 py-3 text-sm text-slate-600 font-semibold shadow-sm focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none cursor-pointer">
+                                <option value="newest">ล่าสุดก่อน</option>
+                                <option value="name">เรียงตามชื่อ</option>
+                            </select>
+                        </div>
                     </div>
                     <div id="gallery-albums-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div class="col-span-3 text-center py-16 text-slate-300"><i class="fa-solid fa-images text-5xl mb-3 block"></i>กำลังโหลดแกลลอรี่...</div>
+                        <div class="skel aspect-[4/3] rounded-[2.5rem]"></div><div class="skel aspect-[4/3] rounded-[2.5rem]"></div><div class="skel aspect-[4/3] rounded-[2.5rem] hidden sm:block"></div>
                     </div>
                 </div>
             </section>

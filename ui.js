@@ -1320,7 +1320,8 @@ export function renderNewsTicker(newsList) {
 let allGalleryAlbums = [];
 
 export function renderHomeGallery(albums) {
-    allGalleryAlbums = albums || [];
+    // หมายเหตุ: ไม่ตั้งค่า allGalleryAlbums ที่นี่ — renderGalleryPage() เป็นเจ้าของ state ตัวนี้
+    // (รวมถึง populate ตัวเลือกปีการศึกษาของ filter) ไม่งั้น guard ของมันจะเข้าใจผิดว่าโหลดแล้ว
     const c = document.getElementById('home-gallery-container');
     if (!c) return;
     if (!albums || !albums.length) {
@@ -1340,7 +1341,7 @@ export function renderHomeGallery(albums) {
             class="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 block"
             style="height:100%;min-height:0">
             ${cover
-                ? `<img src="${cover}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" style="position:absolute;inset:0">`
+                ? `<img src="${cover}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" style="position:absolute;inset:0">`
                 : `<div class="w-full h-full bg-gradient-to-br ${grad} flex items-center justify-center" style="position:absolute;inset:0"><i class="fa-solid fa-images text-white text-2xl opacity-70"></i></div>`}
             <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent"></div>
             <div class="absolute bottom-0 left-0 right-0 p-2.5">
@@ -1354,12 +1355,47 @@ export function renderHomeGallery(albums) {
     }).join('');
 }
 
+function _populateGalleryYearFilter() {
+    const sel = document.getElementById('filter-gallery-year');
+    if (!sel) return;
+    const years = [...new Set(allGalleryAlbums.map(a => a.academic_year).filter(Boolean))].sort((a, b) => String(b).localeCompare(String(a), 'th', { numeric: true }));
+    sel.innerHTML = `<option value="">ทุกปีการศึกษา</option>` + years.map(y => `<option value="${y}">ปีการศึกษา ${y}</option>`).join('');
+}
+
+window.filterGallery = () => {
+    const val = document.getElementById('search-gallery')?.value.trim().toLowerCase() || '';
+    const yearFilter = document.getElementById('filter-gallery-year')?.value || '';
+    const sortBy = document.getElementById('sort-gallery')?.value || 'newest';
+
+    let filtered = allGalleryAlbums.filter(a => {
+        const textMatch = !val || `${a.title || ''} ${a.description || ''}`.toLowerCase().includes(val);
+        const yearMatch = !yearFilter || a.academic_year === yearFilter;
+        return textMatch && yearMatch;
+    });
+    filtered = sortBy === 'name'
+        ? filtered.slice().sort((a, b) => (a.title || '').localeCompare(b.title || '', 'th'))
+        : filtered.slice().sort((a, b) => new Date(b.event_date || 0) - new Date(a.event_date || 0));
+
+    _renderGalleryGrid(filtered);
+};
+
 export function renderGalleryPage(albums) {
-    allGalleryAlbums = albums || [];
+    if (allGalleryAlbums.length === 0 || (albums && albums.length > allGalleryAlbums.length)) {
+        allGalleryAlbums = albums || [];
+        _populateGalleryYearFilter();
+    }
+    _renderGalleryGrid(albums || allGalleryAlbums);
+}
+
+function _renderGalleryGrid(albums) {
     const c = document.getElementById('gallery-albums-container');
     if (!c) return;
+    if (allGalleryAlbums.length === 0) {
+        c.innerHTML = `<div class="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">${Array(6).fill('<div class="skel aspect-[4/3] rounded-[2.5rem]"></div>').join('')}</div>`;
+        return;
+    }
     if (!albums || !albums.length) {
-        c.innerHTML = `<div class="col-span-3 text-center py-20 text-slate-300"><i class="fa-solid fa-images text-5xl mb-3 block"></i><p>ยังไม่มีอัลบั้มภาพ</p></div>`;
+        c.innerHTML = `<div class="col-span-3 text-center py-20 bg-white/50 backdrop-blur rounded-[2.5rem] border border-dashed border-slate-200 text-slate-400 font-medium"><i class="fa-solid fa-images text-5xl mb-3 block opacity-50"></i>ไม่พบอัลบั้มที่ตรงกับเงื่อนไข</div>`;
         return;
     }
     const catColors = { academic:'from-blue-400 to-blue-600', activity:'from-emerald-400 to-emerald-600', sport:'from-orange-400 to-red-500', ceremony:'from-purple-400 to-indigo-600', other:'from-slate-400 to-slate-600' };
@@ -1384,7 +1420,7 @@ export function renderGalleryPage(albums) {
             class="group relative overflow-hidden rounded-[2.5rem] bg-white shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-100 block">
             <div class="relative aspect-[4/3] overflow-hidden">
                 ${cover
-                    ? `<img src="${cover}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">`
+                    ? `<img src="${cover}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">`
                     : `<div class="w-full h-full bg-gradient-to-br ${grad} flex items-center justify-center"><i class="fa-solid fa-images text-white text-5xl opacity-60"></i></div>`}
                 <div class="absolute top-3 left-3">
                     <span class="px-3 py-1 bg-white/90 backdrop-blur text-[10px] font-bold text-slate-600 rounded-full">${lbl}</span>
