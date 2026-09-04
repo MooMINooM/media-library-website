@@ -95,16 +95,51 @@ function setupMobileAccordion() {
     });
 }
 
-// ✅ Site search (quick jump ไปยังเมนู/หน้าต่าง ๆ)
-let _searchIndex = null;
-function buildSearchIndex() {
+// ✅ Site search — เมนู (static) + เนื้อหาจริง (ข่าว/เอกสาร/นวัตกรรม/บุคลากร/ผลงาน/กิจกรรม)
+const RECENT_SEARCH_KEY = 'site_recent_searches';
+let _menuIndex = null;
+let _contentIndex = [];
+
+function buildMenuIndex() {
     const seen = new Map();
     document.querySelectorAll('#main-nav [data-page], #mobile-menu [data-page]').forEach(el => {
         const pageId = el.getAttribute('data-page');
         const label = el.textContent.replace(/\s+/g, ' ').trim();
         if (pageId && label && !seen.has(pageId)) seen.set(pageId, label);
     });
-    return Array.from(seen, ([pageId, label]) => ({ pageId, label }));
+    return Array.from(seen, ([pageId, label]) => ({ category: 'เมนู', icon: 'fa-compass', label, sub: '', url: null, pageId }));
+}
+
+// เรียกจาก fetchAndRenderAll หลังโหลดข้อมูลแต่ละหมวด เพื่อสร้าง index สำหรับค้นหา
+function indexContentItems(category, icon, items, mapper) {
+    if (!items) return;
+    items.forEach(raw => {
+        const mapped = mapper(raw);
+        if (mapped && mapped.label) _contentIndex.push({ category, icon, sub: '', url: null, pageId: null, ...mapped });
+    });
+}
+
+function getRecentSearches() {
+    try { return JSON.parse(localStorage.getItem(RECENT_SEARCH_KEY)) || []; } catch { return []; }
+}
+function saveRecentSearch(q) {
+    if (!q || !q.trim()) return;
+    try {
+        const list = getRecentSearches().filter(x => x !== q);
+        list.unshift(q);
+        localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(list.slice(0, 5)));
+    } catch {}
+}
+
+function _escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+function _highlight(label, q) {
+    const safe = _escapeHtml(label);
+    if (!q) return safe;
+    const idx = safe.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1) return safe;
+    return safe.slice(0, idx) + `<mark class="bg-yellow-200 text-slate-900 rounded-sm">${safe.slice(idx, idx + q.length)}</mark>` + safe.slice(idx + q.length);
 }
 
 function setupSiteSearch() {
@@ -119,26 +154,83 @@ function setupSiteSearch() {
     });
 }
 
+function _goToSearchResult(item) {
+    saveRecentSearch(document.getElementById('site-search-input')?.value || '');
+    if (item.url) window.open(item.url, '_blank');
+    else if (item.pageId) navigateToPage(item.pageId);
+}
+
 function renderSearchResults(query) {
-    if (!_searchIndex) _searchIndex = buildSearchIndex();
+    if (!_menuIndex) _menuIndex = buildMenuIndex();
     const results = document.getElementById('site-search-results');
     if (!results) return;
     const q = query.trim().toLowerCase();
-    const matches = q
-        ? _searchIndex.filter(item => item.label.toLowerCase().includes(q)).slice(0, 8)
-        : _searchIndex.slice(0, 8);
 
-    if (matches.length === 0) {
-        results.innerHTML = `<p class="text-center text-sm text-slate-300 py-6">ไม่พบเมนูที่ตรงกับ "${query}"</p>`;
+    if (!q) {
+        const recent = getRecentSearches();
+        if (recent.length === 0) {
+            const items = _menuIndex.slice(0, 8);
+            results.innerHTML = items.map(item => `
+                <button type="button" class="search-result-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-slate-600 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid ${item.icon} text-[11px] text-slate-300 w-4 text-center"></i> ${_escapeHtml(item.label)}
+                </button>`).join('');
+            _bindResultButtons(results, items);
+        } else {
+            results.innerHTML = `<p class="px-3 pt-1 pb-2 text-[10px] font-black text-slate-300 uppercase tracking-widest">ค้นหาล่าสุด</p>` +
+                recent.map(term => `
+                <button type="button" data-recent="${_escapeHtml(term)}"
+                    class="search-result-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-slate-500 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-clock-rotate-left text-[11px] text-slate-300 w-4 text-center"></i> ${_escapeHtml(term)}
+                </button>`).join('');
+            results.querySelectorAll('[data-recent]').forEach(btn => btn.addEventListener('click', () => {
+                document.getElementById('site-search-input').value = btn.getAttribute('data-recent');
+                renderSearchResults(btn.getAttribute('data-recent'));
+            }));
+        }
         return;
     }
-    results.innerHTML = matches.map(item => `
-        <button type="button" data-goto="${item.pageId}"
-            class="search-result-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-slate-600 flex items-center gap-2 transition-colors">
-            <i class="fa-solid fa-arrow-right text-[10px] text-slate-300"></i> ${item.label}
-        </button>`).join('');
-    results.querySelectorAll('[data-goto]').forEach(btn => {
-        btn.addEventListener('click', () => navigateToPage(btn.getAttribute('data-goto')));
+
+    const all = [..._contentIndex, ..._menuIndex];
+    const matches = all.filter(item =>
+        item.label.toLowerCase().includes(q) || (item.sub && item.sub.toLowerCase().includes(q))
+    );
+
+    if (matches.length === 0) {
+        results.innerHTML = `<div class="empty-state"><i class="fa-solid fa-magnifying-glass text-2xl opacity-40"></i> ไม่พบข้อมูลที่ตรงกับ "${_escapeHtml(query)}"</div>`;
+        return;
+    }
+
+    // แยกผลลัพธ์ตามประเภท จำกัดหมวดละ 5 รายการ รวมไม่เกิน 20
+    const grouped = new Map();
+    for (const item of matches) {
+        if (!grouped.has(item.category)) grouped.set(item.category, []);
+        const arr = grouped.get(item.category);
+        if (arr.length < 5) arr.push(item);
+    }
+
+    let shown = 0;
+    let html = '';
+    const shownItems = [];
+    for (const [category, items] of grouped) {
+        if (shown >= 20) break;
+        html += `<p class="px-3 pt-3 pb-1 text-[10px] font-black text-slate-300 uppercase tracking-widest first:pt-1">${category}</p>`;
+        items.forEach(item => {
+            html += `<button type="button"
+                class="search-result-item w-full text-left px-3 py-2.5 rounded-lg text-sm text-slate-600 flex items-center gap-2 transition-colors">
+                <i class="fa-solid ${item.icon} text-[11px] text-slate-300 w-4 text-center shrink-0"></i>
+                <span class="flex-1 min-w-0"><span class="block truncate">${_highlight(item.label, q)}</span>${item.sub ? `<span class="block text-[11px] text-slate-400 truncate">${_escapeHtml(item.sub)}</span>` : ''}</span></button>`;
+            shownItems.push(item);
+            shown++;
+        });
+    }
+    results.innerHTML = html;
+    _bindResultButtons(results, shownItems);
+}
+
+// ผูก click handler ให้ปุ่มผลลัพธ์แต่ละอัน โดยอิงตำแหน่ง (order) เดียวกับตอน render
+function _bindResultButtons(container, items) {
+    container.querySelectorAll('.search-result-item').forEach((btn, i) => {
+        if (items[i]) btn.addEventListener('click', () => _goToSearchResult(items[i]));
     });
 }
 
@@ -162,7 +254,8 @@ window.closeSiteSearch = function () {
 
 // ✅ Data Fetching System
 async function fetchAndRenderAll() {
-    
+    _contentIndex = [];
+
     // 1. ข้อมูลโรงเรียน & ป๊อปอัพประกาศพิเศษ
     try {
         const { data: info, error } = await supabase.from('school_info').select('*').limit(1).single();
@@ -181,6 +274,7 @@ async function fetchAndRenderAll() {
             UI.renderHomeNews(news);
             UI.renderNews(news);
             UI.renderNewsTicker(news);
+            indexContentItems('ข่าว', 'fa-newspaper', news, n => ({ label: n.title, sub: n.date, url: n.link, pageId: 'news' }));
         }
     } catch (e) { console.warn("Load News Failed", e); }
 
@@ -230,6 +324,10 @@ async function fetchAndRenderAll() {
         UI.renderSchoolAchievements(allAcademic);
         UI.renderHomeAchievements(teachers, students, school);
 
+        indexContentItems('ผลงานครู', 'fa-medal', teachers, t => ({ label: t.students || t.name || t.title || 'เกียรติบัตร', sub: t.title, url: t.image || t.fileUrl, pageId: 'teacher-achievements' }));
+        indexContentItems('ผลงานนักเรียน', 'fa-trophy', students, s => ({ label: s.students || s.name || s.title || 'เกียรติบัตร', sub: s.title, url: s.image || s.fileUrl, pageId: 'student-achievements' }));
+        indexContentItems('ผลงานสถานศึกษา', 'fa-award', allAcademic, a => ({ label: a.title || a.name || 'เกียรติบัตร', sub: a.competition, url: a.image || a.fileUrl, pageId: 'school-achievements' }));
+
     } catch (e) { console.warn("Load Achievements Failed", e); }
 
     // 4. เอกสาร & นวัตกรรม
@@ -237,15 +335,20 @@ async function fetchAndRenderAll() {
         const { data: docs } = await supabase.from('documents').select('*');
         if(docs) {
             UI.renderDocumentsList(docs, 'documents-official-container', 'official');
+            indexContentItems('เอกสารราชการ', 'fa-file-pdf', docs, d => ({ label: d.title, sub: d.category, url: d.fileUrl, pageId: 'documents-official' }));
         }
 
         const { data: forms } = await supabase.from('forms').select('*');
         if(forms) {
             UI.renderDocumentsList(forms, 'documents-forms-container', 'form');
+            indexContentItems('แบบฟอร์ม', 'fa-file-lines', forms, f => ({ label: f.title, sub: f.category, url: f.fileUrl, pageId: 'documents-forms' }));
         }
 
         const { data: innov } = await supabase.from('innovations').select('*');
-        if(innov) UI.renderInnovations(innov);
+        if(innov) {
+            UI.renderInnovations(innov);
+            indexContentItems('นวัตกรรม', 'fa-lightbulb', innov, i => ({ label: i.title, sub: i.creator, url: i.fileUrl, pageId: 'innovations' }));
+        }
 
         UI.renderHomeMedia(docs, innov);
     } catch (e) { console.warn("Load Docs Failed", e); }
@@ -257,7 +360,10 @@ async function fetchAndRenderAll() {
         const { data: board } = await supabase.from('school_board').select('*');
         const { data: council } = await supabase.from('student_council').select('*');
         
-        if(personnel) UI.renderPersonGrid(personnel, 'personnel-list-container');
+        if(personnel) {
+            UI.renderPersonGrid(personnel, 'personnel-list-container');
+            indexContentItems('บุคลากร', 'fa-user-tie', personnel, p => ({ label: p.name, sub: p.role, pageId: 'personnel-list' }));
+        }
         if(board) UI.renderPersonGrid(board, 'school-board-container');
         if(council) UI.renderPersonGrid(council, 'student-council-container');
         if(p_history) UI.renderHistoryTable('personnel-history-table-body', p_history);
@@ -291,6 +397,7 @@ async function fetchAndRenderAll() {
         const { data: calEvents } = await supabase.from('calendar_events').select('*').order('start_date', { ascending: true });
         if (calEvents) {
             UI.renderCalendar(calEvents);
+            indexContentItems('กิจกรรม', 'fa-calendar-day', calEvents, e => ({ label: e.title, sub: e.start_date, pageId: 'calendar' }));
         }
     } catch (e) { console.warn("Load Calendar Failed", e); }
 
