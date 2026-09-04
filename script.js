@@ -38,7 +38,7 @@ function setupNavigation() {
                 if(link.classList.contains('nav-link')) link.classList.add('active');
             }
             const mobileMenu = document.getElementById('mobile-menu');
-            if(mobileMenu) mobileMenu.classList.add('hidden');
+            if(mobileMenu) mobileMenu.classList.remove('open');
         });
     });
 }
