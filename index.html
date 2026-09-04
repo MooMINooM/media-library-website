@@ -50,6 +50,18 @@
         /* ── Site search modal ── */
         #site-search-modal.flex { display: flex; }
         .search-result-item:hover, .search-result-item.is-highlighted { @apply bg-blue-50; }
+
+        /* ── Loading skeleton ── */
+        .skel { @apply bg-slate-100 rounded-lg relative overflow-hidden; }
+        .skel::after {
+            content: ''; position: absolute; inset: 0; transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+            animation: skel-shimmer 1.5s infinite;
+        }
+        @keyframes skel-shimmer { 100% { transform: translateX(100%); } }
+
+        /* ── Empty state ── */
+        .empty-state { @apply text-center py-10 text-slate-300 text-sm flex flex-col items-center gap-2; }
     </style>
 </head>
 
@@ -377,6 +389,14 @@
     <div class="container mx-auto p-4 md:p-8 flex-grow">
         <main id="main-content">
 
+            <!-- ===== CONNECTION ERROR BANNER ===== -->
+            <div id="connection-error-banner" class="hidden mb-5 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+                <p class="text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> เชื่อมต่อข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง</p>
+                <button onclick="location.reload()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> ลองใหม่
+                </button>
+            </div>
+
             <section id="page-home" class="page-content">
 
                 <!-- ===== NEWS TICKER ===== -->
@@ -515,8 +535,9 @@
                             </div>
                             <div id="home-news-container"
                                 class="space-y-4 h-full overflow-y-auto pr-2 custom-scrollbar relative z-10">
-                                <div class="text-center py-20 text-slate-300 text-sm font-light">กำลังโหลดข่าวสาร...
-                                </div>
+                                <div class="flex gap-4 p-4"><div class="skel w-20 h-14 rounded-xl shrink-0"></div><div class="flex-1 space-y-2 py-1"><div class="skel h-3.5 rounded w-4/5"></div><div class="skel h-2.5 rounded w-1/3"></div></div></div>
+                                <div class="flex gap-4 p-4"><div class="skel w-20 h-14 rounded-xl shrink-0"></div><div class="flex-1 space-y-2 py-1"><div class="skel h-3.5 rounded w-3/5"></div><div class="skel h-2.5 rounded w-1/3"></div></div></div>
+                                <div class="flex gap-4 p-4"><div class="skel w-20 h-14 rounded-xl shrink-0"></div><div class="flex-1 space-y-2 py-1"><div class="skel h-3.5 rounded w-4/6"></div><div class="skel h-2.5 rounded w-1/3"></div></div></div>
                             </div>
                         </div>
                     </div>
@@ -555,7 +576,8 @@
                             <div class="relative z-10 flex-1 overflow-y-auto">
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">กิจกรรมที่กำลังจะมาถึง</p>
                                 <div id="calendar-upcoming">
-                                    <p class="text-xs text-slate-300 text-center py-2">กำลังโหลด...</p>
+                                    <div class="flex items-center gap-2.5 py-1.5"><div class="skel w-8 h-8 rounded-xl shrink-0"></div><div class="flex-1 space-y-1.5"><div class="skel h-2.5 rounded w-3/4"></div><div class="skel h-2 rounded w-1/3"></div></div></div>
+                                    <div class="flex items-center gap-2.5 py-1.5"><div class="skel w-8 h-8 rounded-xl shrink-0"></div><div class="flex-1 space-y-1.5"><div class="skel h-2.5 rounded w-2/3"></div><div class="skel h-2 rounded w-1/3"></div></div></div>
                                 </div>
                             </div>
                         </div>
@@ -580,7 +602,7 @@
                         <!-- fixed height 340px, 2×2 grid ที่รูปแต่ละใบสูง calc(50%-4px) -->
                         <div id="home-gallery-container"
                             style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:340px;overflow:hidden">
-                            <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:13px">กำลังโหลดแกลลอรี่...</div>
+                            <div class="skel rounded-xl"></div><div class="skel rounded-xl"></div><div class="skel rounded-xl"></div><div class="skel rounded-xl"></div>
                         </div>
                     </div>
 
@@ -619,7 +641,7 @@
                         <button data-page-link="school-achievements" class="text-xs font-bold text-slate-400 hover:text-amber-600 transition flex items-center gap-1">ดูทั้งหมด <i class="fa-solid fa-arrow-right text-[9px]"></i></button>
                     </div>
                     <div id="home-achievements-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                        <div class="col-span-full text-center py-10 text-slate-300 text-sm font-light">กำลังโหลดผลงาน...</div>
+                        <div class="skel aspect-square rounded-2xl"></div><div class="skel aspect-square rounded-2xl"></div><div class="skel aspect-square rounded-2xl hidden sm:block"></div><div class="skel aspect-square rounded-2xl hidden lg:block"></div><div class="skel aspect-square rounded-2xl hidden lg:block"></div><div class="skel aspect-square rounded-2xl hidden lg:block"></div>
                     </div>
                 </div>
 
@@ -635,7 +657,7 @@
                         <button data-page-link="documents-official" class="text-xs font-bold text-slate-400 hover:text-teal-600 transition flex items-center gap-1">ดูทั้งหมด <i class="fa-solid fa-arrow-right text-[9px]"></i></button>
                     </div>
                     <div id="home-media-container" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div class="col-span-full text-center py-10 text-slate-300 text-sm font-light">กำลังโหลด...</div>
+                        <div class="skel aspect-[4/3] rounded-2xl"></div><div class="skel aspect-[4/3] rounded-2xl"></div><div class="skel aspect-[4/3] rounded-2xl hidden sm:block"></div><div class="skel aspect-[4/3] rounded-2xl hidden sm:block"></div>
                     </div>
                 </div>
             </section>
@@ -1427,32 +1449,70 @@
     </div>
     <audio id="school-song" loop></audio>
 
-    <footer class="bg-[#0f172a] text-slate-400 py-8 mt-auto border-t border-white/5 relative z-10">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
+    <footer class="bg-[#0f172a] text-slate-400 mt-auto border-t border-white/5 relative z-10">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-                <div class="flex items-center justify-center md:justify-start gap-4 order-2 md:order-1">
-                    <a id="footer-facebook" href="#" target="_blank"
-                        class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-base hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110 hidden">
-                        <i class="fa-brands fa-facebook-f"></i>
-                    </a>
-                    <a id="footer-youtube" href="#" target="_blank"
-                        class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-base hover:bg-red-600 hover:text-white transition-all transform hover:scale-110 hidden">
-                        <i class="fa-brands fa-youtube"></i>
-                    </a>
+                <!-- โรงเรียน -->
+                <div>
+                    <p id="footer-school-name" class="text-white font-bold text-base mb-2"></p>
+                    <p id="footer-motto" class="text-xs text-slate-400 leading-relaxed mb-4 hidden"></p>
+                    <div class="flex items-center gap-3">
+                        <a id="footer-facebook" href="#" target="_blank"
+                            class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-base hover:bg-blue-600 hover:text-white transition-all transform hover:scale-110 hidden">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a id="footer-youtube" href="#" target="_blank"
+                            class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-base hover:bg-red-600 hover:text-white transition-all transform hover:scale-110 hidden">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="text-center order-1 md:order-2">
-                    <p class="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] opacity-50">
-                        DEV BY KRUMIN | © 2025 ALL RIGHTS RESERVED.
+                <!-- ลิงก์ด่วน -->
+                <div>
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-widest mb-4">ลิงก์ด่วน</p>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" data-page="news" class="hover:text-white transition-colors">ข่าวประชาสัมพันธ์</a></li>
+                        <li><a href="#" data-page="calendar" class="hover:text-white transition-colors">ปฏิทินกิจกรรม</a></li>
+                        <li><a href="#" data-page="gallery" class="hover:text-white transition-colors">แกลลอรี่ภาพ</a></li>
+                        <li><a href="#" data-page="documents-official" class="hover:text-white transition-colors">เอกสารราชการ</a></li>
+                        <li><a href="#" data-page="documents-forms" class="hover:text-white transition-colors">แบบฟอร์มต่าง ๆ</a></li>
+                    </ul>
+                </div>
+
+                <!-- เกี่ยวกับเรา -->
+                <div>
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-widest mb-4">เกี่ยวกับเรา</p>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" data-page="school-basic" class="hover:text-white transition-colors">ข้อมูลพื้นฐาน</a></li>
+                        <li><a href="#" data-page="personnel-list" class="hover:text-white transition-colors">บุคลากรปัจจุบัน</a></li>
+                        <li><a href="#" data-page="students" class="hover:text-white transition-colors">ข้อมูลนักเรียน</a></li>
+                        <li><a href="#" data-page="innovations" class="hover:text-white transition-colors">นวัตกรรม</a></li>
+                        <li><a href="#" data-page="school-achievements" class="hover:text-white transition-colors">ผลงานสถานศึกษา</a></li>
+                    </ul>
+                </div>
+
+                <!-- ติดต่อเรา -->
+                <div>
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-widest mb-4">ติดต่อเรา</p>
+                    <p id="footer-address" class="text-sm leading-relaxed flex items-start gap-2 hidden">
+                        <i class="fa-solid fa-location-dot mt-0.5 text-slate-500"></i> <span></span>
                     </p>
                 </div>
 
-                <div class="hidden md:flex justify-end order-3">
-                    <p id="footer-school-name"
-                        class="text-[9px] font-black uppercase opacity-20 tracking-[0.2em] truncate max-w-[200px]"></p>
-                </div>
+            </div>
 
+            <div class="h-px bg-white/5 my-8"></div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
+                    DEV BY KRUMIN | © 2025 ALL RIGHTS RESERVED.
+                </p>
+                <button onclick="document.getElementById('login-modal').classList.remove('hidden')"
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-30 hover:opacity-60 transition">
+                    ผู้ดูแลระบบ
+                </button>
             </div>
         </div>
     </footer>

@@ -70,6 +70,13 @@ function getSubjectBadge(subject) {
 // =============================================================================
 // 2. SCHOOL INFO & MEDIA RENDERER
 // =============================================================================
+function _showEmptyVtr(placeholderEl) {
+    placeholderEl.innerHTML = `
+        <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center">
+            <i class="fa-solid fa-video-slash text-xl opacity-50"></i>
+        </div>
+        <p class="font-light tracking-widest text-xs uppercase">ยังไม่มีวิดีโอแนะนำ</p>`;
+}
 
 export function renderSchoolInfo(dataList) {
     if (!dataList) return;
@@ -89,6 +96,18 @@ export function renderSchoolInfo(dataList) {
     if (heroMottoEl && heroTagline) {
         heroMottoEl.innerText = heroTagline;
         heroMottoEl.classList.remove('hidden');
+    }
+
+    const footerMottoEl = document.getElementById('footer-motto');
+    if (footerMottoEl && heroTagline) {
+        footerMottoEl.innerText = heroTagline;
+        footerMottoEl.classList.remove('hidden');
+    }
+
+    const footerAddressEl = document.getElementById('footer-address');
+    if (footerAddressEl && info.address) {
+        footerAddressEl.querySelector('span').innerText = info.address;
+        footerAddressEl.classList.remove('hidden');
     }
 
     const mapping = {
@@ -154,6 +173,7 @@ export function renderSchoolInfo(dataList) {
     }
 
     // VTR Logic
+    const vtrPlaceholder = document.getElementById('vtr-placeholder');
     if (info.vtr_url && document.getElementById('vtr-iframe')) {
         let videoId = "";
         try {
@@ -163,8 +183,12 @@ export function renderSchoolInfo(dataList) {
         } catch (e) { }
         if (videoId) {
             document.getElementById('vtr-iframe').src = `https://www.youtube.com/embed/${videoId}`;
-            if (document.getElementById('vtr-placeholder')) document.getElementById('vtr-placeholder').classList.add('hidden');
+            if (vtrPlaceholder) vtrPlaceholder.classList.add('hidden');
+        } else if (vtrPlaceholder) {
+            _showEmptyVtr(vtrPlaceholder);
         }
+    } else if (vtrPlaceholder) {
+        _showEmptyVtr(vtrPlaceholder);
     }
 
     // School Song
@@ -748,7 +772,12 @@ export function renderStudentChart(data) {
 }
 
 export function renderHomeNews(newsList) {
-    const c = document.getElementById('home-news-container'); if (!c) return; c.innerHTML = '';
+    const c = document.getElementById('home-news-container'); if (!c) return;
+    if (!newsList || newsList.length === 0) {
+        c.innerHTML = `<div class="empty-state h-full justify-center"><i class="fa-regular fa-newspaper text-2xl opacity-50"></i> ยังไม่มีข่าวประชาสัมพันธ์</div>`;
+        return;
+    }
+    c.innerHTML = '';
     // ✅ เปลี่ยนมาใช้ formatDateThai ในหน้าแรกด้วย
     [...newsList].sort((a, b) => b.id - a.id).slice(0, 4).forEach(n => { c.innerHTML += `<div class="p-4 border-b border-slate-50 flex gap-4 hover:bg-white/80 cursor-pointer transition rounded-2xl group" onclick="window.open('${n.link || '#'}', '_blank')"><div class="w-20 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0">${n.image ? `<img src="${n.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">` : ''}</div><div class="flex-1 min-w-0 py-0.5"><h4 class="text-sm font-bold text-slate-700 line-clamp-1 group-hover:text-blue-600 transition-colors">${n.title}</h4><p class="text-[10px] font-black text-slate-400 uppercase mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block mr-1"></span> ${formatDateThai(n.date)}</p></div></div>`; });
 }
@@ -970,7 +999,11 @@ export function renderNewsTicker(newsList) {
     // ถ้า admin ตั้ง ticker_text ไว้แล้วใน school_info ให้ข้ามขั้นตอนนี้
     if (window._adminTickerText) return;
     const ticker = document.getElementById('ticker-content');
-    if (!ticker || !newsList || !newsList.length) return;
+    if (!ticker) return;
+    if (!newsList || !newsList.length) {
+        ticker.innerHTML = `<span class="inline-flex items-center gap-2"><i class="fa-solid fa-circle text-[6px] opacity-60"></i> ยังไม่มีข่าวประชาสัมพันธ์</span>`;
+        return;
+    }
     const items = [...newsList].sort((a,b) => b.id - a.id).slice(0, 8);
     const singleHtml = items.map(n =>
         `<span class="inline-flex items-center gap-2 mr-12"><i class="fa-solid fa-circle text-[6px] opacity-60"></i> ${n.title}</span>`

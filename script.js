@@ -18,8 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileAccordion();
     setupSiteSearch();
     setActiveLink('home');
-    if(supabase) fetchAndRenderAll();
+    if (supabase) fetchAndRenderAll();
+    else showConnectionError();
 });
+
+function showConnectionError() {
+    const banner = document.getElementById('connection-error-banner');
+    if (banner) banner.classList.remove('hidden');
+}
 
 // ✅ Navigation System
 function setupNavigation() {
@@ -159,13 +165,14 @@ async function fetchAndRenderAll() {
     
     // 1. ข้อมูลโรงเรียน & ป๊อปอัพประกาศพิเศษ
     try {
-        const { data: info } = await supabase.from('school_info').select('*').limit(1).single();
+        const { data: info, error } = await supabase.from('school_info').select('*').limit(1).single();
+        if (error) throw error;
         if(info) {
             UI.renderSchoolInfo(info);
             UI.renderAnnouncement(info);
             UI.renderFacebookFeed(info);
         }
-    } catch (e) { console.warn("Load School Info Failed", e); }
+    } catch (e) { console.warn("Load School Info Failed", e); showConnectionError(); }
 
     // 2. ข่าวสาร
     try {
