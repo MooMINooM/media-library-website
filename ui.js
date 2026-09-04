@@ -1072,10 +1072,21 @@ console.log("Lumina Final Super Full Version: Connected with Maps, Colors & Anno
 let calendarEventsData = [];
 let calendarCurrentDate = new Date();
 
+// ── ค่าที่ใช้ร่วมกันระหว่าง mini calendar / full calendar page / event modal ──
+const CAL_MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const CAL_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const CAL_TYPE_COLOR   = { academic: 'bg-blue-500',    activity: 'bg-emerald-500',    holiday: 'bg-red-500',    exam: 'bg-amber-500',    other: 'bg-slate-400' };
+const CAL_TYPE_BG      = { academic: 'bg-blue-50 text-blue-600', activity: 'bg-emerald-50 text-emerald-600', holiday: 'bg-red-50 text-red-600', exam: 'bg-amber-50 text-amber-600', other: 'bg-slate-50 text-slate-500' };
+const CAL_TYPE_BG_SOLID = { academic: 'bg-blue-100 text-blue-700', activity: 'bg-emerald-100 text-emerald-700', holiday: 'bg-red-100 text-red-700', exam: 'bg-amber-100 text-amber-700', other: 'bg-slate-100 text-slate-600' };
+const CAL_TYPE_ICON    = { academic: 'fa-book', activity: 'fa-star', holiday: 'fa-umbrella-beach', exam: 'fa-pen', other: 'fa-circle-dot' };
+const CAL_TYPE_LABEL   = { academic: 'วิชาการ', activity: 'กิจกรรม', holiday: 'วันหยุด', exam: 'สอบ', other: 'อื่นๆ' };
+function _calFmtShort(d) { return `${d.getDate()} ${CAL_MONTHS_SHORT[d.getMonth()]} ${d.getFullYear() + 543}`; }
+
 export function renderCalendar(events) {
     calendarEventsData = events || [];
     window._calendarEventsAll = calendarEventsData; // expose for full list
     renderMiniCalendar();
+    renderFullCalendarPage();
 }
 
 function renderMiniCalendar() {
@@ -1085,19 +1096,13 @@ function renderMiniCalendar() {
 
     const year = calendarCurrentDate.getFullYear();
     const month = calendarCurrentDate.getMonth();
-    const thMonths = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-    const thMonthsFull = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 
-    if (monthLabel) monthLabel.textContent = `${thMonthsFull[month]} ${year + 543}`;
+    if (monthLabel) monthLabel.textContent = `${CAL_MONTHS_FULL[month]} ${year + 543}`;
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
-
-    const typeColors = {
-        academic: 'bg-blue-500', activity: 'bg-emerald-500',
-        holiday: 'bg-red-500', exam: 'bg-amber-500', other: 'bg-slate-400'
-    };
+    const typeColors = CAL_TYPE_COLOR;
 
     // Build event map by date
     const eventMap = {};
@@ -1140,24 +1145,20 @@ function renderMiniCalendar() {
             .sort((a,b) => new Date(a.start_date)-new Date(b.start_date))
             .slice(0, 3);
 
-        const typeIcons = { academic:'fa-book', activity:'fa-star', holiday:'fa-umbrella-beach', exam:'fa-pen', other:'fa-circle-dot' };
-        const typeBg = { academic:'bg-blue-50 text-blue-600', activity:'bg-emerald-50 text-emerald-600', holiday:'bg-red-50 text-red-600', exam:'bg-amber-50 text-amber-600', other:'bg-slate-50 text-slate-500' };
-
         if (upcoming.length === 0) {
             upcomingEl.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">ไม่มีกิจกรรมที่กำลังจะมาถึง</p>`;
         } else {
             upcomingEl.innerHTML = upcoming.map(e => {
                 const d = new Date(e.start_date);
-                const thM = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-                const color = typeBg[e.type] || typeBg.other;
-                const icon = typeIcons[e.type] || 'fa-circle-dot';
+                const color = CAL_TYPE_BG[e.type] || CAL_TYPE_BG.other;
+                const icon = CAL_TYPE_ICON[e.type] || 'fa-circle-dot';
                 return `<div class="flex items-center gap-2.5 py-1.5">
                     <div class="w-8 h-8 rounded-xl ${color} flex flex-col items-center justify-center flex-shrink-0 text-center">
                         <i class="fa-solid ${icon} text-[10px]"></i>
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="text-xs font-bold text-slate-700 truncate">${e.title}</p>
-                        <p class="text-[10px] text-slate-400">${d.getDate()} ${thM[d.getMonth()]} ${d.getFullYear()+543}</p>
+                        <p class="text-[10px] text-slate-400">${_calFmtShort(d)}</p>
                     </div>
                 </div>`;
             }).join('');
@@ -1165,31 +1166,118 @@ function renderMiniCalendar() {
     }
 }
 
+// ── หน้าปฏิทินแบบเต็ม (month view + list view คู่กัน) ──
+function renderFullCalendarPage() {
+    const grid = document.getElementById('cal-page-grid');
+    const monthLabel = document.getElementById('cal-page-month-label');
+    if (!grid) return; // ยังไม่ได้เปิดหน้าปฏิทิน ไม่ต้อง render
+
+    const year = calendarCurrentDate.getFullYear();
+    const month = calendarCurrentDate.getMonth();
+    if (monthLabel) monthLabel.textContent = `${CAL_MONTHS_FULL[month]} ${year + 543}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+
+    const eventMap = {};
+    calendarEventsData.forEach(ev => {
+        const d = ev.start_date ? ev.start_date.split('T')[0] : null;
+        if (!d) return;
+        if (!eventMap[d]) eventMap[d] = [];
+        eventMap[d].push(ev);
+    });
+
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += `<div></div>`;
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+        const evs = eventMap[dateStr] || [];
+        const chips = evs.slice(0, 2).map(e => `<span class="block truncate text-[9px] font-bold px-1 py-0.5 rounded ${CAL_TYPE_BG[e.type] || CAL_TYPE_BG.other}">${e.title}</span>`).join('');
+        const more = evs.length > 2 ? `<span class="block text-[9px] text-slate-400 px-1">+${evs.length - 2} เพิ่มเติม</span>` : '';
+        html += `<div class="min-h-[64px] p-1 rounded-lg border border-slate-50 ${evs.length ? 'cursor-pointer hover:bg-slate-50' : ''} transition"
+            ${evs.length ? `onclick="window.showCalendarEvent('${dateStr}')"` : ''}>
+            <span class="text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full ${isToday ? 'bg-indigo-600 text-white' : 'text-slate-600'}">${day}</span>
+            <div class="mt-0.5 space-y-0.5">${chips}${more}</div>
+        </div>`;
+    }
+    grid.innerHTML = html;
+
+    renderFullCalendarList();
+}
+
+// ── รายการกิจกรรมของเดือนที่กำลังดู (รองรับ filter ตามหมวด) ──
+function renderFullCalendarList() {
+    const listEl = document.getElementById('calendar-full-list');
+    const titleEl = document.getElementById('cal-list-title');
+    if (!listEl) return;
+
+    const year = calendarCurrentDate.getFullYear();
+    const month = calendarCurrentDate.getMonth();
+    const typeFilter = document.getElementById('cal-filter-type')?.value || '';
+
+    let events = calendarEventsData.filter(e => {
+        if (!e.start_date) return false;
+        const d = new Date(e.start_date);
+        return d.getFullYear() === year && d.getMonth() === month;
+    });
+    if (typeFilter) events = events.filter(e => e.type === typeFilter);
+    events = events.slice().sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-list-ul text-indigo-400 text-sm"></i> กิจกรรมเดือน${CAL_MONTHS_FULL[month]} <span class="text-slate-400 font-normal">(${events.length})</span>`;
+
+    if (events.length === 0) {
+        listEl.innerHTML = `<div class="empty-state py-14"><i class="fa-regular fa-calendar text-2xl opacity-40"></i> ไม่มีกิจกรรมในเดือนนี้${typeFilter ? 'สำหรับหมวดที่เลือก' : ''}</div>`;
+        return;
+    }
+
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    listEl.innerHTML = events.map(e => {
+        const d = new Date(e.start_date);
+        const isPast = d < today;
+        const dateStr = e.start_date.split('T')[0];
+        return `<div class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition ${isPast ? 'opacity-50' : ''}" onclick="window.showCalendarEvent('${dateStr}')">
+            <div class="w-11 h-11 rounded-xl ${CAL_TYPE_BG[e.type] || CAL_TYPE_BG.other} flex flex-col items-center justify-center flex-shrink-0">
+                <span class="text-sm font-black leading-none">${d.getDate()}</span>
+                <span class="text-[9px] font-bold leading-none mt-0.5">${CAL_MONTHS_SHORT[d.getMonth()]}</span>
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-bold text-slate-700 truncate">${e.title}</p>
+                ${e.location ? `<p class="text-[11px] text-slate-400 truncate mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${e.location}</p>` : ''}
+            </div>
+            <span class="text-[10px] font-bold px-2 py-1 rounded-full ${CAL_TYPE_BG[e.type] || CAL_TYPE_BG.other} flex-shrink-0">${CAL_TYPE_LABEL[e.type] || 'อื่นๆ'}</span>
+        </div>`;
+    }).join('');
+}
+window.renderFullCalendarList = renderFullCalendarList;
+
 window.calendarPrev = function() {
     calendarCurrentDate = new Date(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth()-1, 1);
     renderMiniCalendar();
+    renderFullCalendarPage();
 };
 window.calendarNext = function() {
     calendarCurrentDate = new Date(calendarCurrentDate.getFullYear(), calendarCurrentDate.getMonth()+1, 1);
     renderMiniCalendar();
+    renderFullCalendarPage();
 };
 window._calCurrentDate = function() { return new Date(calendarCurrentDate); };
 window.showCalendarEvent = function(dateStr) {
     const evs = calendarEventsData.filter(e => e.start_date && e.start_date.split('T')[0] === dateStr);
     if (!evs.length) return;
-    const typeLabel = { academic:'วิชาการ', activity:'กิจกรรม', holiday:'วันหยุด', exam:'สอบ', other:'อื่นๆ' };
-    const typeBg = { academic:'bg-blue-100 text-blue-700', activity:'bg-emerald-100 text-emerald-700', holiday:'bg-red-100 text-red-700', exam:'bg-amber-100 text-amber-700', other:'bg-slate-100 text-slate-600' };
     const d = new Date(dateStr);
-    const thM = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
     let html = `<div class="space-y-3">`;
     evs.forEach(e => {
-        const lbl = typeLabel[e.type] || 'อื่นๆ';
-        const clr = typeBg[e.type] || typeBg.other;
+        const lbl = CAL_TYPE_LABEL[e.type] || 'อื่นๆ';
+        const clr = CAL_TYPE_BG_SOLID[e.type] || CAL_TYPE_BG_SOLID.other;
+        const endDate = e.end_date && e.end_date.split('T')[0] !== dateStr ? new Date(e.end_date) : null;
         html += `<div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
             <div class="flex items-start gap-3">
                 <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${clr} flex-shrink-0 mt-0.5">${lbl}</span>
-                <div>
+                <div class="min-w-0">
                     <p class="font-bold text-slate-800 text-sm">${e.title}</p>
+                    ${endDate ? `<p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-clock mr-1"></i>${_calFmtShort(d)} – ${_calFmtShort(endDate)}</p>` : ''}
                     ${e.description ? `<p class="text-xs text-slate-500 mt-1">${e.description}</p>` : ''}
                     ${e.location ? `<p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${e.location}</p>` : ''}
                 </div>
@@ -1201,7 +1289,7 @@ window.showCalendarEvent = function(dateStr) {
     const modalTitle = document.getElementById('calendar-modal-title');
     const modalBody = document.getElementById('calendar-modal-body');
     if (modal) {
-        if (modalTitle) modalTitle.textContent = `${d.getDate()} ${thM[d.getMonth()]} ${d.getFullYear()+543}`;
+        if (modalTitle) modalTitle.textContent = _calFmtShort(d);
         if (modalBody) modalBody.innerHTML = html;
         modal.classList.remove('hidden');
     }

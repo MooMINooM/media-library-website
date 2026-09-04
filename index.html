@@ -1497,9 +1497,9 @@
                             <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6">
                                 <!-- Calendar Header -->
                                 <div class="flex items-center justify-between mb-4">
-                                    <button onclick="window.calendarPrev(); window.renderFullCalendarList()" class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-400 flex items-center justify-center transition text-sm"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button onclick="window.calendarPrev()" class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-400 flex items-center justify-center transition text-sm"><i class="fa-solid fa-chevron-left"></i></button>
                                     <span id="cal-page-month-label" class="text-base font-bold text-slate-700"></span>
-                                    <button onclick="window.calendarNext(); window.renderFullCalendarList()" class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-400 flex items-center justify-center transition text-sm"><i class="fa-solid fa-chevron-right"></i></button>
+                                    <button onclick="window.calendarNext()" class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 text-slate-400 flex items-center justify-center transition text-sm"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
                                 <!-- Day headers -->
                                 <div class="grid grid-cols-7 text-center mb-2">
@@ -1525,11 +1525,22 @@
                         <!-- Event List Panel -->
                         <div class="lg:col-span-7">
                             <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 h-full">
-                                <h3 id="cal-list-title" class="font-bold text-slate-700 text-base mb-4 flex items-center gap-2">
-                                    <i class="fa-solid fa-list-ul text-indigo-400 text-sm"></i> กิจกรรมทั้งหมด
-                                </h3>
-                                <div id="calendar-full-list" class="space-y-2 max-h-[520px] overflow-y-auto pr-1">
-                                    <div class="text-center py-10 text-slate-300 text-sm">กำลังโหลด...</div>
+                                <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                                    <h3 id="cal-list-title" class="font-bold text-slate-700 text-base flex items-center gap-2">
+                                        <i class="fa-solid fa-list-ul text-indigo-400 text-sm"></i> กิจกรรมทั้งหมด
+                                    </h3>
+                                    <select id="cal-filter-type" onchange="window.renderFullCalendarList()"
+                                        class="bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 text-xs text-slate-600 font-semibold outline-none cursor-pointer">
+                                        <option value="">ทุกประเภท</option>
+                                        <option value="academic">วิชาการ</option>
+                                        <option value="activity">กิจกรรม</option>
+                                        <option value="exam">สอบ</option>
+                                        <option value="holiday">วันหยุด</option>
+                                        <option value="other">อื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div id="calendar-full-list" class="space-y-1 max-h-[520px] overflow-y-auto pr-1">
+                                    <div class="skel h-14 rounded-xl mb-2"></div><div class="skel h-14 rounded-xl mb-2"></div><div class="skel h-14 rounded-xl"></div>
                                 </div>
                             </div>
                         </div>
